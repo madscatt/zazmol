@@ -5,7 +5,6 @@
     conditions; see http://www.gnu.org/licenses/gpl-3.0.html for details.
 '''
 import os,sys
-from distutils.core import setup
 from distutils      import sysconfig
 from numpy.distutils.core import Extension, setup
 

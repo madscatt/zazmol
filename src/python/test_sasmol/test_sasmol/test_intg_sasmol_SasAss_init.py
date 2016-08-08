@@ -39,7 +39,6 @@ class Test_intg_sasmol_SasAss_init(MockerTestCase):
       self.assertEqual(o.mass(),None)
       self.assertEqual(o.coor(),None)
       self.assertEqual(o.com(),None)
-      self.assertEqual(o.name(),'Ass_None')
 
    def tearDown(self):
       pass

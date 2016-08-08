@@ -21,8 +21,6 @@ from unittest import main
 from mocker import Mocker, MockerTestCase, ANY, ARGS, KWARGS
 
 import sasmol.sasmol as sasmol
-import sasmol.sasop as sasop
-import sasmol.sascalc as sascalc
 
 import numpy, os, copy
 

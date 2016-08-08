@@ -35,7 +35,7 @@ class Test_intg_sasmol_SasSys_systype(MockerTestCase):
       #
       id=3
       systype='atomic'
-      o=sasmol.SasSys(id,systype)
+      o=sasmol.SasSys(id,systype='atomic')
       self.assertEqual(o.id(),id)
       self.assertEqual(o.systype(),systype)
 

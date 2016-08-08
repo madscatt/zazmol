@@ -20,7 +20,6 @@ from sasmol.test_sasmol.util import env, util
 from unittest import main, skipIf
 from mocker import Mocker, MockerTestCase, ANY, ARGS, KWARGS
 import sasmol.sasmol as sasmol
-import sasmol.sascalc as sascalc
 
 import numpy
 
@@ -28,7 +27,7 @@ import os
 
 DataPath = os.path.join(os.path.dirname(os.path.realpath(__file__)),'..','data','pdb_common')+os.path.sep
 
-class Test_sascalc_Prop_calcmass(MockerTestCase): 
+class Test_calculate_Prop_calcmass(MockerTestCase): 
 
     def setUp(self):
         self.o=sasmol.SasMol(0)

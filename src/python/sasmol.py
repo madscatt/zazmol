@@ -44,6 +44,7 @@ from __future__ import print_function
 '''
 
 import sys
+import os
 import sasmol.sasio as sasio
 import sasmol.calculate as calculate
 import sasmol.operate as operate
@@ -68,8 +69,11 @@ class SasAtm(sasio.Files, calculate.Calculate, operate.Move, sassubset.Mask, sas
 
     '''
 
-    def __init__(self, **kwargs):
-   
+    def __init__(self, *args, **kwargs):
+  
+#        print(args)
+#        print(kwargs)
+          
         #kwargs.setdefault('filename', None)
         #kwargs.setdefault('id', 0)
         #kwargs.setdefault('debug', False)
@@ -77,12 +81,6 @@ class SasAtm(sasio.Files, calculate.Calculate, operate.Move, sassubset.Mask, sas
         self._filename = kwargs.pop('filename', None)
         self._id = kwargs.pop('id', 0)
         self._debug = kwargs.pop('debug', None)
-
-    #def __init__(self, id=None, debug=None, filename=None):
-
-    #    self._id = id
-    #    self._debug = debug
-    #    self._filename = filename
 
         self._total_mass = 0.0
         self._natoms = 0
@@ -93,9 +91,37 @@ class SasAtm(sasio.Files, calculate.Calculate, operate.Move, sassubset.Mask, sas
 
         if sasconfig.__logging_level__ == 'DEBUG':
             self._debug = True
+
+        self._defined_with_input_file = False
+        argument_flag = True
+        try:
+            for argument in args:
+                if(os.path.isfile(str(argument))):
+                    try:
+                        self.read_pdb(argument)
+                        argument_flag = False
+                        self._defined_with_input_file = True
+                    except:
+                        pass
+                else:
+                    self._id = argument
+        except:
+            argument_flag = False
+
+        if self._filename and argument_flag:
+            try:
+                self.read_pdb(self._filename)
+                self._defined_with_input_file = True
+            except:
+                pass
+
+        ### IS THE FOLLOWING LINE NEEDED? ###
+
+        self.setId(self._id) 
+
                                                     
     def __repr__(self):
-        if self._filename:
+        if self._filename and self._defined_with_input_file:
             return "sasmol object initialied with filename = " + self._filename
         else:
             return "sasmol object"
@@ -571,8 +597,8 @@ class SasMol(SasAtm):
 
 # OPEN	If you load a molecule it doesn't check to see if it IS an molecule
 
-    def __init__(self, **kwargs):
-        SasAtm.__init__(self, **kwargs)
+    def __init__(self, *args, **kwargs):
+        SasAtm.__init__(self, *args, **kwargs)
 
     def molcharge(self):
         pass
@@ -595,10 +621,10 @@ class SasAss(SasMol):
 
 # OPEN	If you load an assembly it doesn't check to see if it IS an assembly
 
-    def __init__(self, **kwargs):
-        SasMol.__init__(self, **kwargs)
+    def __init__(self, *args, **kwargs):
+        SasMol.__init__(self, *args, **kwargs)
 
-class SasSol(object):
+class SasSol(SasMol):
 
     '''
     SasSol is a class used to describe a geometric object in the
@@ -607,8 +633,8 @@ class SasSol(object):
     shape.
     '''
 
-    def __init__(self, **kwargs):
-        pass
+    def __init__(self, *args, **kwargs):
+        SasMol.__init__(self, *args, **kwargs)
 
 class SasHybrid(SasMol):
 
@@ -618,10 +644,10 @@ class SasHybrid(SasMol):
     alone.
     '''
 
-    def __init__(self, **kwargs):
-        pass
+    def __init__(self, *args, **kwargs):
+        SasMol.__init__(self, *args, **kwargs)
 
-class SasSys():
+class SasSys(SasMol):
 
     '''
     SasSys is a class that is used to describe a complete system.
@@ -637,10 +663,11 @@ class SasSys():
         a=sasmol.SasSys(id,systype='hybrid') 	# creates a mixed atomic and solid system
 
     '''
-    def __init__(self, **kwargs):
-        self._id = kwargs.pop('id', 0)
-        self._systype = kwargs.pop('systype', 0)
+    def __init__(self, *args, **kwargs):
+        SasMol.__init__(self, *args, **kwargs)
+        self._systype = kwargs.pop('systype',"atomic")
 
+    
   #  def __init__(self, id, systype='atomic'):
   #      self._id = id
   #      if(systype == 'atomic' or systype == None):

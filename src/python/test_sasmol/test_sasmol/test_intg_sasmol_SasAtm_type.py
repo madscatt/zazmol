@@ -30,8 +30,6 @@ import warnings; warnings.filterwarnings('ignore')
 floattype=os.environ['SASSIE_FLOATTYPE']
 
 import sasmol.sasmol as sasmol
-import sasmol.sasop as sasop
-import sasmol.sascalc as sascalc
 
 DataPath = os.path.join(os.path.dirname(os.path.realpath(__file__)),'..','data','sasmol','sasmol')+os.path.sep
 

@@ -22,7 +22,6 @@ from mocker import Mocker, MockerTestCase, ANY, ARGS
 
 import sasmol.sasmol as sasmol
 import sasmol.operate as operate
-import sasmol.sascalc as sascalc
 
 import numpy
 

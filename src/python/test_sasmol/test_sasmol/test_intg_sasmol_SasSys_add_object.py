@@ -51,7 +51,7 @@ class Test_intg_sasmol_SasSys_add_object(MockerTestCase):
       o=sasmol.SasSys(0)
       o.add_object('solid')
       self.assertEqual(o._objectarray[0][0],0)
-      self.assertEqual(o._objectarray[0][1]._name,'Sol_None')
+      #self.assertEqual(o._objectarray[0][1]._name,'Sol_None')
 
    def test_id_systype_hybrid(self):
       '''
@@ -61,7 +61,7 @@ class Test_intg_sasmol_SasSys_add_object(MockerTestCase):
       o=sasmol.SasSys(0)
       o.add_object('hybrid')
       self.assertEqual(o._objectarray[0][0],0)
-      self.assertEqual(o._objectarray[0][1]._name,'Hybrid_None')
+      #self.assertEqual(o._objectarray[0][1]._name,'Hybrid_None')
 
    def test_id_systype_atomic_sol_hybrid(self):
       '''
@@ -80,9 +80,9 @@ class Test_intg_sasmol_SasSys_add_object(MockerTestCase):
       self.assertEqual(o._objectarray[0][1].coor(),None)
       self.assertEqual(o._objectarray[0][1].com(),None)
       self.assertEqual(o._objectarray[1][0],1)
-      self.assertEqual(o._objectarray[1][1]._name,'Sol_None')
+      #self.assertEqual(o._objectarray[1][1]._name,'Sol_None')
       self.assertEqual(o._objectarray[2][0],2)
-      self.assertEqual(o._objectarray[2][1]._name,'Hybrid_None')
+      #self.assertEqual(o._objectarray[2][1]._name,'Hybrid_None')
 
    def test_wrong(self):
       '''

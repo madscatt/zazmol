@@ -22,8 +22,6 @@ import numpy,copy
 
 from sasmol.test_sasmol.util import env, util
 import sasmol.sasmol as sasmol
-import sasmol.sasop as sasop
-import sasmol.sascalc as sascalc
 
 import os
 

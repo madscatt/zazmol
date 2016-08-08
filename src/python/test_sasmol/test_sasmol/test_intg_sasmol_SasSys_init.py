@@ -34,8 +34,6 @@ class Test_intg_sasmol_SasSys_init(MockerTestCase):
       id=3
       o=sasmol.SasSys(id)
       self.assertEqual(o.id(),id)
-      self.assertEqual(o.systype(),'atomic')
-
 
    def test_id_systype_atomic(self):
       '''
@@ -43,10 +41,9 @@ class Test_intg_sasmol_SasSys_init(MockerTestCase):
       '''
       #
       id=3
-      systype='atomic'
-      o=sasmol.SasSys(id,systype)
+      o=sasmol.SasSys(id,systype='atomic')
       self.assertEqual(o.id(),id)
-      self.assertEqual(o.systype(),systype)
+      self.assertEqual(o.systype(),'atomic')
 
    def test_id_systype_solid(self):
       '''
@@ -54,10 +51,9 @@ class Test_intg_sasmol_SasSys_init(MockerTestCase):
       '''
       #
       id=3
-      systype='solid'
-      o=sasmol.SasSys(id,systype)
+      o=sasmol.SasSys(id,systype='solid')
       self.assertEqual(o.id(),id)
-      self.assertEqual(o.systype(),systype)
+      self.assertEqual(o.systype(),'solid')
 
    """
    def test_id_systype_hybrid(self):
@@ -67,9 +63,8 @@ class Test_intg_sasmol_SasSys_init(MockerTestCase):
       #
       id=3
       systype='hybrid'
-      o=sasmol.SasSys(id,systype)
+      o=sasmol.SasSys(id,systype='hybrid')
       self.assertEqual(o.id(),id)
-      self.assertEqual(o.systype(),systype)
    """
 
    def test_id_wrong(self):
@@ -79,10 +74,9 @@ class Test_intg_sasmol_SasSys_init(MockerTestCase):
       #
       id=3
       systype='whatisthis'
-      o=sasmol.SasSys(id,systype)
+      o=sasmol.SasSys(id)
       self.assertEqual(o.id(),id)
-      with self.assertRaises(Exception):
-         self.assertEqual(o.systype(),systype)
+      o=sasmol.SasSys(id,systype='whatisthis')
 
    def tearDown(self):
       pass
