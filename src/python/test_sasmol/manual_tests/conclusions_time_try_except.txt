@@ -1,0 +1,15 @@
+
+## grab a 200 frame dcd, duplicate frames to make larger files locally (remove when done)
+## timing for hiv1 gag protein 6730 atoms
+
+# frames  without with with(internal in library)
+200     0.04773 0.0522  0.062   0.033
+1000    0.2076  0.2263  0.229   0.214
+5000    1.0543  1.0290  1.215   1.100
+25000   5.8989  5.3016  5.768   5.467
+
+# conclusion: for small number of frames try/except slows things down, for larger numbers of frames it does not.
+
+# conclusion: adding a try/except in the library code doesn't seem to affect the timings ... maybe a little slower.
+
+
