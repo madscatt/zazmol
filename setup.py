@@ -13,6 +13,7 @@ from numpy.distutils.core import Extension, setup
 #
 #       12/01/2009      --      initial coding              :       jc
 #       11/05/2015      --      for sasmol distribution     :       jc
+#       08/08/2016      --      branched for refactoring    :       jc
 #
 #LC      1         2         3         4         5         6         7
 #LC4567890123456789012345678901234567890123456789012345678901234567890123456789
