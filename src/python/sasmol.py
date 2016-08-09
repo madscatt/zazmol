@@ -53,7 +53,7 @@ import sasmol.properties as properties
 import sasmol.topology as topology
 import sasmol.view as view
 
-import sasmol.sasconfig as sasconfig
+import sasmol.config as config
 
 class Error(Exception):
     pass
@@ -89,7 +89,7 @@ class SasAtm(sasio.Files, calculate.Calculate, operate.Move, sassubset.Mask, pro
         self._com = None
         self._conect = []
 
-        if sasconfig.__logging_level__ == 'DEBUG':
+        if config.__logging_level__ == 'DEBUG':
             self._debug = True
 
         self._defined_with_input_file = False

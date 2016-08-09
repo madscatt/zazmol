@@ -79,8 +79,7 @@ pprint.pprint(o.topology_info['ALA'],width=100)
 import os
 import numpy
 import copy
-import sasconfig as sasconfig
-
+import config as config
 
 class CharmmTopology(object):
 
@@ -380,7 +379,7 @@ class CharmmTopology(object):
         Patch N-ter for the first residue and C-ter for the last residue in each segment
         '''
         error = []
-        bin_path = sasconfig.__bin_path__
+        bin_path = config.__bin_path__
         self.read_charmm_topology(topology_file_path=bin_path + '/toppar/')
         self.setup_charmm_residue_atoms()
         self.initialize_children()

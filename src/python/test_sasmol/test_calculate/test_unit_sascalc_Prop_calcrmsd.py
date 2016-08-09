@@ -15,6 +15,7 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 '''
 
+import sasmol.test_sasmol.util as util
 from sasmol.test_sasmol.util import env, util
 
 from unittest import main 
