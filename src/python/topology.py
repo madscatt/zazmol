@@ -13,7 +13,7 @@
 #    You should have received a copy of the GNU General Public License
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
-#	SASPDBRX
+#	TOPOLOGY
 #
 #	1/26/2012	--	initial coding				: jc
 #	12/26/2015	--	refactored for release      : jc

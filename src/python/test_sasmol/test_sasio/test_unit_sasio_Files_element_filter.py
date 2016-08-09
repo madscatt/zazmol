@@ -36,9 +36,9 @@ import sasmol.sasmol as sasmol
 
 import os, sys, string
 
-# This data for atomic properties are stored under sasproperties folder
+# This data for atomic properties are stored under properties folder
 
-DataPath = os.path.join(os.path.dirname(os.path.realpath(__file__)),'..','data','sasmol','sasproperties')+os.path.sep
+DataPath = os.path.join(os.path.dirname(os.path.realpath(__file__)),'..','data','sasmol','properties')+os.path.sep
 
 class Test_unit_sasio_Files_element_filter(MockerTestCase):
 

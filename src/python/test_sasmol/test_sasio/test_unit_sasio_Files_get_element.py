@@ -38,7 +38,7 @@ import os
 
 # This data for atomic properties are stored under sasproperties folder
 
-DataPath = os.path.join(os.path.dirname(os.path.realpath(__file__)),'..','data','sasmol','sasproperties')+os.path.sep
+DataPath = os.path.join(os.path.dirname(os.path.realpath(__file__)),'..','data','sasmol','properties')+os.path.sep
 
 class Test_unit_sasio_Files_get_elements(MockerTestCase):
 

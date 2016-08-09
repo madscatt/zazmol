@@ -27,7 +27,6 @@
         chemical formula parsing, etc.
 '''
 
-#import sasmol.sasproperties as sasproperties
 import string
 
 

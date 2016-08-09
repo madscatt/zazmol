@@ -34,10 +34,10 @@ import sasmol.sasmol as sasmol
 
 import os
 
-DataPath = os.path.join(os.path.dirname(os.path.realpath(__file__)),'..','data','sasmol','sasproperties')+os.path.sep
+DataPath = os.path.join(os.path.dirname(os.path.realpath(__file__)),'..','data','sasmol','properties')+os.path.sep
 
 
-class Test_unit_sasproperties_Atomic_charmm_names(MockerTestCase):
+class Test_unit_properties_Atomic_charmm_names(MockerTestCase):
 
    def setUp(self):
       self.o=sasmol.SasMol(0)
