@@ -18,7 +18,7 @@
 from sasmol.test_sasmol.util import env
 
 """
-Integration test for sasio.sassubset.Mask.get_dihedral_subset_mask
+Integration test for sasio.subset.Mask.get_dihedral_subset_mask
 
 contract:
 
@@ -52,14 +52,14 @@ from unittest import main,skipIf
 from mocker import Mocker, MockerTestCase, ARGS
 
 import sasmol.sasmol as sasmol
-import sasmol.sassubset as sassubset
+import sasmol.subset as subset
 import numpy
 
 import os
 
 PdbDataPath = os.path.join(os.path.dirname(os.path.realpath(__file__)),'..','data','pdb_common')+os.path.sep
 
-class Test_intg_sassubset_Mask_get_dihedral_subset_mask(MockerTestCase): 
+class Test_intg_subset_Mask_get_dihedral_subset_mask(MockerTestCase): 
  
    def setUp(self):
       self.o=sasmol.SasMol(0)

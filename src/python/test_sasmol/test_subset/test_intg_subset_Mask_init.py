@@ -17,20 +17,20 @@
 
 from unittest import main 
 from mocker import Mocker, MockerTestCase
-import sasmol.sassubset as sassubset
+import sasmol.subset as subset
 
-class Test_intg_sassubset_Mask_init(MockerTestCase):
+class Test_intg_subset_Mask_init(MockerTestCase):
 
    def setUp(self):
       pass
 
    def test_init(self):
       '''
-      test initializer of sassubset
+      test initializer of subset
       '''
       #
       basis_filter='' #There is really nothing in the initializer
-      o=sassubset.Mask(basis_filter)
+      o=subset.Mask(basis_filter)
 
 
 

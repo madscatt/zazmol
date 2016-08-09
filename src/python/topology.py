@@ -467,7 +467,7 @@ class CharmmTopology(object):
                                    1] = child.element()[new_indices[i]]
                     self.charge()[child_indices[i] -
                                   1] = child.charge()[new_indices[i]]
-                    # only frame-0 was handled in sassubset.init_child
+                    # only frame-0 was handled in subset.init_child
                     self.coor()[0][child_indices[i] -
                                    1] = child.coor()[0][new_indices[i]]
         return error

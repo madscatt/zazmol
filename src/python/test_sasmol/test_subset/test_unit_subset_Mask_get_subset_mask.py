@@ -38,12 +38,12 @@ from unittest import main,skipIf
 from mocker import Mocker, MockerTestCase, ARGS
 
 import sasmol.sasmol as sasmol
-import sasmol.sassubset as sassubset
+import sasmol.subset as subset
 import numpy
 
 import os
 
-class Test_sassubset_Mask_get_subset_mask(MockerTestCase): 
+class Test_subset_Mask_get_subset_mask(MockerTestCase): 
 
    """
    #NOT SURE WHY DOESNT WORK

@@ -18,7 +18,7 @@
 from sasmol.test_sasmol.util import env
 
 """
-Integration test for sasio.sassubset.Mask.copy_molecule_using_mask
+Integration test for sasio.subset.Mask.copy_molecule_using_mask
 
 contract:
 
@@ -61,7 +61,7 @@ from unittest import main,skipIf
 from mocker import Mocker, MockerTestCase, ARGS
 
 import sasmol.sasmol as sasmol
-import sasmol.sassubset as sassubset
+import sasmol.subset as subset
 
 import numpy
 
@@ -69,7 +69,7 @@ import os
 
 PdbDataPath = os.path.join(os.path.dirname(os.path.realpath(__file__)),'..','data','pdb_common')+os.path.sep
 
-class Test_sassubset_Mask_copy_molecule_using_mask(MockerTestCase): 
+class Test_subset_Mask_copy_molecule_using_mask(MockerTestCase): 
  
 
    def setUp(self):

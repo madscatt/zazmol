@@ -53,7 +53,7 @@ from unittest import main,skipIf
 from mocker import Mocker, MockerTestCase, ARGS
 
 import sasmol.sasmol as sasmol
-import sasmol.sassubset as sassubset
+import sasmol.subset as subset
 
 import numpy
 
@@ -61,7 +61,7 @@ import os, copy
 
 PdbDataPath = os.path.join(os.path.dirname(os.path.realpath(__file__)),'..','data','pdb_common')+os.path.sep
 
-class Test_sassubset_Mask_set_descriptor_using_mask(MockerTestCase): 
+class Test_subset_Mask_set_descriptor_using_mask(MockerTestCase): 
  
 
    def setUp(self):

@@ -45,13 +45,13 @@ from unittest import main,skipIf
 from mocker import Mocker, MockerTestCase, ARGS
 
 import sasmol.sasmol as sasmol
-import sasmol.sassubset as sassubset
+import sasmol.subset as subset
 
 import numpy
 
 import os
 
-class Test_unit_sassubset_Mask_get_dihedral_subset_mask(MockerTestCase): 
+class Test_unit_subset_Mask_get_dihedral_subset_mask(MockerTestCase): 
 
    def mock_up(self, Cls_ptch, mthd, mocker, result=None, mmin=0, mmax=None):
       methodToCall = getattr(Cls_ptch,mthd)

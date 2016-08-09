@@ -18,7 +18,7 @@
 from sasmol.test_sasmol.util import env
 
 """
-Integration test for sasio.sassubset.Mask.merge_two_molecules
+Integration test for sasio.subset.Mask.merge_two_molecules
 
 contract:
 
@@ -63,7 +63,7 @@ from unittest import main,skipIf
 from mocker import Mocker, MockerTestCase, ARGS
 
 import sasmol.sasmol as sasmol
-import sasmol.sassubset as sassubset
+import sasmol.subset as subset
 
 import numpy
 
@@ -74,7 +74,7 @@ print 'PdbDataPath = ', PdbDataPath
 print 'PdbDataPath = ', PdbDataPath
 print 'PdbDataPath = ', PdbDataPath
 
-class Test_sassubset_Mask_merge_two_molecules(MockerTestCase): 
+class Test_subset_Mask_merge_two_molecules(MockerTestCase): 
  
 
    def setUp(self):
