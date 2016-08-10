@@ -21,15 +21,14 @@ from unittest import main
 from mocker import Mocker, MockerTestCase, ANY, ARGS, KWARGS
 
 import sasmol.sasmol as sasmol
-import sasmol.sasmath as sasmath
-import sasmol.sasio as sasio
+import sasmol.linear_algebra as linear_algebra
 
 import numpy
 
 import os
 floattype=os.environ['SASSIE_FLOATTYPE']
 
-class Test_sasmath_vec_scale(MockerTestCase): 
+class Test_linear_algebra_vec_scale(MockerTestCase): 
 
     def setUp(self):
         pass
@@ -47,7 +46,7 @@ class Test_sasmath_vec_scale(MockerTestCase):
         a=numpy.array([0.0, 0.0, 0.0],floattype)
         x=util.num_to_floattype(0,floattype)
         y=numpy.array([0.0, 0.0, 0.0],floattype)
-        result = sasmath.vec_scale(a,x,y)
+        result = linear_algebra.vec_scale(a,x,y)
         expected = util.list_to_floattype(x*y,floattype)
         self.assert_list_almost_equal(result,expected)
 
@@ -55,7 +54,7 @@ class Test_sasmath_vec_scale(MockerTestCase):
         a=numpy.array([0.0, 0.0, 0.0],floattype)
         x=util.num_to_floattype(1.0,floattype)
         y=numpy.array([1.0, 1.0, 1.0],floattype)
-        result = sasmath.vec_scale(a,x,y)
+        result = linear_algebra.vec_scale(a,x,y)
         expected = util.list_to_floattype(x*y,floattype)
         self.assert_list_almost_equal(result,expected)
 
@@ -63,7 +62,7 @@ class Test_sasmath_vec_scale(MockerTestCase):
         a=numpy.array([0.0, 0.0, 0.0],floattype)
         x=util.num_to_floattype(-35.01,floattype)
         y=numpy.array([-23.1, 0.98, 18.208],floattype)
-        result = sasmath.vec_scale(a,x,y)
+        result = linear_algebra.vec_scale(a,x,y)
         expected = util.list_to_floattype(x*y,floattype)
         self.assert_list_almost_equal(result,expected)
 
@@ -71,7 +70,7 @@ class Test_sasmath_vec_scale(MockerTestCase):
         a=numpy.array([0.02, 5.2, -10.0],floattype)
         x=util.HUGE
         y=numpy.array([-23.1, 19.8, 18.208],floattype)
-        result = sasmath.vec_scale(a,x,y)
+        result = linear_algebra.vec_scale(a,x,y)
         expected = util.list_to_floattype(x*y,floattype)
         self.assert_list_almost_equal(result,expected)
 
@@ -79,7 +78,7 @@ class Test_sasmath_vec_scale(MockerTestCase):
         a=numpy.array([util.HUGE, 103.0, -30.0],floattype)
         x=util.INF
         y=numpy.array([-23.1, 0.98, 18.208],floattype)
-        result = sasmath.vec_scale(a,x,y)
+        result = linear_algebra.vec_scale(a,x,y)
         expected = util.list_to_floattype(x*y,floattype)
         self.assert_list_almost_equal(result,expected)
 
@@ -87,7 +86,7 @@ class Test_sasmath_vec_scale(MockerTestCase):
         a=numpy.array([20.0, util.NAN, -30.0],floattype)
         x=util.NAN
         y=numpy.array([-23.1, util.NAN, 18.208],floattype)
-        result = sasmath.vec_scale(a,x,y)
+        result = linear_algebra.vec_scale(a,x,y)
         expected = util.list_to_floattype(x*y,floattype)
         self.assert_list_almost_equal(result,expected)
 
@@ -95,7 +94,7 @@ class Test_sasmath_vec_scale(MockerTestCase):
         a=numpy.array([0.0, 0.0, 0.0],floattype)
         x=util.INF
         y=numpy.array([-23.1, util.NAN, 18.208],floattype)
-        result = sasmath.vec_scale(a,x,y)
+        result = linear_algebra.vec_scale(a,x,y)
         expected = util.list_to_floattype(x*y,floattype)
         self.assert_list_almost_equal(result,expected)
 
@@ -103,7 +102,7 @@ class Test_sasmath_vec_scale(MockerTestCase):
         a=numpy.array([0.0, 0.0, 0.0],floattype)
         x=util.TINY
         y=numpy.array([-23.1, util.TINY, 18.208],floattype)
-        result = sasmath.vec_scale(a,x,y)
+        result = linear_algebra.vec_scale(a,x,y)
         expected = util.list_to_floattype(x*y,floattype)
         self.assert_list_almost_equal(result,expected)
 
@@ -111,7 +110,7 @@ class Test_sasmath_vec_scale(MockerTestCase):
         a=numpy.array([0.0, 0.0, 0.0],floattype)
         x=util.ZERO
         y=numpy.array([-23.1, util.ZERO, 18.208],floattype)
-        result = sasmath.vec_scale(a,x,y)
+        result = linear_algebra.vec_scale(a,x,y)
         expected = util.list_to_floattype(x*y,floattype)
         self.assert_list_almost_equal(result,expected)
 

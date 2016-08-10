@@ -18,7 +18,7 @@
 from sasmol.test_sasmol.util import env, util
 
 '''
-Contract for unit test of sasio_Files_element_filter:
+Contract for unit test of file_io_Files_element_filter:
 
 Test for null
 Test for conflict atoms in the case of heavy atoms
@@ -40,7 +40,7 @@ import os, sys, string
 
 DataPath = os.path.join(os.path.dirname(os.path.realpath(__file__)),'..','data','sasmol','properties')+os.path.sep
 
-class Test_unit_sasio_Files_element_filter(MockerTestCase):
+class Test_unit_file_io_Files_element_filter(MockerTestCase):
 
    def setUp(self):
       self.o=sasmol.SasMol(0)

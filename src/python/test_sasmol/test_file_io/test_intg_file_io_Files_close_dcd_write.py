@@ -26,7 +26,7 @@ import sasmol.dcdio as dcdio
 import os, sys, string, shutil
 
 commonDcdDataPath = os.path.join(os.path.dirname(os.path.realpath(__file__)),'..','data','dcd_common')+os.path.sep
-moduleDataPath = os.path.join(os.path.dirname(os.path.realpath(__file__)),'..','data','sasmol','sasio')+os.path.sep
+moduleDataPath = os.path.join(os.path.dirname(os.path.realpath(__file__)),'..','data','sasmol','file_io')+os.path.sep
 
 
 class Test_intg_sasio_Files_close_dcd_write(MockerTestCase):

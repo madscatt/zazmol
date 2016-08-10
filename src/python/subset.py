@@ -151,7 +151,7 @@ class Mask(object):
 
                 NOTE: coordinates will have to be updated separately using
                         get_coor_using_mask ... using the mask(s) generated
-                        by sasio.initialize_children()
+                        by file_io.initialize_children()
 
         '''
 

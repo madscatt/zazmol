@@ -26,7 +26,7 @@ import os
 
 DataPath = os.path.join(os.path.dirname(os.path.realpath(__file__)),'..','data','dcd_common')+os.path.sep
 
-class Test_intg_sasio_Files_open_dcd_read(MockerTestCase):
+class Test_intg_file_io_Files_open_dcd_read(MockerTestCase):
 
    def setUp(self):
       self.o=sasmol.SasMol(0)

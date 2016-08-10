@@ -20,15 +20,14 @@ from sasmol.test_sasmol.util import env, util
 from unittest import main 
 from mocker import Mocker, MockerTestCase, ANY, ARGS, KWARGS
 import sasmol.sasmol as sasmol
-import sasmol.sasmath as sasmath
-import sasmol.sasio as sasio
+import sasmol.linear_algebra as linear_algebra
 
 import numpy
 
 import os
 floattype=os.environ['SASSIE_FLOATTYPE']
 
-class Test_sasmath_vec_sub(MockerTestCase): 
+class Test_linear_algebra_vec_sub(MockerTestCase): 
 
     def setUp(self):
         pass 
@@ -46,7 +45,7 @@ class Test_sasmath_vec_sub(MockerTestCase):
         a=numpy.array([0.0, 0.0, 0.0],floattype)
         x=numpy.array([0.0, 0.0, 0.0],floattype)
         y=numpy.array([0.0, 0.0, 0.0],floattype)
-        result = sasmath.vec_sub(a,x,y)
+        result = linear_algebra.vec_sub(a,x,y)
         expected = numpy.subtract(x,y)
         self.assert_list_almost_equal(result,expected)
 
@@ -54,7 +53,7 @@ class Test_sasmath_vec_sub(MockerTestCase):
         a=numpy.array([0.0, 0.0, 0.0],floattype)
         x=numpy.array([1.0, 1.0, 1.0],floattype)
         y=numpy.array([1.0, 1.0, 1.0],floattype)
-        result = sasmath.vec_sub(a,x,y)
+        result = linear_algebra.vec_sub(a,x,y)
         expected = numpy.subtract(x,y)
         self.assert_list_almost_equal(result,expected)
 
@@ -62,7 +61,7 @@ class Test_sasmath_vec_sub(MockerTestCase):
         a=numpy.array([0.0, 0.0, 0.0],floattype)
         x=numpy.array([-2.3, 5.6, 0.2],floattype)
         y=numpy.array([12.01, -109.3, 3.87],floattype)
-        result = sasmath.vec_sub(a,x,y)
+        result = linear_algebra.vec_sub(a,x,y)
         expected = numpy.subtract(x,y)
         self.assert_list_almost_equal(result,expected)
 
@@ -70,7 +69,7 @@ class Test_sasmath_vec_sub(MockerTestCase):
         a=numpy.array([util.HUGE, 0.0, 0.0],floattype)
         x=numpy.array([-2.3, util.HUGE, 0.2],floattype)
         y=numpy.array([12.01, -109.3, 3.87],floattype)
-        result = sasmath.vec_sub(a,x,y)
+        result = linear_algebra.vec_sub(a,x,y)
         expected = numpy.subtract(x,y)
         self.assert_list_almost_equal(result,expected)
 
@@ -78,7 +77,7 @@ class Test_sasmath_vec_sub(MockerTestCase):
         a=numpy.array([util.INF, 0.0, 0.0],floattype)
         x=numpy.array([-2.3, util.INF, 0.2],floattype)
         y=numpy.array([12.01, -109.3, 3.87],floattype)
-        result = sasmath.vec_sub(a,x,y)
+        result = linear_algebra.vec_sub(a,x,y)
         expected = numpy.subtract(x,y)
         self.assert_list_almost_equal(result,expected)
 
@@ -86,7 +85,7 @@ class Test_sasmath_vec_sub(MockerTestCase):
         a=numpy.array([util.NAN, 0.0, 0.0],floattype)
         x=numpy.array([-2.3, util.NAN, 0.2],floattype)
         y=numpy.array([12.01, -109.3, 3.87],floattype)
-        result = sasmath.vec_sub(a,x,y)
+        result = linear_algebra.vec_sub(a,x,y)
         expected = numpy.subtract(x,y)
         self.assert_list_almost_equal(result,expected)
 
@@ -94,7 +93,7 @@ class Test_sasmath_vec_sub(MockerTestCase):
         a=numpy.array([util.INF, 0.0, 0.0],floattype)
         x=numpy.array([-2.3, util.NAN, 0.2],floattype)
         y=numpy.array([12.01, -109.3, util.HUGE],floattype)
-        result = sasmath.vec_sub(a,x,y)
+        result = linear_algebra.vec_sub(a,x,y)
         expected = numpy.subtract(x,y)
         self.assert_list_almost_equal(result,expected)
 
@@ -102,7 +101,7 @@ class Test_sasmath_vec_sub(MockerTestCase):
         a=numpy.array([util.TINY, 0.0, 0.0],floattype)
         x=numpy.array([-2.3, util.TINY, 0.2],floattype)
         y=numpy.array([12.01, -109.3, 3.87],floattype)
-        result = sasmath.vec_sub(a,x,y)
+        result = linear_algebra.vec_sub(a,x,y)
         expected = numpy.subtract(x,y)
         self.assert_list_almost_equal(result,expected)
 
@@ -110,7 +109,7 @@ class Test_sasmath_vec_sub(MockerTestCase):
         a=numpy.array([util.ZERO, 2.0, 3.0],floattype)
         x=numpy.array([-2.3, util.ZERO, 0.2],floattype)
         y=numpy.array([12.01, -109.3, 3.87],floattype)
-        result = sasmath.vec_sub(a,x,y)
+        result = linear_algebra.vec_sub(a,x,y)
         expected = numpy.subtract(x,y)
         self.assert_list_almost_equal(result,expected)
 

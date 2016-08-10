@@ -15,26 +15,39 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 '''
 
+from sasmol.test_sasmol.util import env, util
 
 from unittest import main 
 from mocker import Mocker, MockerTestCase
-import sasmol.sasio as sasio
 
-class Test_intg_sasmol_Files_init(MockerTestCase):
+import sasmol.sasmol as sasmol
+
+import os
+
+class Test_unit_file_io_Files_print_error(MockerTestCase):
 
    def setUp(self):
-      pass
+      self.o=sasmol.SasMol(0)
 
-   def test_init(self):
+   def test_null(self):
       '''
-      test initializer of sasmol.Files
+      null test
       '''
-      #
-      filename = 'null' #there is really nothing in the constructor
-      flag = 0
-      o=sasio.Files(filename, flag)
+      name = ''
+      my_message = ''
+      error = self.o.print_error(name,my_message)
+      expected_error = ['\nELEMENT NAME NOT IN CHARMM DATABASE AND SINGLE CHARACTER OPTION NOT APPLICABLE\n\n\n\n stopping now: name = \n']
+      self.assertEqual(error,expected_error)
 
-
+   def test_notnull(self):
+      '''
+      not null test
+      '''
+      name = 'me'
+      my_message = 'mess'
+      error = self.o.print_error(name,my_message)
+      expected_error = ['\nELEMENT NAME NOT IN CHARMM DATABASE AND SINGLE CHARACTER OPTION NOT APPLICABLE\n\nme\nmess\n stopping now: name = me\n']
+      self.assertEqual(error,expected_error)
 
    def tearDown(self):
       pass

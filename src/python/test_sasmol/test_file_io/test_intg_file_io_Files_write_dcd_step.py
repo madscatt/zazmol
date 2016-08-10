@@ -28,9 +28,9 @@ import numpy, os
 floattype=os.environ['SASSIE_FLOATTYPE']
 
 DataPath = os.path.join(os.path.dirname(os.path.realpath(__file__)),'..','data','pdb_common')+os.path.sep
-moduleDataPath = os.path.join(os.path.dirname(os.path.realpath(__file__)),'..','data','sasmol','sasio')+os.path.sep
+moduleDataPath = os.path.join(os.path.dirname(os.path.realpath(__file__)),'..','data','sasmol','file_io')+os.path.sep
 
-class Test_intg_sasio_Files_write_dcd_step(MockerTestCase):
+class Test_intg_file_io_Files_write_dcd_step(MockerTestCase):
 
    def setUp(self):
       self.o=sasmol.SasMol(0)

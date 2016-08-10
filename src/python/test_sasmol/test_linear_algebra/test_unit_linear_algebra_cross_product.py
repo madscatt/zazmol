@@ -20,28 +20,27 @@ from sasmol.test_sasmol.util import env, util
 from unittest import main 
 from mocker import Mocker, MockerTestCase, ANY, ARGS, KWARGS
 import sasmol.sasmol as sasmol
-import sasmol.sasmath as sasmath
-import sasmol.sasio as sasio
+import sasmol.linear_algebra as linear_algebra
 import numpy
 
 import os
 floattype=os.environ['SASSIE_FLOATTYPE']
 
-class Test_sasmath_cross_product(MockerTestCase): 
+class Test_linear_algebra_cross_product(MockerTestCase): 
 
     def setUp(self):
         self.m = Mocker()
 
         """
-        sasmath.Math.__init__ = self.m.mock()
-        sasmath.Math.__init__(ARGS)
+        linear_algebra.Math.__init__ = self.m.mock()
+        linear_algebra.Math.__init__(ARGS)
         self.m.result(None)
         self.m.count(0,None)
         """
 
         self.m.replay()
 
-        #self.o=sasmath.Math()
+        #self.o=linear_algebra.Math()
 
     def assert_list_almost_equal(self,a,b,places=5):
         if (len(a)!=len(b)):
@@ -55,51 +54,51 @@ class Test_sasmath_cross_product(MockerTestCase):
 
         x=numpy.array([0.0, 0.0, 0.0],floattype)
         y=numpy.array([0.0, 0.0, 0.0],floattype)
-        result = sasmath.cross_product(x,y)
+        result = linear_algebra.cross_product(x,y)
         self.assert_list_almost_equal(a=result,b=[0.0, 0.0, 0.0])
 
     def test_1_zero_array(self):
 
         x=numpy.array([0.0, 0.0, 0.0],floattype)
         y=numpy.array([3.2, 2.6, -0.3],floattype)
-        result=sasmath.cross_product(x,y)
+        result=linear_algebra.cross_product(x,y)
         self.assert_list_almost_equal(result,[0.0, 0.0, 0.0])
 
     def test_x_axis_cross_y_axis(self):
         x=numpy.array([1.0, 0.0, 0.0],floattype)
         y=numpy.array([0.0, 1.0, 0.0],floattype)
-        result=sasmath.cross_product(x,y)
+        result=linear_algebra.cross_product(x,y)
         self.assert_list_almost_equal(result,[0.0, 0.0, 1.0])
 
     def test_x_axis_cross_z_axis(self):
         x=numpy.array([1.0, 0.0, 0.0],floattype)
         y=numpy.array([0.0, 0.0, 1.0],floattype)
-        result=sasmath.cross_product(x,y)
+        result=linear_algebra.cross_product(x,y)
         self.assert_list_almost_equal(result,[0.0, -1.0, 0.0])
 
     def test_2x_axis_cross_3z_axis(self):
         x=numpy.array([2.0, 0.0, 0.0],floattype)
         y=numpy.array([0.0, 0.0, 3.0],floattype)
-        result=sasmath.cross_product(x,y)
+        result=linear_algebra.cross_product(x,y)
         self.assert_list_almost_equal(result,[0.0, -6.0, 0.0])
 
     def test_arbitary(self):
         x=numpy.array([3.0, 0.0, 0.0],floattype)
         y=numpy.array([0.0, 0.0, -2.2],floattype)
-        result=sasmath.cross_product(x,y)
+        result=linear_algebra.cross_product(x,y)
         self.assert_list_almost_equal(result,[0.0, 6.6, 0.0])
 
     def test_against_numpy(self):
         x=numpy.array([3.0, 3.0, -100.2],floattype)
         y=numpy.array([17.68, 0.9, -2.2],floattype)
-        result=sasmath.cross_product(x,y)
+        result=linear_algebra.cross_product(x,y)
         resultnp = numpy.cross(x,y)
         self.assert_list_almost_equal(result,resultnp)
 
     def test_inf_1(self):
         x=numpy.array([util.HUGE, 3.0, -100.2],floattype)
         y=numpy.array([2.0, 0.9, -2.2],floattype)
-        result=sasmath.cross_product(x,y)
+        result=linear_algebra.cross_product(x,y)
         print result
         resultnp = numpy.cross(x,y)
         self.assert_list_almost_equal(result,resultnp)
@@ -107,28 +106,28 @@ class Test_sasmath_cross_product(MockerTestCase):
     def test_inf_2(self):
         x=numpy.array([util.INF, 3.0, -100.2],floattype)
         y=numpy.array([1.0, 0.9, -2.2],floattype)
-        result=sasmath.cross_product(x,y)
+        result=linear_algebra.cross_product(x,y)
         resultnp = numpy.cross(x,y)
         self.assert_list_almost_equal(result,resultnp)
 
     def test_nan(self):
         x=numpy.array([util.NAN, 3.0, -100.2],floattype)
         y=numpy.array([1.0, 0.9, -2.2],floattype)
-        result=sasmath.cross_product(x,y)
+        result=linear_algebra.cross_product(x,y)
         resultnp = numpy.cross(x,y)
         self.assert_list_almost_equal(result,resultnp)
 
     def test_tiny(self):
         x=numpy.array([util.TINY, 3.0, -100.2],floattype)
         y=numpy.array([1.0, 0.9, -2.2],floattype)
-        result=sasmath.cross_product(x,y)
+        result=linear_algebra.cross_product(x,y)
         resultnp = numpy.cross(x,y)
         self.assert_list_almost_equal(result,resultnp)
 
     def test_zero(self):
         x=numpy.array([util.ZERO, 3.0, -100.2],floattype)
         y=numpy.array([1.0, 0.9, -2.2],floattype)
-        result=sasmath.cross_product(x,y)
+        result=linear_algebra.cross_product(x,y)
         resultnp = numpy.cross(x,y)
         self.assert_list_almost_equal(result,resultnp)
 

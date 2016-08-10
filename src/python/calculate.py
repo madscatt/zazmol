@@ -35,7 +35,6 @@ from __future__ import print_function
 import sys
 import numpy
 import sasmol.operate as operate
-import sasmol.sasmath as sasmath
 
 class Calculate(object):
 

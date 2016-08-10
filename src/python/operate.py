@@ -20,7 +20,7 @@ from __future__ import print_function
 '''
 import sys
 import numpy
-import sasmol.sasmath as sasmath
+import sasmol.linear_algebra as linear_algebra
 
 #	OPERATE
 #
@@ -129,11 +129,11 @@ class Move():
 		self.masscheck(frame)
 		self.calculate_center_of_mass(frame)
 	
-		u = sasmath.find_u(coor_sub_1, coor_sub_2)
+		u = linear_algebra.find_u(coor_sub_1, coor_sub_2)
 
 		tao = numpy.transpose(self.coor()[frame] - com_sub_2)
 
-		error,nat2 = sasmath.matrix_multiply(u,tao)
+		error,nat2 = linear_algebra.matrix_multiply(u,tao)
 
 		ncoor = numpy.transpose(nat2) + com_sub_1
 
@@ -159,7 +159,7 @@ class Move():
 			mat=numpy.array([[cs,-si,0.0],[si,cs,0.0],[0.0,0.0,1.0]])
 
 		coordt=self._coor[frame,:].T	
-		error,matrix_product = sasmath.matrix_multiply(mat,coordt)
+		error,matrix_product = linear_algebra.matrix_multiply(mat,coordt)
 		ncoord = matrix_product.T	
 		self._coor[frame,:]=ncoord 
 	

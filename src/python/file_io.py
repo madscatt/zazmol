@@ -25,7 +25,7 @@ import numpy
 import time
 import dcdio
 
-#	SASIO
+#	FILE_IO
 #
 #	12/5/2009	--	initial coding			:	jc
 #	12/10/2009	--	doc strings 			:	jc
@@ -35,7 +35,7 @@ import dcdio
 #LC4567890123456789012345678901234567890123456789012345678901234567890123456789
 #								       *      **
 '''
-	Sasio is the main module that contains the base classes that 
+	FILE_IO is the main module that contains the base classes that 
 	read and write atomic information from and to the hard disk,
 	and (eventually) deal with logging of input parameters and
 	project runs.
@@ -919,9 +919,9 @@ class Files(object):
                 conect[ndxs[0]] = ndxs[1:]
 
         if(((this_frame - 1) != num_frames) and not fastread):
-            if(printme): print '>>> WARNING: pdb file had ',num_frames,' sasio read ',this_frame-1,' frames'
-            if(printme): print '>>> WARNING: pdb file had ',num_frames,' sasio read ',this_frame-1,' frames'
-            if(printme): print '>>> WARNING: pdb file had ',num_frames,' sasio read ',this_frame-1,' frames'
+            if(printme): print '>>> WARNING: pdb file had ',num_frames,' file_io read ',this_frame-1,' frames'
+            if(printme): print '>>> WARNING: pdb file had ',num_frames,' file_io read ',this_frame-1,' frames'
+            if(printme): print '>>> WARNING: pdb file had ',num_frames,' file_io read ',this_frame-1,' frames'
 
         self._coor=numpy.array(coor)
 

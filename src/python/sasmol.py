@@ -45,7 +45,7 @@ from __future__ import print_function
 
 import sys
 import os
-import sasmol.sasio as sasio
+import sasmol.file_io as file_io
 import sasmol.calculate as calculate
 import sasmol.operate as operate
 import sasmol.subset as subset
@@ -59,13 +59,13 @@ class Error(Exception):
     pass
 
 
-class SasAtm(sasio.Files, calculate.Calculate, operate.Move, subset.Mask, properties.Atomic, topology.CharmmTopology, view.View):
+class SasAtm(file_io.Files, calculate.Calculate, operate.Move, subset.Mask, properties.Atomic, topology.CharmmTopology, view.View):
 
     '''
         SasAtm is the base class to build and deal with atomistic systems.
         The various methods described herein are separated in regards to
         their function.  The class inherits file input/output and 
-        manipulation abilities from the sasio, calculate, and operate modules.
+        manipulation abilities from the file_io, calculate, and operate modules.
 
     '''
 
