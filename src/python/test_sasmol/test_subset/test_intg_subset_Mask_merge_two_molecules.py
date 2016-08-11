@@ -15,7 +15,7 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 '''
 
-from sasmol.test_sasmol.util import env
+from sasmol.test_sasmol.utilities import env
 
 """
 Integration test for sasio.subset.Mask.merge_two_molecules

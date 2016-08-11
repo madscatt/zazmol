@@ -15,7 +15,7 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 '''
 
-from sasmol.test_sasmol.util import env, util
+from sasmol.test_sasmol.utilities import env
 
 '''
 sasio.Files.read_pdb seems not getting the moltype right

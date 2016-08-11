@@ -15,7 +15,7 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 '''
 
-from sasmol.test_sasmol.util import env
+from sasmol.test_sasmol.utilities import env
 
 """
 Contract of Integration test for Mask.set_descriptor_using_mask(

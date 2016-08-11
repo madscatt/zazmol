@@ -15,8 +15,6 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 '''
 
-from sasmol.test_sasmol.util import env, util
-
 '''
 Contract for unit test of file_io_Files_element_filter:
 

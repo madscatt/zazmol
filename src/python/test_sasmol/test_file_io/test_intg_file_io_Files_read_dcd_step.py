@@ -15,7 +15,7 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 '''
 
-from sasmol.test_sasmol.util import env, util, generate_huge_dcd_onthefly
+from sasmol.test_sasmol.utilities import env, generate_huge_dcd_onthefly
 
 from unittest import main,skipIf
 from mocker import Mocker, MockerTestCase

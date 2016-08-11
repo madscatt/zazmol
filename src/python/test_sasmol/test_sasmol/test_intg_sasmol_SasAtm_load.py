@@ -20,7 +20,8 @@ from unittest import main
 from mocker import Mocker, MockerTestCase, ANY, ARGS, KWARGS
 import numpy,copy
 
-from sasmol.test_sasmol.util import env, util
+from sasmol.test_sasmol.utilities import env
+
 import sasmol.sasmol as sasmol
 
 import os
