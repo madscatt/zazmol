@@ -1,10 +1,10 @@
 try:
-    # check to see if file is readable
+    ### check to see if file is readable
     with open(filename) as tempFile:
 
 except Exception as e:
     print e
-    # here you can modify the error message to your liking
+    ### here you can modify the error message to your liking
 
 
 OR

@@ -26,9 +26,9 @@ The old existing code base may be corrected in the future using autopep ( https:
 
 ### SETUP.PY ###
 
-# format for data files:  ( path in site-packages, [ path + file_name of file to move] )
-# format for data files:  ( path in site-packages, [ path1 + file_name1 of file to move, path2 + filename2 of file to move] )
-# I will list single files even if multiple files go to the same place so that editing is easier
+### format for data files:  ( path in site-packages, [ path + file_name of file to move] )
+### format for data files:  ( path in site-packages, [ path1 + file_name1 of file to move, path2 + filename2 of file to move] )
+### I will list single files even if multiple files go to the same place so that editing is easier
 
     data_files = [
             ( os.path.join('sasmol','test_sasmol','manual_tests') , [os.path.join('src','python','test_sasmol','manual_tests','hiv1_gag.pdb')]),
@@ -117,7 +117,7 @@ A description of the circumstances under which a function or method raises excep
 
 https://git-scm.com/book/en/v2/Customizing-Git-Git-Configuration
 
-# config:
+### config:
 
 git config --list
 git config --global core.editor "vi"
@@ -131,18 +131,18 @@ git config --global core.editor "vi"
 
 git config --global core.excludesfile ~/.gitignore_global 
 
-# both of these do not seem to work ???
+### both of these do not seem to work ???
 
 git config --global core.autocrlf = true
 git config --global core.autocrlf = input
 
-# but if you merely edit the ~/.gitconfig file it works
-# (there are other things in this file ... only showing the autocrlf bit
+### but if you merely edit the ~/.gitconfig file it works
+### (there are other things in this file ... only showing the autocrlf bit
 
 [core]
     autocrlf = input
 
-# cloning
+### cloning
 
 
 git clone https://github.com/madscatt/sasmol.git
@@ -163,15 +163,15 @@ git push -u sasmol add_cpp_section
 
 (but afterwards on local you must
 
-# update the local files already done on GitHub
+### update the local files already done on GitHub
 git pull
 
-# make the master the active branch
+### make the master the active branch
 git checkout master
 
-# delete the other branch
+### delete the other branch
 git branch -d add_cpp_section
 
-#list branches
+###list branches
 git branch -av
      
