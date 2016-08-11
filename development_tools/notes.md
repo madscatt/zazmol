@@ -1,4 +1,11 @@
 
+###
+
+how to create markdown from jupyter notebook (named Untitled.ipynb)
+
+ipython nbconvert --to markdown Untitled.ipynb
+
+
 ### 0. Identation
 
 Here is an example snippet from a .vimrc file that defines indentation rules. Note that the entire code base will have to be filtered to implement this. Any new code should follow these rules. Developers that use other IDEs should provide their settings for others to benefit.
