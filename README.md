@@ -14,3 +14,5 @@ dependencies:
 numpy,
 mocker
 
+[basic usage](doc_files/basic_usage.html)
+
