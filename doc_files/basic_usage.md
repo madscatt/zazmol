@@ -63,11 +63,6 @@ m.center(0)
 
 
 ```python
-import os ; os.chdir('/Users/curtisj/subversion_working_copies/svn_utk/sassie_2.0/trunk/sassie/simulate/monte_carlo')
-```
-
-
-```python
 m.calculate_center_of_mass(0)
 ```
 
@@ -77,33 +72,3 @@ m.calculate_center_of_mass(0)
     array([  7.11544707e-13,   2.48159571e-12,  -8.45832820e-13])
 
 
-
-
-```python
-import gui_mimic_ten_mer
-```
-
-
-    ---------------------------------------------------------------------------
-
-    ImportError                               Traceback (most recent call last)
-
-    <ipython-input-12-7a9b78798219> in <module>()
-    ----> 1 import gui_mimic_ten_mer
-    
-
-    /Users/curtisj/subversion_working_copies/svn_utk/sassie_2.0/trunk/sassie/simulate/monte_carlo/gui_mimic_ten_mer.py in <module>()
-          6 import sys
-          7 
-    ----> 8 import sassie.simulate.monte_carlo.monte_carlo as monte_carlo
-          9 import sassie.interface.input_filter as input_filter
-         10 import multiprocessing
-
-
-    ImportError: No module named sassie.simulate.monte_carlo.monte_carlo
-
-
-
-```python
-
-```
