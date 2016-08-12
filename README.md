@@ -18,8 +18,7 @@ mocker
 
 ### [`developer notes`](development_tools/notes.md)
 
-[//]: # [file i/o notes](development_tools/file_io_experiments.md)
-
+[]([file i/o notes](development_tools/file_io_experiments.md))
 
 
 ```python
