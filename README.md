@@ -21,18 +21,19 @@ mocker
 [file i/o notes](development_tools/file_io_experiments.md)
 
 
+
 ```python
-import sasmol.sasmol as s
+import sasmol.sasmol as sasmol
 ```
 
 
 ```python
-m = s.SasMol(0)
+molecule = sasmol.SasMol()
 ```
 
 
 ```python
-m.read_pdb('hiv1_gag.pdb')
+molecule.read_pdb('hiv1_gag.pdb')
 ```
 
     reading filename:  hiv1_gag.pdb
@@ -43,53 +44,98 @@ m.read_pdb('hiv1_gag.pdb')
 
 
 ```python
-m
+molecule.natoms()
 ```
 
 
 
 
-    sasmol object
+    6730
 
 
 
 
 ```python
-m.names()[:3]
+molecule.number_of_frames()
 ```
 
 
 
 
-    ['N', 'HT1', 'HT2']
+    1
 
 
 
 
 ```python
-m.calculate_center_of_mass(0)
+frame = 0
+```
+
+
+```python
+molecule.calculate_center_of_mass(frame)
 ```
 
 
 
 
-    array([ -6.79114736, -23.71577133,   8.06558513])
+    array([ 88.3,  19.6,  14.7])
 
 
 
 
 ```python
-m.center(0)
+molecule.moveto(frame,[88.3, 19.6, 14.7])
 ```
 
 
 ```python
-m.calculate_center_of_mass(0)
+molecule.calculate_center_of_mass(frame)
 ```
 
 
 
 
-    array([  7.11544707e-13,   2.48159571e-12,  -8.45832820e-13])
+    array([ 88.3,  19.6,  14.7])
 
 
+
+
+```python
+molecule.rotate(frame,'x',45)
+```
+
+
+```python
+molecule.calculate_center_of_mass(frame)
+```
+
+
+
+
+    array([ 88.3       , -21.92399383,  10.93565245])
+
+
+
+
+```python
+molecule.calculate_principle_moments_of_inertia(frame)
+```
+
+
+
+
+    (array([  1.30834716e+07,   1.91993314e+08,   1.85015201e+08]),
+     array([[-0.08711655, -0.97104917,  0.22242802],
+            [-0.53401862, -0.14296585, -0.8332976 ],
+            [-0.84097255,  0.19137472,  0.50610364]]),
+     array([[  1.90290278e+08,  -7.02983463e+06,  -1.38929432e+07],
+            [ -7.02983463e+06,   1.36127046e+08,  -7.74046010e+07],
+            [ -1.38929432e+07,  -7.74046010e+07,   6.36746633e+07]]))
+
+
+
+
+```python
+molecule.write_pdb('rotated_hiv1_gag.pdb',frame,'w');
+```
