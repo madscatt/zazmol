@@ -1,17 +1,23 @@
 
+#### Import sasmol library
+
 
 ```python
-import sasmol.sasmol as s
+import sasmol.sasmol as sasmol
 ```
 
+#### Define "molecule", an instance of the SasMol class ; this is the "object" that will hold all information for the molecule
+
 
 ```python
-m = s.SasMol(0)
+molecule = sasmol.SasMol(0)
 ```
 
+#### Read  the contents of a PDB file into the molecule
+
 
 ```python
-m.read_pdb('hiv1_gag.pdb')
+molecule.read_pdb('hiv1_gag.pdb')
 ```
 
     reading filename:  hiv1_gag.pdb
@@ -20,33 +26,25 @@ m.read_pdb('hiv1_gag.pdb')
     finished reading frame =  1
 
 
+#### Query the number of atoms
+
 
 ```python
-m
+molecule.natoms()
 ```
 
 
 
 
-    sasmol object
+    6730
 
 
 
-
-```python
-m.names()[:3]
-```
-
-
-
-
-    ['N', 'HT1', 'HT2']
-
-
+####  Determine the center of mass of the molecule for frame = 0
 
 
 ```python
-m.calculate_center_of_mass(0)
+molecule.calculate_center_of_mass(0) 
 ```
 
 
@@ -56,14 +54,18 @@ m.calculate_center_of_mass(0)
 
 
 
+#### Set the center of mass to [0, 0, 0] for frame = 0
+
 
 ```python
-m.center(0)
+molecule.center(0)
 ```
 
+#### Check that the center of mass is indeed now at [0, 0, 0]
+
 
 ```python
-m.calculate_center_of_mass(0)
+molecule.calculate_center_of_mass(0)
 ```
 
 
