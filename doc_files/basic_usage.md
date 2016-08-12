@@ -1,4 +1,9 @@
 
+### Basic Usage
+
+#### This section highlights basic usage from reading in atomic information from a protein data bank (PDB) file, extracting information from the molecule, performing simple operations on the molecule and how to save the new coordinates to a new PDB file
+***
+
 #### Import sasmol library
 
 
@@ -74,3 +79,10 @@ molecule.calculate_center_of_mass(0)
     array([  7.11544707e-13,   2.48159571e-12,  -8.45832820e-13])
 
 
+
+#### Save the coordinates to a new PDB file
+
+
+```python
+molecule.write_pdb("centered_hiv1_gag.pdb", 0, "w");
+```
