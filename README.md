@@ -14,11 +14,11 @@ dependencies:
 numpy,
 mocker
 
-[basic usage](doc_files/basic_usage.md)
+### [`basic usage`](doc_files/basic_usage.md)
 
-[developer notes](development_tools/notes.md)
+### [`developer notes`](development_tools/notes.md)
 
-[file i/o notes](development_tools/file_io_experiments.md)
+[comment]: <> [file i/o notes](development_tools/file_io_experiments.md)
 
 
 
