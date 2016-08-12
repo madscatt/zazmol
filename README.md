@@ -18,6 +18,8 @@ mocker
 
 ### [`basic usage`](doc_files/basic_usage.md)
 
+### [`library file structure`](doc_files/library_files.md)
+
 ### [`developer notes`](development_tools/notes.md)
 
 []([file i/o notes](development_tools/file_io_experiments.md))
