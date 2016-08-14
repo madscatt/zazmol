@@ -1,7 +1,7 @@
 import os
 
 import numpy as np
-import sasmol.sasmol as s
+import sasmol.system as system
 import sasmol.dcdio as dcdio
 
 def generate(fin='rna.pdb', fout='rna.dcd', frames=1000):
@@ -14,7 +14,7 @@ def generate(fin='rna.pdb', fout='rna.dcd', frames=1000):
   fout = os.path.join('/tmp/',fout)
   if os.path.exists(fout):
     return
-  o=s.SasMol(0)
+  o=system.Molecule(0)
   o.read_pdb(fin)
   outfile = dcdio.open_dcd_write(fout)
   nset = frames

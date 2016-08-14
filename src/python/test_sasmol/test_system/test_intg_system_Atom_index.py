@@ -18,18 +18,18 @@
 from unittest import main 
 from mocker import Mocker, MockerTestCase
 
-import sasmol.sasmol as sasmol
+import sasmol.system as system
 
 import numpy
 
 import os
 
-DataPath = os.path.join(os.path.dirname(os.path.realpath(__file__)),'..','data','sasmol','sasmol')+os.path.sep
+DataPath = os.path.join(os.path.dirname(os.path.realpath(__file__)),'..','data','sasmol','system')+os.path.sep
 
-class Test_intg_sasmol_SasAtm_index(MockerTestCase):
+class Test_intg_system_Atom_index(MockerTestCase):
 
    def setUp(self):
-      self.o=sasmol.SasAtm(3,'1CRN-3frames.pdb')
+      self.o=system.Atom(3,'1CRN-3frames.pdb')
 
    def assert_list_almost_equal(self,a,b,places=5):
         if (len(a)!=len(b)):

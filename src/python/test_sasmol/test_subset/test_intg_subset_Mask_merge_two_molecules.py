@@ -62,7 +62,7 @@ merge a problem pdb (1PSI) with a large protein complex (groel) (Skipped as SASS
 from unittest import main,skipIf 
 from mocker import Mocker, MockerTestCase, ARGS
 
-import sasmol.sasmol as sasmol
+import sasmol.system as system
 import sasmol.subset as subset
 
 import numpy
@@ -78,10 +78,9 @@ class Test_subset_Mask_merge_two_molecules(MockerTestCase):
  
 
    def setUp(self):
-      self.o1=sasmol.SasMol(0)
-      self.o2=sasmol.SasMol(1)
-      self.o3=sasmol.SasMol(2)
-
+      self.o1=system.Molecule(0)
+      self.o2=system.Molecule(1)
+      self.o3=system.Molecule(2)
 
    def assert_list_almost_equal(self,a,b,places=5):
         if (len(a)!=len(b)):

@@ -20,7 +20,7 @@ from sasmol.test_sasmol.utilities import env
 from unittest import main, skipIf
 from mocker import Mocker, MockerTestCase
 
-import sasmol.sasmol as sasmol
+import sasmol.system as system
 import sasmol.dcdio as dcdio
 
 import os, sys, string, shutil
@@ -32,8 +32,7 @@ moduleDataPath = os.path.join(os.path.dirname(os.path.realpath(__file__)),'..','
 class Test_intg_sasio_Files_close_dcd_write(MockerTestCase):
 
    def setUp(self):
-      self.o=sasmol.SasMol(0)
-
+      self.o=system.Molecule(0)
 
    def test_file_doesnt_exist(self):
       '''

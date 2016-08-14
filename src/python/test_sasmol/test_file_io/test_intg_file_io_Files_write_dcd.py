@@ -20,7 +20,7 @@ from sasmol.test_sasmol.utilities import env
 from unittest import main,skipIf
 from mocker import Mocker, MockerTestCase
 
-import sasmol.sasmol as sasmol
+import sasmol.system as system
 
 import numpy
 import os
@@ -34,7 +34,7 @@ moduleDataPath = os.path.join(os.path.dirname(os.path.realpath(__file__)),'..','
 class Test_intg_file_io_Files_write_dcd(MockerTestCase):
 
    def setUp(self):
-      self.o=sasmol.SasMol(0)
+      self.o=system.Molecule(0)
       self.prcsn = 3
 
    def assert_list_almost_equal(self,a,b,places=5):
@@ -57,7 +57,7 @@ class Test_intg_file_io_Files_write_dcd(MockerTestCase):
       dcdFile = moduleDataPath+'test-results/1ATM-1to2-writedcd.dcd'
       self.o.read_pdb(pdbFile)
       self.o.write_dcd(dcdFile)
-      o1 = sasmol.SasMol(0)
+      o1 = system.Molecule(0)
       o1.read_dcd(dcdFile)
       result_coor = o1.coor()
       sum_result_coor = sum(sum(sum(result_coor)))
@@ -81,7 +81,7 @@ class Test_intg_file_io_Files_write_dcd(MockerTestCase):
       dcdFile = moduleDataPath+'test-results/2AAD-1to3-writedcd.dcd'
       self.o.read_pdb(pdbFile)
       self.o.write_dcd(dcdFile)
-      o1 = sasmol.SasMol(0)
+      o1 = system.Molecule(0)
       o1.read_dcd(dcdFile)
       result_coor = o1.coor()
       sum_result_coor = sum(sum(sum(result_coor)))
@@ -107,7 +107,7 @@ class Test_intg_file_io_Files_write_dcd(MockerTestCase):
       dcdFile = moduleDataPath+'test-results/rna-writedcd.dcd'
       self.o.read_pdb(pdbFile)
       self.o.write_dcd(dcdFile)
-      o1 = sasmol.SasMol(0)
+      o1 = system.Molecule(0)
       o1.read_dcd(dcdFile)
       result_coor = o1.coor()
       sum_result_coor = sum(sum(sum(result_coor)))
@@ -131,7 +131,7 @@ class Test_intg_file_io_Files_write_dcd(MockerTestCase):
       dcdFile = moduleDataPath+'test-results/rna-1to10-writedcd.dcd'
       self.o.read_pdb(pdbFile)
       self.o.write_dcd(dcdFile)
-      o1 = sasmol.SasMol(0)
+      o1 = system.Molecule(0)
       o1.read_dcd(dcdFile)
       result_coor = o1.coor()
       sum_result_coor = sum(sum(sum(result_coor)))
@@ -155,7 +155,7 @@ class Test_intg_file_io_Files_write_dcd(MockerTestCase):
       dcdFile = moduleDataPath+'test-results/1CRN-writedcd.dcd'
       self.o.read_pdb(pdbFile)
       self.o.write_dcd(dcdFile)
-      o1 = sasmol.SasMol(0)
+      o1 = system.Molecule(0)
       o1.read_dcd(dcdFile)
       result_coor = o1.coor()
       sum_result_coor = sum(sum(sum(result_coor)))
@@ -179,7 +179,7 @@ class Test_intg_file_io_Files_write_dcd(MockerTestCase):
       dcdFile = moduleDataPath+'test-results/1KP8-writedcd.dcd'
       self.o.read_pdb(pdbFile)
       self.o.write_dcd(dcdFile)
-      o1 = sasmol.SasMol(0)
+      o1 = system.Molecule(0)
       o1.read_dcd(dcdFile)
       result_coor = o1.coor()
       sum_result_coor = sum(sum(sum(result_coor)))
@@ -191,8 +191,6 @@ class Test_intg_file_io_Files_write_dcd(MockerTestCase):
       sum_expected_coor = 6269170.260
       self.assert_list_almost_equal(expected_sample_coor,result_coor[0][100], self.prcsn)
       self.assertAlmostEqual(sum_result_coor, sum_expected_coor, self.prcsn)
-
-
 
 
    def tearDown(self):

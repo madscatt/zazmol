@@ -18,14 +18,14 @@
 from unittest import main 
 from mocker import Mocker, MockerTestCase
 
-import sasmol.sasmol as sasmol
+import sasmol.system as system
 
 import os
 
 class Test_unit_sasio_Files_print_error(MockerTestCase):
 
    def setUp(self):
-      self.o=sasmol.SasMol(0)
+      self.o=system.Molecule(0)
 
    def test_no_error(self):
       '''

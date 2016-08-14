@@ -22,7 +22,7 @@ sasio.Files.read_pdb seems not getting the moltype right
 '''
 from unittest import main 
 from mocker import Mocker, MockerTestCase, ANY, ARGS, KWARGS
-import sasmol.sasmol as sasmol
+import sasmol.system as system
 
 import numpy, os, copy
 
@@ -32,10 +32,10 @@ floattype=os.environ['SASSIE_FLOATTYPE']
 
 DataPath = os.path.join(os.path.dirname(os.path.realpath(__file__)),'..','data','pdb_common')+os.path.sep
 
-class Test_intg_sasmol_SasAtm_Type(MockerTestCase):
+class Test_intg_system_Atom_Type(MockerTestCase):
 
    def setUp(self):
-      self.o=sasmol.SasAtm(3,'1CRN-3frames.pdb')
+      self.o=system.Atom(3,'1CRN-3frames.pdb')
 
    def test_energy(self):
       expected = 10.0

@@ -44,7 +44,7 @@ rna with 50 residue, mask all
 from unittest import main,skipIf 
 from mocker import Mocker, MockerTestCase, ARGS
 
-import sasmol.sasmol as sasmol
+import sasmol.system as system
 import sasmol.subset as subset
 
 import numpy
@@ -80,8 +80,7 @@ class Test_unit_subset_Mask_get_dihedral_subset_mask(MockerTestCase):
 
    def setUp(self):
       self.m=Mocker()
-      self.o=sasmol.SasMol(0)
-
+      self.o=system.Molecule(0)
 
    def test_single_residue_nomask(self):
       '''

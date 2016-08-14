@@ -19,7 +19,7 @@ from sasmol.test_sasmol.utilities import env, util
 
 from unittest import main 
 from mocker import Mocker, MockerTestCase, ANY, ARGS, KWARGS
-import sasmol.sasmol as sasmol
+import sasmol.system as system
 
 import numpy
 
@@ -31,8 +31,8 @@ floattype=os.environ['SASSIE_FLOATTYPE']
 class Test_sascalc_Prop_calcrmsd(MockerTestCase): 
 
     def setUp(self):
-        self.o1=sasmol.SasMol(0)
-        self.o2=sasmol.SasMol(0)
+        self.o1=system.Molecule(0)
+        self.o2=system.Molecule(0)
 
     def calc_exp(self):
         c1 = numpy.array((self.o1.coor()[0]),floattype)

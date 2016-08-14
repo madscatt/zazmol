@@ -19,7 +19,7 @@ from sasmol.test_sasmol.utilities import env, util
 
 from unittest import main 
 from mocker import Mocker, MockerTestCase, ANY, ARGS, KWARGS
-import sasmol.sasmol as sasmol
+import sasmol.system as system
 import sasmol.operate as operate
 
 import numpy
@@ -42,7 +42,7 @@ class Test_sascalc_Prop_calcpmi(MockerTestCase):
 
         self.m.replay()
 
-        self.o=sasmol.SasMol(0)
+        self.o=system.Molecule(0)
 
     def assert_list_almost_equal_flip_sign_allowed(self,a,b,places=5):
         if (len(a)!=len(b)):

@@ -18,7 +18,7 @@
 from unittest import main 
 from mocker import Mocker, MockerTestCase
 
-import sasmol.sasmol as sasmol
+import sasmol.system as system
 
 import os
 
@@ -27,7 +27,7 @@ DataPath = os.path.join(os.path.dirname(os.path.realpath(__file__)),'..','data',
 class Test_unit_file_io_Files_get_resnames(MockerTestCase):
 
    def setUp(self):
-      self.o=sasmol.SasMol(0)
+      self.o=system.Molecule(0)
       (self.protein, self.dna, self.rna, self.nucleic, self.water)=self.o.get_resnames()
 
    def unique(self,seq):

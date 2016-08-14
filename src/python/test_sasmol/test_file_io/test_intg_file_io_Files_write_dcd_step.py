@@ -20,7 +20,7 @@ from sasmol.test_sasmol.utilities import env
 from unittest import main,skipIf
 from mocker import Mocker, MockerTestCase
 
-import sasmol.sasmol as sasmol
+import sasmol.system as system
 import sasmol.dcdio as dcdio
 
 import numpy, os
@@ -33,7 +33,7 @@ moduleDataPath = os.path.join(os.path.dirname(os.path.realpath(__file__)),'..','
 class Test_intg_file_io_Files_write_dcd_step(MockerTestCase):
 
    def setUp(self):
-      self.o=sasmol.SasMol(0)
+      self.o=system.Molecule(0)
       self.prcsn = 3
 
    def assert_list_almost_equal(self,a,b,places=5):
@@ -66,7 +66,7 @@ class Test_intg_file_io_Files_write_dcd_step(MockerTestCase):
       self.o.write_dcd_step(fp, frame, step)
       dcdio.close_dcd_write(fp)
       #
-      otest = sasmol.SasMol(0)
+      otest = system.Molecule(0)
       otest.read_dcd(dcdFileName)
       result_coor = otest.coor()
       sum_result_coor = sum(sum(sum(result_coor)))
@@ -98,7 +98,7 @@ class Test_intg_file_io_Files_write_dcd_step(MockerTestCase):
       self.o.write_dcd_step(fp, frame, step)
       dcdio.close_dcd_write(fp)
       #
-      otest = sasmol.SasMol(0)
+      otest = system.Molecule(0)
       otest.read_dcd(dcdFileName)
       result_coor = otest.coor()
       sum_result_coor = sum(sum(sum(result_coor)))
@@ -129,7 +129,7 @@ class Test_intg_file_io_Files_write_dcd_step(MockerTestCase):
       self.o.write_dcd_step(fp, frame, step)
       dcdio.close_dcd_write(fp)
       #
-      otest = sasmol.SasMol(0)
+      otest = system.Molecule(0)
       otest.read_dcd(dcdFileName)
       result_coor = otest.coor()
       sum_result_coor = sum(sum(sum(result_coor)))
@@ -161,7 +161,7 @@ class Test_intg_file_io_Files_write_dcd_step(MockerTestCase):
       self.o.write_dcd_step(fp, frame, step)
       dcdio.close_dcd_write(fp)
       #
-      otest = sasmol.SasMol(0)
+      otest = system.Molecule(0)
       otest.read_dcd(dcdFileName)
       result_coor = otest.coor()
       sum_result_coor = sum(sum(sum(result_coor)))
@@ -193,7 +193,7 @@ class Test_intg_file_io_Files_write_dcd_step(MockerTestCase):
       self.o.write_dcd_step(fp, frame, step)
       dcdio.close_dcd_write(fp)
       #
-      otest = sasmol.SasMol(0)
+      otest = system.Molecule(0)
       otest.read_dcd(dcdFileName)
       result_coor = otest.coor()
       sum_result_coor = sum(sum(sum(result_coor)))
@@ -226,7 +226,7 @@ class Test_intg_file_io_Files_write_dcd_step(MockerTestCase):
       self.o.write_dcd_step(fp, frame, step)
       dcdio.close_dcd_write(fp)
       #
-      otest = sasmol.SasMol(0)
+      otest = system.Molecule(0)
       otest.read_dcd(dcdFileName)
       result_coor = otest.coor()
       sum_result_coor = sum(sum(sum(result_coor)))
@@ -260,7 +260,7 @@ class Test_intg_file_io_Files_write_dcd_step(MockerTestCase):
       self.o.write_dcd_step(fp, frame, step)
       dcdio.close_dcd_write(fp)
       #
-      otest = sasmol.SasMol(0)
+      otest = system.Molecule(0)
       otest.read_dcd(dcdFileName)
       result_coor = otest.coor()
       sum_result_coor = sum(sum(sum(result_coor)))
@@ -294,7 +294,7 @@ class Test_intg_file_io_Files_write_dcd_step(MockerTestCase):
       self.o.write_dcd_step(fp, frame, step)
       dcdio.close_dcd_write(fp)
       #
-      otest = sasmol.SasMol(0)
+      otest = system.Molecule(0)
       otest.read_dcd(dcdFileName)
       result_coor = otest.coor()
       sum_result_coor = sum(sum(sum(result_coor)))
@@ -329,7 +329,7 @@ class Test_intg_file_io_Files_write_dcd_step(MockerTestCase):
       self.o.write_dcd_step(fp, frame, step)
       dcdio.close_dcd_write(fp)
       #
-      otest = sasmol.SasMol(0)
+      otest = system.Molecule(0)
       otest.read_dcd(dcdFileName)
       result_coor = otest.coor()
       sum_result_coor = sum(sum(sum(result_coor)))
@@ -363,7 +363,7 @@ class Test_intg_file_io_Files_write_dcd_step(MockerTestCase):
       self.o.write_dcd_step(fp, frame, step)
       dcdio.close_dcd_write(fp)
       #
-      otest = sasmol.SasMol(0)
+      otest = system.Molecule(0)
       otest.read_dcd(dcdFileName)
       result_coor = otest.coor()
       sum_result_coor = sum(sum(sum(result_coor)))
@@ -397,7 +397,7 @@ class Test_intg_file_io_Files_write_dcd_step(MockerTestCase):
       self.o.write_dcd_step(fp, frame, step)
       dcdio.close_dcd_write(fp)
       #
-      otest = sasmol.SasMol(0)
+      otest = system.Molecule(0)
       otest.read_dcd(dcdFileName)
       result_coor = otest.coor()
       sum_result_coor = sum(sum(sum(result_coor)))
@@ -428,7 +428,7 @@ class Test_intg_file_io_Files_write_dcd_step(MockerTestCase):
       self.o.write_dcd_step(fp, frame, step)
       dcdio.close_dcd_write(fp)
       #
-      otest = sasmol.SasMol(0)
+      otest = system.Molecule(0)
       otest.read_dcd(dcdFileName)
       result_coor = otest.coor()
       sum_result_coor = sum(sum(sum(result_coor)))
@@ -460,7 +460,7 @@ class Test_intg_file_io_Files_write_dcd_step(MockerTestCase):
       self.o.write_dcd_step(fp, frame, step)
       dcdio.close_dcd_write(fp)
       #
-      otest = sasmol.SasMol(0)
+      otest = system.Molecule(0)
       otest.read_dcd(dcdFileName)
       result_coor = otest.coor()
       sum_result_coor = sum(sum(sum(result_coor)))

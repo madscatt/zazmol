@@ -17,9 +17,9 @@
 
 from unittest import main 
 from mocker import Mocker, MockerTestCase
-import sasmol.sasmol as sasmol
+import sasmol.system as system
 
-class Test_intg_sasmol_SasAtm_init(MockerTestCase):
+class Test_intg_system_Atom_init(MockerTestCase):
 
    def setUp(self):
       pass
@@ -29,7 +29,7 @@ class Test_intg_sasmol_SasAtm_init(MockerTestCase):
       test initializer with default input
       '''
       #
-      o=sasmol.SasAtm()
+      o=system.Atom()
       self.assertEqual(o.id(),0)
       self.assertEqual(o.total_mass(),0.0)
       self.assertEqual(o.natoms(),0)
@@ -43,7 +43,7 @@ class Test_intg_sasmol_SasAtm_init(MockerTestCase):
       '''
       #
       id=3
-      o=sasmol.SasAtm(id)
+      o=system.Atom(id)
       self.assertEqual(o.id(),id)
       self.assertEqual(o.total_mass(),0.0)
       self.assertEqual(o.natoms(),0)

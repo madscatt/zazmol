@@ -19,7 +19,7 @@ from sasmol.test_sasmol.utilities import env
 
 from unittest import main 
 from mocker import Mocker, MockerTestCase, ANY, ARGS, KWARGS
-import sasmol.sasmol as sasmol
+import sasmol.system as system
 import sasmol.operate as operate
 
 import numpy
@@ -36,10 +36,10 @@ class Test_intg_operate_Move_align(MockerTestCase):
 
 
     def setUp(self):
-        self.o1=sasmol.SasMol(0)
-        self.o2=sasmol.SasMol(0)
-        self.o1Sub=sasmol.SasMol(0)
-        self.o2Sub=sasmol.SasMol(0)
+        self.o1=system.Molecule(0)
+        self.o2=system.Molecule(0)
+        self.o1Sub=system.Molecule(0)
+        self.o2Sub=system.Molecule(0)
 
 
     def assert_list_almost_equal(self,a,b,places=5):

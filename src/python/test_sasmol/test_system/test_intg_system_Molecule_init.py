@@ -19,9 +19,9 @@
 from unittest import main 
 from mocker import Mocker, MockerTestCase
 
-import sasmol.sasmol as sasmol
+import sasmol.system as system
 
-class Test_intg_sasmol_SasMol_init(MockerTestCase):
+class Test_intg_system_Molecule_init(MockerTestCase):
 
    def setUp(self):
       pass
@@ -33,7 +33,7 @@ class Test_intg_sasmol_SasMol_init(MockerTestCase):
       '''
       #
       id=3
-      o=sasmol.SasMol(id)
+      o=system.Molecule(id)
       self.assertEqual(o.id(),id)
       self.assertEqual(o.total_mass(),0.0)
       self.assertEqual(o.natoms(),0)

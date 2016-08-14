@@ -19,7 +19,7 @@ from sasmol.test_sasmol.utilities import env
 
 from unittest import main, skipIf
 from mocker import Mocker, MockerTestCase
-import sasmol.sasmol as sasmol
+import sasmol.system as system
 
 import numpy
 
@@ -30,7 +30,7 @@ PdbPath = os.path.join(os.path.dirname(os.path.realpath(__file__)),'..','data','
 class Test_sascalc_Prop_calcminmax(MockerTestCase): 
 
     def setUp(self):
-        self.o=sasmol.SasMol(0)
+        self.o=system.Molecule(0)
 
     def assert_list_almost_equal(self,a,b,places=5):
         if (len(a)!=len(b)):

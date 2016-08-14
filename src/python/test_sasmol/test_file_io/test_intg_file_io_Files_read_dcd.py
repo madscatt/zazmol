@@ -20,7 +20,7 @@ from sasmol.test_sasmol.utilities import env, generate_huge_dcd_onthefly
 from unittest import main,skipIf
 from mocker import Mocker, MockerTestCase
 
-import sasmol.sasmol as sasmol
+import sasmol.system as system
 
 import numpy
 
@@ -35,7 +35,7 @@ moduleDataPath = os.path.join(os.path.dirname(os.path.realpath(__file__)),'..','
 class Test_intg_file_io_Files_read_dcd(MockerTestCase):
 
    def setUp(self):
-      self.o=sasmol.SasMol(0)
+      self.o=system.Molecule(0)
       self.prcsn = 3
 
    def assert_list_almost_equal(self,a,b,places=5):

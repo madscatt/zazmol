@@ -80,7 +80,7 @@ class Mask(object):
 
     def init_child(self, descriptor):
         '''
-        This method allows one to create a list of SasMol objects
+        This method allows one to create a list of Molecule objects
         that are defined by the input descriptor.
 
 
@@ -88,7 +88,7 @@ class Mask(object):
 
                 This is a way to create a mask to be used somewhere else:
 
-                m1=sasmol.SasMol(0)	### create a molecule m1
+                m1=system.Molecule(0)	### create a molecule m1
                 m1.read_pdb(filename)	### read in variables, coor, etc.
                 m1.initialize_children()   ### set up the masks etc.
 
@@ -155,7 +155,7 @@ class Mask(object):
 
         '''
 
-        import sasmol
+        import sasmol.system as system
 
         at = 'len(self.' + descriptor + '())'
         number_of_objects = eval(at)
@@ -165,7 +165,7 @@ class Mask(object):
 
         for i in xrange(number_of_objects):
 
-            new_object = sasmol.SasMol(0)
+            new_object = system.Molecule(0)
             at = 'self.' + descriptor + '_mask()[' + str(i) + ']'
             mask = eval(at)
             error = self.copy_molecule_using_mask(new_object, mask, frame)
@@ -187,7 +187,7 @@ class Mask(object):
 
                 Here is a way to create a mask to be used somewhere else:
 
-                m1=sasmol.SasMol(0)	### create a molecule m1
+                m1=system.Molecule(0)	### create a molecule m1
                 m1.read_pdb(filename)	### read in variables, coor, etc.
 
                 . . . do stuff . . . 
@@ -322,13 +322,13 @@ class Mask(object):
         usage:
 
 
-                m1=sasmol.SasMol(0)	### create a molecule m1
+                m1=system.Molecule(0)	### create a molecule m1
                 m1.read_pdb(filename1)	### read in variables, coor, etc.
 
-                m2=sasmol.SasMol(1)	### create a molecule m2
+                m2=system.Molecule(1)	### create a molecule m2
                 m2.read_pdb(filename2)	### read in variables, coor, etc.
 
-                m3=sasmol.SasMol(2)	### create a molecule m3
+                m3=system.Molecule(2)	### create a molecule m3
 
 
                 . . . do stuff . . . 
@@ -549,7 +549,7 @@ class Mask(object):
 
                 Here is a way to create a mask to be used somewhere else:
 
-                m1=sasmol.SasMol(0)	### create a molecule m1
+                m1=system.Molecule(0)	### create a molecule m1
                 m1.read_pdb(filename)	### read in variables, coor, etc.
 
                 . . . do stuff . . . 
@@ -558,7 +558,7 @@ class Mask(object):
 
                 error,mask = m1.get_subset_mask(basis_filter)  ### get a mask
 
-                sub_m1=sasmol.SasMol(1)		### create a new molecule sub_m1
+                sub_m1=system.Molecule(1)		### create a new molecule sub_m1
 
                 error = m1.copy_molecule_using_mask(sub_m1,mask,frame) ### initializes sub_m1
 
@@ -723,7 +723,7 @@ class Mask(object):
 
                 Here is a way to create a mask to be used somewhere else:
 
-                m1=sasmol.SasMol(0)	### create a molecule m1
+                m1=system.Molecule(0)	### create a molecule m1
                 m1.read_pdb(filename)	### read in variables, coor, etc.
 
                 # you need an array of x,y,z coords that set the com position
@@ -731,7 +731,7 @@ class Mask(object):
 
                 . . . do stuff . . . 
 
-                m2=sasmol.SasMol(1)  	### create a second molecule m2
+                m2=system.Molecule(1)  	### create a second molecule m2
 
                 error = m1.duplicate_molecule(m2,number_of_duplicates,frame,com_coor) 
 
@@ -929,7 +929,7 @@ class Mask(object):
 
         usage:
 
-                m1=sasmol.SasMol(0)	### create a molecule m1
+                m1=system.Molecule(0)	### create a molecule m1
                 m1.read_pdb(filename)	### read in variables, coor, etc.
 
                 . . . do stuff . . . 
@@ -968,10 +968,10 @@ class Mask(object):
 
         usage:
 
-                m1=sasmol.SasMol(0)	### create a molecule m1
+                m1=system.Molecule(0)	### create a molecule m1
                 m1.read_pdb(filename)	### read in variables, coor, etc.
 
-                m2=sasmol.SasMol(1)	### create a molecule m2
+                m2=system.Molecule(1)	### create a molecule m2
 
                 . . . do stuff . . . 
 
@@ -1036,7 +1036,7 @@ class Mask(object):
 
         usage:
 
-                m1=sasmol.SasMol(0)	### create a molecule m1
+                m1=system.Molecule(0)	### create a molecule m1
                 m1.read_pdb(filename)	### read in variables, coor, etc.
 
                 . . . do stuff . . . 
@@ -1109,13 +1109,13 @@ class Mask(object):
     def copy_apply_biomt(self, other, frame, selection, U, M):
         """
         Copy selected atoms (with initial coordinates from the given frame)
-        to new SasMol object (other) and apply transforms taken from biological
+        to new Molecule object (other) and apply transforms taken from biological
         unit (BIOMT) to the coordinates.
 
         Information on BIOMT available at:
         http://pdb101.rcsb.org/learn/guide-to-understanding-pdb-data/biological-assemblies
 
-        @type  frame:      SasMol
+        @type  frame:      Molecule
         @param frame:      Object to copy transformed information into
         @type  frame:      integer
         @param frame:      Frame number of coordinates to transform

@@ -19,7 +19,7 @@ from sasmol.test_sasmol.utilities import env
 
 from unittest import main, skipIf
 from mocker import Mocker, MockerTestCase, ANY, ARGS
-import sasmol.sasmol as sasmol
+import sasmol.system as system
 
 import numpy
 
@@ -31,7 +31,7 @@ DataPath = os.path.join(os.path.dirname(os.path.realpath(__file__)),'..','data',
 class Test_sascalc_Prop_calccom(MockerTestCase): 
 
     def setUp(self):
-        self.o=sasmol.SasMol(0)
+        self.o=system.Molecule(0)
 
     def calc_exp(self):
         self.o.calculate_center_of_mass(0)

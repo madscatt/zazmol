@@ -19,7 +19,7 @@ from sasmol.test_sasmol.utilities import env
 
 from unittest import main, skipIf
 from mocker import Mocker, MockerTestCase, ANY, ARGS
-import sasmol.sasmol as sasmol
+import sasmol.system as system
 
 import numpy
 
@@ -35,8 +35,8 @@ modulePdbPath = os.path.join(os.path.dirname(os.path.realpath(__file__)),'..','d
 class test_sascalc_Prop_calcrmsd(MockerTestCase): 
 
     def setUp(self):
-        self.o1=sasmol.SasMol(0)
-        self.o2=sasmol.SasMol(0)
+        self.o1=system.Molecule(0)
+        self.o2=system.Molecule(0)
         self.tol = 3
 
     def test_null(self):

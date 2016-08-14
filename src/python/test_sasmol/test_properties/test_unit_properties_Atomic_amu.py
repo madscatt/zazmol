@@ -25,7 +25,7 @@ make sure the right amu list was generated
 from unittest import main 
 from mocker import Mocker, MockerTestCase
 
-import sasmol.sasmol as sasmol
+import sasmol.system as system
 
 import os
 
@@ -34,7 +34,7 @@ DataPath = os.path.join(os.path.dirname(os.path.realpath(__file__)),'..','data',
 class Test_unit_properties_Atomic_charmm_names(MockerTestCase):
 
    def setUp(self):
-      self.o=sasmol.SasMol(0)
+      self.o=system.Molecule(0)
       self.standard_atomic_weight  = self.o.amu()
 
 

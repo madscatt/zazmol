@@ -19,7 +19,7 @@ from sasmol.test_sasmol.utilities import env
 
 from unittest import main, skipIf
 from mocker import Mocker, MockerTestCase, ANY, ARGS, KWARGS
-import sasmol.sasmol as sasmol
+import sasmol.system as system
 
 import numpy, os, copy
 
@@ -27,12 +27,11 @@ import numpy, os, copy
 floattype=os.environ['SASSIE_FLOATTYPE']
 
 DataPath = os.path.join(os.path.dirname(os.path.realpath(__file__)),'..','data','pdb_common')+os.path.sep
-moduleDataPath = os.path.join(os.path.dirname(os.path.realpath(__file__)),'..','data','sasmol','sasio')+os.path.sep
 
 class Test_intg_sasio_Files_initialize_children(MockerTestCase):
 
    def setUp(self):
-      self.o=sasmol.SasMol(0)
+      self.o=system.Molecule(0)
 
    def assert_list_almost_equal(self,a,b,places=5):
       if (len(a)!=len(b)):

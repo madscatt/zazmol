@@ -19,7 +19,7 @@ from sasmol.test_sasmol.utilities import env
 
 from unittest import main 
 from mocker import Mocker, MockerTestCase, ANY, ARGS, KWARGS
-import sasmol.sasmol as sasmol
+import sasmol.system as system
 
 import numpy, os, copy
 
@@ -27,12 +27,12 @@ import warnings; warnings.filterwarnings('ignore')
 
 floattype=os.environ['SASSIE_FLOATTYPE']
 
-DataPath = os.path.join(os.path.dirname(os.path.realpath(__file__)),'..','data','sasmol','sasmol')+os.path.sep
+DataPath = os.path.join(os.path.dirname(os.path.realpath(__file__)),'..','data','sasmol','system')+os.path.sep
 
-class Test_intg_sasmol_SasAtm_maketop(MockerTestCase):
+class Test_intg_sytem_Atom_maketop(MockerTestCase):
 
    def setUp(self):
-      self.o=sasmol.SasAtm(3,'1CRN-3frames.pdb')
+      self.o=system.Atom(3,'1CRN-3frames.pdb')
 
    def assert_list_almost_equal(self,a,b,places=5):
       if (len(a)!=len(b)):

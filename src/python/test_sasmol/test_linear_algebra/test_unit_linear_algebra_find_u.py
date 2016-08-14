@@ -19,7 +19,7 @@ from sasmol.test_sasmol.utilities import env
 
 from unittest import main 
 from mocker import Mocker, MockerTestCase, ANY, ARGS, KWARGS
-import sasmol.sasmol as sasmol
+import sasmol.system as system
 import sasmol.linear_algebra as linear_algebra
 
 import numpy
@@ -135,8 +135,8 @@ class Test_linear_algebra(MockerTestCase):
           self.assert_list_almost_equal(list(result_u[i]),expected_u[i])
 
     def test_find_u_rotate_pdb(self):
-        m1 = sasmol.SasMol(0)
-        m2 = sasmol.SasMol(1)
+        m1 = system.Molecule(0)
+        m2 = system.Molecule(1)
         m1.read_pdb(PdbPath+"1CRN.pdb")
         m2.read_pdb(modulePdbPath+"1CRN-rot.pdb")
 
@@ -146,7 +146,7 @@ class Test_linear_algebra(MockerTestCase):
         u = linear_algebra.find_u(coor_sub_m1, coor_sub_m2)
         result = numpy.array((numpy.matrix(u)*(numpy.matrix(coor_sub_m2).T)).T, numpy.float)
         #print numpy.dot(result.reshape(1,-1)[0],coor_sub_m1.reshape(1,-1)[0])/numpy.sqrt(numpy.dot(coor_sub_m1.reshape(1,-1)[0],coor_sub_m1.reshape(1,-1)[0])*numpy.dot(result.reshape(1,-1)[0],result.reshape(1,-1)[0]))
-        #m3 = sasmol.SasMol(2)
+        #m3 = system.Molecule(2)
         #m3.read_pdb('1CRN.pdb')
         #m3._coor[0,:]=result
         #m3.writepdb('1CRN-result.pdb',0,'w')

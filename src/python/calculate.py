@@ -38,7 +38,37 @@ import sasmol.operate as operate
 
 class Calculate(object):
 
-    '''
+    """Base class for applied mathematical functions.
+
+        It also serves as a constructor for undefined function classes.
+
+        Examples
+        ========
+
+        First example shows how to use Function as a constructor for undefined
+        function classes:
+
+        >>> from sympy import Function, Symbol
+        >>> x = Symbol('x')
+        >>> f = Function('f')
+        >>> g = Function('g')(x)
+        >>> f
+        f
+        >>> f(x)
+        f(x)
+        In the following example Function is used as a base class for
+        ``my_func`` that represents a mathematical function *my_func*. Suppose
+        that it is well known, that *my_func(0)* is *1* and *my_func* at infinity
+        goes to *0*, so we want those two simplifications to occur automatically.
+        Suppose also that *my_func(x)* is real exactly when *x* is real. Here is
+        an implementation that honours those requirements:
+
+        >>> class my_func(Function):
+        ...
+        ...     @classmethod
+        ...     def eval(cls, x):
+
+
     This class contains methods to calculate various properties of the supplied object.
 
     TODO:  Need to write a generic driver to loop over single or multiple frames
@@ -46,7 +76,7 @@ class Calculate(object):
     TODO:  Generic loop w/ multiprocessing
     TODO:  Cleaner doc-strings
 
-    '''
+    """ 
 
     def calculate_mass(self, **kwargs):
         '''

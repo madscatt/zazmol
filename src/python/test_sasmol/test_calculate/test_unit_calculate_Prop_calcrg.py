@@ -19,7 +19,7 @@ from sasmol.test_sasmol.utilities import env, util
 
 from unittest import main 
 from mocker import Mocker, MockerTestCase
-import sasmol.sasmol as sasmol
+import sasmol.system as system
 
 import numpy
 
@@ -31,7 +31,7 @@ floattype=os.environ['SASSIE_FLOATTYPE']
 class Test_sascalc_Prop_calcrg(MockerTestCase): 
 
     def setUp(self):
-        self.o=sasmol.SasMol(0)
+        self.o=system.Molecule(0)
         self.tol = 3
 
     def calc_exp(self):

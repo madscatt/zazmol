@@ -53,7 +53,7 @@ a bad pdb, assertRaises (some problem)
 from unittest import main,skipIf 
 from mocker import Mocker, MockerTestCase, ARGS
 
-import sasmol.sasmol as sasmol
+import sasmol.system as system
 import sasmol.subset as subset
 
 import numpy
@@ -66,9 +66,9 @@ class Test_subset_Mask_set_descriptor_using_mask(MockerTestCase):
  
 
    def setUp(self):
-      self.o=sasmol.SasMol(0)
-      self.o_result=sasmol.SasMol(1)
-      self.o_expected=sasmol.SasMol(2)
+      self.o=system.Molecule(0)
+      self.o_result=system.Molecule(1)
+      self.o_expected=system.Molecule(2)
 
 
    def assert_list_almost_equal(self,a,b,places=5):

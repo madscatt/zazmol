@@ -30,7 +30,7 @@ Test for noncharmm/wrong atoms (ABC, ...)
 from unittest import main 
 from mocker import Mocker, MockerTestCase, ARGS
 
-import sasmol.sasmol as sasmol
+import sasmol.system as system
 
 import os, sys, string
 
@@ -41,7 +41,7 @@ DataPath = os.path.join(os.path.dirname(os.path.realpath(__file__)),'..','data',
 class Test_unit_file_io_Files_element_filter(MockerTestCase):
 
    def setUp(self):
-      self.o=sasmol.SasMol(0)
+      self.o=system.Molecule(0)
 
 
    def test_null(self):

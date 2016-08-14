@@ -20,14 +20,14 @@ inf nan and etc need not be tested for this module
 '''
 from unittest import main 
 from mocker import Mocker, MockerTestCase, ANY, ARGS, KWARGS
-import sasmol.sasmol as sasmol
+import sasmol.system as system
 
 import numpy
 
 class Test_sascalc_Prop_calcmass(MockerTestCase): 
 
     def setUp(self):
-        self.o=sasmol.SasMol(0)
+        self.o=system.Molecule(0)
 
     def assert_list_almost_equal(self,a,b,places=5):
         if (len(a)!=len(b)):

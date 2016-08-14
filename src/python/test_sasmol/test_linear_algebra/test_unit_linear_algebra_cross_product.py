@@ -19,7 +19,6 @@ from sasmol.test_sasmol.utilities import env, util
 
 from unittest import main 
 from mocker import Mocker, MockerTestCase, ANY, ARGS, KWARGS
-import sasmol.sasmol as sasmol
 import sasmol.linear_algebra as linear_algebra
 import numpy
 

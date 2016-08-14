@@ -19,7 +19,7 @@ from sasmol.test_sasmol.utilities import env,util
 
 from unittest import main 
 from mocker import Mocker, MockerTestCase, ANY, ARGS, KWARGS
-import sasmol.sasmol as sasmol
+import sasmol.system as system
 import sasmol.operate as operate
 import sasmol.calculate as calculate
 
@@ -50,7 +50,7 @@ class Test_unit_operate_Move_moveto(MockerTestCase):
 
         self.m.replay()
 
-        self.o=sasmol.SasMol(0)
+        self.o=system.Molecule(0)
 
     def assert_list_almost_equal(self,a,b,places=5):
         if (len(a)!=len(b)):

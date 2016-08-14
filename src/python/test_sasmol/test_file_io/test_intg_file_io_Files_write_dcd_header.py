@@ -20,7 +20,7 @@ from sasmol.test_sasmol.utilities import env
 from unittest import main, skipIf 
 from mocker import Mocker, MockerTestCase
 
-import sasmol.sasmol as sasmol
+import sasmol.system as system
 import sasmol.dcdio as dcdio
 
 import os
@@ -31,7 +31,7 @@ moduleDataPath = os.path.join(os.path.dirname(os.path.realpath(__file__)),'..','
 class Test_intg_file_io_Files_write_dcd_header(MockerTestCase):
 
    def setUp(self):
-      self.o=sasmol.SasMol(0)
+      self.o=system.Molecule(0)
 
    def assert_list_almost_equal(self,a,b,places=5):
       if (len(a)!=len(b)):

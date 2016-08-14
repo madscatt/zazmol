@@ -20,7 +20,7 @@ from sasmol.test_sasmol.utilities import env,util
 from unittest import main, skipIf
 from mocker import Mocker, MockerTestCase, ANY, ARGS
 
-import sasmol.sasmol as sasmol
+import sasmol.system as system
 import sasmol.operate as operate
 
 import numpy
@@ -35,7 +35,7 @@ DataPath = os.path.join(os.path.dirname(os.path.realpath(__file__)),'..','data',
 class Test_intg_operate_Move_moveto(MockerTestCase): 
 
     def setUp(self):
-        self.o=sasmol.SasMol(0)
+        self.o=system.Molecule(0)
 
     def assert_list_almost_equal(self,a,b,places=5):
         if (len(a)!=len(b)):
