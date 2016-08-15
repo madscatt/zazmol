@@ -242,6 +242,51 @@ class Move():
             and the transformation is then done to all the atoms of
             molecule 2
 
+        Parameters
+        ----------
+        frame 
+            integer : trajectory frame number to use
+
+        coor_sub_2:
+            numpy array : coordinates of molecule 2
+
+        com_sub_2:
+            numpy array : center of mass of molecule 2
+        
+        coor_sub_1:
+            numpy array : coordinates of molecule 1
+
+        com_sub_1:
+            numpy array : center of mass of molecule 1
+        
+        kwargs 
+            optional future arguments
+                                                                                     
+        Returns
+        -------
+        None
+            updated self._coor
+
+        Examples
+        -------
+
+        >>> import sasmol.system as system
+        >>> molecule_1 = system.Molecule('hiv1_gag.pdb')
+        >>> molecule_2 = system.Molecule('moved_and_rotated_hiv1_gag.pdb')
+        >>> frame = 0
+        >>> coor_sub_1 = molecule_1.coor()
+        >>> com_sub_1 = molecule_1.calculate_center_of_mass(frame)
+        >>> coor_sub_2 = molecule_2.coor()
+        >>> com_sub_2 = molecule_2.calculate_center_of_mass(frame)
+        
+        Note
+        ----
+        mass_check determines if mass is defined for the ojbect so that
+        center of mass can be calculated
+       
+        method is scheduled for re-factoring
+         
+        
         '''
         self.mass_check()
         self.calculate_center_of_mass(frame)
@@ -292,7 +337,7 @@ class Move():
  
         Note 
         ----------
-        Calcuations are carried out using radians
+        Calculations are carried out using radians
         
         '''
 
@@ -356,7 +401,7 @@ class Move():
  
         Note 
         ----------
-        Calcuations are carried out using radians
+        Calculations are carried out using radians
         
         '''
 
@@ -418,7 +463,7 @@ class Move():
  
         Note 
         ----------
-        Calcuations are carried out using radians
+        Calculations are carried out using radians
 
         '''
 
