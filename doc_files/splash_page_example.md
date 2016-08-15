@@ -1,12 +1,12 @@
 
 
 ```python
-import sasmol.sasmol as sasmol
+import sasmol.system as system
 ```
 
 
 ```python
-molecule = sasmol.SasMol('hiv1_gag.pdb')
+molecule = system.Molecule('hiv1_gag.pdb')
 ```
 
     reading filename:  hiv1_gag.pdb

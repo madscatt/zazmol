@@ -2,6 +2,7 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 #from __future__ import unicode_literals
+
 '''
     SASSIE: Copyright (C) 2011 Joseph E. Curtis, Ph.D. 
 
@@ -29,7 +30,7 @@ import sasmol.linear_algebra as linear_algebra
 #   07/23/2016  --  refactored for Python 3         :   jc
 #
 #	 1         2         3         4         5         6         7
-#LC4567890123456789012345678901234567890123456789012345678901234567890123456789
+# LC4567890123456789012345678901234567890123456789012345678901234567890123456789
 #								       *      **
 '''
 	Operate contains the classes and methods to perform the basic
@@ -40,180 +41,220 @@ import sasmol.linear_algebra as linear_algebra
 	of single objects (i.e. no intra-object movements)
 '''
 
+
 class Move():
 
-	'''
-	This class moves an object.
+    """ Base class containing methods to perform basic translation, rotation,
+        and alignment operatioins on instances of system objects.
 
-	masscheck makes sure the mass and center of mass (COM) is current
+        The methods in this class move entire objects, not pieces
+        of single objects (i.e. no intra-object movements)
 
-	translate moves the object to a point in space.
-	
-	center moves the COM of the object to (0,0,0)
+        Examples
+        ========
 
-	moveto moves the COM to a point in space (x,y,z)
+        First example shows how to use class methods from system object:
 
-	'''	
+        >>> import sasmol.system as system
+        >>> molecule = system.Molecule('hiv1_gag.pdb')
+        >>> molecule.calculate_mass()
+        47896.61864599498
 
-	def masscheck(self,frame, **kwargs):
-		if(self._total_mass <=0.0):
-			self.calcmass()
-		return
-	
-	def translate(self,frame,value, **kwargs):
+        Second example shows how to use class methods directly:
 
-		'''
-		Simple movement.  It accepts an array of three
-		numbers and adds this array to each element.
-		It ends by updating the center of mass.   
-		'''
-		
-		self._coor[frame,:,0]=self._coor[frame,:,0]+value[0]
-		self._coor[frame,:,1]=self._coor[frame,:,1]+value[1]
-		self._coor[frame,:,2]=self._coor[frame,:,2]+value[2]
+        >>> import sasmol.system as system
+        >>> import sasmol.calculate as calculate
+        >>> molecule = system.Molecule('hiv1_gag.pdb')
+        >>> calculate.Calculate.calculate_mass(molecule) 
+        47896.61864599498
 
-		self.masscheck(frame)
-		self.calculate_center_of_mass(frame)
+        Note
+        ----
 
-		return
+        `self` parameter is not shown in the ``Parameters`` section in the documentation
 
-	def center(self,frame, **kwargs):
 
-		'''
-		Simple movement.  It moves the center of mass
-		to (0.0,0.0,0.0).  The method checks that
-		the COM has been calculated first.  
-		It ends by updating the center of mass
-		'''
-	
-		self.masscheck(frame)
-		self.calculate_center_of_mass(frame)
-			
-		self._coor[frame,:,0]=self._coor[frame,:,0]-self._com[0]
-		self._coor[frame,:,1]=self._coor[frame,:,1]-self._com[1]
-		self._coor[frame,:,2]=self._coor[frame,:,2]-self._com[2]
-		
-		self.calculate_center_of_mass(frame)
-	
-		return
+    """
 
-	def moveto(self,frame,value, **kwargs):
-		'''
-		Simple movement.  It moves the center of mass
-		to the destination value=[x,y,z].  The method 
-		checks that the COM has been calculated first.  
-		It ends by updating the center of mass
-		'''
-		
-		self.masscheck(frame)
-		self.calculate_center_of_mass(frame)
-	
-		self._coor[frame,:,0]=self._coor[frame,:,0]-self._com[0]+value[0]
-		self._coor[frame,:,1]=self._coor[frame,:,1]-self._com[1]+value[1]
-		self._coor[frame,:,2]=self._coor[frame,:,2]-self._com[2]+value[2]
-		
-		self.calculate_center_of_mass(frame)
-	
-		return
+    '''
 
-	def align(self,frame,coor_sub_2,com_sub_2,coor_sub_1,com_sub_1, **kwargs):
+        masscheck makes sure the mass and center of mass (COM) is current
 
-		'''
-		Alignment of one object on top of another
-		"self" is aligned onto "other" using the basis
-		of molecule 2 to align onto the basis of molecule 1
-		and the transformation is then done to all the atoms of
-		molecule 2
+        translate moves the object to a point in space.
 
-		'''
-		self.masscheck(frame)
-		self.calculate_center_of_mass(frame)
-	
-		u = linear_algebra.find_u(coor_sub_1, coor_sub_2)
+        center moves the COM of the object to (0,0,0)
 
-		tao = numpy.transpose(self.coor()[frame] - com_sub_2)
+        moveto moves the COM to a point in space (x,y,z)
 
-		error,nat2 = linear_algebra.matrix_multiply(u,tao)
+    '''
 
-		ncoor = numpy.transpose(nat2) + com_sub_1
+    def masscheck(self, frame, **kwargs):
+        if(self._total_mass <= 0.0):
+            self.calcmass()
+        return
 
-		self._coor[frame,:] = ncoor
- 
-		return
- 
-	def rotate(self,frame,axis,theta, **kwargs):
-			
-		'''
-		Simple rotation about the x, y, or z axis.
-		
-		Note that calcuations are in radians
+    def translate(self, frame, value, **kwargs):
+        '''
+            Simple movement.  It accepts an array of three
+            numbers and adds this array to each element.
+            It ends by updating the center of mass.   
+        '''
 
-		'''
+        self._coor[frame, :, 0] = self._coor[frame, :, 0] + value[0]
+        self._coor[frame, :, 1] = self._coor[frame, :, 1] + value[1]
+        self._coor[frame, :, 2] = self._coor[frame, :, 2] + value[2]
 
-		cs=numpy.cos(theta) ; si=numpy.sin(theta)
-		if(axis=='x'):
-			mat=numpy.array([[1.0,0.0,0.0],[0.0,cs,-si],[0.0,si,cs]])
-		elif(axis=='y'):
-			mat=numpy.array([[cs,0.0,si],[0.0,1.0,0.0],[-si,0.0,cs]])
-		elif(axis=='z'):
-			mat=numpy.array([[cs,-si,0.0],[si,cs,0.0],[0.0,0.0,1.0]])
+        self.masscheck(frame)
+        self.calculate_center_of_mass(frame)
 
-		coordt=self._coor[frame,:].T	
-		error,matrix_product = linear_algebra.matrix_multiply(mat,coordt)
-		ncoord = matrix_product.T	
-		self._coor[frame,:]=ncoord 
-	
-		return
+        return
 
-	def general_axis_rotate(self,frame,theta,ux,uy,uz, **kwargs):
-		'''
-        The general rotation of a molecule along an arbitrarily
-		given unit axis (ux,uy,uz) by an angle theta.
+    def center(self, frame, **kwargs):
+        '''
+            Simple movement.  It moves the center of mass
+            to (0.0,0.0,0.0).  The method checks that
+            the COM has been calculated first.  
+            It ends by updating the center of mass
+        '''
+
+        self.masscheck(frame)
+        self.calculate_center_of_mass(frame)
+
+        self._coor[frame, :, 0] = self._coor[frame, :, 0] - self._com[0]
+        self._coor[frame, :, 1] = self._coor[frame, :, 1] - self._com[1]
+        self._coor[frame, :, 2] = self._coor[frame, :, 2] - self._com[2]
+
+        self.calculate_center_of_mass(frame)
+
+        return
+
+    def moveto(self, frame, value, **kwargs):
+        '''
+            Simple movement.  It moves the center of mass
+            to the destination value=[x,y,z].  The method 
+            checks that the COM has been calculated first.  
+            It ends by updating the center of mass
+        '''
+
+        self.masscheck(frame)
+        self.calculate_center_of_mass(frame)
+
+        self._coor[frame, :, 0] = self._coor[
+            frame, :, 0] - self._com[0] + value[0]
+        self._coor[frame, :, 1] = self._coor[
+            frame, :, 1] - self._com[1] + value[1]
+        self._coor[frame, :, 2] = self._coor[
+            frame, :, 2] - self._com[2] + value[2]
+
+        self.calculate_center_of_mass(frame)
+
+        return
+
+    def align(self, frame, coor_sub_2, com_sub_2, coor_sub_1, com_sub_1, **kwargs):
+        '''
+            Alignment of one object on top of another
+            "self" is aligned onto "other" using the basis
+            of molecule 2 to align onto the basis of molecule 1
+            and the transformation is then done to all the atoms of
+            molecule 2
+
+        '''
+        self.masscheck(frame)
+        self.calculate_center_of_mass(frame)
+
+        u = linear_algebra.find_u(coor_sub_1, coor_sub_2)
+
+        tao = numpy.transpose(self.coor()[frame] - com_sub_2)
+
+        error, nat2 = linear_algebra.matrix_multiply(u, tao)
+
+        ncoor = numpy.transpose(nat2) + com_sub_1
+
+        self._coor[frame, :] = ncoor
+
+        return
+
+    def rotate(self, frame, axis, theta, **kwargs):
+        '''
+            Simple rotation about the x, y, or z axis.
+
+            Note that calcuations are in radians
+
+        '''
+
+        cs = numpy.cos(theta)
+        si = numpy.sin(theta)
+        if(axis == 'x'):
+            mat = numpy.array(
+                    [[1.0, 0.0, 0.0], [0.0, cs, -si], [0.0, si, cs]])
+        elif(axis == 'y'):
+            mat = numpy.array(
+                    [[cs, 0.0, si], [0.0, 1.0, 0.0], [-si, 0.0, cs]])
+        elif(axis == 'z'):
+            mat = numpy.array(
+                    [[cs, -si, 0.0], [si, cs, 0.0], [0.0, 0.0, 1.0]])
+
+        coordt = self._coor[frame, :].T
+        error, matrix_product = linear_algebra.matrix_multiply(mat, coordt)
+        ncoord = matrix_product.T
+        self._coor[frame, :] = ncoord
+
+        return
+
+    def general_axis_rotate(self, frame, theta, ux, uy, uz, **kwargs):
+        '''
+            The general rotation of a molecule along an arbitrarily
+            given unit axis (ux,uy,uz) by an angle theta.
 
         Note that calcuations are in radians
         '''
 
-		c11 = numpy.cos(theta)+pow(ux,2)*(1-numpy.cos(theta))
-		c12 = ux*uy*(1-numpy.cos(theta))-uz*numpy.sin(theta)
-		c13 = ux*uz*(1-numpy.cos(theta))+uy*numpy.sin(theta)
-		c21 = uy*ux*(1-numpy.cos(theta))+uz*numpy.sin(theta)
-		c22 = numpy.cos(theta)+pow(uy,2)*(1-numpy.cos(theta))
-		c23 = uy*uz*(1-numpy.cos(theta))-ux*numpy.sin(theta)
-		c31 = uz*ux*(1-numpy.cos(theta))-uy*numpy.sin(theta)
-		c32 = uz*uy*(1-numpy.cos(theta))+ux*numpy.sin(theta)
-		c33 = numpy.cos(theta)+pow(uz,2)*(1-numpy.cos(theta))
+        c11 = numpy.cos(theta) + pow(ux, 2) * (1 - numpy.cos(theta))
+        c12 = ux * uy * (1 - numpy.cos(theta)) - uz * numpy.sin(theta)
+        c13 = ux * uz * (1 - numpy.cos(theta)) + uy * numpy.sin(theta)
+        c21 = uy * ux * (1 - numpy.cos(theta)) + uz * numpy.sin(theta)
+        c22 = numpy.cos(theta) + pow(uy, 2) * (1 - numpy.cos(theta))
+        c23 = uy * uz * (1 - numpy.cos(theta)) - ux * numpy.sin(theta)
+        c31 = uz * ux * (1 - numpy.cos(theta)) - uy * numpy.sin(theta)
+        c32 = uz * uy * (1 - numpy.cos(theta)) + ux * numpy.sin(theta)
+        c33 = numpy.cos(theta) + pow(uz, 2) * (1 - numpy.cos(theta))
 
-		C = numpy.matrix([[c11,c12,c13],[c21,c22,c23],[c31,c32,c33]])
+        C = numpy.matrix(
+            [[c11, c12, c13], [c21, c22, c23], [c31, c32, c33]])
 
-		coor = numpy.array(self.coor()[frame]*C)
+        coor = numpy.array(self.coor()[frame] * C)
 
-		self.coor()[frame,:] = coor
+        self.coor()[frame, :] = coor
 
-		return
+        return
 
-	def euler_rotate(self,frame,phi,theta,psi, **kwargs):
-		'''
+    def euler_rotate(self, frame, phi, theta, psi, **kwargs):
+        '''
         Rotate the molecule by a euler angle set (phi,theta,psi)
 
         Note that calcuations are in radians
 
         '''
 
-		c11 = numpy.cos(theta)*numpy.cos(psi)
-		c12 = numpy.cos(phi)*numpy.sin(psi) + numpy.sin(phi)*numpy.sin(theta)*numpy.cos(psi)
-		c13 = numpy.sin(phi)*numpy.sin(psi) - numpy.cos(phi)*numpy.sin(theta)*numpy.cos(psi)
-		c21 = -numpy.cos(theta)*numpy.sin(psi)
-		c22 = numpy.cos(phi)*numpy.cos(psi) - numpy.sin(phi)*numpy.sin(theta)*numpy.sin(psi)
-		c23 = numpy.sin(phi)*numpy.cos(psi) + numpy.cos(phi)*numpy.sin(theta)*numpy.sin(psi)
-		c31 = numpy.sin(theta)
-		c32 = -numpy.sin(phi)*numpy.cos(theta)
-		c33 = numpy.cos(phi)*numpy.cos(theta)
+        c11 = numpy.cos(theta) * numpy.cos(psi)
+        c12 = numpy.cos(phi) * numpy.sin(psi) + \
+                numpy.sin(phi) * numpy.sin(theta) * numpy.cos(psi)
+        c13 = numpy.sin(phi) * numpy.sin(psi) - \
+                numpy.cos(phi) * numpy.sin(theta) * numpy.cos(psi)
+        c21 = -numpy.cos(theta) * numpy.sin(psi)
+        c22 = numpy.cos(phi) * numpy.cos(psi) - \
+                numpy.sin(phi) * numpy.sin(theta) * numpy.sin(psi)
+        c23 = numpy.sin(phi) * numpy.cos(psi) + \
+                numpy.cos(phi) * numpy.sin(theta) * numpy.sin(psi)
+        c31 = numpy.sin(theta)
+        c32 = -numpy.sin(phi) * numpy.cos(theta)
+        c33 = numpy.cos(phi) * numpy.cos(theta)
 
-		C = numpy.matrix([[c11,c12,c13],[c21,c22,c23],[c31,c32,c33]])
-                
-		coor = numpy.array(self.coor()[frame]*C)
-               
-		self.coor()[frame,:] = coor 
-                
-		return
+        C = numpy.matrix(
+                [[c11, c12, c13], [c21, c22, c23], [c31, c32, c33]])
 
+        coor = numpy.array(self.coor()[frame] * C)
+
+        self.coor()[frame, :] = coor
+
+        return

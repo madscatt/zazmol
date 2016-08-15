@@ -19,7 +19,7 @@ Utility methods to handle vector and matrix operations, overlap transformations,
 
 ###[calculate.py](calculate/calculate_overview.md)
 
- - contains methods to calculate properties from coordinates
+ - contains methods to calculate properties from coordinatesdd
 
 ###[operate.py](operate/operate_overview.md)
 
