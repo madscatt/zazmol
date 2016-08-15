@@ -45,7 +45,7 @@ import sasmol.linear_algebra as linear_algebra
 class Move():
 
     """ Base class containing methods to perform basic translation, rotation,
-        and alignment operatioins on instances of system objects.
+        and alignment operations on instances of system objects.
 
         The methods in this class move entire objects, not pieces
         of single objects (i.e. no intra-object movements)
@@ -88,7 +88,7 @@ class Move():
         Note
         ----
         mass_check determines if mass is defined for the ojbect so that
-        center of mass (COM) can be calculated
+        center of mass can be calculated
         
 
         Parameters
@@ -210,14 +210,16 @@ class Move():
         >>> frame = 0
         >>> molecule.calculate_center_of_mass(frame)
         array([ -6.79114736, -23.71577133,   8.06558513])
-        >>> displacement = [3.0, 4.0, 5.0]
-        >>> molecule.translate(frame,displacement)
+        >>> molecule.center(frame)
         >>> molecule.calculate_center_of_mass(frame)
-        array([ -3.79114736, -19.71577133,  13.06558513])
+        array([  7.11544707e-13,   2.48159571e-12,  -8.45832820e-13])
 
         Note 
         ----------
         mass_check is called to validate self._total_mass()    
+        
+        Can achieve same result using self.translate(frame,[0,0,0],point=True)
+
         
         '''
 
@@ -260,8 +262,38 @@ class Move():
         '''
             Simple rotation about the x, y, or z axis.
 
-            Note that calcuations are in radians
 
+        Parameters
+        ----------
+        frame 
+            integer : trajectory frame number to use
+
+        axis 
+            string : 'x', 'y', or 'z'
+
+        theta 
+            float : angle in radians
+
+        kwargs 
+            optional future arguments        
+       
+        Returns
+        -------
+        None
+            updated self._coor 
+
+        Examples
+        -------
+
+        >>> import sasmol.system as system ; import math
+        >>> molecule = system.Molecule('hiv1_gag.pdb')
+        >>> frame = 0 ; axis = 'x' ; theta = 45.0 * math.pi / 180.0
+        >>> molecule.rotate(frame, axis, theta)
+ 
+        Note 
+        ----------
+        Calcuations are carried out using radians
+        
         '''
 
         cs = numpy.cos(theta)
@@ -288,7 +320,44 @@ class Move():
             The general rotation of a molecule along an arbitrarily
             given unit axis (ux,uy,uz) by an angle theta.
 
-        Note that calcuations are in radians
+        Parameters
+        ----------
+        frame 
+            integer : trajectory frame number to use
+
+        theta 
+            float : angle in radians
+        
+        ux 
+            float : x-component of unit axis
+
+        uy 
+            float : y-component of unit axis
+
+        uz 
+            float : z-component of unit axis
+
+        kwargs 
+            optional future arguments        
+       
+        Returns
+        -------
+        None
+            updated self._coor 
+
+        Examples
+        -------
+
+        >>> import sasmol.system as system ; import math
+        >>> molecule = system.Molecule('hiv1_gag.pdb')
+        >>> frame = 0 ; theta = 45.0 * math.pi / 180.0
+        >>> ux = 0.2 ; uy = 1.3 ; uz = -3.5
+        >>> molecule.general_axis_rotate(frame, theta, ux, uy, uz)
+ 
+        Note 
+        ----------
+        Calcuations are carried out using radians
+        
         '''
 
         c11 = numpy.cos(theta) + pow(ux, 2) * (1 - numpy.cos(theta))
@@ -314,7 +383,42 @@ class Move():
         '''
         Rotate the molecule by a euler angle set (phi,theta,psi)
 
-        Note that calcuations are in radians
+        Parameters
+        ----------
+        frame 
+            integer : trajectory frame number to use
+
+        phi 
+            float : phi angle
+
+        theta 
+            float : theta angle
+
+        psi 
+            float : psi angle
+
+        kwargs 
+            optional future arguments        
+       
+        Returns
+        -------
+        None
+            updated self._coor 
+
+        Examples
+        -------
+
+        >>> import sasmol.system as system ; import math
+        >>> molecule = system.Molecule('hiv1_gag.pdb')
+        >>> frame = 0 
+        >>> phi = 45.0 * math.pi / 180.0 
+        >>> theta = 45.0 * math.pi / 180.0
+        >>> psi = 32.0 * math.pi / 180.0
+        >>> molecule.euler_rotate(frame, phi, theta, psi)
+ 
+        Note 
+        ----------
+        Calcuations are carried out using radians
 
         '''
 
