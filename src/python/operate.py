@@ -173,9 +173,9 @@ class Move():
         if point_flag:
             self._com = self.calculate_center_of_mass(frame)
 
-            self._coor[frame, :, 0] = self._coor[frame, :, 0] - self._com[0]
-            self._coor[frame, :, 1] = self._coor[frame, :, 1] - self._com[1]
-            self._coor[frame, :, 2] = self._coor[frame, :, 2] - self._com[2]
+            self._coor[frame, :, 0] -= self._com[0]
+            self._coor[frame, :, 1] -= self._com[1]
+            self._coor[frame, :, 2] -= self._com[2]
          
         self._coor[frame, :, 0] += value[0]
         self._coor[frame, :, 1] += value[1]
