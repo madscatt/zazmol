@@ -27,7 +27,7 @@ import os
 
 DataPath = os.path.join(os.path.dirname(os.path.realpath(__file__)),'..','data','pdb_common')+os.path.sep
 
-class Test_operate_Move_masscheck(MockerTestCase): 
+class Test_operate_Move_mass_check(MockerTestCase): 
 
     def setUp(self):
         self.o=system.Molecule(0)
@@ -47,7 +47,7 @@ class Test_operate_Move_masscheck(MockerTestCase):
 
     def test_one_atom_pdb(self):
         self.o.read_pdb(DataPath+'1ATM.pdb')
-	self.o.masscheck(0)
+	self.o.mass_check()
         result_totalmass  = self.o.total_mass()
         result_mass = self.o.mass()
         expected_mass = [14.00672]
@@ -57,7 +57,7 @@ class Test_operate_Move_masscheck(MockerTestCase):
 
     def test_two_aa_pdb(self):
         self.o.read_pdb(DataPath+'2AAD.pdb')
-	self.o.masscheck(0)
+	self.o.mass_check()
         result_totalmass  = self.o.total_mass()
         result_mass = self.o.mass()
         expected_mass = [14.00672, 12.01078, 12.01078, 15.99943, 12.01078, 12.01078, 12.01078, \
@@ -68,7 +68,7 @@ class Test_operate_Move_masscheck(MockerTestCase):
 
     def test_rna_pdb(self):
         self.o.read_pdb(DataPath+'rna.pdb')
-	self.o.masscheck(0)
+	self.o.mass_check()
         result_totalmass  = self.o.total_mass()
         result_mass = self.o.mass()
         expected_totalmass = 106197.087
@@ -76,7 +76,7 @@ class Test_operate_Move_masscheck(MockerTestCase):
 
     def test_1CRN_pdb(self):
         self.o.read_pdb(DataPath+'1CRN.pdb')
-	self.o.masscheck(0)
+	self.o.mass_check()
         result_totalmass  = self.o.total_mass()
         result_mass = self.o.mass()
         expected_totalmass = 4412.904
@@ -85,7 +85,7 @@ class Test_operate_Move_masscheck(MockerTestCase):
     #@skipIf(os.environ['SASSIE_LARGETEST']=='n',"I am not testing large files")
     def test_1KP8_pdb(self):
         self.o.read_pdb(DataPath+'1KP8.pdb')
-	self.o.masscheck(0)
+	self.o.mass_check()
         result_totalmass  = self.o.total_mass()
         result_mass = self.o.mass()
         expected_totalmass = 766109.266

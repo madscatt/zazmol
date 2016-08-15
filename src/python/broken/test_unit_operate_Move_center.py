@@ -35,9 +35,9 @@ class Test_unit_operate_Move_center(MockerTestCase):
     def setUp(self):
         self.m = Mocker()
 
-        self.back_masscheck = operate.Move.masscheck
-        operate.Move.masscheck = self.m.mock()
-        operate.Move.masscheck(ARGS)
+        self.back_mass_check = operate.Move.mass_check
+        operate.Move.mass_check = self.m.mock()
+        operate.Move.mass_check(ARGS)
         self.m.result(None)
         self.m.count(0,None)
 
@@ -143,7 +143,7 @@ class Test_unit_operate_Move_center(MockerTestCase):
     def tearDown(self):
         self.m.verify()
         calculate.Calculate.calculate_center_of_mass=self.back_calccom
-        operate.Move.masscheck  =self.back_masscheck
+        operate.Move.mass_check  =self.back_mass_check
 
 
 if __name__ == '__main__': 

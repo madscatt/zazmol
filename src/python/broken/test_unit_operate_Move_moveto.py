@@ -30,16 +30,16 @@ import warnings; warnings.filterwarnings('ignore')
 import os
 floattype=os.environ['SASSIE_FLOATTYPE']
 
-class Test_unit_operate_Move_moveto(MockerTestCase): 
+class Test_unit_operate_Move_translate_to_point(MockerTestCase): 
 
     def setUp(self):
-        self.back_masscheck = operate.Move.masscheck
+        self.back_mass_check = operate.Move.mass_check
         self.back_calccom = calculate.Calculate.calculate_center_of_mass 
 
         self.m = Mocker()
 
-        operate.Move.masscheck = self.m.mock()
-        operate.Move.masscheck(ARGS)
+        operate.Move.mass_check = self.m.mock()
+        operate.Move.mass_check()
         self.m.result(None)
         self.m.count(0,None)
 
@@ -67,23 +67,21 @@ class Test_unit_operate_Move_moveto(MockerTestCase):
         self.o.setCoor(numpy.array([[[-1.0, 2.0, 3.0]]],floattype))
         self.o.setCom(numpy.array([-1.0, 2.0, 3.0],floattype))
         value = numpy.array([1.0, 3.0, 6.0],floattype)
-        self.o.moveto(0,value)
+        self.o.translate(0,value,point=True)
         result_coor = self.o.coor()
         print result_coor
         expected_coor = numpy.array([[[1.0, 3.0, 6.0]]], floattype)
         self.assert_list_almost_equal(expected_coor, result_coor,3)
 
-
     def test_two_atoms(self):
         self.o.setCoor(numpy.array([[[-1.0, 2.0, 3.87],[-5.0, 3.2, 6.0]]],floattype))
         self.o.setCom(numpy.average(self.o.coor()[0],axis=0))
         value = numpy.array([1.0, 3.0, 6.0],floattype)
-        self.o.moveto(0,value)
+        self.o.translate(0,value,point=True)
         result_coor = self.o.coor()[0]
         print result_coor
         expected_coor = numpy.array([[3.0, 2.4, 4.935],[-1.0, 3.6, 7.065]], floattype)
         self.assert_list_almost_equal(expected_coor, result_coor,3)
-
 
     def test_six_atoms(self):
         coorback = numpy.array([[[1.2, 2.0, 3.0],[-2.0, 5.0, 6.0],[7.0, 8.0, 9.0],[1.0, 3.0, 5.0],[2.0, 4.0, 6.0],[0.0, 2.0, 3.0]]],floattype)
@@ -91,7 +89,7 @@ class Test_unit_operate_Move_moveto(MockerTestCase):
         self.o.setCoor(coor)
         self.o.setCom(numpy.average(self.o.coor()[0],axis=0))
         value = numpy.array([1.0, 3.0, 6.0],floattype)
-        self.o.moveto(0,value)
+        self.o.translate(0,value,point=True)
         result_coor = self.o.coor()[0]
         print result_coor,'\n\n'
         expected_coor = coorback[0]-self.o.com()+value
@@ -104,7 +102,7 @@ class Test_unit_operate_Move_moveto(MockerTestCase):
         self.o.setCoor(coor)
         self.o.setCom(numpy.average(self.o.coor()[0],axis=0))
         value = numpy.array([1.0, 3.0, 6.0],floattype)
-        self.o.moveto(0,value)
+        self.o.translate(0,value,point=True)
         result_coor = self.o.coor()[0]
         print result_coor,'\n\n'
         expected_coor = coorback[0]-self.o.com()+value
@@ -117,7 +115,7 @@ class Test_unit_operate_Move_moveto(MockerTestCase):
         self.o.setCoor(coor)
         self.o.setCom(numpy.average(self.o.coor()[0],axis=0))
         value = numpy.array([1.0, 3.0, 6.0],floattype)
-        self.o.moveto(0,value)
+        self.o.translate(0,value,point=True)
         result_coor = self.o.coor()[0]
         print result_coor,'\n\n'
         expected_coor = coorback[0]-self.o.com()+value
@@ -130,7 +128,7 @@ class Test_unit_operate_Move_moveto(MockerTestCase):
         self.o.setCoor(coor)
         self.o.setCom(numpy.average(self.o.coor()[0],axis=0))
         value = numpy.array([1.0, 3.0, 6.0],floattype)
-        self.o.moveto(0,value)
+        self.o.translate(0,value,point=True)
         result_coor = self.o.coor()[0]
         print result_coor,'\n\n'
         expected_coor = coorback[0]-self.o.com()+value
@@ -143,7 +141,7 @@ class Test_unit_operate_Move_moveto(MockerTestCase):
         self.o.setCoor(coor)
         self.o.setCom(numpy.average(self.o.coor()[0],axis=0))
         value = numpy.array([1.0, 3.0, 6.0],floattype)
-        self.o.moveto(0,value)
+        self.o.translate(0,value,point=True)
         result_coor = self.o.coor()[0]
         print result_coor,'\n\n'
         expected_coor = coorback[0]-self.o.com()+value
@@ -156,7 +154,7 @@ class Test_unit_operate_Move_moveto(MockerTestCase):
         self.o.setCoor(coor)
         self.o.setCom(numpy.average(self.o.coor()[0],axis=0))
         value = numpy.array([1.0, 3.0, 6.0],floattype)
-        self.o.moveto(0,value)
+        self.o.translate(0,value,point=True)
         result_coor = self.o.coor()[0]
         print result_coor,'\n\n'
         expected_coor = coorback[0]-self.o.com()+value
@@ -168,7 +166,7 @@ class Test_unit_operate_Move_moveto(MockerTestCase):
     def tearDown(self):
         self.m.verify()
         calculate.Calculate.calculate_center_of_mass  =self.back_calccom
-        operate.Move.masscheck  =self.back_masscheck
+        operate.Move.mass_check  =self.back_mass_check
 
 
 if __name__ == '__main__': 

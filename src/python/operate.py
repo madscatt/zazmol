@@ -55,18 +55,18 @@ class Move():
 
         First example shows how to use class methods from system object:
 
-        >>> import sasmol.system as system
+        >>> import sasmol.system as system ; import math
         >>> molecule = system.Molecule('hiv1_gag.pdb')
-        >>> molecule.calculate_mass()
-        47896.61864599498
+        >>> frame = 0 ; axis = 'x' ; theta = 45.0 * math.pi / 180.0
+        >>> molecule.rotate(frame, axis, theta)
 
         Second example shows how to use class methods directly:
 
-        >>> import sasmol.system as system
-        >>> import sasmol.calculate as calculate
+        >>> import sasmol.system as system ; import math
+        >>> import sasmol.operate as operate
         >>> molecule = system.Molecule('hiv1_gag.pdb')
-        >>> calculate.Calculate.calculate_mass(molecule) 
-        47896.61864599498
+        >>> frame = 0 ; axis = 'x' ; theta = 45.0 * math.pi / 180.0
+        >>> operate.Move.rotate(molecule, frame, axis, theta) 
 
         Note
         ----
@@ -78,75 +78,158 @@ class Move():
 
     '''
 
-        masscheck makes sure the mass and center of mass (COM) is current
-
-        translate moves the object to a point in space.
-
-        center moves the COM of the object to (0,0,0)
 
         moveto moves the COM to a point in space (x,y,z)
 
     '''
 
-    def masscheck(self, frame, **kwargs):
+    def mass_check(self, **kwargs):
+        ''' 
+        Note
+        ----
+        mass_check determines if mass is defined for the ojbect so that
+        center of mass (COM) can be calculated
+        
+
+        Parameters
+        ----------
+        kwargs 
+            optional future arguments
+                                                                                     
+        Returns
+        -------
+        None
+            updated self._total_mass
+
+        Examples
+        -------
+
+        >>> import sasmol.system as system
+        >>> molecule = system.Molecule('hiv1_gag.pdb')
+        >>> molecule.mass_check()
+        
+        ''' 
+          
         if(self._total_mass <= 0.0):
-            self.calcmass()
+            self.calculate_mass()
         return
 
     def translate(self, frame, value, **kwargs):
-        '''
-            Simple movement.  It accepts an array of three
-            numbers and adds this array to each element.
-            It ends by updating the center of mass.   
-        '''
+        ''' 
+        
+        translate moves the object 
+        
+        Parameters
+        ----------
+        frame 
+            integer : trajectory frame number to use
 
-        self._coor[frame, :, 0] = self._coor[frame, :, 0] + value[0]
-        self._coor[frame, :, 1] = self._coor[frame, :, 1] + value[1]
-        self._coor[frame, :, 2] = self._coor[frame, :, 2] + value[2]
+        value 
+            list of x, y, z float values
 
-        self.masscheck(frame)
-        self.calculate_center_of_mass(frame)
+        kwargs 
+            point = True : will translate to a fixed point
+                           given by value variable                                                                             
+        Returns
+        -------
+        None
+            updated self._coor and self._center_of_mass
+
+        Examples
+        -------
+
+        >>> import sasmol.system as system
+        >>> molecule = system.Molecule('hiv1_gag.pdb')
+        >>> frame = 0
+        >>> molecule.calculate_center_of_mass(frame)
+        array([ -6.79114736, -23.71577133,   8.06558513])
+        >>> displacement = [3.0, 4.0, 5.0]
+        >>> molecule.translate(frame, displacement)
+        >>> molecule.calculate_center_of_mass(frame)
+        array([ -3.79114736, -19.71577133,  13.06558513])
+      
+         
+        >>> import sasmol.system as system
+        >>> molecule = system.Molecule('hiv1_gag.pdb')
+        >>> frame = 0
+        >>> final_position = [3.0, 4.0, 5.0]
+        >>> molecule.translate(frame, final_position, point=True)
+        >>> molecule.calculate_center_of_mass(frame)  
+        array([ 3.,  4.,  5.])
+         
+        Note 
+        ----------
+        mass_check is called to validate self._total_mass()    
+
+
+        '''
+        try: 
+            point_flag = kwargs['point']
+        except:
+            point_flag = False
+        
+        self.mass_check()
+
+        if point_flag:
+            self._com = self.calculate_center_of_mass(frame)
+            print(type(self._com))
+
+            self._coor[frame, :, 0] = self._coor[frame, :, 0] - self._com[0]
+            self._coor[frame, :, 1] = self._coor[frame, :, 1] - self._com[1]
+            self._coor[frame, :, 2] = self._coor[frame, :, 2] - self._com[2]
+         
+        self._coor[frame, :, 0] += value[0]
+        self._coor[frame, :, 1] += value[1]
+        self._coor[frame, :, 2] += value[2]
+
+        self._com = self.calculate_center_of_mass(frame)
 
         return
 
     def center(self, frame, **kwargs):
         '''
-            Simple movement.  It moves the center of mass
-            to (0.0,0.0,0.0).  The method checks that
-            the COM has been calculated first.  
-            It ends by updating the center of mass
+        Method moves the center of mass of object to [0.0, 0.0, 0.0]
+       
+        Parameters
+        ----------
+        frame 
+            integer : trajectory frame number to use
+
+        kwargs 
+            optional future arguments
+                                                                                     
+        Returns
+        -------
+        None
+            updated self._coor and self._center_of_mass
+
+        Examples
+        -------
+
+        >>> import sasmol.system as system
+        >>> molecule = system.Molecule('hiv1_gag.pdb')
+        >>> frame = 0
+        >>> molecule.calculate_center_of_mass(frame)
+        array([ -6.79114736, -23.71577133,   8.06558513])
+        >>> displacement = [3.0, 4.0, 5.0]
+        >>> molecule.translate(frame,displacement)
+        >>> molecule.calculate_center_of_mass(frame)
+        array([ -3.79114736, -19.71577133,  13.06558513])
+
+        Note 
+        ----------
+        mass_check is called to validate self._total_mass()    
+        
         '''
 
-        self.masscheck(frame)
-        self.calculate_center_of_mass(frame)
+        self.mass_check()
+        self._com = self.calculate_center_of_mass(frame)
 
         self._coor[frame, :, 0] = self._coor[frame, :, 0] - self._com[0]
         self._coor[frame, :, 1] = self._coor[frame, :, 1] - self._com[1]
         self._coor[frame, :, 2] = self._coor[frame, :, 2] - self._com[2]
 
-        self.calculate_center_of_mass(frame)
-
-        return
-
-    def moveto(self, frame, value, **kwargs):
-        '''
-            Simple movement.  It moves the center of mass
-            to the destination value=[x,y,z].  The method 
-            checks that the COM has been calculated first.  
-            It ends by updating the center of mass
-        '''
-
-        self.masscheck(frame)
-        self.calculate_center_of_mass(frame)
-
-        self._coor[frame, :, 0] = self._coor[
-            frame, :, 0] - self._com[0] + value[0]
-        self._coor[frame, :, 1] = self._coor[
-            frame, :, 1] - self._com[1] + value[1]
-        self._coor[frame, :, 2] = self._coor[
-            frame, :, 2] - self._com[2] + value[2]
-
-        self.calculate_center_of_mass(frame)
+        self._com = self.calculate_center_of_mass(frame)
 
         return
 
@@ -159,7 +242,7 @@ class Move():
             molecule 2
 
         '''
-        self.masscheck(frame)
+        self.mass_check()
         self.calculate_center_of_mass(frame)
 
         u = linear_algebra.find_u(coor_sub_1, coor_sub_2)

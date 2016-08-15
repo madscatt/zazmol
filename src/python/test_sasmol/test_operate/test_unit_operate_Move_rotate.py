@@ -33,9 +33,9 @@ class Test_unit_operate_Move_translate(MockerTestCase):
     def setUp(self):
         self.m = Mocker()
 
-        self.back_masscheck = operate.Move.masscheck
-        operate.Move.masscheck = self.m.mock()
-        operate.Move.masscheck(ARGS)
+        self.back_mass_check = operate.Move.mass_check
+        operate.Move.mass_check = self.m.mock()
+        operate.Move.mass_check()
         self.m.result(None)
         self.m.count(0,None)
 
@@ -279,13 +279,9 @@ class Test_unit_operate_Move_translate(MockerTestCase):
         #
         self.assert_list_almost_equal(expected_coor, result_coor,3)
 
-
-
     def tearDown(self):
         self.m.verify()
-        operate.Move.masscheck  =self.back_masscheck
-
-
+        operate.Move.mass_check  =self.back_mass_check
 
 if __name__ == '__main__': 
    main() 

@@ -32,7 +32,7 @@ floattype=os.environ['SASSIE_FLOATTYPE']
 
 DataPath = os.path.join(os.path.dirname(os.path.realpath(__file__)),'..','data','pdb_common')+os.path.sep
 
-class Test_intg_operate_Move_moveto(MockerTestCase): 
+class Test_intg_operate_Move_translate_to_point(MockerTestCase): 
 
     def setUp(self):
         self.o=system.Molecule(0)
@@ -51,12 +51,12 @@ class Test_intg_operate_Move_moveto(MockerTestCase):
     def test_null(self):
         value = numpy.array([1.0, 3.0, 6.0],floattype)
         with self.assertRaises(Exception):
-          self.o.moveto(0,value)
+          self.o.translate(0,value,point=True)
 
     def test_one_atom_pdb(self):
         self.o.read_pdb(DataPath+'1ATM.pdb')
         value = numpy.array([1.0, 3.0, 6.0],floattype)
-        self.o.moveto(0,value)
+        self.o.translate(0,value,point=True)
         result_coor = self.o.coor()
         result_com = self.o.com()
         expected_coor = numpy.array([[[1.0, 3.0, 6.0]]], floattype)
@@ -68,7 +68,7 @@ class Test_intg_operate_Move_moveto(MockerTestCase):
     def test_two_aa_pdb(self):
         self.o.read_pdb(DataPath+'2AAD.pdb')
         value = numpy.array([1.0, 3.0, 6.0],floattype)
-        self.o.moveto(0,value)
+        self.o.translate(0,value,point=True)
         result_coor = self.o.coor()
         result_com = self.o.com()
         expected_coor = numpy.array([[[1.0, 3.0, 6.0]]], floattype)
@@ -79,7 +79,7 @@ class Test_intg_operate_Move_moveto(MockerTestCase):
     def test_rna_pdb(self):
         self.o.read_pdb(DataPath+'rna.pdb')
         value = numpy.array([1.0, 3.0, 6.0],floattype)
-        self.o.moveto(0,value)
+        self.o.translate(0,value,point=True)
         result_coor = self.o.coor()
         result_com = self.o.com()
         expected_coor = numpy.array([[[1.0, 3.0, 6.0]]], floattype)
@@ -90,7 +90,7 @@ class Test_intg_operate_Move_moveto(MockerTestCase):
     def test_1CRN_pdb(self):
         self.o.read_pdb(DataPath+'1CRN.pdb')
         value = numpy.array([1.0, 3.0, 6.0],floattype)
-        self.o.moveto(0,value)
+        self.o.translate(0,value,point=True)
         result_coor = self.o.coor()
         result_com = self.o.com()
         expected_coor = numpy.array([[[1.0, 3.0, 6.0]]], floattype)
@@ -102,7 +102,7 @@ class Test_intg_operate_Move_moveto(MockerTestCase):
     def test_1KP8_pdb(self):
         self.o.read_pdb(DataPath+'1KP8.pdb')
         value = numpy.array([1.0, 3.0, 6.0],floattype)
-        self.o.moveto(0,value)
+        self.o.translate(0,value,point=True)
         result_coor = self.o.coor()
         result_com = self.o.com()
         expected_coor = numpy.array([[[1.0, 3.0, 6.0]]], floattype)
