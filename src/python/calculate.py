@@ -332,7 +332,7 @@ class Calculate(object):
         else:
             uk, ak = numpy.linalg.eig(I)
 
-        operate.Move.moveto(self, frame, com)
+        operate.Move.translate(self, frame, com, point=True)
 
         return uk, ak, I
 

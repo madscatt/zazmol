@@ -172,7 +172,6 @@ class Move():
 
         if point_flag:
             self._com = self.calculate_center_of_mass(frame)
-            print(type(self._com))
 
             self._coor[frame, :, 0] = self._coor[frame, :, 0] - self._com[0]
             self._coor[frame, :, 1] = self._coor[frame, :, 1] - self._com[1]
