@@ -8,14 +8,14 @@
 
 
 ```python
-import sasmol.sasmol as sasmol
+import sasmol.system as system
 ```
 
-#### Define "molecule" an instance of the SasMol class.  This is the "object" that will hold all information for the molecule
+#### Define "molecule" an instance of the Molecule class.  This is the "object" that will hold all information for the molecule
 
 
 ```python
-molecule = sasmol.SasMol()
+molecule = system.Molecule()
 ```
 
 #### Read  the contents of a PDB file into the molecule
