@@ -6,8 +6,8 @@
 '''
 import os,sys
 from distutils      import sysconfig
+import setuptools
 from numpy.distutils.core import Extension, setup
-
 #       SETUP
 #
 #       12/01/2009      --      initial coding              :       jc
