@@ -1,3 +1,4 @@
+
 ## ZAZMOL
 ## ======
 
@@ -22,7 +23,7 @@ mocker
 
 ### [`developer notes`](development_tools/notes.md)
 
-[]([file i/o notes](development_tools/file_io_experiments.md))
+[]([file i/o notes](development_tools/file_io_experiments.md)
 
 ***
 
@@ -86,7 +87,7 @@ molecule.calculate_center_of_mass(frame)
 
 
 ```python
-molecule.moveto(frame,[88.3, 19.6, 14.7])
+molecule.translate(frame,[88.3, 19.6, 14.7],point=True)
 ```
 
 
@@ -103,7 +104,7 @@ molecule.calculate_center_of_mass(frame)
 
 
 ```python
-molecule.rotate(frame,'x',45)
+molecule.rotate(frame,'x',45*3.1515927/180.0)
 ```
 
 
@@ -114,7 +115,7 @@ molecule.calculate_center_of_mass(frame)
 
 
 
-    array([ 88.3       ,  -2.21197083,  24.39994232])
+    array([ 88.3       ,   3.40417778,  24.26234889])
 
 
 
@@ -128,11 +129,11 @@ molecule.calculate_principle_moments_of_inertia(frame)
 
     (array([  1.30834716e+07,   1.91993314e+08,   1.85015201e+08]),
      array([[-0.08711655, -0.97104917,  0.22242802],
-            [-0.99611823,  0.08773832, -0.00710418],
-            [ 0.01261695,  0.2221835 ,  0.97492323]]),
-     array([[  1.90290278e+08,  -1.55144810e+07,  -1.31655748e+06],
-            [ -1.55144810e+07,   1.44693990e+07,   2.29686530e+06],
-            [ -1.31655748e+06,   2.29686530e+06,   1.85332310e+08]]))
+            [-0.9670572 ,  0.13604234,  0.21515775],
+            [ 0.23918838,  0.19635682,  0.95091162]]),
+     array([[  1.90290278e+08,  -1.54065145e+07,   2.25205595e+06],
+            [ -1.54065145e+07,   2.43538600e+07,   3.99557354e+07],
+            [  2.25205595e+06,   3.99557354e+07,   1.75447849e+08]]))
 
 
 
