@@ -28,7 +28,7 @@ import numpy
 import warnings; warnings.filterwarnings('ignore')
 
 import os
-floattype=os.environ['SASSIE_FLOATTYPE']
+floattype=os.environ['SASMOL_FLOATTYPE']
 
 class Test_unit_operate_Move_translate(MockerTestCase): 
 

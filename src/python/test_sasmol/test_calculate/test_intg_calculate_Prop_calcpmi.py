@@ -24,7 +24,7 @@ import sasmol.system as system
 import numpy
 
 import os
-floattype=os.environ['SASSIE_FLOATTYPE']
+floattype=os.environ['SASMOL_FLOATTYPE']
 
 PdbPath = os.path.join(os.path.dirname(os.path.realpath(__file__)),'..','data','pdb_common')+os.path.sep
 
@@ -139,7 +139,7 @@ class Test_sascalc_Prop_calcpmi(MockerTestCase):
         self.assert_list_almost_equal_flip_sign_allowed(expected_eigenvalues, result_eigenvalues,3)
         self.assert_list_almost_equal_flip_sign_allowed(expected_eigenvectors, result_eigenvectors,3)
 
-    @skipIf(os.environ['SASSIE_LARGETEST']=='n',"I am not testing large files")
+    @skipIf(os.environ['SASMOL_LARGETEST']=='n',"I am not testing large files")
     def test_1KP8_pdb(self):
         self.o.read_pdb(PdbPath+'1KP8.pdb')
         self.o.calculate_mass()

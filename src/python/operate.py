@@ -87,7 +87,7 @@ class Move():
         ''' 
         Note
         ----
-        mass_check determines if mass is defined for the ojbect so that
+        mass_check determines if mass is defined for the object so that
         center of mass can be calculated
         
 
@@ -281,10 +281,10 @@ class Move():
         
         Note
         ----
-        mass_check determines if mass is defined for the ojbect so that
+        mass_check determines if mass is defined for the object so that
         center of mass can be calculated
        
-        method is scheduled for re-factoring
+        align method is scheduled for re-factoring
          
         
         '''
@@ -360,7 +360,7 @@ class Move():
 
         return
 
-    def general_axis_rotate(self, frame, theta, ux, uy, uz, **kwargs):
+    def rotate_general_axis(self, frame, theta, unit_axis, **kwargs):
         '''
             The general rotation of a molecule along an arbitrarily
             given unit axis (ux,uy,uz) by an angle theta.
@@ -373,14 +373,8 @@ class Move():
         theta 
             float : angle in radians
         
-        ux 
-            float : x-component of unit axis
-
-        uy 
-            float : y-component of unit axis
-
-        uz 
-            float : z-component of unit axis
+        unit_axis
+            float : [ux, uy, uz] components of unit axis
 
         kwargs 
             optional future arguments        
@@ -396,14 +390,18 @@ class Move():
         >>> import sasmol.system as system ; import math
         >>> molecule = system.Molecule('hiv1_gag.pdb')
         >>> frame = 0 ; theta = 45.0 * math.pi / 180.0
-        >>> ux = 0.2 ; uy = 1.3 ; uz = -3.5
-        >>> molecule.general_axis_rotate(frame, theta, ux, uy, uz)
+        >>> unit_axis = [ 0.2, 1.3, -3.5 ]
+        >>> molecule.rotate_general_axis(frame, theta, unit_axis)
  
         Note 
         ----------
         Calculations are carried out using radians
         
         '''
+
+        ux = unit_axis[0]
+        uy = unit_axis[1]
+        uz = unit_axis[2]
 
         c11 = numpy.cos(theta) + pow(ux, 2) * (1 - numpy.cos(theta))
         c12 = ux * uy * (1 - numpy.cos(theta)) - uz * numpy.sin(theta)
@@ -424,7 +422,7 @@ class Move():
 
         return
 
-    def euler_rotate(self, frame, phi, theta, psi, **kwargs):
+    def rotate_euler(self, frame, phi, theta, psi, **kwargs):
         '''
         Rotate the molecule by a euler angle set (phi,theta,psi)
 

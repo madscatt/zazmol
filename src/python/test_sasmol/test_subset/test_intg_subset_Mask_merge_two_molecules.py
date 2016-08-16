@@ -41,22 +41,22 @@ merge a pdb of 2 residues with small protein
 merge a small protein (crambin) with a non-existing pdb
 merge a small protein (crambin) with a problem pdb (1PSI) 
 merge a small protein (crambin) with itself
-merge a small protein (crambin) with a large protein (groel) (Skipped as SASSIE_LARGETEST)
+merge a small protein (crambin) with a large protein (groel) (Skipped as SASMOL_LARGETEST)
 merge a small protein (crambin) with an rna
 
-merge a large protein (groel) with a non-existing pdb  (Skipped as SASSIE_LARGETEST)
-merge a large protein (groel) with a problem pdb (1PSI)  (Skipped as SASSIE_LARGETEST)
-merge a large protein (groel) with itself (Skipped as SASSIE_LARGETEST)
-merge a large protein (groel) with rna (Skipped as SASSIE_LARGETEST)
+merge a large protein (groel) with a non-existing pdb  (Skipped as SASMOL_LARGETEST)
+merge a large protein (groel) with a problem pdb (1PSI)  (Skipped as SASMOL_LARGETEST)
+merge a large protein (groel) with itself (Skipped as SASMOL_LARGETEST)
+merge a large protein (groel) with rna (Skipped as SASMOL_LARGETEST)
 
 merge an rna with a non-existing pdb
 merge an rna with a problem pdb (1PSI) 
 merge an rna with itself
-merge an rna with a large protein complex (groel) (Skipped as SASSIE_LARGETEST)
+merge an rna with a large protein complex (groel) (Skipped as SASMOL_LARGETEST)
 
 merge a problem pdb (1PSI) with a non-existing pdb
 merge a problem pdb (1PSI) with itself
-merge a problem pdb (1PSI) with a large protein complex (groel) (Skipped as SASSIE_LARGETEST)
+merge a problem pdb (1PSI) with a large protein complex (groel) (Skipped as SASMOL_LARGETEST)
 """
 
 from unittest import main,skipIf 
@@ -382,7 +382,7 @@ class Test_subset_Mask_merge_two_molecules(MockerTestCase):
       self.assert_pdb(self.o1, self.o2, self.o3)
 
 
-   @skipIf(os.environ['SASSIE_LARGETEST']=='n',"I am not testing large files")
+   @skipIf(os.environ['SASMOL_LARGETEST']=='n',"I am not testing large files")
    def test_1CRN_4(self):
       '''
       merge a small protein (crambin) with a large protein (groel)
@@ -415,7 +415,7 @@ class Test_subset_Mask_merge_two_molecules(MockerTestCase):
       self.assert_pdb(self.o1, self.o2, self.o3)
 
 
-   @skipIf(os.environ['SASSIE_LARGETEST']=='n',"I am not testing large files")
+   @skipIf(os.environ['SASMOL_LARGETEST']=='n',"I am not testing large files")
    def test_1KP8_1(self):
       '''
       merge a large protein (groel) with a non-existing pdb
@@ -436,7 +436,7 @@ class Test_subset_Mask_merge_two_molecules(MockerTestCase):
          self.assert_pdb(self.o1, self.o2, self.o3)
 
 
-   @skipIf(os.environ['SASSIE_LARGETEST']=='n',"I am not testing large files")
+   @skipIf(os.environ['SASMOL_LARGETEST']=='n',"I am not testing large files")
    def test_1KP8_2(self):
       '''
       merge a large protein (groel) with a problem pdb (1PSI) 
@@ -457,7 +457,7 @@ class Test_subset_Mask_merge_two_molecules(MockerTestCase):
          self.assert_pdb(self.o1, self.o2, self.o3)
 
 
-   @skipIf(os.environ['SASSIE_LARGETEST']=='n',"I am not testing large files")
+   @skipIf(os.environ['SASMOL_LARGETEST']=='n',"I am not testing large files")
    def test_1KP8_3(self):
       '''
       merge a large protein (groel) with itself
@@ -474,7 +474,7 @@ class Test_subset_Mask_merge_two_molecules(MockerTestCase):
       self.assert_pdb(self.o1, self.o2, self.o3)
 
 
-   @skipIf(os.environ['SASSIE_LARGETEST']=='n',"I am not testing large files")
+   @skipIf(os.environ['SASMOL_LARGETEST']=='n',"I am not testing large files")
    def test_1KP8_4(self):
       '''
       merge a large protein (groel) with rna
@@ -547,7 +547,7 @@ class Test_subset_Mask_merge_two_molecules(MockerTestCase):
       self.assert_pdb(self.o1, self.o2, self.o3)
 
 
-   @skipIf(os.environ['SASSIE_LARGETEST']=='n',"I am not testing large files")
+   @skipIf(os.environ['SASMOL_LARGETEST']=='n',"I am not testing large files")
    def test_rna_4(self):
       '''
       merge an rna with a large protein complex (groel)
@@ -601,7 +601,7 @@ class Test_subset_Mask_merge_two_molecules(MockerTestCase):
          error = self.o3.merge_two_molecules(self.o1, self.o2)
 
 
-   @skipIf(os.environ['SASSIE_LARGETEST']=='n',"I am not testing large files")
+   @skipIf(os.environ['SASMOL_LARGETEST']=='n',"I am not testing large files")
    def test_1PSI_3(self):
       '''
       merge a problem pdb (1PSI) with a large protein complex (groel)

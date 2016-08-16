@@ -23,7 +23,7 @@ import sasmol.linear_algebra as linear_algebra
 import numpy
 
 import os
-floattype=os.environ['SASSIE_FLOATTYPE']
+floattype=os.environ['SASMOL_FLOATTYPE']
 
 class Test_linear_algebra_cross_product(MockerTestCase): 
 

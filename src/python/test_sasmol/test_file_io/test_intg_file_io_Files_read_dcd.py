@@ -26,7 +26,7 @@ import numpy
 
 import os
 
-floattype=os.environ['SASSIE_FLOATTYPE']
+floattype=os.environ['SASMOL_FLOATTYPE']
 
 DataPath = os.path.join(os.path.dirname(os.path.realpath(__file__)),'..','data','dcd_common')+os.path.sep
 pdbDataPath = os.path.join(os.path.dirname(os.path.realpath(__file__)),'..','data','pdb_common')+os.path.sep
@@ -109,7 +109,7 @@ class Test_intg_file_io_Files_read_dcd(MockerTestCase):
 
    """
    # Memory allocation error
-   @skipIf(os.environ['SASSIE_HUGETEST']=='n',"I am not testing huge files")   
+   @skipIf(os.environ['SASMOL_HUGETEST']=='n',"I am not testing huge files")   
    def test_rna_0point8gb(self):
       '''
       test a dcd 0.8gb based on a rna molecule
@@ -132,7 +132,7 @@ class Test_intg_file_io_Files_read_dcd(MockerTestCase):
 
    """
    # Memory allocation error
-   @skipIf(os.environ['SASSIE_HUGETEST']=='n',"I am not testing huge files")   
+   @skipIf(os.environ['SASMOL_HUGETEST']=='n',"I am not testing huge files")   
    def test_rna_1point0gb(self):
       '''
       test a dcd 1.0gb based on a rna molecule
@@ -155,7 +155,7 @@ class Test_intg_file_io_Files_read_dcd(MockerTestCase):
 
    """
    # Memory allocation error
-   @skipIf(os.environ['SASSIE_HUGETEST']=='n',"I am not testing huge files")   
+   @skipIf(os.environ['SASMOL_HUGETEST']=='n',"I am not testing huge files")   
    def test_rna_1point2gb(self):
       '''
       test a dcd 1.2gb based on a rna molecule

@@ -24,13 +24,12 @@ import sasmol.linear_algebra as linear_algebra
 import numpy
 
 import os
-floattype=os.environ['SASSIE_FLOATTYPE']
+floattype=os.environ['SASMOL_FLOATTYPE']
 
 class Test_linear_algebra_vec_sub(MockerTestCase): 
 
     def setUp(self):
         pass 
-
 
     def assert_list_almost_equal(self,a,b):
         if (len(a)!=len(b)):

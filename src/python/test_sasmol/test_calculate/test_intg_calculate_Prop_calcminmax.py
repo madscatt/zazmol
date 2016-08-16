@@ -77,7 +77,7 @@ class Test_sascalc_Prop_calcminmax(MockerTestCase):
         self.assert_list_almost_equal(expected_minmax[0], result_minmax[0])
         self.assert_list_almost_equal(expected_minmax[1], result_minmax[1])
 
-    @skipIf(os.environ['SASSIE_LARGETEST']=='n',"I am not testing large files")
+    @skipIf(os.environ['SASMOL_LARGETEST']=='n',"I am not testing large files")
     def test_1KP8_pdb(self):
         self.o.read_pdb(PdbPath+'1KP8.pdb')
         result_minmax  = self.o.calculate_minimum_and_maximum()

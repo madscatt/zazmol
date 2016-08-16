@@ -75,7 +75,7 @@ class Test_sascalc_Prop_calccom(MockerTestCase):
         expected_com = [9.30026, 9.77488, 6.97776]
         self.assert_list_almost_equal(expected_com, result_com, self.tol)
 
-    @skipIf(os.environ['SASSIE_LARGETEST']=='n',"I am not testing large files")
+    @skipIf(os.environ['SASMOL_LARGETEST']=='n',"I am not testing large files")
     def test_1KP8_pdb(self):
         self.o.read_pdb(DataPath+'1KP8.pdb')
         self.o.setTotal_mass(0.0)

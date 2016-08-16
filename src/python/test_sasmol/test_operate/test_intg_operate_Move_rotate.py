@@ -27,7 +27,7 @@ import numpy
 import warnings; warnings.filterwarnings('ignore')
 
 import os
-floattype=os.environ['SASSIE_FLOATTYPE']
+floattype=os.environ['SASMOL_FLOATTYPE']
 
 DataPath = os.path.join(os.path.dirname(os.path.realpath(__file__)),'..','data','pdb_common')+os.path.sep
 
@@ -110,7 +110,7 @@ class Test_intg_operate_Move_rotate(MockerTestCase):
         self.assert_list_almost_equal(expected_com, result_com,2)
 
 
-    @skipIf(os.environ['SASSIE_LARGETEST']=='n',"I am not testing large files")
+    @skipIf(os.environ['SASMOL_LARGETEST']=='n',"I am not testing large files")
     def test_1KP8_pdb(self):
         self.o.read_pdb(DataPath+'1KP8.pdb')
         axis = 'x'

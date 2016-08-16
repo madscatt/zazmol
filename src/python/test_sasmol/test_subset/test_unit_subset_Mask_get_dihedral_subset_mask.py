@@ -358,7 +358,7 @@ class Test_unit_subset_Mask_get_dihedral_subset_mask(MockerTestCase):
       self.assert_list_almost_equal(farray, expected_farray)
 
 
-   @skipIf(os.environ['SASSIE_LARGETEST']=='n',"I am not testing large files")
+   @skipIf(os.environ['SASMOL_LARGETEST']=='n',"I am not testing large files")
    def test_500_residues_mask_100to300(self):
       '''
       test for 500 residues
@@ -415,7 +415,7 @@ class Test_unit_subset_Mask_get_dihedral_subset_mask(MockerTestCase):
       self.assert_list_almost_equal(farray, expected_farray)
 
 
-   @skipIf(os.environ['SASSIE_LARGETEST']=='n',"I am not testing large files")
+   @skipIf(os.environ['SASMOL_LARGETEST']=='n',"I am not testing large files")
    def test_500_residues_mask_all_residues(self):
       '''
       test for 500 residues

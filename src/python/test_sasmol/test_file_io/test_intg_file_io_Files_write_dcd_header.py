@@ -101,7 +101,7 @@ class Test_intg_file_io_Files_write_dcd_header(MockerTestCase):
       os.remove(dcdFileName)
 
 
-   @skipIf(os.environ['SASSIE_LARGETEST']=='n',"I am not testing large files")
+   @skipIf(os.environ['SASMOL_LARGETEST']=='n',"I am not testing large files")
    def test_1KP8(self):
       '''
 	   test a dcd from a large protein complex (groel)

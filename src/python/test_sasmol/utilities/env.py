@@ -18,33 +18,32 @@ def determine_float_type():
       return 'float'
 
 
-if os.environ.has_key('SASSIE_LARGETEST'):
-   print '\nKEY CONFLICT IN os.envrion of SASSIE_LARGETEST!\nWILL QUIT!'
+if os.environ.has_key('SASMOL_LARGETEST'):
+   print '\nKEY CONFLICT IN os.envrion of SASMOL_LARGETEST!\nWILL QUIT!'
    exit()
 else:
-   os.environ['SASSIE_LARGETEST']='n'
+   os.environ['SASMOL_LARGETEST']='n'
 
 
-if os.environ.has_key('SASSIE_HUGETEST'):
-   print '\nKEY CONFLICT IN os.envrion of SASSIE_HUGETEST!\nWILL QUIT!'
+if os.environ.has_key('SASMOL_HUGETEST'):
+   print '\nKEY CONFLICT IN os.envrion of SASMOL_HUGETEST!\nWILL QUIT!'
    exit()
 else:
-   os.environ['SASSIE_HUGETEST']='n'
+   os.environ['SASMOL_HUGETEST']='n'
 
 
-# Genrate huge dcd files if SASSIE_HUGETEST is specified
-# IMPORTANT, SASSIE_HUGETEST only implies the huge rna dcd files generated below will be used
-if os.environ['SASSIE_HUGETEST']=='y':
+# Genrate huge dcd files if SASMOL_HUGETEST is specified
+# IMPORTANT, SASMOL_HUGETEST only implies the huge rna dcd files generated below will be used
+if os.environ['SASMOL_HUGETEST']=='y':
 	from sassie.core_testing.util import generate_huge_dcd_onthefly
 	generate_huge_dcd_onthefly.generate_huge_dcd()
 
 
-if os.environ.has_key('SASSIE_FLOATTYPE'):
-   print '\nKEY CONFLICT IN os.envrion of SASSIE_FLOATTYPE!\nWILL QUIT!'
+if os.environ.has_key('SASMOL_FLOATTYPE'):
+   print '\nKEY CONFLICT IN os.envrion of SASMOL_FLOATTYPE!\nWILL QUIT!'
    exit()
 else:
-   os.environ['SASSIE_FLOATTYPE']= determine_float_type()
-
+   os.environ['SASMOL_FLOATTYPE']= determine_float_type()
 
 
 """

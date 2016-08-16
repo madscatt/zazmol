@@ -6,7 +6,7 @@ set the abnormal float numbers for unittest
 import numpy
 
 import os
-floattype=os.environ['SASSIE_FLOATTYPE']
+floattype=os.environ['SASMOL_FLOATTYPE']
 
 
 # Convert a number to a floattype ft

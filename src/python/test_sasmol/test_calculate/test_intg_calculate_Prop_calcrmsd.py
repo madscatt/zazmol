@@ -26,7 +26,7 @@ import numpy
 import warnings; warnings.filterwarnings('ignore')
 
 import os
-floattype=os.environ['SASSIE_FLOATTYPE']
+floattype=os.environ['SASMOL_FLOATTYPE']
 
 PdbPath = os.path.join(os.path.dirname(os.path.realpath(__file__)),'..','data','pdb_common')+os.path.sep
 modulePdbPath = os.path.join(os.path.dirname(os.path.realpath(__file__)),'..','data','sasmol','calculate')+os.path.sep
@@ -88,7 +88,7 @@ class test_sascalc_Prop_calcrmsd(MockerTestCase):
         expected_rmsd = 0.0
         self.assertAlmostEqual(expected_rmsd, result_rmsd, self.tol) 
 
-    @skipIf(os.environ['SASSIE_LARGETEST']=='n',"I am not testing large files")
+    @skipIf(os.environ['SASMOL_LARGETEST']=='n',"I am not testing large files")
     def test_1KP8_1KP8_pdb(self):
         self.o1.read_pdb(PdbPath+'1KP8.pdb')                                                            
         self.o2.read_pdb(PdbPath+'1KP8.pdb')

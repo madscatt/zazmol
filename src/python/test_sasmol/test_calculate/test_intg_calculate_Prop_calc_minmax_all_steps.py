@@ -40,7 +40,6 @@ class Test_sascalc_Prop_calc_minmax_all_steps(MockerTestCase):
               if (numpy.isnan(a[i]) and numpy.isnan(b[i])): continue
               self.assertAlmostEqual(a[i],b[i],places)
 
-
     def test_null(self):
         with self.assertRaises(Exception):
             self.o.calcminmax_frame(0)
@@ -48,14 +47,16 @@ class Test_sascalc_Prop_calc_minmax_all_steps(MockerTestCase):
 
     def test_one_atom(self):
         self.o.read_pdb(DataPath+'1ATM.pdb')
-        result_minmax  = self.o.calculate_minimum_and_maximum_all_frames(dcdDataPath+'1ATM.dcd')
+        self.o.read_dcd(dcdDataPath+'1ATM.dcd')
+        result_minmax  = self.o.calculate_minimum_and_maximum()
         expected_minmax = [ [73.944, 38.799, 41.652], [76.944,  41.799, 41.652]]
         self.assert_list_almost_equal(expected_minmax[0], result_minmax[0])
         self.assert_list_almost_equal(expected_minmax[1], result_minmax[1])
 
     def test_two_aa(self):
         self.o.read_pdb(DataPath+'2AAD.pdb')
-        result_minmax  = self.o.calculate_minimum_and_maximum_all_frames(dcdDataPath+'2AAD.dcd')
+        self.o.read_dcd(dcdDataPath+'2AAD.dcd')
+        result_minmax  = self.o.calculate_minimum_and_maximum()
 	print result_minmax
         expected_minmax = [[-79.712, -46.273,  39.354], [79.712,  46.273,  43.910]]
         self.assert_list_almost_equal(expected_minmax[0], result_minmax[0])
@@ -65,7 +66,8 @@ class Test_sascalc_Prop_calc_minmax_all_steps(MockerTestCase):
 
     def test_rna_1to10(self):
         self.o.read_pdb(DataPath+'rna.pdb')
-        result_minmax  = self.o.calculate_minimum_and_maximum_all_frames(dcdDataPath+'rna-1to10.dcd')
+        self.o.read_dcd(dcdDataPath+'rna-1to10.dcd')
+        result_minmax  = self.o.calculate_minimum_and_maximum()
 	numpy.set_printoptions(precision=3)
 	print result_minmax
         expected_minmax = [[-43.801, -44.888, -42.605], [ 41.234,  39.706,  41.903]]
@@ -73,10 +75,11 @@ class Test_sascalc_Prop_calc_minmax_all_steps(MockerTestCase):
         self.assert_list_almost_equal(expected_minmax[1], result_minmax[1])
         self.assert_list_almost_equal(expected_minmax[1], result_minmax[1])
 
-    @skipIf(os.environ['SASSIE_HUGETEST']=='n',"I am not testing huge files")
+    @skipIf(os.environ['SASMOL_HUGETEST']=='n',"I am not testing huge files")
     def test_rna_0point8g(self):
         self.o.read_pdb(DataPath+'rna.pdb')
-        result_minmax  = self.o.calculate_minimum_and_maximum_all_frames(dcdDataPath+'rna-0.8g.dcd')
+        self.o.read_dcd(dcdDataPath+'rna-0.8g.dcd')
+        result_minmax  = self.o.calculate_minimum_and_maximum()
 	numpy.set_printoptions(precision=3)
 	print result_minmax
         expected_minmax = [[-45.714, -45.643, -42.868], [ 41.65 ,  41.087,  45.362]]
@@ -84,10 +87,11 @@ class Test_sascalc_Prop_calc_minmax_all_steps(MockerTestCase):
         self.assert_list_almost_equal(expected_minmax[1], result_minmax[1],3)
         self.assert_list_almost_equal(expected_minmax[1], result_minmax[1],3)
 
-    @skipIf(os.environ['SASSIE_HUGETEST']=='n',"I am not testing huge files")
+    @skipIf(os.environ['SASMOL_HUGETEST']=='n',"I am not testing huge files")
     def test_rna_1point0g(self):
         self.o.read_pdb(DataPath+'rna.pdb')
-        result_minmax  = self.o.calculate_minimum_and_maximum_all_frames(dcdDataPath+'rna-1.0g.dcd')
+        self.o.read_dcd(dcdDataPath+'rna-1.0g.dcd')
+        result_minmax  = self.o.calculate_minimum_and_maximum()
 	numpy.set_printoptions(precision=3)
 	print result_minmax
         expected_minmax = [[-46.369, -45.643, -42.868], [ 41.65 ,  41.087,  45.362]]
@@ -95,10 +99,11 @@ class Test_sascalc_Prop_calc_minmax_all_steps(MockerTestCase):
         self.assert_list_almost_equal(expected_minmax[1], result_minmax[1],3)
         self.assert_list_almost_equal(expected_minmax[1], result_minmax[1],3)
 
-    @skipIf(os.environ['SASSIE_HUGETEST']=='n',"I am not testing huge files")
+    @skipIf(os.environ['SASMOL_HUGETEST']=='n',"I am not testing huge files")
     def test_rna_2point0g(self):
         self.o.read_pdb(DataPath+'rna.pdb')
-        result_minmax  = self.o.calculate_minimum_and_maximum_all_frames(dcdDataPath+'rna-2.0g.dcd')
+        self.o.read_dcd(dcdDataPath+'rna-2.0g.dcd')
+        result_minmax  = self.o.calculate_minimum_and_maximum()
 	numpy.set_printoptions(precision=3)
 	print result_minmax
         expected_minmax = [[-48.253, -45.643, -42.868], [ 41.65 ,  41.087,  45.362]]
@@ -106,10 +111,11 @@ class Test_sascalc_Prop_calc_minmax_all_steps(MockerTestCase):
         self.assert_list_almost_equal(expected_minmax[1], result_minmax[1],3)
         self.assert_list_almost_equal(expected_minmax[1], result_minmax[1],3)
 
-    @skipIf(os.environ['SASSIE_HUGETEST']=='n',"I am not testing huge files")
+    @skipIf(os.environ['SASMOL_HUGETEST']=='n',"I am not testing huge files")
     def test_rna_3point2g(self):
         self.o.read_pdb(DataPath+'rna.pdb')
-        result_minmax  = self.o.calculate_minimum_and_maximum_all_frames(dcdDataPath+'rna-3.2g.dcd')
+        self.o.read_dcd(dcdDataPath+'rna-3.2g.dcd')
+        result_minmax  = self.o.calculate_minimum_and_maximum()
 	numpy.set_printoptions(precision=3)
 	print result_minmax
         expected_minmax = [[-48.253, -45.643, -42.868], [ 41.65 ,  41.087,  45.362]]
@@ -117,10 +123,11 @@ class Test_sascalc_Prop_calc_minmax_all_steps(MockerTestCase):
         self.assert_list_almost_equal(expected_minmax[1], result_minmax[1],3)
         self.assert_list_almost_equal(expected_minmax[1], result_minmax[1],3)
 
-    @skipIf(os.environ['SASSIE_HUGETEST']=='n',"I am not testing huge files")
+    @skipIf(os.environ['SASMOL_HUGETEST']=='n',"I am not testing huge files")
     def test_rna_6point4g(self):
         self.o.read_pdb(DataPath+'rna.pdb')
-        result_minmax  = self.o.calculate_minimum_and_maximum_all_frames(dcdDataPath+'rna-6.4g.dcd')
+        self.o.read_dcd(dcdDataPath+'rna-6.4g.dcd')
+        result_minmax  = self.o.calculate_minimum_and_maximum()
 	numpy.set_printoptions(precision=3)
 	print result_minmax
         expected_minmax = [[-48.253, -45.643, -42.868], [ 41.65 ,  41.332,  45.362]]

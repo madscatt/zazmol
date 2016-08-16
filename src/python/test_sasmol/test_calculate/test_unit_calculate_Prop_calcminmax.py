@@ -26,7 +26,7 @@ import numpy
 import warnings; warnings.filterwarnings('ignore')
 
 import os
-floattype=os.environ['SASSIE_FLOATTYPE']
+floattype=os.environ['SASMOL_FLOATTYPE']
 
 class Test_sascalc_Prop_calcminmax(MockerTestCase): 
 
@@ -40,8 +40,6 @@ class Test_sascalc_Prop_calcminmax(MockerTestCase):
            for i in range(len(a)):
               if (numpy.isnan(a[i]) and numpy.isnan(b[i])): continue
               self.assertAlmostEqual(a[i],b[i],places)
-
-
 
     def test_1_atom(self):
         self.o.setCoor(numpy.array([[[1.0, 2.0, 3.0]]],floattype))

@@ -3,6 +3,10 @@
 
     ipython nbconvert --to markdown Untitled.ipynb
 
+###  search all files to find a string
+
+grep -rnw *.py -e "SASSIE_FLOATTYPE" 
+
 
 ### 0. Identation
 

@@ -82,7 +82,7 @@ class Test_operate_Move_mass_check(MockerTestCase):
         expected_totalmass = 4412.904
         self.assertAlmostEqual(expected_totalmass, result_totalmass, self.tol)
 
-    #@skipIf(os.environ['SASSIE_LARGETEST']=='n',"I am not testing large files")
+    #@skipIf(os.environ['SASMOL_LARGETEST']=='n',"I am not testing large files")
     def test_1KP8_pdb(self):
         self.o.read_pdb(DataPath+'1KP8.pdb')
 	self.o.mass_check()

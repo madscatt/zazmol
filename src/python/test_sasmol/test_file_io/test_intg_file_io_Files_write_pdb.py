@@ -25,7 +25,7 @@ import numpy, os, copy
 
 import warnings; warnings.filterwarnings('ignore')
 
-floattype=os.environ['SASSIE_FLOATTYPE']
+floattype=os.environ['SASMOL_FLOATTYPE']
 
 DataPath = os.path.join(os.path.dirname(os.path.realpath(__file__)),'..','data','pdb_common')+os.path.sep
 moduleDataPath = os.path.join(os.path.dirname(os.path.realpath(__file__)),'..','data','sasmol','file_io')+os.path.sep
@@ -119,7 +119,7 @@ class Test_intg_file_io_Files_write_pdb(MockerTestCase):
       os.remove(moduleDataPath+'test-results/1CRN-writepdb-test.pdb')
 
 
-   @skipIf(os.environ['SASSIE_LARGETEST']=='n',"I am not testing large files")   
+   @skipIf(os.environ['SASMOL_LARGETEST']=='n',"I am not testing large files")   
    def test_1KP8(self):
       '''
 	   test a large protein complex (groel)

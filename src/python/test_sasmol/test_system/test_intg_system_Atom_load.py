@@ -28,7 +28,7 @@ import os
 
 DataPath = os.path.join(os.path.dirname(os.path.realpath(__file__)),'..','data','sasmol','system')+os.path.sep
 
-floattype=os.environ['SASSIE_FLOATTYPE']
+floattype=os.environ['SASMOL_FLOATTYPE']
 import warnings; warnings.filterwarnings('ignore')
 
 class Test_intg_system_Atom_load(MockerTestCase):

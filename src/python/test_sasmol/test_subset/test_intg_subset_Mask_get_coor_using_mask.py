@@ -48,10 +48,10 @@ small protein (crambin)/1-frame, mask frame-0(no atom)
 small protein (crambin)/1-frame, mask frame-0(46 atoms)
 small protein (crambin)/1-frame, mask frame-0(all atoms)
 
-large protein (groel)/1-frame, mask frame-0(no atom) (Skipped as SASSIE_LARGETEST)
-large protein (groel)/1-frame, mask frame-0(7350 atoms) (Skipped as SASSIE_LARGETEST)
-large protein (groel)/1-frame, mask frame-0(all atoms) (Skipped as SASSIE_LARGETEST)
-large protein (groel)/1-frame, mask frame-0(all atoms) (Skipped as SASSIE_LARGETEST)
+large protein (groel)/1-frame, mask frame-0(no atom) (Skipped as SASMOL_LARGETEST)
+large protein (groel)/1-frame, mask frame-0(7350 atoms) (Skipped as SASMOL_LARGETEST)
+large protein (groel)/1-frame, mask frame-0(all atoms) (Skipped as SASMOL_LARGETEST)
+large protein (groel)/1-frame, mask frame-0(all atoms) (Skipped as SASMOL_LARGETEST)
 
 a bad pdb, assertRaises
 """
@@ -485,10 +485,10 @@ class Test_subset_Mask_get_coor_using_mask(MockerTestCase):
 
 
 
-   @skipIf(os.environ['SASSIE_LARGETEST']=='n',"I am not testing large files")
+   @skipIf(os.environ['SASMOL_LARGETEST']=='n',"I am not testing large files")
    def test_1KP8_1(self):
       '''
-      large protein (groel)/1-frame, mask frame-0(no atom) (Skipped as SASSIE_LARGETEST)
+      large protein (groel)/1-frame, mask frame-0(no atom) (Skipped as SASMOL_LARGETEST)
 	   '''
       #
       self.o.read_pdb(PdbDataPath+'1KP8.pdb')
@@ -506,10 +506,10 @@ class Test_subset_Mask_get_coor_using_mask(MockerTestCase):
       self.assert_list_almost_equal(expected_coor, result_coor)
 
 
-   @skipIf(os.environ['SASSIE_LARGETEST']=='n',"I am not testing large files")
+   @skipIf(os.environ['SASMOL_LARGETEST']=='n',"I am not testing large files")
    def test_1KP8_2(self):
       '''
-      large protein (groel)/1-frame, mask frame-0(7350 atoms) (Skipped as SASSIE_LARGETEST)
+      large protein (groel)/1-frame, mask frame-0(7350 atoms) (Skipped as SASMOL_LARGETEST)
 	   '''
       #
       self.o.read_pdb(PdbDataPath+'1KP8.pdb')
@@ -527,10 +527,10 @@ class Test_subset_Mask_get_coor_using_mask(MockerTestCase):
       self.assert_list_almost_equal(expected_coor, result_coor)
 
 
-   @skipIf(os.environ['SASSIE_LARGETEST']=='n',"I am not testing large files")
+   @skipIf(os.environ['SASMOL_LARGETEST']=='n',"I am not testing large files")
    def test_1KP8_3(self):
       '''
-      large protein (groel)/1-frame, mask frame-0(all atoms) (Skipped as SASSIE_LARGETEST)
+      large protein (groel)/1-frame, mask frame-0(all atoms) (Skipped as SASMOL_LARGETEST)
 	   '''
       #
       self.o.read_pdb(PdbDataPath+'1KP8.pdb')

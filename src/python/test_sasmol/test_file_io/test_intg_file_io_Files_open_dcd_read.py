@@ -72,7 +72,7 @@ class Test_intg_file_io_Files_open_dcd_read(MockerTestCase):
       self.assertEqual(fp[4],5)
 
 
-   @skipIf(os.environ['SASSIE_HUGETEST']=='n',"I am not testing huge files")
+   @skipIf(os.environ['SASMOL_HUGETEST']=='n',"I am not testing huge files")
    def test_rna_1point0g(self):
       '''
 	   test a dcd of size 1.0gb based on a rna molecule
@@ -87,7 +87,7 @@ class Test_intg_file_io_Files_open_dcd_read(MockerTestCase):
       self.assertEqual(fp[4],0)
 
 
-   @skipIf(os.environ['SASSIE_HUGETEST']=='n',"I am not testing huge files")
+   @skipIf(os.environ['SASMOL_HUGETEST']=='n',"I am not testing huge files")
    def test_rna_2point0g(self):
       '''
 	   test a dcd of size 2.0gb based on a rna molecule
@@ -102,7 +102,7 @@ class Test_intg_file_io_Files_open_dcd_read(MockerTestCase):
       self.assertEqual(fp[4],0)
 
 
-   @skipIf(os.environ['SASSIE_HUGETEST']=='n',"I am not testing huge files")
+   @skipIf(os.environ['SASMOL_HUGETEST']=='n',"I am not testing huge files")
    def test_rna_3point2g(self):
       '''
 	   test a dcd of size 3.2gb based on a rna molecule
@@ -117,7 +117,7 @@ class Test_intg_file_io_Files_open_dcd_read(MockerTestCase):
       self.assertEqual(fp[4],0)
 
 
-   @skipIf(os.environ['SASSIE_HUGETEST']=='n',"I am not testing huge files")
+   @skipIf(os.environ['SASMOL_HUGETEST']=='n',"I am not testing huge files")
    def test_rna_6point4g(self):
       '''
 	   test a dcd of size 6.4gb based on a rna molecule

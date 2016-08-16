@@ -39,8 +39,8 @@ null test by reading a nonexisting pdb, mask none
 small protein (crambin with 46aa), randomly mask [12, 36, 46, 18, 8]
 small protein (crambin with 46aa), mask all
 
-large protein complex (groel with 526*14 residues), randomly mask [12, 36, 46, 18, 8] (Skipped as SASSIE_LARGETEST)
-large protein complex (groel with 526*14 residues), mask all (Skipped as SASSIE_LARGETEST)
+large protein complex (groel with 526*14 residues), randomly mask [12, 36, 46, 18, 8] (Skipped as SASMOL_LARGETEST)
+large protein complex (groel with 526*14 residues), mask all (Skipped as SASMOL_LARGETEST)
 
 rna molecule, mask randomly 3 residue dihedrals
 rna molecule, mask all residues
@@ -337,7 +337,7 @@ class Test_intg_subset_Mask_get_dihedral_subset_mask(MockerTestCase):
       self.assert_list_almost_equal(result_farray, expected_farray)
 
 
-   @skipIf(os.environ['SASSIE_LARGETEST']=='n',"I am not testing huge files")
+   @skipIf(os.environ['SASMOL_LARGETEST']=='n',"I am not testing huge files")
    def test_1KP8_mask_random_5(self):
       '''
 	   test a large protein complex (groel)
@@ -357,7 +357,7 @@ class Test_intg_subset_Mask_get_dihedral_subset_mask(MockerTestCase):
       self.assert_list_almost_equal(result_farray, expected_farray)
       
 
-   @skipIf(os.environ['SASSIE_LARGETEST']=='n',"I am not testing huge files. It will take 5 min")
+   @skipIf(os.environ['SASMOL_LARGETEST']=='n',"I am not testing huge files. It will take 5 min")
    def test_1KP8_mask_all(self):
       '''
 	   test a large protein complex (groel)
@@ -394,7 +394,7 @@ class Test_intg_subset_Mask_get_dihedral_subset_mask(MockerTestCase):
       self.assertTrue(isinstance(result_farray, numpy.ndarray))
       self.assert_list_almost_equal(result_farray, expected_farray)
 
-   @skipIf(os.environ['SASSIE_LARGETEST']=='n',"I am not testing huge files. It will take 5 min")
+   @skipIf(os.environ['SASMOL_LARGETEST']=='n',"I am not testing huge files. It will take 5 min")
    def test_rna_mask_all(self):
       '''
       test a rna molecule

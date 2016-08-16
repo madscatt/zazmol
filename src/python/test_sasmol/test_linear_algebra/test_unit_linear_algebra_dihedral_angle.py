@@ -24,14 +24,12 @@ import sasmol.linear_algebra as linear_algebra
 import numpy
 
 import os
-floattype=os.environ['SASSIE_FLOATTYPE']
+floattype=os.environ['SASMOL_FLOATTYPE']
 
 class Test_linear_algebra_dihedral_angle(MockerTestCase): 
 
     def setUp(self):
         pass 
-
-
 
     def test_all_zero_arrays(self):
         a=numpy.array([0.0, 0.0, 0.0],floattype)

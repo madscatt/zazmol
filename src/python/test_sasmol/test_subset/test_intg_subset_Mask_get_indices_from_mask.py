@@ -43,7 +43,7 @@ small protein (crambin), mask all atoms
 
 large protein (groel), mask no atom
 large protein (groel), mask 100 atoms
-large protein (groel), mask all atoms, set moltype (Skipped as SASSIE_LARGETEST)
+large protein (groel), mask all atoms, set moltype (Skipped as SASMOL_LARGETEST)
 
 a bad pdb, assertRaises
 
@@ -324,7 +324,7 @@ class Test_subset_Mask_set_descriptor_using_mask(MockerTestCase):
 
 
 
-   @skipIf(os.environ['SASSIE_LARGETEST']=='n',"I am not testing large files")
+   @skipIf(os.environ['SASMOL_LARGETEST']=='n',"I am not testing large files")
    def test_1KP8_1(self):
       '''
       large protein (groel), mask no atom
@@ -341,7 +341,7 @@ class Test_subset_Mask_set_descriptor_using_mask(MockerTestCase):
       self.assert_list_almost_equal(expected_indices, result_indices)
 
 
-   @skipIf(os.environ['SASSIE_LARGETEST']=='n',"I am not testing large files")
+   @skipIf(os.environ['SASMOL_LARGETEST']=='n',"I am not testing large files")
    def test_1KP8_2(self):
       '''
       large protein (groel), mask 100 atoms
@@ -359,10 +359,10 @@ class Test_subset_Mask_set_descriptor_using_mask(MockerTestCase):
 
 
 
-   @skipIf(os.environ['SASSIE_LARGETEST']=='n',"I am not testing large files")
+   @skipIf(os.environ['SASMOL_LARGETEST']=='n',"I am not testing large files")
    def test_1KP8_3(self):
       '''
-      large protein (groel), mask all atoms, set moltype (Skipped as SASSIE_LARGETEST)
+      large protein (groel), mask all atoms, set moltype (Skipped as SASMOL_LARGETEST)
 	   '''
       #
       self.o.read_pdb(PdbDataPath+'1KP8.pdb')

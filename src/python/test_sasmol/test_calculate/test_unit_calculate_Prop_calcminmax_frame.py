@@ -26,7 +26,7 @@ import numpy
 import warnings; warnings.filterwarnings('ignore')
 
 import os
-floattype=os.environ['SASSIE_FLOATTYPE']
+floattype=os.environ['SASMOL_FLOATTYPE']
 
 class Test_sascalc_Prop_calcminmax(MockerTestCase): 
 
@@ -43,49 +43,49 @@ class Test_sascalc_Prop_calcminmax(MockerTestCase):
 
     def test_1_atom(self):
         self.o.setCoor(numpy.array([[[1.0, 2.0, 3.0]]],floattype))
-        result_minmax  = self.o.calculate_minimum_and_maximum_one_frame(0)
+        result_minmax  = self.o.calculate_minimum_and_maximum()
         expected_minmax = [[1.0, 2.0, 3.0], [1.0, 2.0, 3.0]]
         self.assert_list_almost_equal(expected_minmax[0], result_minmax[0])
         self.assert_list_almost_equal(expected_minmax[1], result_minmax[1])
 
     def test_2_atoms_duplicate(self):
         self.o.setCoor(numpy.array([[[1.0, 2.0, 3.0], [1.0, 2.0, 3.0]]],floattype))
-        result_minmax  = self.o.calculate_minimum_and_maximum_one_frame(0)
+        result_minmax  = self.o.calculate_minimum_and_maximum()
         expected_minmax = [[1.0, 2.0, 3.0], [1.0, 2.0, 3.0]]
         self.assert_list_almost_equal(expected_minmax[0], result_minmax[0])
         self.assert_list_almost_equal(expected_minmax[1], result_minmax[1])
 
     def test_2_atoms(self):
         self.o.setCoor(numpy.array([[[1.0, 2.0, 3.0], [-1.0, 2.0, -6.0]]],floattype))
-        result_minmax  = self.o.calculate_minimum_and_maximum_one_frame(0)
+        result_minmax  = self.o.calculate_minimum_and_maximum()
         expected_minmax = [[-1.0, 2.0, -6.0], [1.0, 2.0, 3.0]]
         self.assert_list_almost_equal(expected_minmax[0], result_minmax[0])
         self.assert_list_almost_equal(expected_minmax[1], result_minmax[1])
 
     def test_6_atoms(self):
         self.o.setCoor(numpy.array([[[1.0, 2.0, 3.0],[-4.0, 5.0, 6.0],[7.0, 8.0, -9.0],[1.0, 3.0, 5.0],[2.0, 4.0, 6.0],[0.0, 2.0, 3.0]]],floattype))
-        result_minmax  = self.o.calculate_minimum_and_maximum_one_frame(0)
+        result_minmax  = self.o.calculate_minimum_and_maximum()
         expected_minmax = [[-4.0, 2.0, -9.0], [7.0, 8.0, 6.0]]
         self.assert_list_almost_equal(expected_minmax[0], result_minmax[0])
         self.assert_list_almost_equal(expected_minmax[1], result_minmax[1])
 
     def test_6_atoms_inf1(self):
         self.o.setCoor(numpy.array([[[1.0, 2.0, 3.0],[-util.HUGE,5.0, 6.0],[7.0, 8.0, -9.0],[1.0, 3.0, 5.0],[2.0, util.HUGE,6.0],[0.0, 2.0, 3.0]]],floattype))
-        result_minmax  = self.o.calculate_minimum_and_maximum_one_frame(0)
+        result_minmax  = self.o.calculate_minimum_and_maximum()
         expected_minmax = [[-util.HUGE,2.0, -9.0], [7.0, util.HUGE,6.0]]
         self.assert_list_almost_equal(expected_minmax[0], result_minmax[0])
         self.assert_list_almost_equal(expected_minmax[1], result_minmax[1])
 
     def test_6_atoms_inf2(self):
         self.o.setCoor(numpy.array([[[1.0, 2.0, 3.0],[-util.INF,5.0, 6.0],[7.0, 8.0, -9.0],[1.0, 3.0, 5.0],[2.0, util.INF,6.0],[0.0, 2.0, 3.0]]],floattype))
-        result_minmax  = self.o.calculate_minimum_and_maximum_one_frame(0)
+        result_minmax  = self.o.calculate_minimum_and_maximum()
         expected_minmax = [[-util.INF,2.0, -9.0], [7.0, util.INF,6.0]]
         self.assert_list_almost_equal(expected_minmax[0], result_minmax[0])
         self.assert_list_almost_equal(expected_minmax[1], result_minmax[1])
 
     def test_6_atoms_nan(self):
         self.o.setCoor(numpy.array([[[1.0, 2.0, 3.0],[util.NAN,5.0, 6.0],[7.0, 8.0, -9.0],[1.0, 3.0, 5.0],[2.0, util.NAN,6.0],[0.0, 2.0, 3.0]]],floattype))
-        result_minmax  = self.o.calculate_minimum_and_maximum_one_frame(0)
+        result_minmax  = self.o.calculate_minimum_and_maximum()
         print result_minmax
         expected_minmax = [[util.NAN,util.NAN,-9.0], [util.NAN,util.NAN,6.0]]
         self.assert_list_almost_equal(expected_minmax[0], result_minmax[0])
@@ -93,7 +93,7 @@ class Test_sascalc_Prop_calcminmax(MockerTestCase):
 
     def test_6_atoms_tiny(self):
         self.o.setCoor(numpy.array([[[1.0, -2.0, 3.0],[-util.TINY,-5.0, 6.0],[7.0, -8.0, -9.0],[1.0, -3.0, 5.0],[2.0, util.TINY,6.0],[0.0, 0.0, 3.0]]],floattype))
-        result_minmax  = self.o.calculate_minimum_and_maximum_one_frame(0)
+        result_minmax  = self.o.calculate_minimum_and_maximum()
         print result_minmax
         expected_minmax = [[-util.TINY,-8.0, -9.0], [7.0, util.TINY,6.0]]
         self.assert_list_almost_equal(expected_minmax[0], result_minmax[0])
@@ -101,7 +101,7 @@ class Test_sascalc_Prop_calcminmax(MockerTestCase):
 
     def test_6_atoms_zero(self):
         self.o.setCoor(numpy.array([[[1.0, -2.0, 3.0],[-util.ZERO,-5.0, 6.0],[7.0, -8.0, -9.0],[1.0, -3.0, 5.0],[2.0, util.ZERO,6.0],[0.0, 0.0, 3.0]]],floattype))
-        result_minmax  = self.o.calculate_minimum_and_maximum_one_frame(0)
+        result_minmax  = self.o.calculate_minimum_and_maximum()
         print result_minmax
         expected_minmax = [[-util.ZERO,-8.0, -9.0], [7.0, util.ZERO,6.0]]
         self.assert_list_almost_equal(expected_minmax[0], result_minmax[0])

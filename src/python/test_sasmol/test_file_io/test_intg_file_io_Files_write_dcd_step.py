@@ -25,7 +25,7 @@ import sasmol.dcdio as dcdio
 
 import numpy, os
 
-floattype=os.environ['SASSIE_FLOATTYPE']
+floattype=os.environ['SASMOL_FLOATTYPE']
 
 DataPath = os.path.join(os.path.dirname(os.path.realpath(__file__)),'..','data','pdb_common')+os.path.sep
 moduleDataPath = os.path.join(os.path.dirname(os.path.realpath(__file__)),'..','data','sasmol','file_io')+os.path.sep
@@ -441,7 +441,7 @@ class Test_intg_file_io_Files_write_dcd_step(MockerTestCase):
       self.assertAlmostEqual(sum_result_coor, sum_expected_coor, self.prcsn)
 
 
-   @skipIf(os.environ['SASSIE_LARGETEST']=='n',"I am not testing large files")
+   @skipIf(os.environ['SASMOL_LARGETEST']=='n',"I am not testing large files")
    def test_1KP8(self):
       '''
       test a dcd based on a large pdb complex (groel)

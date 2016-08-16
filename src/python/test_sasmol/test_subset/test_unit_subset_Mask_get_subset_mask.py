@@ -446,7 +446,7 @@ class Test_subset_Mask_get_subset_mask(MockerTestCase):
       self.assertEqual(list(mask),expected_mask)
 
 
-   @skipIf(os.environ['SASSIE_LARGETEST']=='n',"I am not testing large files")
+   @skipIf(os.environ['SASMOL_LARGETEST']=='n',"I am not testing large files")
    def test_10000out50000_masked(self):
       '''
       test for 50000 atoms where 10000 will be masked
@@ -479,7 +479,7 @@ class Test_subset_Mask_get_subset_mask(MockerTestCase):
       self.assertEqual(list(mask),expected_mask)
 
 
-   @skipIf(os.environ['SASSIE_HUGETEST']=='n',"I am not testing huge files")
+   @skipIf(os.environ['SASMOL_HUGETEST']=='n',"I am not testing huge files")
    def test_1000000out5000000_masked(self):
       '''
       test for 5000000 atoms where 1000000 will be masked

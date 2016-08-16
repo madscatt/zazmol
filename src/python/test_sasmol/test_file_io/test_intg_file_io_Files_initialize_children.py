@@ -23,7 +23,7 @@ import sasmol.system as system
 
 import numpy, os, copy
 
-floattype=os.environ['SASSIE_FLOATTYPE']
+floattype=os.environ['SASMOL_FLOATTYPE']
 
 DataPath = os.path.join(os.path.dirname(os.path.realpath(__file__)),'..','data','pdb_common')+os.path.sep
 moduleDataPath = os.path.join(os.path.dirname(os.path.realpath(__file__)),'..','data','sasmol','file_io')+os.path.sep
@@ -226,7 +226,7 @@ class Test_intg_file_io_Files_initialize_children(MockerTestCase):
       self.assertEqual(sum(sum(self.o.elements_mask())), 327)
       self.assertEqual(sum(sum(self.o.segnames_mask())), 327)
 
-   #@skipIf(os.environ['SASSIE_LARGETEST']=='n',"I am not testing large files")   
+   #@skipIf(os.environ['SASMOL_LARGETEST']=='n',"I am not testing large files")   
    def test_1KP8(self):
       '''
       test a pdb file of 1KP8

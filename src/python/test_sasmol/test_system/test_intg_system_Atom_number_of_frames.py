@@ -24,7 +24,7 @@ import numpy, os, copy
 
 import warnings; warnings.filterwarnings('ignore')
 
-floattype=os.environ['SASSIE_FLOATTYPE']
+floattype=os.environ['SASMOL_FLOATTYPE']
 
 import os
 DataPath = os.path.join(os.path.dirname(os.path.realpath(__file__)),'..','data','sasmol','system')+os.path.sep

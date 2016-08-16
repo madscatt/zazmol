@@ -48,9 +48,9 @@ small protein (crambin with 46 residues), mask none due to wrong basis_filter
 small protein (crambin with 46 residues), mask 4
 small protein (crambin with 46 residues), mask all
 
-large protein (groel with 526*14 residues), mask none (Skipped as SASSIE_LARGETEST)
-large protein (groel with 526*14 residues), mask partial (Skipped as SASSIE_LARGETEST)
-large protein (groel with 526*14 residues), mask all (Skipped as SASSIE_LARGETEST)
+large protein (groel with 526*14 residues), mask none (Skipped as SASMOL_LARGETEST)
+large protein (groel with 526*14 residues), mask partial (Skipped as SASMOL_LARGETEST)
+large protein (groel with 526*14 residues), mask all (Skipped as SASMOL_LARGETEST)
 
 problemetic pdb (1PSI wih unpaird MODEL/ENDMDL)
 """
@@ -450,7 +450,7 @@ class Test_subset_Mask_get_subset_mask(MockerTestCase):
       self.assertEqual(list(mask),expectd_mask)
 
 
-   @skipIf(os.environ['SASSIE_LARGETEST']=='n',"I am not testing huge files")
+   @skipIf(os.environ['SASMOL_LARGETEST']=='n',"I am not testing huge files")
    def test_1KP8_1(self):
       '''
 	   test a groel
@@ -470,7 +470,7 @@ class Test_subset_Mask_get_subset_mask(MockerTestCase):
       self.assertEqual(list(mask),expectd_mask)
 
 
-   @skipIf(os.environ['SASSIE_LARGETEST']=='n',"I am not testing huge files")
+   @skipIf(os.environ['SASMOL_LARGETEST']=='n',"I am not testing huge files")
    def test_1KP8_2(self):
       '''
 	   test a groel
@@ -490,7 +490,7 @@ class Test_subset_Mask_get_subset_mask(MockerTestCase):
       self.assertEqual(list(mask),expectd_mask)
 
 
-   @skipIf(os.environ['SASSIE_LARGETEST']=='n',"I am not testing huge files")
+   @skipIf(os.environ['SASMOL_LARGETEST']=='n',"I am not testing huge files")
    def test_1KP8_3(self):
       '''
 	   test a groel

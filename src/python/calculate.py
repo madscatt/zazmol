@@ -338,14 +338,18 @@ class Calculate(object):
 
     def calculate_minimum_and_maximum(self, **kwargs):
         '''	
-        This method calculates the min and max of of the object in (x,y,z)
+        This method calculates the minimum and maximum values
+        of of the object in (x,y,z)
 
-        A numpy array of min and max values are returned
+        The default usage is to evaluate all frames
+
+        A numpy array of minimum and maximum values for each
+        dimension are returned
 
         Parameters
         ----------
         kwargs 
-            optional future arguments
+           frames = [] : integer list of frames to process 
                                                                                      
         Returns
         -------
@@ -360,147 +364,49 @@ class Calculate(object):
         >>> molecule = system.Molecule('hiv1_gag.pdb')
         >>> molecule.calculate_minimum_and_maximum()
         [array([-31.29899979, -93.23899841, -85.81900024]), array([ 19.64699936,  30.37800026,  99.52999878])] 
-       
-        '''
-
-        min_x = numpy.min(self._coor[:, :, 0])
-        max_x = numpy.max(self._coor[:, :, 0])
-        min_y = numpy.min(self._coor[:, :, 1])
-        max_y = numpy.max(self._coor[:, :, 1])
-        min_z = numpy.min(self._coor[:, :, 2])
-        max_z = numpy.max(self._coor[:, :, 2])
-
-        self._total_minimum = numpy.array([min_x, min_y, min_z])
-        self._total_maximum = numpy.array([max_x, max_y, max_z])
-
-        return [self._total_minimum, self._total_maximum]
-
-    def calculate_minimum_and_maximum_one_frame(self, frame, **kwargs):
-        '''	
-        This method calculates the min and max of frame=frame of the object in (x,y,z)
-
-        A numpy array of min and max values are returned
-        
-        Parameters
-        ----------
-        frame 
-            integer : trajectory frame number to use
-
-        kwargs 
-            optional future arguments
-                                                                                     
-        Returns
-        -------
-        numpy array 
-            nested list of minimum and maximum values 
-            [ [ min_x, min_y, min_z ], [max_x, max_y, max_z] ]
-
-        Examples
-        -------
-
+      
         >>> import sasmol.system as system
         >>> molecule = system.Molecule('hiv1_gag.pdb')
-        >>> molecule.calculate_minimum_and_maximum_one_frame(0)
-        [array([-31.29899979, -93.23899841, -85.81900024]), array([ 19.64699936,  30.37800026,  99.52999878])] 
+        >>> molecule.read_dcd('hiv1_gag_200_frames')
+        >>> molecule.calculate_minimum_and_maximum()
+        [array([ -94.47146606, -121.88082886,  -99.94940948]), array([  52.85133362,   65.53725433,  100.76850891])]
+        >>> molecule.calculate_minimum_and_maximum(frames=[0,1,2,3])
+        [array([-30.9330883 , -92.68256378, -84.51082611]), array([ 20.98281288,  38.45230484,  99.91564178])] 
+      
+       
+        '''
         
-        '''
+        try: 
+            frames = kwargs['frames']
+        except:
+            frames = [x for x in xrange(self.number_of_frames())]
 
-        min_x = numpy.min(self._coor[frame, :, 0])
-        max_x = numpy.max(self._coor[frame, :, 0])
-        min_y = numpy.min(self._coor[frame, :, 1])
-        max_y = numpy.max(self._coor[frame, :, 1])
-        min_z = numpy.min(self._coor[frame, :, 2])
-        max_z = numpy.max(self._coor[frame, :, 2])
+        first_flag = True        
 
-        self._minimum = numpy.array([min_x, min_y, min_z])
-        self._maximum = numpy.array([max_x, max_y, max_z])
+        for frame in frames:
 
-        return [self._minimum, self._maximum]
+            this_min_x=numpy.min(self._coor[frame,:,0])
+            this_max_x=numpy.max(self._coor[frame,:,0])		
+            this_min_y=numpy.min(self._coor[frame,:,1])
+            this_max_y=numpy.max(self._coor[frame,:,1])		
+            this_min_z=numpy.min(self._coor[frame,:,2])
+            this_max_z=numpy.max(self._coor[frame,:,2])		
 
-    def calculate_minimum_and_maximum_all_frames(self, filename, **kwargs):
-        '''	
-        This method calculates the min and max of frame=frame of the object in (x,y,z)
-
-        A numpy array of min and max values are returned
-
-        Note
-        ----------
-            Default usage requires trajectory input from a DCD file
-
-        Parameters
-        ----------
-        filename 
-            string : name of file to read trajectory
-
-        kwargs 
-            optional
-            {
-                pdb = "pdb" : indicates input file is a PDB file
-            }
-                                                                                              
-        Returns
-        -------
-        numpy array 
-            nested list of minimum and maximum values 
-            [ [ min_x, min_y, min_z ], [max_x, max_y, max_z] ]
-
-        Examples
-        -------
-
-        >>> import sasmol.system as system
-        >>> molecule = system.Molecule()
-        >>> molecule.calculate_minimum_and_maximum_all_frames('hiv1_gag.dcd')
-        [array([-31.29899979, -93.23899841, -85.81900024]), array([ 19.64699936,  30.37800026,  99.52999878])]
-         
-        '''
-
-        if 'pdb' in kwargs:
-            file_type = 'pdb'
-            number_of_frames = self.number_of_frames()
-        else:
-            file_type = 'dcd'
-            dcdfilepointer_array = self.open_dcd_read(filename)
-            dcdfile = dcdfilepointer_array[0]
-            number_of_frames = dcdfilepointer_array[2]
-
-        min_x = None
-        min_y = None
-        min_z = None
-        max_x = None
-        max_y = None
-        max_z = None
-
-        for i in xrange(number_of_frames):
-
-            if(file_type == 'dcd'):
-                self.read_dcd_step(dcdfilepointer_array, i)
-                this_minmax = self.calculate_minimum_and_maximum_one_frame(0)
-            else:
-                this_minmax = self.calcminmax_frame(i)
-
-            this_min_x = this_minmax[0][0]
-            this_max_x = this_minmax[1][0]
-            this_min_y = this_minmax[0][1]
-            this_max_y = this_minmax[1][1]
-            this_min_z = this_minmax[0][2]
-            this_max_z = this_minmax[1][2]
-
-            if((min_x == None) or (this_min_x < min_x)):
+            if(first_flag or (this_min_x < min_x)):
                 min_x = this_min_x
-            if((min_y == None) or (this_min_y < min_y)):
+            if(first_flag or (this_min_y < min_y)):
                 min_y = this_min_y
-            if((min_z == None) or (this_min_z < min_z)):
+            if(first_flag or (this_min_z < min_z)):
                 min_z = this_min_z
 
-            if((max_x == None) or (this_max_x > max_x)):
+            if(first_flag or (this_max_x > max_x)):
                 max_x = this_max_x
-            if((max_y == None) or (this_max_y > max_y)):
+            if(first_flag or (this_max_y > max_y)):
                 max_y = this_max_y
-            if((max_z == None) or (this_max_z > max_z)):
+            if(first_flag or (this_max_z > max_z)):
                 max_z = this_max_z
-
-        if(file_type == 'dcd'):
-            self.close_dcd_read(dcdfile)
+    
+            first_flag = False
 
         self._minimum = numpy.array([min_x, min_y, min_z])
         self._maximum = numpy.array([max_x, max_y, max_z])

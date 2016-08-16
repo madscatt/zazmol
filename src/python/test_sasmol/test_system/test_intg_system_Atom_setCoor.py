@@ -24,7 +24,7 @@ import numpy
 
 import os
 
-floattype = os.environ['SASSIE_FLOATTYPE']
+floattype = os.environ['SASMOL_FLOATTYPE']
 
 import sasmol.system as system
 
