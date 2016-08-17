@@ -1,10 +1,43 @@
+from __future__ import absolute_import
+from __future__ import division
+from __future__ import print_function
+#from __future__ import unicode_literals
 
-import sasmol.system as system
-import sys, time, numpy, math
+'''
+    SASMOL: Copyright (C) 2011 Joseph E. Curtis, Ph.D. 
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+'''
+import sys
+import numpy
+import math
 import copy
-
 import multiprocessing
+import sasmol.system as system
 
+#	MULTIPROCESSING_SASMOL
+#
+#	08/16/2015	--	initial coding			        :	jc
+#
+#	 1         2         3         4         5         6         7
+# LC4567890123456789012345678901234567890123456789012345678901234567890123456789
+#								       *      **
+'''
+    Multiprocessing_sasmol contains methods to manage the creation and combination
+    of sasmol.system objects and to manage multiprocessing jobs using
+    these objects.
+'''
 
 class Multiprocessing_SasMol():
 
@@ -25,7 +58,7 @@ class Multiprocessing_SasMol():
         >>> molecules = test.divide_molecule(number_of_batches)
         >>> test.submit_jobs(molecules, test.example_worker, number_of_batches)
 
-        ### POTENTIAL USAGE BELOW ASSUMES CLASS INHERITS FROM SASMOL.SYSTEM.ATOM
+       
         >>> molecules = molecule.divide_molecule(number_of_batches)
         >>> test = Multiprocessing_SasMol()
         >>> test.submit_jobs(molecules, test.example_worker, number_of_batches)
@@ -34,8 +67,9 @@ class Multiprocessing_SasMol():
         ----
 
         THIS CLASS IS NEW AND IS UNDER ACTIVE DEVELOPMENT AND MAY CHANGE DRAMATICALLY
-        THIS CLASS IS NEW AND IS UNDER ACTIVE DEVELOPMENT AND MAY CHANGE DRAMATICALLY
-        THIS CLASS IS NEW AND IS UNDER ACTIVE DEVELOPMENT AND MAY CHANGE DRAMATICALLY
+
+         ### LAST THREE LINES OF EXAMPLE ARE FOR CONSIDERATION FOR POTENTIAL 
+             WOULD REQUIRE CLASS TO INHERIT FROM SASMOL.SYSTEM.ATOM
 
         `self` parameter is not shown in the ``Parameters`` section in the documentation
 
@@ -63,7 +97,7 @@ class Multiprocessing_SasMol():
                                                                                      
         Returns
         -------
-        None
+        frames
             integer list of frame lists
 
         Examples
@@ -154,9 +188,13 @@ class Multiprocessing_SasMol():
         >>> test = Multiprocessing_SasMol()
         >>> molecules = test.divide_molecule(number_of_batches)
 
-        ### POTENTIAL USAGE BELOW ASSUMES CLASS INHERITS FROM SASMOL.SYSTEM.ATOM
         >>> molecules = molecule.divide_molecule(number_of_batches)
-        
+       
+        Note 
+        -------
+        Last line in the examples is an alternative use case to explore yet
+        not implemented.
+
         '''
 
         frames = self.get_frame_lists(molecule.number_of_frames(), number_of_batches)
@@ -173,8 +211,34 @@ class Multiprocessing_SasMol():
 
         return molecules
 
-    def submit_jobs(self, molecules, target_method, number_of_jobs):
+    def submit_jobs(self, molecules, target_method, number_of_jobs, **kwargs):
+        ''' 
+        Utility method to start a set of multiprocessing jobs
 
+        Parameters
+        ----------
+        molecules
+            list : system objects
+
+        target_method
+            string : name of method to call
+        
+        number_of_jobs
+            int : number of job / processes to run
+
+        kwargs 
+            optional future arguments
+                                                                                     
+        Returns
+        -------
+        None
+
+        Examples
+        -------
+
+        >>> test.submit_jobs(molecules, test.example_worker, number_of_batches)
+        
+        ''' 
         jobs = []
         for i in range(number_of_jobs):
             p = multiprocessing.Process(target=target_method, args=(i,molecules[i]))
@@ -190,6 +254,8 @@ if __name__ == "__main__" :
     mol = system.Molecule(pdbfilename)
     mol.read_dcd(dcdfilename)
 
+
+    '''
     number_of_batches = 10
 
     test = Multiprocessing_SasMol()
@@ -212,3 +278,4 @@ if __name__ == "__main__" :
     #for j in xrange(mol.number_of_frames()):
     #    print com[j]
 
+    '''

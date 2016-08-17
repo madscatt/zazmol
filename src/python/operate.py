@@ -4,7 +4,7 @@ from __future__ import print_function
 #from __future__ import unicode_literals
 
 '''
-    SASSIE: Copyright (C) 2011 Joseph E. Curtis, Ph.D. 
+    SASMOL: Copyright (C) 2011 Joseph E. Curtis, Ph.D. 
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -21,6 +21,7 @@ from __future__ import print_function
 '''
 import sys
 import numpy
+import sasmol as sasmol
 import sasmol.linear_algebra as linear_algebra
 
 #	OPERATE
@@ -218,7 +219,7 @@ class Move():
         ----------
         mass_check is called to validate self._total_mass()    
         
-        Can achieve same result using self.translate(frame,[0,0,0],point=True)
+        Can achieve same result using self.translate(frame, [0,0,0], point=True)
 
         
         '''
@@ -233,8 +234,8 @@ class Move():
         self._com = self.calculate_center_of_mass(frame)
 
         return
-
-    def align(self, frame, coor_sub_2, com_sub_2, coor_sub_1, com_sub_1, **kwargs):
+    
+    def align(self, other, self_basis, other_basis, **kwargs):
         '''
             Alignment of one object on top of another
             "self" is aligned onto "other" using the basis
@@ -242,26 +243,32 @@ class Move():
             and the transformation is then done to all the atoms of
             molecule 2
 
+            self = molecule_2
+
+            other = molecule_1
+
+            self aligned to other
+
+            molecule_2 aligned to molecule_1
+
+
         Parameters
         ----------
         frame 
             integer : trajectory frame number to use
-
-        coor_sub_2:
-            numpy array : coordinates of molecule 2
-
-        com_sub_2:
-            numpy array : center of mass of molecule 2
         
-        coor_sub_1:
-            numpy array : coordinates of molecule 1
+        other
+            system object : molecule 1
 
-        com_sub_1:
-            numpy array : center of mass of molecule 1
+        self_basis
+            string : unique description of atoms used for alignment
+
+        other_basis
+            string : unique description of atoms used for alignment
         
         kwargs 
             optional future arguments
-                                                                                     
+
         Returns
         -------
         None
@@ -274,30 +281,53 @@ class Move():
         >>> molecule_1 = system.Molecule('hiv1_gag.pdb')
         >>> molecule_2 = system.Molecule('moved_and_rotated_hiv1_gag.pdb')
         >>> frame = 0
-        >>> coor_sub_1 = molecule_1.coor()
-        >>> com_sub_1 = molecule_1.calculate_center_of_mass(frame)
-        >>> coor_sub_2 = molecule_2.coor()
+        >>> basis_1 = 'name[i] == "CA"'
+        >>> basis_2 = 'name[i] == "CA"'
+        >>> molecule_2.align(molecule_1, basis_1, basis_2)
         >>> com_sub_2 = molecule_2.calculate_center_of_mass(frame)
         
         Note
         ----
         mass_check determines if mass is defined for the object so that
         center of mass can be calculated
-       
-        align method is scheduled for re-factoring
          
         
         '''
-        self.mass_check()
-        self.calculate_center_of_mass(frame)
 
-        u = linear_algebra.find_u(coor_sub_1, coor_sub_2)
+        frame = 0
 
-        tao = numpy.transpose(self.coor()[frame] - com_sub_2)
+
+        ### other = molecule_1 (reference)
+        
+        error, other_mask = other.get_subset_mask(other_basis)
+        
+        subset_other = sasmol.system.Molecule()
+        error = other.copy_molecule_using_mask(subset_other, other_mask, frame) 
+        
+        com_subset_other = subset_other.calculate_center_of_mass(frame)
+        subset_other.center(frame)
+        coor_subset_other = subset_other.coor()[frame]
+       
+
+        ### self = molecule_2 (to be aligned to other / molecule_1)
+
+        error, self_mask = self.get_subset_mask(self_basis)
+        
+        subset_self = sasmol.system.Molecule()
+        error = self.copy_molecule_using_mask(subset_self, self_mask, frame) 
+        
+        com_subset_self = subset_self.calculate_center_of_mass(frame)
+        subset_self.center(frame)
+        coor_subset_self = subset_self.coor()[frame]
+       
+        
+        u = linear_algebra.find_u(coor_subset_self, coor_subset_other)
+
+        tao = numpy.transpose(self.coor()[frame] - com_subset_other)
 
         error, nat2 = linear_algebra.matrix_multiply(u, tao)
 
-        ncoor = numpy.transpose(nat2) + com_sub_1
+        ncoor = numpy.transpose(nat2) + com_subset_other
 
         self._coor[frame, :] = ncoor
 

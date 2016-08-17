@@ -1,4 +1,9 @@
-#    SASMOL: Copyright (C) 2011 Joseph E. Curtis, Ph.D. 
+from __future__ import absolute_import
+from __future__ import division
+from __future__ import print_function
+#from __future__ import unicode_literals
+
+#    SASMOL: Copyright (C) 2011 Joseph E. Curtis, Ph.D.
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -13,7 +18,7 @@
 #    You should have received a copy of the GNU General Public License
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
-#	SASMATH
+#	LINEAR_ALGEBRA
 #
 #	12/13/2009	--	initial coding			:	jc
 #	12/24/2015	--	refactored for release  :	jc
@@ -22,25 +27,82 @@
 # LC4567890123456789012345678901234567890123456789012345678901234567890123456789
 #								       *      **
 '''
-	Sasmath methods to perform basic mathematical operations
+	LINEAR_ALGEBRA contains methods to perform basic mathematical operations
 '''
 
 import sys
 import numpy
 import math
-import matrix_math
-
+import sasmol.matrix_math as matrix_math
 
 def cross_product(a, b):
+    ''' 
+    Returns cross product (vector product) on two vectors
+
+    Parameters
+        ----------
+    a
+        float list : vector a
+
+    b
+        float list : vector b
+
+    Returns
+    -------
+    numpy.array of cross product
+
+    Examples
+    -------
+
+    >>> import sasmol.linear_algebra as linear_algebra
+    >>> a = [1.0, 2.0, 3.0]
+    >>> b = [-1.0, 6.0, 8.0]
+    >>> linear_algebra.cross_product(a, b)
+    array([ -2., -11.,   8.]) 
+
+    '''
+
     cross = [0] * 3
     cross[0] = a[1] * b[2] - a[2] * b[1]
     cross[1] = a[2] * b[0] - a[0] * b[2]
     cross[2] = a[0] * b[1] - a[1] * b[0]
+
     return numpy.array(cross)
 
 
 def matrix_multiply(a, b):
+    ''' 
+    Returns the result of multiplying matrix a by matrix b
 
+    Parameters
+        ----------
+    a
+        float list : matrix a
+
+    b
+        float list : matrix b
+
+    Returns
+    -------
+    tuple 
+        error
+            list with error code (if error occurs)
+
+        numpy.array of matrix product
+
+    Examples
+    -------
+
+    >>> import sasmol.linear_algebra as linear_algebra
+    >>> import numpy
+    >>> a=numpy.array([[5.0, 3.0, 1.0],[2.0, 3.0, 5.0]])
+    >>> b=numpy.array([[2.0, -4.0, 8.0]]).T
+    >>> linear_algebra.matrix_multiply(a, b)
+    ([], array([[  6.],
+       [ 32.]]))
+
+
+    '''
     error = []
 
     shape_a = a.shape
@@ -67,8 +129,37 @@ def matrix_multiply(a, b):
 
 def find_u(x, y):
     '''
-    Method to find the U matrix used to align two molecules
+    Method to find the U matrix used to align two sets of 3 x 3 coordinate
+    arrays
+
+    Parameters
+        ----------
+    x
+        numpy array : 3 x 3
+
+    y
+        numpy array : 3 x 3
+
+    Returns
+    -------
+    numpy.array
+        containing U matrix for alignment of two vectors
+
+    Examples
+    -------
+
+    >>> import sasmol.linear_algebra as linear_algebra
+    >>> import numpy
+    >>> a = numpy.array([[[1.0, 2.0, 3.0],[1.0, 2.0, 3.0],[1.0, 2.0, 3.0]],[[1.0, 2.0, 3.0],[1.0, 2.0, 3.0],[1.0, 2.0, 3.0]],[[1.0, 2.0, 3.0],[1.0, 2.0, 3.0],[1.0, 2.0, 3.0]]])
+    >>> b = numpy.array([[[-1.0, 6.0, 8.0],[-1.0, 6.0, 8.0],[-1.0, 6.0, 8.0]],[[-1.0, 6.0, 8.0],[-1.0, 6.0, 8.0],[-1.0, 6.0, 8.0]],[[-1.0, 6.0, 8.0],[-1.0, 6.0, 8.0],[-1.0, 6.0, 8.0]]])
+    >>> b = [-1.0, 6.0, 8.0]
+    >>> linear_algebra.find_u(a, b)
+    array([[-0.33333333, -0.33333333, -0.33333333],
+        [-0.33333333, -0.33333333, -0.33333333],
+        [-0.33333333, -0.33333333, -0.33333333]])
+
     '''
+
     b = numpy.zeros(9, numpy.float)
     k = 0
     for i in range(3):
@@ -121,21 +212,8 @@ def find_u(x, y):
             numpy.put(lu, lk, rad)
             lk = lk + 1
     u = numpy.reshape(lu, (-1, 3))
+
     return u
-
-
-def vec_sub(a, b, c):
-    a[0] = b[0] - c[0]
-    a[1] = b[1] - c[1]
-    a[2] = b[2] - c[2]
-    return a
-
-
-def vec_scale(a, b, c):
-    a[0] = b * c[0]
-    a[1] = b * c[1]
-    a[2] = b * c[2]
-    return a
 
 
 def signed_angle(a, b, c):
@@ -143,6 +221,33 @@ def signed_angle(a, b, c):
     This method calcultes the sign of the angle which is used in the calculation of a dihedral angle.
     As such, this method is not validated for other uses.  It will fail if the basis atoms for the
     dihedral (atom 2 and atom 3) overlap.
+
+    Parameters
+        ----------
+    a
+        float list : vector a
+
+    b
+        float list : vector b
+
+    c
+        float list : vector c
+
+    Returns
+    -------
+    float
+        signed angle in degrees
+
+    Examples
+    -------
+
+    >>> import sasmol.linear_algebra as linear_algebra
+    >>> a = [1.0, 2.0, 3.0]
+    >>> b = [-1.0, 6.0, 8.0]
+    >>> c = [-4.0, -1.0, 4]
+    >>> linear_algebra.signed_angle(a, b, c)
+    21.444512921997863   
+
     '''
 
     ada = (a[0] * a[0] + a[1] * a[1] + a[2] * a[2])
@@ -155,10 +260,7 @@ def signed_angle(a, b, c):
         try:
             argument = adb / math.sqrt(ada * bdb)
             angle = (180.0 / math.pi) * math.acos(argument)
-        #angle = (180.0/math.pi) * math.acos(adb/math.sqrt(ada*bdb))
         except:
-            # print '>>> exception averted: arg = ',argument
-            print ';',
             return 180.0
 
     cp = cross_product(a, b)
@@ -169,16 +271,46 @@ def signed_angle(a, b, c):
 
 
 def dihedral_angle(a1, a2, a3, a4):
+    '''
+    Calculates the dihedral angle between four vectors  
+
+
+    Parameters
+        ----------
+    a1
+        float list : vector a1
+
+    a2
+        float list : vector a2
+
+    a3
+        float list : vector a3
+
+    a4
+        float list : vector a4
+
+    Returns
+    -------
+    float
+        dihedral angle in degrees
+
+    Examples
+    -------
+
+    >>> import sasmol.linear_algebra as linear_algebra
+    >>> a1 = numpy.array([1.0, 2.0, 3.0])
+    >>> a2 = numpy.array([-1.0, 6.0, 8.0])
+    >>> a3 = numpy.array([-4.0, -1.0, 4.0])
+    >>> a4 = numpy.array([-3.0, -41, 3.0])
+    >>> linear_algebra.dihedral_angle(a1, a2, a3, a4)
+    85.950635659264 
+
+    '''
 
     r1 = numpy.zeros(3, numpy.float)
     r2 = numpy.zeros(3, numpy.float)
     r3 = numpy.zeros(3, numpy.float)
     r4 = numpy.zeros(3, numpy.float)
-
-#	vec_sub(r1,a1,a2)
-#	vec_sub(r2,a3,a2)
-#	vec_scale(r3,-1,r2)
-#	vec_sub(r4,a4,a3)
 
     r1 = a1 - a2
     r2 = a3 - a2
@@ -193,13 +325,40 @@ def dihedral_angle(a1, a2, a3, a4):
     return dihedral_angle
 
 
-def calc_angle(coor1, coor2, coor3):
-    '''
-    Method to calculate the angle between three atoms
+def calculate_angle(a, b, c):
     '''
 
-    u = coor1 - coor2
-    v = coor3 - coor2
+    Calculates the dihedral angle between three vectors  
+
+    Parameters
+        ----------
+    a
+        float list : vector a
+
+    b
+        float list : vector b
+
+    c
+        float list : vector c
+
+    Returns
+    -------
+    float
+        angle in radians
+
+    Examples
+    -------
+
+    >>> import sasmol.linear_algebra as linear_algebra
+    >>> a = numpy.array([1.0, 2.0, 3.0])
+    >>> b = numpy.array([-1.0, 6.0, 8.0])
+    >>> c = numpy.array([-4.0, -1.0, 4.0])
+    >>> linear_algebra.calculate_angle(a, b, c)
+    0.7556508878558726 
+
+    '''
+    u = a - b
+    v = c - b
 
     norm_u = math.sqrt(sum(u * u))
     norm_v = math.sqrt(sum(v * v))
