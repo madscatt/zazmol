@@ -1,3 +1,8 @@
+from __future__ import absolute_import
+from __future__ import division
+from __future__ import print_function
+#from __future__ import unicode_literals
+
 #   SASMOL: Copyright (C) 2011 Joseph E. Curtis, Ph.D. 
 #
 #    This program is free software: you can redistribute it and/or modify
@@ -17,93 +22,198 @@
 #
 #	1/26/2012	--	initial coding				: jc
 #	12/26/2015	--	refactored for release      : jc
+#	08/18/2016	--	documentation               : jc
 #
 #	 1         2         3         4         5         6         7
 # LC4567890123456789012345678901234567890123456789012345678901234567890123456789
 #								       *      **
 
-"""
-The topolgy dictionary looks like the following:
-
-pprint.pprint(o.topology_info['NTER'],width=100)
-{'ATOM': [['N', 'NH3', '-0.30'],
-          ['HT1', 'HC', '0.33'],
-          ['HT2', 'HC', '0.33'],
-          ['HT3', 'HC', '0.33'],
-          ['CA', 'CT1', '0.21'],
-          ['HA', 'HB', '0.10']],
- 'BOND': [['HT1', 'N'], ['HT2', 'N'], ['HT3', 'N']],
- 'DELE': [['ATOM', 'HN']],
- 'DONO': ['HT1', 'N', 'HT2', 'N', 'HT3', 'N'],
- 'IC': [['HT1', 'N', 'CA', 'C', '0.0000', '0.0000', '180.0000', '0.0000', '0.0000'],
-        ['HT2', 'CA', '*N', 'HT1', '0.0000', '0.0000', '120.0000', '0.0000', '0.0000'],
-        ['HT3', 'CA', '*N', 'HT2', '0.0000', '0.0000', '120.0000', '0.0000', '0.0000']],
- 'TOTAL_CHARGE': '1.00'}
-
-pprint.pprint(o.topology_info['ALA'],width=100)
-{'ACCE': ['O', 'C'],
- 'ATOM': [['N', 'NH1', '-0.47'],
-          ['HN', 'H', '0.31'],
-          ['CA', 'CT1', '0.07'],
-          ['HA', 'HB', '0.09'],
-          ['CB', 'CT3', '-0.27'],
-          ['HB1', 'HA', '0.09'],
-          ['HB2', 'HA', '0.09'],
-          ['HB3', 'HA', '0.09'],
-          ['C', 'C', '0.51'],
-          ['O', 'O', '-0.51']],
- 'BOND': [['CB', 'CA'],
-          ['N', 'HN'],
-          ['N', 'CA'],
-          ['C', 'CA'],
-          ['C', '+N'],
-          ['CA', 'HA'],
-          ['CB', 'HB1'],
-          ['CB', 'HB2'],
-          ['CB', 'HB3']],
- 'DONO': ['HN', 'N'],
- 'DOUB': [['O', 'C']],
- 'IC': [['-C', 'CA', '*N', 'HN', '1.3551', '126.4900', '180.0000', '115.4200', '0.9996'],
-        ['-C', 'N', 'CA', 'C', '1.3551', '126.4900', '180.0000', '114.4400', '1.5390'],
-        ['N', 'CA', 'C', '+N', '1.4592', '114.4400', '180.0000', '116.8400', '1.3558'],
-        ['+N', 'CA', '*C', 'O', '1.3558', '116.8400', '180.0000', '122.5200', '1.2297'],
-        ['CA', 'C', '+N', '+CA', '1.5390', '116.8400', '180.0000', '126.7700', '1.4613'],
-        ['N', 'C', '*CA', 'CB', '1.4592', '114.4400', '123.2300', '111.0900', '1.5461'],
-        ['N', 'C', '*CA', 'HA', '1.4592', '114.4400', '-120.4500', '106.3900', '1.0840'],
-        ['C', 'CA', 'CB', 'HB1', '1.5390', '111.0900', '177.2500', '109.6000', '1.1109'],
-        ['HB1', 'CA', '*CB', 'HB2', '1.1109', '109.6000', '119.1300', '111.0500', '1.1119'],
-        ['HB1', 'CA', '*CB', 'HB3', '1.1109', '109.6000', '-119.5800', '111.6100', '1.1114']],
- 'IMPR': [['N', '-C', 'CA', 'HN'], ['C', 'CA', '+N', 'O']],
-"""
-
 import os
 import numpy
 import copy
-import config as config
+import sasmol.config as config
 
 class CharmmTopology(object):
 
     '''
     This class contains charmm topology information used other modules.
+
+
+    The output topology dictionary looks like the following examples:
+
+    Examples
+    ========
+
+    >>> import pprint
+    >>> import sasmol.topology as topology
+    >>> test = topology.CharmmTopology()
+    >>> test.read_charmm_topology()
+    >>> pprint.pprint(test.topology_info['NTER'],width=100)
+    {'ATOM': [['N', 'NH3', '-0.30'],
+          ['HT1', 'HC', '0.33'],
+          ['HT2', 'HC', '0.33'],
+          ['HT3', 'HC', '0.33'],
+          ['CA', 'CT1', '0.21'],
+          ['HA', 'HB', '0.10']],
+    'BOND': [['HT1', 'N'], ['HT2', 'N'], ['HT3', 'N']],
+    'DELE': [['ATOM', 'HN']],
+    'DONO': ['HT1', 'N', 'HT2', 'N', 'HT3', 'N'],
+    'IC': [['HT1', 'N', 'CA', 'C', '0.0000', '0.0000', '180.0000', '0.0000', '0.0000'],
+            ['HT2', 'CA', '*N', 'HT1', '0.0000', '0.0000', '120.0000', '0.0000', '0.0000'],
+            ['HT3', 'CA', '*N', 'HT2', '0.0000', '0.0000', '120.0000', '0.0000', '0.0000']],
+    'TOTAL_CHARGE': '1.00'}
+    
+    >>> import pprint
+    >>> import sasmol.topology as topology
+    >>> test = topology.CharmmTopology()
+    >>> test.read_charmm_topology()
+    >>> pprint.pprint(test.topology_info['ALA'],width=100)
+    {'ACCE': ['O', 'C'],
+    'ATOM': [['N', 'NH1', '-0.47'],
+            ['HN', 'H', '0.31'],
+            ['CA', 'CT1', '0.07'],
+            ['HA', 'HB', '0.09'],
+            ['CB', 'CT3', '-0.27'],
+            ['HB1', 'HA', '0.09'],
+            ['HB2', 'HA', '0.09'],
+            ['HB3', 'HA', '0.09'],
+            ['C', 'C', '0.51'],
+            ['O', 'O', '-0.51']],
+    'BOND': [['CB', 'CA'],
+            ['N', 'HN'],
+            ['N', 'CA'],
+            ['C', 'CA'],
+            ['C', '+N'],
+            ['CA', 'HA'],
+            ['CB', 'HB1'],
+            ['CB', 'HB2'],
+            ['CB', 'HB3']],
+    'DONO': ['HN', 'N'],
+    'DOUB': [['O', 'C']],
+    'IC': [['-C', 'CA', '*N', 'HN', '1.3551', '126.4900', '180.0000', '115.4200', '0.9996'],
+            ['-C', 'N', 'CA', 'C', '1.3551', '126.4900', '180.0000', '114.4400', '1.5390'],
+            ['N', 'CA', 'C', '+N', '1.4592', '114.4400', '180.0000', '116.8400', '1.3558'],
+            ['+N', 'CA', '*C', 'O', '1.3558', '116.8400', '180.0000', '122.5200', '1.2297'],
+            ['CA', 'C', '+N', '+CA', '1.5390', '116.8400', '180.0000', '126.7700', '1.4613'],
+            ['N', 'C', '*CA', 'CB', '1.4592', '114.4400', '123.2300', '111.0900', '1.5461'],
+            ['N', 'C', '*CA', 'HA', '1.4592', '114.4400', '-120.4500', '106.3900', '1.0840'],
+            ['C', 'CA', 'CB', 'HB1', '1.5390', '111.0900', '177.2500', '109.6000', '1.1109'],
+            ['HB1', 'CA', '*CB', 'HB2', '1.1109', '109.6000', '119.1300', '111.0500', '1.1119'],
+            ['HB1', 'CA', '*CB', 'HB3', '1.1109', '109.6000', '-119.5800', '111.6100', '1.1114']],
+    'IMPR': [['N', '-C', 'CA', 'HN'], ['C', 'CA', '+N', 'O']],
+
+
+        Note
+        ----
+    
+        `self` parameter is not shown in the ``Parameters`` section in the documentation
+
+
     '''
 
-    def add(self, dictionary, key, value):
+    def add(self, dictionary, key, value, **kwargs):
+
         '''
-        This method is only used by read_topolgy method
+        This method is used by the self.read_topology method.
+
         It will check whether the key is in the dictionary:
         if yes, append value to dictionary[key]
         if no, initialize dictionary[key] as [value]
-        '''
+
+        Parameters
+        ----------
+        dictionary 
+            dictionary : containing existing key, value pairs
+
+        key 
+            dictionary key : key to query and perhaps intialize
+
+        value 
+            dictionary value : value add
+
+        kwargs 
+            optional future arguments
+
+
+        Returns
+        -------
+        updated dictionary
+
+
+        Examples
+        -------
+
+        >>> import sasmol.topology as topology
+        >>> d = {}
+        >>> d['ALA'] = 'RESI ALA'
+        >>> test = topology.CharmmTopology()
+        >>> test.add(d, 'GLU', 'GLU')
+        >>> d
+        {'GLU': ['GLU'], 'ALA': 'RESI ALA'} 
+        >>> test.add(d, 'ASP', 'RESI ASP')
+        >>> d
+        {'ASP': ['RESI ASP'], 'GLU': ['GLU'], 'ALA': 'RESI ALA'}
+       
+        ''' 
+   
         if key not in dictionary:
             dictionary[key] = [value]
         else:
             dictionary[key].append(value)
 
-    def read_charmm_topology(self, topology_file_path='', topology_file_name='top_all27_prot_na.inp'):
+
+    def read_charmm_topology(self, topology_file_path='', topology_file_name='top_all27_prot_na.inp', **kwargs):
         '''
         Read and parse the charmm topology file
         A comprehensive dictionary (topology_info) will be built to store all the topology information
-        The present strategy for parsing topology file is by splitting the words of each line
+        The strategy for parsing topology file is to split words in each line
+
+        Parameters
+        ----------
+        topology_file_path 
+
+            string : default = ''
+
+        topology_file_name 
+
+            string : default = 'top_all27_prot_na.inp'
+
+        kwargs 
+            optional future arguments
+
+        Examples
+        -------
+
+        >>> import pprint
+        >>> import sasmol.topology as topology
+        >>> test = topology.CharmmTopology()
+        >>> test.read_charmm_topology()
+        >>> pprint.pprint(test.topology_info['NTER'],width=100)
+        {'ATOM': [['N', 'NH3', '-0.30'],
+            ['HT1', 'HC', '0.33'],
+            ['HT2', 'HC', '0.33'],
+            ['HT3', 'HC', '0.33'],
+            ['CA', 'CT1', '0.21'],
+            ['HA', 'HB', '0.10']],
+        'BOND': [['HT1', 'N'], ['HT2', 'N'], ['HT3', 'N']],
+        'DELE': [['ATOM', 'HN']],
+        'DONO': ['HT1', 'N', 'HT2', 'N', 'HT3', 'N'],
+        'IC': [['HT1', 'N', 'CA', 'C', '0.0000', '0.0000', '180.0000', '0.0000', '0.0000'],
+                ['HT2', 'CA', '*N', 'HT1', '0.0000', '0.0000', '120.0000', '0.0000', '0.0000'],
+                ['HT3', 'CA', '*N', 'HT2', '0.0000', '0.0000', '120.0000', '0.0000', '0.0000']],
+        'TOTAL_CHARGE': '1.00'}
+    
+        Returns
+        -------
+        error
+            list : with error code
+
+        Note
+        ----
+    
+        error code needs to be addressed and handled globally
+
+
         '''
         error = []
         self.topology_info = {}
@@ -287,10 +397,44 @@ class CharmmTopology(object):
                             pass
         return error
 
-    def patch_charmm_residue_atoms(self, residue, patch):
+    def patch_charmm_residue_atoms(self, residue, patch, **kwargs):
+
         '''
-        patch 'patch' to 'residue' based on the charmm topology file
+        Applies 'patch' to 'residue' based on the charmm topology 
+        definition to add / remove atoms as needed.  Only ATOM and DELE
+        records are accommodated
+        
+        Parameters
+        ----------
+        residue 
+            string : residue name
+
+        patch
+            string : patch name
+
+        kwargs 
+            optional future arguments
+
+        Examples
+        -------
+
+        >>> import sasmol.system as system
+        >>> molecule = system.Molecule('hiv1_gag.pdb')
+        >>> molecule.check_charmm_atomic_order_reorganize()
+        >>> molecule.patch_charmm_residue_atoms('GLY','GLYP') 
+        
+        Returns
+        -------
+        updated dictionary entry for residue in question
+
+        Note
+        ____
+
+        Error list is defined and used, but not returned.  Needs to be handled globally.
+
+            
         '''
+        
         # OPEN: ONLY ATOMS ARE PATCHED (NO BOND, ETC)
         error = []
         #
@@ -334,11 +478,55 @@ class CharmmTopology(object):
         self.charmm_residue_atoms[
             residue + '_' + patch] = numpy.array(tmp_dict['ATOM'])[:, 0].tolist()
 
-    def setup_cys_patch_atoms_dirty(self):
+    def setup_cys_patch_atoms_simple(self, **kwargs):
         '''
-        a dirty way to set up cys patch atoms
+        A way to set up cys patch atoms
         simply remove HG1 atom from the atom list
+
+        Parameters
+        ----------
+        
+        kwargs 
+            optional future arguments
+
+        Examples
+        -------
+
+        >>> import sasmol.topology as topology
+        >>> import pprint
+        >>> test = topology.CharmmTopology()
+        >>> test.read_charmm_topology()
+        >>> pprint.pprint(self.topology_info['CYS']['ATOM'])
+        [['N', 'NH1', '-0.47'],
+        ['HN', 'H', '0.31'],
+        ['CA', 'CT1', '0.07'],
+        ['HA', 'HB', '0.09'],
+        ['CB', 'CT2', '-0.11'],
+        ['HB1', 'HA', '0.09'],
+        ['HB2', 'HA', '0.09'],
+        ['SG', 'S', '-0.23'],
+        ['HG1', 'HS', '0.16'],
+        ['C', 'C', '0.51'],
+        ['O', 'O', '-0.51']]
+        >>> pprint.pprint(test.setup_cys_patch_atoms_simple(), width=80)
+        [['N', 'NH1', '-0.47'],
+        ['HN', 'H', '0.31'],
+        ['CA', 'CT1', '0.07'],
+        ['HA', 'HB', '0.09'],
+        ['CB', 'CT2', '-0.11'],
+        ['HB1', 'HA', '0.09'],
+        ['HB2', 'HA', '0.09'],
+        ['SG', 'S', '-0.23'],
+        ['C', 'C', '0.51'],
+        ['O', 'O', '-0.51']] 
+
+        
+        Returns
+        -------
+        updated dictionary entry for residue in question
+
         '''
+
         atoms = self.topology_info['CYS']['ATOM']
         for atom in atoms:
             if atom[0] == 'HG1':
@@ -346,23 +534,71 @@ class CharmmTopology(object):
         # print atoms
         return atoms
 
-    def setup_charmm_residue_atoms(self):
+    def setup_charmm_residue_atoms(self, **kwargs):
         '''
-        build the atom list of all the residues in the charmm topology file
+
+        Build the atom list of all the residues in the charmm topology file
+
+        Parameters
+        ----------
+        
+        kwargs 
+            optional future arguments
+
+        Examples
+        -------
+
+        >>> import sasmol.topology as topology
+        >>> test = topology.CharmmTopology()
+        >>> test.read_charmm_topology()
+        >>> test.setup_charmm_residue_atoms() 
+
+        Returns
+        -------
+        self.charmm_residue_atoms : new dictionary entry for residue in question
+
         '''
+
         self.charmm_residue_atoms = {}
         for (key, value) in zip(self.topology_info.keys(), self.topology_info.values()):
             if type(value) is dict:
                 if 'ATOM' in value:
                     atoms = numpy.array(value['ATOM'])[:, 0].tolist()
                     self.charmm_residue_atoms[key] = atoms
-        # OPEN Setup CYS patch atoms in a dirty way
-        self.charmm_residue_atoms['DISU'] = self.setup_cys_patch_atoms_dirty()
+        # OPEN Setup CYS patch atoms in a simple way
+        self.charmm_residue_atoms['DISU'] = self.setup_cys_patch_atoms_simple()
 
-    def compare_list_ignore_order(self, l1, l2):
+    def compare_list_ignore_order(self, l1, l2, **kwargs):
         '''
-        compare two list ignoring the order
+        Compare two lists while ignoring order
+
+        Parameters
+        ----------
+        l1
+            list : list 1 
+
+        l2
+            list : list 2
+
+        kwargs 
+            optional future arguments
+
+        Examples
+        -------
+
+        >>> import sasmol.topology as topology
+        >>> test = topology.CharmmTopology()
+        >>> l1 = [1, 2, 4]
+        >>> l2 = [2, 1, 4]
+        >>> test.compare_list_ignore_order(l1, l2)
+        True 
+
+        Returns
+        -------
+        Boolean
+
         '''
+
         if len(l1) != len(l2):  # make sure the lenght of two lists are the same
             return False
         for item in l1:
@@ -370,14 +606,38 @@ class CharmmTopology(object):
                 return False
         return True
 
-    def check_charmm_atomic_order_reorganize(self):
+    def check_charmm_atomic_order_reorganize(self, **kwargs):
         '''
         re-organize the atomic list according to the charmm topology contract
         do nothing if the atomic order alreay match that in the charmm topology file
         meanwhile make sure there are no missing or extra atoms
         H-atoms are required
         Patch N-ter for the first residue and C-ter for the last residue in each segment
+
+        Parameters
+        ----------
+        
+        kwargs 
+            optional future arguments
+
+        Examples
+        -------
+        >>> import sasmol.system as system
+        >>> molecule = system.Molecule('hiv1_gag.pdb')
+        >>> molecule.check_charmm_atomic_order_reorganize()
+
+        Returns
+        -------
+        error
+            list : with error code
+
+        Note
+        ----
+    
+        error code needs to be addressed and handled globally
+
         '''
+        
         error = []
         bin_path = config.__bin_path__
         self.read_charmm_topology(topology_file_path=bin_path + '/toppar/')
@@ -473,81 +733,3 @@ class CharmmTopology(object):
         return error
 
 
-def set_pdb_values(m, natoms, **kwargs):
-
-    atom = []
-    index = []
-    name = []
-    loc = []
-    resname = []
-    chain = []
-    resid = []
-    rescode = []
-    occupancy = []
-    beta = []
-    segname = []
-    element = []
-    charge = []
-    moltype = []
-
-    if 'name' in kwargs:
-        default_name = kwargs['name']
-    else:
-        default_name = "C"
-
-    if 'resname' in kwargs:
-        default_resname = kwargs['resname']
-    else:
-        default_resname = "DUM"
-
-    if 'segname' in kwargs:
-        default_segname = kwargs['segname']
-    else:
-        default_segname = "DUM"
-
-    if 'element' in kwargs:
-        default_element = kwargs['element']
-    else:
-        default_element = "C"
-
-    if 'moltype' in kwargs:
-        default_moltype = kwargs['moltype']
-    else:
-        default_moltype = "other"
-
-    if 'coor' in kwargs:
-        m.setCoor = kwargs['coor']
-
-    for i in xrange(natoms):
-        atom.append("ATOM  ")
-        index.append(i + 1)
-        name.append(default_name)
-        loc.append(" ")
-        resname.append(default_resname)
-        chain.append(" ")
-        resid.append(i + 1)
-        rescode.append(" ")
-        occupancy.append("  0.00")
-        beta.append("  0.00")
-        segname.append(default_segname)
-        element.append(default_element)
-        charge.append("  ")
-        moltype.append(default_moltype)
-
-    m.setAtom(atom)
-    m.setIndex(index)
-    m.setName(name)
-    m.setLoc(loc)
-    m.setResname(resname)
-    m.setChain(chain)
-    m.setResid(resid)
-    m.setRescode(rescode)
-    m.setOccupancy(occupancy)
-    m.setBeta(beta)
-    m.setSegname(segname)
-    m.setElement(element)
-    m.setCharge(charge)
-    m.setMoltype(moltype)
-    m.setNatoms(natoms)
-
-    return
