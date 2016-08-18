@@ -19,7 +19,7 @@ mocker
 
 ### [`basic usage`](doc_files/basic_usage.md)
 
-### [`library file structure`](doc_files/library_files.md)
+### [`library file structure`](docs/index.html)
 
 ### [`developer notes`](development_tools/notes.md)
 
