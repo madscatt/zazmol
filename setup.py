@@ -5,14 +5,14 @@
     conditions; see http://www.gnu.org/licenses/gpl-3.0.html for details.
 '''
 import os,sys
-from distutils.core import setup
 from distutils      import sysconfig
+import setuptools
 from numpy.distutils.core import Extension, setup
-
 #       SETUP
 #
 #       12/01/2009      --      initial coding              :       jc
 #       11/05/2015      --      for sasmol distribution     :       jc
+#       08/08/2016      --      branched for refactoring    :       jc
 #
 #LC      1         2         3         4         5         6         7
 #LC4567890123456789012345678901234567890123456789012345678901234567890123456789
@@ -53,7 +53,7 @@ setup(name='sasmol',
 
 	package_dir={'sasmol':os.path.join('src','python')},
 
-    packages=['sasmol','sasmol.test_sasmol','sasmol.test_sasmol.util','sasmol.test_sasmol.manual_tests','sasmol.test_sasmol.data','sasmol.test_sasmol.data.pdb_common','sasmol.test_sasmol.data.dcd_common','sasmol.test_sasmol.data.sasmol','sasmol.test_sasmol.data.sasmol.calculate','sasmol.test_sasmol.data.sasmol.sasio','sasmol.test_sasmol.data.sasmol.sasio.test-results','sasmol.test_sasmol.data.sasmol.sasmath','sasmol.test_sasmol.data.sasmol.sasmol','sasmol.test_sasmol.data.sasmol.operate','sasmol.test_sasmol.data.sasmol.sasproperties','sasmol.test_sasmol.test_calculate','sasmol.test_sasmol.test_sasio','sasmol.test_sasmol.test_sasmath','sasmol.test_sasmol.test_sasmol','sasmol.test_sasmol.test_operate','sasmol.test_sasmol.test_sasproperties','sasmol.test_sasmol.test_sassubset','sasmol.extensions','sasmol.extensions.dcdio','sasmol.extensions.view','sasmol.extensions.mask','sasmol.extensions.matrix_math'],
+    packages=['sasmol','sasmol.test_sasmol','sasmol.test_sasmol.utilities','sasmol.test_sasmol.manual_tests','sasmol.test_sasmol.data','sasmol.test_sasmol.data.pdb_common','sasmol.test_sasmol.data.dcd_common','sasmol.test_sasmol.data.sasmol','sasmol.test_sasmol.data.sasmol.calculate','sasmol.test_sasmol.data.sasmol.file_io','sasmol.test_sasmol.data.sasmol.file_io.test-results','sasmol.test_sasmol.data.sasmol.linear_algebra','sasmol.test_sasmol.data.sasmol.system','sasmol.test_sasmol.data.sasmol.operate','sasmol.test_sasmol.data.sasmol.properties','sasmol.test_sasmol.test_calculate','sasmol.test_sasmol.test_file_io','sasmol.test_sasmol.test_linear_algebra','sasmol.test_sasmol.test_operate','sasmol.test_sasmol.test_properties','sasmol.test_sasmol.test_subset','sasmol.extensions','sasmol.extensions.dcdio','sasmol.extensions.view','sasmol.extensions.mask','sasmol.extensions.matrix_math'],
 	
     ext_modules=[
 	Extension('sasmol._dcdio',[os.path.join('src','python','extensions','dcdio','dcdio.i'),os.path.join('src','python','extensions','dcdio','dcdio.c')],include_dirs=[numpy_include]),
@@ -91,49 +91,49 @@ setup(name='sasmol',
         ( os.path.join('sasmol','test_sasmol','data','sasmol','calculate') , [os.path.join('src','python','test_sasmol','data','sasmol','calculate','1CRN-rot-shift.pdb')]),
     
     
-        ( os.path.join('sasmol','test_sasmol','data','sasmol','sasproperties') , [os.path.join('src','python','test_sasmol','data','sasmol','sasproperties','Catoms.txt')]),
-        ( os.path.join('sasmol','test_sasmol','data','sasmol','sasproperties') , [os.path.join('src','python','test_sasmol','data','sasmol','sasproperties','ConflictAtoms.txt')]),
-        ( os.path.join('sasmol','test_sasmol','data','sasmol','sasproperties') , [os.path.join('src','python','test_sasmol','data','sasmol','sasproperties','Hatoms.txt')]),
-        ( os.path.join('sasmol','test_sasmol','data','sasmol','sasproperties') , [os.path.join('src','python','test_sasmol','data','sasmol','sasproperties','MisAtoms.txt')]),
-        ( os.path.join('sasmol','test_sasmol','data','sasmol','sasproperties') , [os.path.join('src','python','test_sasmol','data','sasmol','sasproperties','Natoms.txt')]),
-        ( os.path.join('sasmol','test_sasmol','data','sasmol','sasproperties') , [os.path.join('src','python','test_sasmol','data','sasmol','sasproperties','Oatoms.txt')]),
-        ( os.path.join('sasmol','test_sasmol','data','sasmol','sasproperties') , [os.path.join('src','python','test_sasmol','data','sasmol','sasproperties','Otheratoms.txt')]),
-        ( os.path.join('sasmol','test_sasmol','data','sasmol','sasproperties') , [os.path.join('src','python','test_sasmol','data','sasmol','sasproperties','Patoms.txt')]),
-        ( os.path.join('sasmol','test_sasmol','data','sasmol','sasproperties') , [os.path.join('src','python','test_sasmol','data','sasmol','sasproperties','Satoms.txt')]),
-        ( os.path.join('sasmol','test_sasmol','data','sasmol','sasproperties') , [os.path.join('src','python','test_sasmol','data','sasmol','sasproperties','amino_acid_sld.txt')]),
-        ( os.path.join('sasmol','test_sasmol','data','sasmol','sasproperties') , [os.path.join('src','python','test_sasmol','data','sasmol','sasproperties','charmm27_atoms.txt')]),
-        ( os.path.join('sasmol','test_sasmol','data','sasmol','sasproperties') , [os.path.join('src','python','test_sasmol','data','sasmol','sasproperties','standard_atomic_weigh.txt')]),
+        ( os.path.join('sasmol','test_sasmol','data','sasmol','properties') , [os.path.join('src','python','test_sasmol','data','sasmol','properties','Catoms.txt')]),
+        ( os.path.join('sasmol','test_sasmol','data','sasmol','properties') , [os.path.join('src','python','test_sasmol','data','sasmol','properties','ConflictAtoms.txt')]),
+        ( os.path.join('sasmol','test_sasmol','data','sasmol','properties') , [os.path.join('src','python','test_sasmol','data','sasmol','properties','Hatoms.txt')]),
+        ( os.path.join('sasmol','test_sasmol','data','sasmol','properties') , [os.path.join('src','python','test_sasmol','data','sasmol','properties','MisAtoms.txt')]),
+        ( os.path.join('sasmol','test_sasmol','data','sasmol','properties') , [os.path.join('src','python','test_sasmol','data','sasmol','properties','Natoms.txt')]),
+        ( os.path.join('sasmol','test_sasmol','data','sasmol','properties') , [os.path.join('src','python','test_sasmol','data','sasmol','properties','Oatoms.txt')]),
+        ( os.path.join('sasmol','test_sasmol','data','sasmol','properties') , [os.path.join('src','python','test_sasmol','data','sasmol','properties','Otheratoms.txt')]),
+        ( os.path.join('sasmol','test_sasmol','data','sasmol','properties') , [os.path.join('src','python','test_sasmol','data','sasmol','properties','Patoms.txt')]),
+        ( os.path.join('sasmol','test_sasmol','data','sasmol','properties') , [os.path.join('src','python','test_sasmol','data','sasmol','properties','Satoms.txt')]),
+        ( os.path.join('sasmol','test_sasmol','data','sasmol','properties') , [os.path.join('src','python','test_sasmol','data','sasmol','properties','amino_acid_sld.txt')]),
+        ( os.path.join('sasmol','test_sasmol','data','sasmol','properties') , [os.path.join('src','python','test_sasmol','data','sasmol','properties','charmm27_atoms.txt')]),
+        ( os.path.join('sasmol','test_sasmol','data','sasmol','properties') , [os.path.join('src','python','test_sasmol','data','sasmol','properties','standard_atomic_weigh.txt')]),
    
         ( os.path.join('sasmol','test_sasmol','data','sasmol','operate') , [os.path.join('src','python','test_sasmol','data','sasmol','operate','1CRN-rot-shift.pdb')]),
         ( os.path.join('sasmol','test_sasmol','data','sasmol','operate') , [os.path.join('src','python','test_sasmol','data','sasmol','operate','1CRN-rot-sub.pdb')]),
         ( os.path.join('sasmol','test_sasmol','data','sasmol','operate') , [os.path.join('src','python','test_sasmol','data','sasmol','operate','1CRN-rot.pdb')]),
         ( os.path.join('sasmol','test_sasmol','data','sasmol','operate') , [os.path.join('src','python','test_sasmol','data','sasmol','operate','1CRN-sub.pdb')]),
     
-        ( os.path.join('sasmol','test_sasmol','data','sasmol','sasmath') , [os.path.join('src','python','test_sasmol','data','sasmol','sasmath','1CRN-rot-shift.pdb')]),
-        ( os.path.join('sasmol','test_sasmol','data','sasmol','sasmath') , [os.path.join('src','python','test_sasmol','data','sasmol','sasmath','1CRN-rot.pdb')]),
+        ( os.path.join('sasmol','test_sasmol','data','sasmol','linear_algebra') , [os.path.join('src','python','test_sasmol','data','sasmol','linear_algebra','1CRN-rot-shift.pdb')]),
+        ( os.path.join('sasmol','test_sasmol','data','sasmol','linear_algebra') , [os.path.join('src','python','test_sasmol','data','sasmol','linear_algebra','1CRN-rot.pdb')]),
         
         ( os.path.join('sasmol','test_sasmol','data','sasmol','sasmol') , [os.path.join('src','python','test_sasmol','data','sasmol','sasmol','1CRN-3frames.pdb')]),
 
-        ( os.path.join('sasmol','test_sasmol','data','sasmol','sasio') , [os.path.join('src','python','test_sasmol','data','sasmol','sasio','1AA-NoEND.pdb')]),
-        ( os.path.join('sasmol','test_sasmol','data','sasmol','sasio') , [os.path.join('src','python','test_sasmol','data','sasmol','sasio','1ATM-1.pdb')]),
-        ( os.path.join('sasmol','test_sasmol','data','sasmol','sasio') , [os.path.join('src','python','test_sasmol','data','sasmol','sasio','1ATM-2.pdb')]),
-        ( os.path.join('sasmol','test_sasmol','data','sasmol','sasio') , [os.path.join('src','python','test_sasmol','data','sasmol','sasio','2AAD-1.pdb')]),
-        ( os.path.join('sasmol','test_sasmol','data','sasmol','sasio') , [os.path.join('src','python','test_sasmol','data','sasmol','sasio','2AAD-1to3-END.pdb')]),
-        ( os.path.join('sasmol','test_sasmol','data','sasmol','sasio') , [os.path.join('src','python','test_sasmol','data','sasmol','sasio','2AAD-1to3-END_wrong_number_atoms.pdb')]),
-        ( os.path.join('sasmol','test_sasmol','data','sasmol','sasio') , [os.path.join('src','python','test_sasmol','data','sasmol','sasio','2AAD-1to3-MODEL.pdb')]),
-        ( os.path.join('sasmol','test_sasmol','data','sasmol','sasio') , [os.path.join('src','python','test_sasmol','data','sasmol','sasio','2AAD-1to3-MODEL_missing_END.pdb')]),
-        ( os.path.join('sasmol','test_sasmol','data','sasmol','sasio') , [os.path.join('src','python','test_sasmol','data','sasmol','sasio','2AAD-1to3-MODEL_mix_END_noterminating.pdb')]),
-        ( os.path.join('sasmol','test_sasmol','data','sasmol','sasio') , [os.path.join('src','python','test_sasmol','data','sasmol','sasio','2AAD-1to3-MODEL_wrong_number_atoms.pdb')]),
-        ( os.path.join('sasmol','test_sasmol','data','sasmol','sasio') , [os.path.join('src','python','test_sasmol','data','sasmol','sasio','2AAD-1to3-MODEL_wrongnumber_mix_END.pdb')]),
-        ( os.path.join('sasmol','test_sasmol','data','sasmol','sasio') , [os.path.join('src','python','test_sasmol','data','sasmol','sasio','2AAD-1to3_MODEL.pdb')]),
-        ( os.path.join('sasmol','test_sasmol','data','sasmol','sasio') , [os.path.join('src','python','test_sasmol','data','sasmol','sasio','2AAD-1to3_MODELwrong.pdb')]),
-        ( os.path.join('sasmol','test_sasmol','data','sasmol','sasio') , [os.path.join('src','python','test_sasmol','data','sasmol','sasio','2AAD-2.pdb')]),
-        ( os.path.join('sasmol','test_sasmol','data','sasmol','sasio') , [os.path.join('src','python','test_sasmol','data','sasmol','sasio','2AAD-3.pdb')]),
-        ( os.path.join('sasmol','test_sasmol','data','sasmol','sasio') , [os.path.join('src','python','test_sasmol','data','sasmol','sasio','3AAD-2chain.pdb')]),
-        ( os.path.join('sasmol','test_sasmol','data','sasmol','sasio') , [os.path.join('src','python','test_sasmol','data','sasmol','sasio','3AAD.pdb')]),
-        ( os.path.join('sasmol','test_sasmol','data','sasmol','sasio') , [os.path.join('src','python','test_sasmol','data','sasmol','sasio','nef_nohis.pdb')]),
-        ( os.path.join('sasmol','test_sasmol','data','sasmol','sasio') , [os.path.join('src','python','test_sasmol','data','sasmol','sasio','nef_nohis_1.pdb')]),
-        ( os.path.join('sasmol','test_sasmol','data','sasmol','sasio') , [os.path.join('src','python','test_sasmol','data','sasmol','sasio','new_package_rna.pdb')]) #,
+        ( os.path.join('sasmol','test_sasmol','data','sasmol','file_io') , [os.path.join('src','python','test_sasmol','data','sasmol','file_io','1AA-NoEND.pdb')]),
+        ( os.path.join('sasmol','test_sasmol','data','sasmol','file_io') , [os.path.join('src','python','test_sasmol','data','sasmol','file_io','1ATM-1.pdb')]),
+        ( os.path.join('sasmol','test_sasmol','data','sasmol','file_io') , [os.path.join('src','python','test_sasmol','data','sasmol','file_io','1ATM-2.pdb')]),
+        ( os.path.join('sasmol','test_sasmol','data','sasmol','file_io') , [os.path.join('src','python','test_sasmol','data','sasmol','file_io','2AAD-1.pdb')]),
+        ( os.path.join('sasmol','test_sasmol','data','sasmol','file_io') , [os.path.join('src','python','test_sasmol','data','sasmol','file_io','2AAD-1to3-END.pdb')]),
+        ( os.path.join('sasmol','test_sasmol','data','sasmol','file_io') , [os.path.join('src','python','test_sasmol','data','sasmol','file_io','2AAD-1to3-END_wrong_number_atoms.pdb')]),
+        ( os.path.join('sasmol','test_sasmol','data','sasmol','file_io') , [os.path.join('src','python','test_sasmol','data','sasmol','file_io','2AAD-1to3-MODEL.pdb')]),
+        ( os.path.join('sasmol','test_sasmol','data','sasmol','file_io') , [os.path.join('src','python','test_sasmol','data','sasmol','file_io','2AAD-1to3-MODEL_missing_END.pdb')]),
+        ( os.path.join('sasmol','test_sasmol','data','sasmol','file_io') , [os.path.join('src','python','test_sasmol','data','sasmol','file_io','2AAD-1to3-MODEL_mix_END_noterminating.pdb')]),
+        ( os.path.join('sasmol','test_sasmol','data','sasmol','file_io') , [os.path.join('src','python','test_sasmol','data','sasmol','file_io','2AAD-1to3-MODEL_wrong_number_atoms.pdb')]),
+        ( os.path.join('sasmol','test_sasmol','data','sasmol','file_io') , [os.path.join('src','python','test_sasmol','data','sasmol','file_io','2AAD-1to3-MODEL_wrongnumber_mix_END.pdb')]),
+        ( os.path.join('sasmol','test_sasmol','data','sasmol','file_io') , [os.path.join('src','python','test_sasmol','data','sasmol','file_io','2AAD-1to3_MODEL.pdb')]),
+        ( os.path.join('sasmol','test_sasmol','data','sasmol','file_io') , [os.path.join('src','python','test_sasmol','data','sasmol','file_io','2AAD-1to3_MODELwrong.pdb')]),
+        ( os.path.join('sasmol','test_sasmol','data','sasmol','file_io') , [os.path.join('src','python','test_sasmol','data','sasmol','file_io','2AAD-2.pdb')]),
+        ( os.path.join('sasmol','test_sasmol','data','sasmol','file_io') , [os.path.join('src','python','test_sasmol','data','sasmol','file_io','2AAD-3.pdb')]),
+        ( os.path.join('sasmol','test_sasmol','data','sasmol','file_io') , [os.path.join('src','python','test_sasmol','data','sasmol','file_io','3AAD-2chain.pdb')]),
+        ( os.path.join('sasmol','test_sasmol','data','sasmol','file_io') , [os.path.join('src','python','test_sasmol','data','sasmol','file_io','3AAD.pdb')]),
+        ( os.path.join('sasmol','test_sasmol','data','sasmol','file_io') , [os.path.join('src','python','test_sasmol','data','sasmol','file_io','nef_nohis.pdb')]),
+        ( os.path.join('sasmol','test_sasmol','data','sasmol','file_io') , [os.path.join('src','python','test_sasmol','data','sasmol','file_io','nef_nohis_1.pdb')]),
+        ( os.path.join('sasmol','test_sasmol','data','sasmol','file_io') , [os.path.join('src','python','test_sasmol','data','sasmol','file_io','new_package_rna.pdb')]) #,
 
                    ]
 	)

@@ -15,11 +15,11 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 '''
 
-from sasmol.test_sasmol.util import env,util
+from sasmol.test_sasmol.utilities import env
 
 from unittest import main, skipIf
 from mocker import Mocker, MockerTestCase, ANY, ARGS, KWARGS
-import sasmol.sasmol as sasmol
+import sasmol.system as system
 import sasmol.operate as operate
 
 import numpy
@@ -27,14 +27,14 @@ import numpy
 import warnings; warnings.filterwarnings('ignore')
 
 import os
-floattype=os.environ['SASSIE_FLOATTYPE']
+floattype=os.environ['SASMOL_FLOATTYPE']
 
 DataPath = os.path.join(os.path.dirname(os.path.realpath(__file__)),'..','data','pdb_common')+os.path.sep
 
 class Test_intg_operate_Move_translate(MockerTestCase): 
 
     def setUp(self):
-        self.o=sasmol.SasMol(0)
+        self.o=system.Molecule(0)
         self.tol = 3
 
     def assert_list_almost_equal(self,a,b,places=5):
@@ -109,7 +109,7 @@ class Test_intg_operate_Move_translate(MockerTestCase):
         self.assertAlmostEqual(expected_coor_sum, result_coor_sum,self.tol)
 
 
-    @skipIf(os.environ['SASSIE_LARGETEST']=='n',"I am not testing large files")
+    @skipIf(os.environ['SASMOL_LARGETEST']=='n',"I am not testing large files")
     def test_1KP8_pdb(self):
         self.o.read_pdb(DataPath+'1KP8.pdb')
         value = numpy.array([1.0, 3.0, 6.0],floattype)

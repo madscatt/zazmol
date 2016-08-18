@@ -15,11 +15,11 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 '''
 
-from sasmol.test_sasmol.util import env,util
+from sasmol.test_sasmol.utilities import env,util
 
 from unittest import main 
 from mocker import Mocker, MockerTestCase, ANY, ARGS, KWARGS
-import sasmol.sasmol as sasmol
+import sasmol.system as system
 import sasmol.operate as operate
 import sasmol.calculate as calculate
 
@@ -28,12 +28,12 @@ import numpy
 import warnings; warnings.filterwarnings('ignore')
 
 import os
-floattype=os.environ['SASSIE_FLOATTYPE']
+floattype=os.environ['SASMOL_FLOATTYPE']
 
 class Test_unit_operate_Move_translate(MockerTestCase): 
 
     def setUp(self):
-        self.back_masscheck = operate.Move.masscheck
+        self.back_mass_check = operate.Move.mass_check
         self.back_calccom = calculate.Calculate.calculate_center_of_mass 
 
         self.m = Mocker()
@@ -43,14 +43,14 @@ class Test_unit_operate_Move_translate(MockerTestCase):
         self.m.result(None)
         self.m.count(0,None)
 
-        operate.Move.masscheck = self.m.mock()
-        operate.Move.masscheck(ARGS)
+        operate.Move.mass_check = self.m.mock()
+        operate.Move.mass_check()
         self.m.result(None)
         self.m.count(0,None)
 
         self.m.replay()
 
-        self.o=sasmol.SasMol(0)
+        self.o=system.Molecule(0)
 
     def assert_list_almost_equal(self,a,b,places=5):
         if (len(a)!=len(b)):
@@ -138,7 +138,7 @@ class Test_unit_operate_Move_translate(MockerTestCase):
     def tearDown(self):
         self.m.verify()
         calculate.Calculate.calculate_center_of_mass=self.back_calccom
-        operate.Move.masscheck  =self.back_masscheck
+        operate.Move.mass_check  =self.back_mass_check
 
 
 if __name__ == '__main__': 

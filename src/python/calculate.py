@@ -2,6 +2,7 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 #from __future__ import unicode_literals
+#
 #    SASMOL: Copyright (C) 2011 Joseph E. Curtis, Ph.D.
 #
 #    This program is free software: you can redistribute it and/or modify
@@ -26,31 +27,56 @@ from __future__ import print_function
 #	 1         2         3         4         5         6         7
 # LC4567890123456789012345678901234567890123456789012345678901234567890123456789
 #								       *      **
+
 '''
     Calculate contains the classes and methods to calculate various
-    atomic and molecular properties from instances of sasmol objects
+    atomic and molecular properties from instances of system objects
 
 '''
 
 import sys
 import numpy
 import sasmol.operate as operate
-import sasmol.sasmath as sasmath
 
 class Calculate(object):
 
-    '''
-    This class contains methods to calculate various properties of the supplied object.
+    """ Base class containing methods to calculate properties of system object.
 
-    TODO:  Need to write a generic driver to loop over single or multiple frames
-    TODO:  Exception handling
-    TODO:  Generic loop w/ multiprocessing
-    TODO:  Cleaner doc-strings
+        Examples
+        ========
 
-    '''
+        First example shows how to use class methods from system object:
+
+        >>> import sasmol.system as system
+        >>> molecule = system.Molecule('hiv1_gag.pdb')
+        >>> molecule.calculate_mass()
+        47896.61864599498
+
+        Second example shows how to use class methods directly:
+
+        >>> import sasmol.system as system
+        >>> import sasmol.calculate as calculate
+        >>> molecule = system.Molecule('hiv1_gag.pdb')
+        >>> calculate.Calculate.calculate_mass(molecule) 
+        47896.61864599498
+
+        Note
+        ----
+    
+        `self` parameter is not shown in the ``Parameters`` section in the documentation
+
+        TODO:  Need to write a generic driver to loop over single or multiple frames
+
+    """ 
 
     def calculate_mass(self, **kwargs):
         '''
+
+        Note
+        ----
+
+        atomic weights are contained in the ``properties.py`` file
+
         http://physics.nist.gov/cgi-bin/Compositions/stand_alone.pl?ele=&ascii=html&isotype=some
 
         standard atomic weight is based on the natural istopic composition
@@ -59,15 +85,23 @@ class Calculate(object):
         have their natural abundance weight. These elements are located
         at the end of the dictionary.
 
-        @type   self                :   sasmol object 
+        Parameters
+        ----------
+        kwargs 
+            optional future arguments
+                                                                                     
+        Returns
+        -------
+        float
+            mass of object in Daltons
 
-        @param  self                :   intialized sasmol object be used to perform calculation
+        Examples
+        -------
 
-        @type   kwargs              :   optional future arguments
-
-        @rtype                      :   float
-
-        @return                     :   mass of the sasmol object
+        >>> import sasmol.system as system
+        >>> molecule = system.Molecule('hiv1_gag.pdb')
+        >>> molecule.calculate_mass()
+        47896.61864599498
 
         '''
 
@@ -95,19 +129,26 @@ class Calculate(object):
         '''	
         This method calculates the center of mass of the object.  
 
-        @type   self                :   sasmol object 
+        Parameters
+        ----------
+        frame 
+            integer : trajectory frame number to use
 
-        @param  self                :   intialized sasmol object be used to perform calculation
+        kwargs 
+            optional future arguments
+                                                                                     
+        Returns
+        -------
+        numpy array 
+            coordinates of center of mass
 
-        @type   kwargs              :   optional future arguments
+        Examples
+        -------
 
-        @type   frame               :   integer
-
-        @param  frame               :   frame of trajectory to use
-
-        @rtype                      :   float
-
-        @return                     :   center of mass of the sasmol object
+        >>> import sasmol.system as system
+        >>> molecule = system.Molecule('hiv1_gag.pdb')
+        >>> molecule.calculate_center_of_mass(0)
+        array([ -6.79114736, -23.71577133,   8.06558513])
 
         '''
 
@@ -130,18 +171,26 @@ class Calculate(object):
         '''	
         This method calculates the radius of gyration of the object
 
-        @type   self                :   sasmol object 
-        @param  self                :   intialized sasmol object be used to perform calculation
+        Parameters
+        ----------
+        frame 
+            integer : trajectory frame number to use
 
-        @type   frame               :   integer
+        kwargs 
+            optional future arguments
+                                                                                     
+        Returns
+        -------
+        float
+            radius of gyration of object 
 
-        @param  frame               :   frame of trajectory to use
+        Examples
+        -------
 
-        @type   kwargs              :   optional future arguments
-
-        @rtype                      :   float
-
-        @return                     :   radius of gyration of the sasmol object
+        >>> import sasmol.system as system
+        >>> molecule = system.Molecule('hiv1_gag.pdb')
+        >>> molecule.calculate_radius_of_gyration(0)
+        64.043168998442368 
 
         '''
 
@@ -167,17 +216,22 @@ class Calculate(object):
         To use this over multiple frames you must call this function
         repeatedly.
 
-        @type   self                :   sasmol object 
+        Parameters
+        ----------
+        other 
+            system object with coordinates with equal number of frames
 
-        @param  self                :   intialized sasmol object be used to perform calculation
+        kwargs 
+            optional future arguments
+                                                                                     
+        Returns
+        -------
+        float
+            root mean square deviation between objects 
 
-        @type   other               :   sasmol object
+        Examples
+        -------
 
-        @type   kwargs              :   optional future arguments
-
-        @rtype                      :   float  
-
-        @return                     :   root mean square deviation between objects 
 
         '''
 
@@ -205,21 +259,34 @@ class Calculate(object):
         will return eigenvectors and I as None.  Testing for non-None return
         values should be done in the calling method.
 
-        @type   self                :   sasmol object 
+        Parameters
+        ----------
+        frame 
+            integer : trajectory frame number to use
 
-        @param  self                :   intialized sasmol object be used to perform calculation
+        kwargs 
+            optional future arguments
+                                                                                     
+        Returns
+        -------
+        tuple of numpy arrays 
+            principle moments of inertia of object :
+            eigenvalues, eigenvectors, and I
 
-        @type   frame               :   integer
+        Examples
+        -------
 
-        @param  frame               :   frame of trajectory to use
-
-        @type   kwargs              :   optional future arguments
-
-        @rtype                      :   float 
-
-        @return                     :   eigen values, eigen vectors and
-                                        principle moments of inertia array
-
+        >>> import sasmol.system as system
+        >>> molecule = system.Molecule('hiv1_gag.pdb')
+        >>> molecule.calculate_principle_moments_of_inetia(0)
+        (array([  1.30834716e+07,   1.91993314e+08,   1.85015201e+08]), 
+        array([[-0.08711655, -0.97104917,  0.22242802],
+               [-0.512547  ,  0.23514759,  0.82583363],
+               [ 0.85422847,  0.04206103,  0.51819358]]), 
+        array([[  1.90290278e+08,  -9.27036144e+06,   1.25097100e+07],
+               [ -9.27036144e+06,   1.40233826e+08,   7.53462715e+07],
+               [  1.25097100e+07,   7.53462715e+07,   5.95678834e+07]])) 
+        
         '''
 
         com = self.calculate_center_of_mass(frame)
@@ -265,146 +332,81 @@ class Calculate(object):
         else:
             uk, ak = numpy.linalg.eig(I)
 
-        operate.Move.moveto(self, frame, com)
+        operate.Move.translate(self, frame, com, point=True)
 
         return uk, ak, I
 
     def calculate_minimum_and_maximum(self, **kwargs):
         '''	
-        This method calculates the min and max of of the object in (x,y,z)
+        This method calculates the minimum and maximum values
+        of of the object in (x,y,z)
 
-        A numpy array of min and max values are returned
+        The default usage is to evaluate all frames
 
-        @type   self                :   sasmol object 
+        A numpy array of minimum and maximum values for each
+        dimension are returned
 
-        @param  self                :   intialized sasmol object be used to perform calculation
+        Parameters
+        ----------
+        kwargs 
+           frames = [] : integer list of frames to process 
+                                                                                     
+        Returns
+        -------
+        numpy array 
+            nested list of minimum and maximum values 
+            [ [ min_x, min_y, min_z ], [max_x, max_y, max_z] ]
 
-        @type   kwargs              :   optional future arguments
+        Examples
+        -------
 
-        @rtype                      :   float array
-
-        @return                     :   nested list of minimum and maximum values 
-                                    :   [ [ min_x, min_y, min_z ], [max_x, max_y, max_z] ]
-
+        >>> import sasmol.system as system
+        >>> molecule = system.Molecule('hiv1_gag.pdb')
+        >>> molecule.calculate_minimum_and_maximum()
+        [array([-31.29899979, -93.23899841, -85.81900024]), array([ 19.64699936,  30.37800026,  99.52999878])] 
+      
+        >>> import sasmol.system as system
+        >>> molecule = system.Molecule('hiv1_gag.pdb')
+        >>> molecule.read_dcd('hiv1_gag_200_frames')
+        >>> molecule.calculate_minimum_and_maximum()
+        [array([ -94.47146606, -121.88082886,  -99.94940948]), array([  52.85133362,   65.53725433,  100.76850891])]
+        >>> molecule.calculate_minimum_and_maximum(frames=[0,1,2,3])
+        [array([-30.9330883 , -92.68256378, -84.51082611]), array([ 20.98281288,  38.45230484,  99.91564178])] 
+      
+       
         '''
+        
+        try: 
+            frames = kwargs['frames']
+        except:
+            frames = [x for x in xrange(self.number_of_frames())]
 
-        min_x = numpy.min(self._coor[:, :, 0])
-        max_x = numpy.max(self._coor[:, :, 0])
-        min_y = numpy.min(self._coor[:, :, 1])
-        max_y = numpy.max(self._coor[:, :, 1])
-        min_z = numpy.min(self._coor[:, :, 2])
-        max_z = numpy.max(self._coor[:, :, 2])
+        first_flag = True        
 
-        self._total_minimum = numpy.array([min_x, min_y, min_z])
-        self._total_maximum = numpy.array([max_x, max_y, max_z])
+        for frame in frames:
 
-        return [self._total_minimum, self._total_maximum]
+            this_min_x=numpy.min(self._coor[frame,:,0])
+            this_max_x=numpy.max(self._coor[frame,:,0])		
+            this_min_y=numpy.min(self._coor[frame,:,1])
+            this_max_y=numpy.max(self._coor[frame,:,1])		
+            this_min_z=numpy.min(self._coor[frame,:,2])
+            this_max_z=numpy.max(self._coor[frame,:,2])		
 
-    def calculate_minimum_and_maximum_one_frame(self, frame, **kwargs):
-        '''	
-        This method calculates the min and max of frame=frame of the object in (x,y,z)
-
-        A numpy array of min and max values are returned
-
-        @type   self                :   sasmol object 
-
-        @param  self                :   intialized sasmol object be used to perform calculation
-
-        @type   frame               :   integer
-
-        @param  frame               :   frame of trajectory to use
-
-        @type   kwargs              :   optional future arguments
-
-        @rtype                      :   float array
-
-        @return                     :   nested list of minimum and maximum values 
-                                    :   [ [ min_x, min_y, min_z ], [max_x, max_y, max_z] ]
-
-        '''
-
-        min_x = numpy.min(self._coor[frame, :, 0])
-        max_x = numpy.max(self._coor[frame, :, 0])
-        min_y = numpy.min(self._coor[frame, :, 1])
-        max_y = numpy.max(self._coor[frame, :, 1])
-        min_z = numpy.min(self._coor[frame, :, 2])
-        max_z = numpy.max(self._coor[frame, :, 2])
-
-        self._minimum = numpy.array([min_x, min_y, min_z])
-        self._maximum = numpy.array([max_x, max_y, max_z])
-
-        return [self._minimum, self._maximum]
-
-    def calculate_minimum_and_maximum_all_frames(self, filename, **kwargs):
-        '''	
-        This method calculates the min and max of frame=frame of the object in (x,y,z)
-
-        A numpy array of min and max values are returned
-
-        @type   self                :   sasmol object 
-
-        @param  self                :   intialized sasmol object be used to perform calculation
-
-        @type   filename            :   string
-
-        @param  filename            :   file with trajectory to use
-
-        @type   kwargs              :   pdb or dcd file input type
-
-        @rtype                      :   float array
-
-        @return                     :   nested list of minimum and maximum values 
-                                    :   [ [ [ min_x, min_y, min_z ], [max_x, max_y, max_z] ] ]
-
-        '''
-
-        if 'pdb' in kwargs:
-            file_type = 'pdb'
-            number_of_frames = self.number_of_frames()
-        else:
-            file_type = 'dcd'
-            dcdfilepointer_array = self.open_dcd_read(filename)
-            dcdfile = dcdfilepointer_array[0]
-            number_of_frames = dcdfilepointer_array[2]
-
-        min_x = None
-        min_y = None
-        min_z = None
-        max_x = None
-        max_y = None
-        max_z = None
-
-        for i in xrange(number_of_frames):
-
-            if(file_type == 'dcd'):
-                self.read_dcd_step(dcdfilepointer_array, i)
-                this_minmax = self.calculate_minimum_and_maximum_one_frame(0)
-            else:
-                this_minmax = self.calcminmax_frame(i)
-
-            this_min_x = this_minmax[0][0]
-            this_max_x = this_minmax[1][0]
-            this_min_y = this_minmax[0][1]
-            this_max_y = this_minmax[1][1]
-            this_min_z = this_minmax[0][2]
-            this_max_z = this_minmax[1][2]
-
-            if((min_x == None) or (this_min_x < min_x)):
+            if(first_flag or (this_min_x < min_x)):
                 min_x = this_min_x
-            if((min_y == None) or (this_min_y < min_y)):
+            if(first_flag or (this_min_y < min_y)):
                 min_y = this_min_y
-            if((min_z == None) or (this_min_z < min_z)):
+            if(first_flag or (this_min_z < min_z)):
                 min_z = this_min_z
 
-            if((max_x == None) or (this_max_x > max_x)):
+            if(first_flag or (this_max_x > max_x)):
                 max_x = this_max_x
-            if((max_y == None) or (this_max_y > max_y)):
+            if(first_flag or (this_max_y > max_y)):
                 max_y = this_max_y
-            if((max_z == None) or (this_max_z > max_z)):
+            if(first_flag or (this_max_z > max_z)):
                 max_z = this_max_z
-
-        if(file_type == 'dcd'):
-            self.close_dcd_read(dcdfile)
+    
+            first_flag = False
 
         self._minimum = numpy.array([min_x, min_y, min_z])
         self._maximum = numpy.array([max_x, max_y, max_z])
@@ -417,23 +419,29 @@ class Calculate(object):
         Method to sum the atomic charges and assign the net charge of the
         resiude to a new variable that is attached to each atom.
 
-        usage:
+        Note
+        ----------
+        Requires that the atom_charge() attribute of object is complete        
 
-        single_molecule.calculate_residue_charge()
+        Parameters
+        ----------
+        kwargs 
+            optional future arguments
+                                                                                     
+        Returns
+        -------
+        float
+            charge per residue assigned to object
 
-        residue_charge = single_molecule.residue_charge()
+        Examples
+        -------
 
-        print('res-charge = ',residue_charge[0])
-
-        @type   self                :   sasmol object 
-
-        @param  self                :   intialized sasmol object be used to perform calculation
-
-        @type   kwargs              :   optional future arguments
-
-        @rtype                      :   float  
-
-        @return                     :   charge per residue assigned to sasmol object
+        >>> import sasmol.system as system
+        >>> molecule = system.Molecule('hiv1_gag.pdb')
+        >>> molecule.calculate_residue_charge()
+        >>> single_molecule.calculate_residue_charge()
+        >>> residue_charge = single_molecule.residue_charge()
+        >>> print('res-charge = ',residue_charge[0])
 
         '''
 
@@ -480,15 +488,23 @@ class Calculate(object):
 
         Method to determine the number of each element in the molecule
 
-        @type   self                :   sasmol object 
+        Parameters
+        ----------
+        kwargs 
+            optional future arguments
+                                                                                     
+        Returns
+        -------
+        dictionary
+            {element : integer number, ... }
+        
+        Examples
+        -------
 
-        @param  self                :   intialized sasmol object be used to perform calculation
-
-        @type   kwargs              :   optional future arguments
-
-        @rtype                      :   string  
-
-        @return                     :   molecular formula
+        >>> import sasmol.system as system
+        >>> molecule = system.Molecule('hiv1_gag.pdb')
+        >>> molecule.calculate_molecular_formula()
+        {'H': 3378, 'C': 2080, 'S': 24, 'O': 632, 'N': 616}
 
         '''
 

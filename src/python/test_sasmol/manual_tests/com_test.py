@@ -1,10 +1,10 @@
 import os
-import sasmol.sasmol as sasmol
+import sasmol.system as system
 import sasmol.calculate as calculate
 
 pdbDataPath = os.path.join(os.path.dirname(os.path.realpath(__file__)),'..','data','pdb_common')+os.path.sep
 
-m = sasmol.SasMol(0)
+m = system.Molecule(0)
 
 try:
     m.read_pdb("hiv1_gag.pdb")

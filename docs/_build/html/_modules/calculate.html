@@ -1,0 +1,608 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>calculate &mdash; sasmol 1.0 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '1.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="sasmol 1.0 documentation" href="../index.html" />
+    <link rel="up" title="Module code" href="index.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for calculate</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">absolute_import</span>
+<span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">division</span>
+<span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">print_function</span>
+<span class="c1">#from __future__ import unicode_literals</span>
+<span class="c1">#</span>
+<span class="c1">#    SASMOL: Copyright (C) 2011 Joseph E. Curtis, Ph.D.</span>
+<span class="c1">#</span>
+<span class="c1">#    This program is free software: you can redistribute it and/or modify</span>
+<span class="c1">#    it under the terms of the GNU General Public License as published by</span>
+<span class="c1">#    the Free Software Foundation, either version 3 of the License, or</span>
+<span class="c1">#    (at your option) any later version.</span>
+<span class="c1">#</span>
+<span class="c1">#    This program is distributed in the hope that it will be useful,</span>
+<span class="c1">#    but WITHOUT ANY WARRANTY; without even the implied warranty of</span>
+<span class="c1">#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the</span>
+<span class="c1">#    GNU General Public License for more details.</span>
+<span class="c1">#</span>
+<span class="c1">#    You should have received a copy of the GNU General Public License</span>
+<span class="c1">#    along with this program.  If not, see &lt;http://www.gnu.org/licenses/&gt;.</span>
+<span class="c1">#</span>
+<span class="c1">#	CALCULATE</span>
+<span class="c1">#</span>
+<span class="c1">#	12/10/2009	--	initial coding			        :	jc</span>
+<span class="c1">#	12/20/2015	--	refactored for release          :	jc</span>
+<span class="c1">#	07/23/2016	--	refactored for Python 3         :	jc</span>
+<span class="c1">#</span>
+<span class="c1">#	 1         2         3         4         5         6         7</span>
+<span class="c1"># LC4567890123456789012345678901234567890123456789012345678901234567890123456789</span>
+<span class="c1">#								       *      **</span>
+
+<span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    Calculate contains the classes and methods to calculate various</span>
+<span class="sd">    atomic and molecular properties from instances of system objects</span>
+
+<span class="sd">&#39;&#39;&#39;</span>
+
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">import</span> <span class="nn">numpy</span>
+<span class="kn">import</span> <span class="nn">sasmol.operate</span> <span class="kn">as</span> <span class="nn">operate</span>
+
+<div class="viewcode-block" id="Calculate"><a class="viewcode-back" href="../index_calculate.html#calculate.Calculate">[docs]</a><span class="k">class</span> <span class="nc">Calculate</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+
+    <span class="sd">&quot;&quot;&quot; Base class containing methods to calculate properties of system object.</span>
+
+<span class="sd">        Examples</span>
+<span class="sd">        ========</span>
+
+<span class="sd">        First example shows how to use class methods from system object:</span>
+
+<span class="sd">        &gt;&gt;&gt; import sasmol.system as system</span>
+<span class="sd">        &gt;&gt;&gt; molecule = system.Molecule(&#39;hiv1_gag.pdb&#39;)</span>
+<span class="sd">        &gt;&gt;&gt; molecule.calculate_mass()</span>
+<span class="sd">        47896.61864599498</span>
+
+<span class="sd">        Second example shows how to use class methods directly:</span>
+
+<span class="sd">        &gt;&gt;&gt; import sasmol.system as system</span>
+<span class="sd">        &gt;&gt;&gt; import sasmol.calculate as calculate</span>
+<span class="sd">        &gt;&gt;&gt; molecule = system.Molecule(&#39;hiv1_gag.pdb&#39;)</span>
+<span class="sd">        &gt;&gt;&gt; calculate.Calculate.calculate_mass(molecule) </span>
+<span class="sd">        47896.61864599498</span>
+
+<span class="sd">        Note</span>
+<span class="sd">        ----</span>
+<span class="sd">    </span>
+<span class="sd">        `self` parameter is not shown in the ``Parameters`` section in the documentation</span>
+
+<span class="sd">        TODO:  Need to write a generic driver to loop over single or multiple frames</span>
+
+<span class="sd">    &quot;&quot;&quot;</span> 
+
+<div class="viewcode-block" id="Calculate.calculate_mass"><a class="viewcode-back" href="../index_calculate.html#calculate.Calculate.calculate_mass">[docs]</a>    <span class="k">def</span> <span class="nf">calculate_mass</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+
+<span class="sd">        Note</span>
+<span class="sd">        ----</span>
+
+<span class="sd">        atomic weights are contained in the ``properties.py`` file</span>
+
+<span class="sd">        http://physics.nist.gov/cgi-bin/Compositions/stand_alone.pl?ele=&amp;ascii=html&amp;isotype=some</span>
+
+<span class="sd">        standard atomic weight is based on the natural istopic composition</span>
+
+<span class="sd">        NOTE: deuterium is &#39;D&#39; 2H1 and &#39;1H&#39; is 1H1, all other elements </span>
+<span class="sd">        have their natural abundance weight. These elements are located</span>
+<span class="sd">        at the end of the dictionary.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        kwargs </span>
+<span class="sd">            optional future arguments</span>
+<span class="sd">                                                                                     </span>
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        float</span>
+<span class="sd">            mass of object in Daltons</span>
+
+<span class="sd">        Examples</span>
+<span class="sd">        -------</span>
+
+<span class="sd">        &gt;&gt;&gt; import sasmol.system as system</span>
+<span class="sd">        &gt;&gt;&gt; molecule = system.Molecule(&#39;hiv1_gag.pdb&#39;)</span>
+<span class="sd">        &gt;&gt;&gt; molecule.calculate_mass()</span>
+<span class="sd">        47896.61864599498</span>
+
+<span class="sd">        &#39;&#39;&#39;</span>
+
+        <span class="n">standard_atomic_weight</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">amu</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_total_mass</span> <span class="o">=</span> <span class="mf">0.0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_mass</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_element</span><span class="p">),</span> <span class="n">numpy</span><span class="o">.</span><span class="n">float</span><span class="p">)</span>
+
+        <span class="n">count</span> <span class="o">=</span> <span class="mi">0</span>
+
+        <span class="k">for</span> <span class="n">element</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_element</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">element</span> <span class="ow">in</span> <span class="n">standard_atomic_weight</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_total_mass</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_total_mass</span> <span class="o">+</span> \
+                    <span class="n">standard_atomic_weight</span><span class="p">[</span><span class="n">element</span><span class="p">]</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_mass</span><span class="p">[</span><span class="n">count</span><span class="p">]</span> <span class="o">=</span> <span class="n">standard_atomic_weight</span><span class="p">[</span><span class="n">element</span><span class="p">]</span>
+                <span class="n">count</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">message</span> <span class="o">=</span> <span class="s1">&#39;element &#39;</span> <span class="o">+</span> <span class="n">element</span> <span class="o">+</span> <span class="s1">&#39; not found&#39;</span>
+<span class="c1">#                log.error(&#39;ERROR: &#39; + message)</span>
+
+<span class="c1">#               need to return an error that element was not found</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_total_mass</span></div>
+
+<div class="viewcode-block" id="Calculate.calculate_center_of_mass"><a class="viewcode-back" href="../index_calculate.html#calculate.Calculate.calculate_center_of_mass">[docs]</a>    <span class="k">def</span> <span class="nf">calculate_center_of_mass</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">frame</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;	</span>
+<span class="sd">        This method calculates the center of mass of the object.  </span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        frame </span>
+<span class="sd">            integer : trajectory frame number to use</span>
+
+<span class="sd">        kwargs </span>
+<span class="sd">            optional future arguments</span>
+<span class="sd">                                                                                     </span>
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        numpy array </span>
+<span class="sd">            coordinates of center of mass</span>
+
+<span class="sd">        Examples</span>
+<span class="sd">        -------</span>
+
+<span class="sd">        &gt;&gt;&gt; import sasmol.system as system</span>
+<span class="sd">        &gt;&gt;&gt; molecule = system.Molecule(&#39;hiv1_gag.pdb&#39;)</span>
+<span class="sd">        &gt;&gt;&gt; molecule.calculate_center_of_mass(0)</span>
+<span class="sd">        array([ -6.79114736, -23.71577133,   8.06558513])</span>
+
+<span class="sd">        &#39;&#39;&#39;</span>
+
+        <span class="k">if</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_total_mass</span> <span class="o">&lt;=</span> <span class="mf">0.0</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">calculate_mass</span><span class="p">()</span>
+
+        <span class="n">x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_coor</span><span class="p">[</span><span class="n">frame</span><span class="p">,</span> <span class="p">:,</span> <span class="mi">0</span><span class="p">]</span>
+        <span class="n">y</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_coor</span><span class="p">[</span><span class="n">frame</span><span class="p">,</span> <span class="p">:,</span> <span class="mi">1</span><span class="p">]</span>
+        <span class="n">z</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_coor</span><span class="p">[</span><span class="n">frame</span><span class="p">,</span> <span class="p">:,</span> <span class="mi">2</span><span class="p">]</span>
+
+        <span class="n">comx</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_mass</span> <span class="o">*</span> <span class="n">x</span><span class="p">)</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">_total_mass</span>
+        <span class="n">comy</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_mass</span> <span class="o">*</span> <span class="n">y</span><span class="p">)</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">_total_mass</span>
+        <span class="n">comz</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_mass</span> <span class="o">*</span> <span class="n">z</span><span class="p">)</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">_total_mass</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_com</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">comx</span><span class="p">,</span> <span class="n">comy</span><span class="p">,</span> <span class="n">comz</span><span class="p">],</span> <span class="n">numpy</span><span class="o">.</span><span class="n">float</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_com</span></div>
+
+<div class="viewcode-block" id="Calculate.calculate_radius_of_gyration"><a class="viewcode-back" href="../index_calculate.html#calculate.Calculate.calculate_radius_of_gyration">[docs]</a>    <span class="k">def</span> <span class="nf">calculate_radius_of_gyration</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">frame</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;	</span>
+<span class="sd">        This method calculates the radius of gyration of the object</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        frame </span>
+<span class="sd">            integer : trajectory frame number to use</span>
+
+<span class="sd">        kwargs </span>
+<span class="sd">            optional future arguments</span>
+<span class="sd">                                                                                     </span>
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        float</span>
+<span class="sd">            radius of gyration of object </span>
+
+<span class="sd">        Examples</span>
+<span class="sd">        -------</span>
+
+<span class="sd">        &gt;&gt;&gt; import sasmol.system as system</span>
+<span class="sd">        &gt;&gt;&gt; molecule = system.Molecule(&#39;hiv1_gag.pdb&#39;)</span>
+<span class="sd">        &gt;&gt;&gt; molecule.calculate_radius_of_gyration(0)</span>
+<span class="sd">        64.043168998442368 </span>
+
+<span class="sd">        &#39;&#39;&#39;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_com</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">calculate_center_of_mass</span><span class="p">(</span><span class="n">frame</span><span class="p">)</span>
+
+        <span class="k">if</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_natoms</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">):</span>
+            <span class="n">rg2</span> <span class="o">=</span> <span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">_coor</span><span class="p">[</span><span class="n">frame</span><span class="p">,</span> <span class="p">:,</span> <span class="p">:]</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">_com</span><span class="p">)</span>
+                    <span class="o">*</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_coor</span><span class="p">[</span><span class="n">frame</span><span class="p">,</span> <span class="p">:,</span> <span class="p">:]</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">_com</span><span class="p">))</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_rg</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">numpy</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">numpy</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">rg2</span><span class="p">))</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">_natoms</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_rg</span></div>
+
+<div class="viewcode-block" id="Calculate.calculate_root_mean_square_deviation"><a class="viewcode-back" href="../index_calculate.html#calculate.Calculate.calculate_root_mean_square_deviation">[docs]</a>    <span class="k">def</span> <span class="nf">calculate_root_mean_square_deviation</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;	</span>
+<span class="sd">        This method calculates the radius root mean square deviation</span>
+<span class="sd">        of one set of coordinates compared to another</span>
+
+<span class="sd">        self contains the coordinates of set 1</span>
+<span class="sd">        other contains the coordinates of set 2</span>
+
+<span class="sd">        the number of coordinates in each set must be equal	</span>
+
+<span class="sd">        To use this over multiple frames you must call this function</span>
+<span class="sd">        repeatedly.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        other </span>
+<span class="sd">            system object with coordinates with equal number of frames</span>
+
+<span class="sd">        kwargs </span>
+<span class="sd">            optional future arguments</span>
+<span class="sd">                                                                                     </span>
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        float</span>
+<span class="sd">            root mean square deviation between objects </span>
+
+<span class="sd">        Examples</span>
+<span class="sd">        -------</span>
+
+
+<span class="sd">        &#39;&#39;&#39;</span>
+
+        <span class="c1"># OPEN	Add frame support here?</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">dxyz</span> <span class="o">=</span> <span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">_coor</span> <span class="o">-</span> <span class="n">other</span><span class="o">.</span><span class="n">_coor</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_coor</span> <span class="o">-</span> <span class="n">other</span><span class="o">.</span><span class="n">_coor</span><span class="p">))</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_rmsd</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">sqrt</span><span class="p">((</span><span class="n">numpy</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">dxyz</span><span class="p">))</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">_natoms</span><span class="p">)</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="k">if</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_natoms</span> <span class="o">!=</span> <span class="n">other</span><span class="o">.</span><span class="n">_natoms</span><span class="p">):</span>
+                <span class="k">print</span><span class="p">(</span><span class="s1">&#39;number of atoms in (1) != (2)&#39;</span><span class="p">)</span>
+                <span class="k">print</span><span class="p">(</span><span class="s1">&#39;rmsd not calculated: None returned&#39;</span><span class="p">)</span>
+                <span class="k">print</span><span class="p">(</span><span class="s1">&#39;number of atoms in self is &lt; 1&#39;</span><span class="p">)</span>
+                <span class="k">print</span><span class="p">(</span><span class="s1">&#39;number of atoms in other is &lt; 1&#39;</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_rmsd</span> <span class="o">=</span> <span class="bp">None</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_rmsd</span></div>
+
+<div class="viewcode-block" id="Calculate.calculate_principle_moments_of_inertia"><a class="viewcode-back" href="../index_calculate.html#calculate.Calculate.calculate_principle_moments_of_inertia">[docs]</a>    <span class="k">def</span> <span class="nf">calculate_principle_moments_of_inertia</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">frame</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;	</span>
+<span class="sd">        This method calculates the principal moments of inertia</span>
+<span class="sd">        of the object. It uses the center method from operate.Move</span>
+<span class="sd">        to center the molecule. </span>
+<span class="sd">        The present method is designated for the non-linear system with</span>
+<span class="sd">        non-singular moment of inertia matrix only. For the linear systems, it</span>
+<span class="sd">        will return eigenvectors and I as None.  Testing for non-None return</span>
+<span class="sd">        values should be done in the calling method.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        frame </span>
+<span class="sd">            integer : trajectory frame number to use</span>
+
+<span class="sd">        kwargs </span>
+<span class="sd">            optional future arguments</span>
+<span class="sd">                                                                                     </span>
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        tuple of numpy arrays </span>
+<span class="sd">            principle moments of inertia of object :</span>
+<span class="sd">            eigenvalues, eigenvectors, and I</span>
+
+<span class="sd">        Examples</span>
+<span class="sd">        -------</span>
+
+<span class="sd">        &gt;&gt;&gt; import sasmol.system as system</span>
+<span class="sd">        &gt;&gt;&gt; molecule = system.Molecule(&#39;hiv1_gag.pdb&#39;)</span>
+<span class="sd">        &gt;&gt;&gt; molecule.calculate_principle_moments_of_inetia(0)</span>
+<span class="sd">        (array([  1.30834716e+07,   1.91993314e+08,   1.85015201e+08]), </span>
+<span class="sd">        array([[-0.08711655, -0.97104917,  0.22242802],</span>
+<span class="sd">               [-0.512547  ,  0.23514759,  0.82583363],</span>
+<span class="sd">               [ 0.85422847,  0.04206103,  0.51819358]]), </span>
+<span class="sd">        array([[  1.90290278e+08,  -9.27036144e+06,   1.25097100e+07],</span>
+<span class="sd">               [ -9.27036144e+06,   1.40233826e+08,   7.53462715e+07],</span>
+<span class="sd">               [  1.25097100e+07,   7.53462715e+07,   5.95678834e+07]])) </span>
+<span class="sd">        </span>
+<span class="sd">        &#39;&#39;&#39;</span>
+
+        <span class="n">com</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">calculate_center_of_mass</span><span class="p">(</span><span class="n">frame</span><span class="p">)</span>
+
+        <span class="n">operate</span><span class="o">.</span><span class="n">Move</span><span class="o">.</span><span class="n">center</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">frame</span><span class="p">)</span>
+
+        <span class="n">Ixx</span> <span class="o">=</span> <span class="mf">0.0</span>
+        <span class="n">Iyy</span> <span class="o">=</span> <span class="mf">0.0</span>
+        <span class="n">Izz</span> <span class="o">=</span> <span class="mf">0.0</span>
+        <span class="n">Ixy</span> <span class="o">=</span> <span class="mf">0.0</span>
+        <span class="n">Ixz</span> <span class="o">=</span> <span class="mf">0.0</span>
+        <span class="n">Iyz</span> <span class="o">=</span> <span class="mf">0.0</span>
+        <span class="n">Iyx</span> <span class="o">=</span> <span class="mf">0.0</span>
+        <span class="n">Izx</span> <span class="o">=</span> <span class="mf">0.0</span>
+        <span class="n">Izy</span> <span class="o">=</span> <span class="mf">0.0</span>
+
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_natoms</span><span class="p">):</span>
+
+            <span class="n">xp</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_coor</span><span class="p">[</span><span class="n">frame</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span>
+            <span class="n">yp</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_coor</span><span class="p">[</span><span class="n">frame</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span>
+            <span class="n">zp</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_coor</span><span class="p">[</span><span class="n">frame</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="mi">2</span><span class="p">]</span>
+
+            <span class="n">Ixx</span> <span class="o">=</span> <span class="n">Ixx</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">_mass</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">*</span> <span class="p">(</span><span class="n">yp</span> <span class="o">*</span> <span class="n">yp</span> <span class="o">+</span> <span class="n">zp</span> <span class="o">*</span> <span class="n">zp</span><span class="p">)</span>
+            <span class="n">Iyy</span> <span class="o">=</span> <span class="n">Iyy</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">_mass</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">*</span> <span class="p">(</span><span class="n">xp</span> <span class="o">*</span> <span class="n">xp</span> <span class="o">+</span> <span class="n">zp</span> <span class="o">*</span> <span class="n">zp</span><span class="p">)</span>
+            <span class="n">Izz</span> <span class="o">=</span> <span class="n">Izz</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">_mass</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">*</span> <span class="p">(</span><span class="n">xp</span> <span class="o">*</span> <span class="n">xp</span> <span class="o">+</span> <span class="n">yp</span> <span class="o">*</span> <span class="n">yp</span><span class="p">)</span>
+
+            <span class="n">Ixy</span> <span class="o">=</span> <span class="n">Ixy</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">_mass</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">*</span> <span class="n">xp</span> <span class="o">*</span> <span class="n">yp</span>
+            <span class="n">Ixz</span> <span class="o">=</span> <span class="n">Ixz</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">_mass</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">*</span> <span class="n">xp</span> <span class="o">*</span> <span class="n">zp</span>
+            <span class="n">Iyz</span> <span class="o">=</span> <span class="n">Iyz</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">_mass</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">*</span> <span class="n">yp</span> <span class="o">*</span> <span class="n">zp</span>
+            <span class="n">Iyx</span> <span class="o">=</span> <span class="n">Iyx</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">_mass</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">*</span> <span class="n">yp</span> <span class="o">*</span> <span class="n">xp</span>
+            <span class="n">Izx</span> <span class="o">=</span> <span class="n">Izx</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">_mass</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">*</span> <span class="n">zp</span> <span class="o">*</span> <span class="n">xp</span>
+            <span class="n">Izy</span> <span class="o">=</span> <span class="n">Izy</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">_mass</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">*</span> <span class="n">zp</span> <span class="o">*</span> <span class="n">yp</span>
+
+        <span class="n">I</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="n">Ixx</span><span class="p">,</span> <span class="n">Ixy</span><span class="p">,</span> <span class="n">Ixz</span><span class="p">],</span> <span class="p">[</span><span class="n">Iyx</span><span class="p">,</span> <span class="n">Iyy</span><span class="p">,</span> <span class="n">Iyz</span><span class="p">],</span> <span class="p">[</span><span class="n">Izx</span><span class="p">,</span> <span class="n">Izy</span><span class="p">,</span> <span class="n">Izz</span><span class="p">]])</span>
+
+        <span class="k">if</span> <span class="n">numpy</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">matrix_rank</span><span class="p">(</span><span class="n">I</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">3</span><span class="p">:</span>
+            <span class="k">print</span><span class="p">(</span><span class="s2">&quot;You are requesting the pmi calculation for a singular system.&quot;</span><span class="p">)</span>
+            <span class="k">print</span><span class="p">(</span><span class="s2">&quot;The eigen-decomposition of this system is not defined&quot;</span><span class="p">)</span>
+
+            <span class="n">uk</span> <span class="o">=</span> <span class="bp">None</span>
+            <span class="n">ak</span> <span class="o">=</span> <span class="bp">None</span>
+            <span class="n">I</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">uk</span><span class="p">,</span> <span class="n">ak</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">eig</span><span class="p">(</span><span class="n">I</span><span class="p">)</span>
+
+        <span class="n">operate</span><span class="o">.</span><span class="n">Move</span><span class="o">.</span><span class="n">translate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">frame</span><span class="p">,</span> <span class="n">com</span><span class="p">,</span> <span class="n">point</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">uk</span><span class="p">,</span> <span class="n">ak</span><span class="p">,</span> <span class="n">I</span></div>
+
+<div class="viewcode-block" id="Calculate.calculate_minimum_and_maximum"><a class="viewcode-back" href="../index_calculate.html#calculate.Calculate.calculate_minimum_and_maximum">[docs]</a>    <span class="k">def</span> <span class="nf">calculate_minimum_and_maximum</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;	</span>
+<span class="sd">        This method calculates the minimum and maximum values</span>
+<span class="sd">        of of the object in (x,y,z)</span>
+
+<span class="sd">        The default usage is to evaluate all frames</span>
+
+<span class="sd">        A numpy array of minimum and maximum values for each</span>
+<span class="sd">        dimension are returned</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        kwargs </span>
+<span class="sd">           frames = [] : integer list of frames to process </span>
+<span class="sd">                                                                                     </span>
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        numpy array </span>
+<span class="sd">            nested list of minimum and maximum values </span>
+<span class="sd">            [ [ min_x, min_y, min_z ], [max_x, max_y, max_z] ]</span>
+
+<span class="sd">        Examples</span>
+<span class="sd">        -------</span>
+
+<span class="sd">        &gt;&gt;&gt; import sasmol.system as system</span>
+<span class="sd">        &gt;&gt;&gt; molecule = system.Molecule(&#39;hiv1_gag.pdb&#39;)</span>
+<span class="sd">        &gt;&gt;&gt; molecule.calculate_minimum_and_maximum()</span>
+<span class="sd">        [array([-31.29899979, -93.23899841, -85.81900024]), array([ 19.64699936,  30.37800026,  99.52999878])] </span>
+<span class="sd">      </span>
+<span class="sd">        &gt;&gt;&gt; import sasmol.system as system</span>
+<span class="sd">        &gt;&gt;&gt; molecule = system.Molecule(&#39;hiv1_gag.pdb&#39;)</span>
+<span class="sd">        &gt;&gt;&gt; molecule.read_dcd(&#39;hiv1_gag_200_frames&#39;)</span>
+<span class="sd">        &gt;&gt;&gt; molecule.calculate_minimum_and_maximum()</span>
+<span class="sd">        [array([ -94.47146606, -121.88082886,  -99.94940948]), array([  52.85133362,   65.53725433,  100.76850891])]</span>
+<span class="sd">        &gt;&gt;&gt; molecule.calculate_minimum_and_maximum(frames=[0,1,2,3])</span>
+<span class="sd">        [array([-30.9330883 , -92.68256378, -84.51082611]), array([ 20.98281288,  38.45230484,  99.91564178])] </span>
+<span class="sd">      </span>
+<span class="sd">       </span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        
+        <span class="k">try</span><span class="p">:</span> 
+            <span class="n">frames</span> <span class="o">=</span> <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;frames&#39;</span><span class="p">]</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="n">frames</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">xrange</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">number_of_frames</span><span class="p">())]</span>
+
+        <span class="n">first_flag</span> <span class="o">=</span> <span class="bp">True</span>        
+
+        <span class="k">for</span> <span class="n">frame</span> <span class="ow">in</span> <span class="n">frames</span><span class="p">:</span>
+
+            <span class="n">this_min_x</span><span class="o">=</span><span class="n">numpy</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_coor</span><span class="p">[</span><span class="n">frame</span><span class="p">,:,</span><span class="mi">0</span><span class="p">])</span>
+            <span class="n">this_max_x</span><span class="o">=</span><span class="n">numpy</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_coor</span><span class="p">[</span><span class="n">frame</span><span class="p">,:,</span><span class="mi">0</span><span class="p">])</span>		
+            <span class="n">this_min_y</span><span class="o">=</span><span class="n">numpy</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_coor</span><span class="p">[</span><span class="n">frame</span><span class="p">,:,</span><span class="mi">1</span><span class="p">])</span>
+            <span class="n">this_max_y</span><span class="o">=</span><span class="n">numpy</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_coor</span><span class="p">[</span><span class="n">frame</span><span class="p">,:,</span><span class="mi">1</span><span class="p">])</span>		
+            <span class="n">this_min_z</span><span class="o">=</span><span class="n">numpy</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_coor</span><span class="p">[</span><span class="n">frame</span><span class="p">,:,</span><span class="mi">2</span><span class="p">])</span>
+            <span class="n">this_max_z</span><span class="o">=</span><span class="n">numpy</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_coor</span><span class="p">[</span><span class="n">frame</span><span class="p">,:,</span><span class="mi">2</span><span class="p">])</span>		
+
+            <span class="k">if</span><span class="p">(</span><span class="n">first_flag</span> <span class="ow">or</span> <span class="p">(</span><span class="n">this_min_x</span> <span class="o">&lt;</span> <span class="n">min_x</span><span class="p">)):</span>
+                <span class="n">min_x</span> <span class="o">=</span> <span class="n">this_min_x</span>
+            <span class="k">if</span><span class="p">(</span><span class="n">first_flag</span> <span class="ow">or</span> <span class="p">(</span><span class="n">this_min_y</span> <span class="o">&lt;</span> <span class="n">min_y</span><span class="p">)):</span>
+                <span class="n">min_y</span> <span class="o">=</span> <span class="n">this_min_y</span>
+            <span class="k">if</span><span class="p">(</span><span class="n">first_flag</span> <span class="ow">or</span> <span class="p">(</span><span class="n">this_min_z</span> <span class="o">&lt;</span> <span class="n">min_z</span><span class="p">)):</span>
+                <span class="n">min_z</span> <span class="o">=</span> <span class="n">this_min_z</span>
+
+            <span class="k">if</span><span class="p">(</span><span class="n">first_flag</span> <span class="ow">or</span> <span class="p">(</span><span class="n">this_max_x</span> <span class="o">&gt;</span> <span class="n">max_x</span><span class="p">)):</span>
+                <span class="n">max_x</span> <span class="o">=</span> <span class="n">this_max_x</span>
+            <span class="k">if</span><span class="p">(</span><span class="n">first_flag</span> <span class="ow">or</span> <span class="p">(</span><span class="n">this_max_y</span> <span class="o">&gt;</span> <span class="n">max_y</span><span class="p">)):</span>
+                <span class="n">max_y</span> <span class="o">=</span> <span class="n">this_max_y</span>
+            <span class="k">if</span><span class="p">(</span><span class="n">first_flag</span> <span class="ow">or</span> <span class="p">(</span><span class="n">this_max_z</span> <span class="o">&gt;</span> <span class="n">max_z</span><span class="p">)):</span>
+                <span class="n">max_z</span> <span class="o">=</span> <span class="n">this_max_z</span>
+    
+            <span class="n">first_flag</span> <span class="o">=</span> <span class="bp">False</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_minimum</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">min_x</span><span class="p">,</span> <span class="n">min_y</span><span class="p">,</span> <span class="n">min_z</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_maximum</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">max_x</span><span class="p">,</span> <span class="n">max_y</span><span class="p">,</span> <span class="n">max_z</span><span class="p">])</span>
+
+        <span class="k">return</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_minimum</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_maximum</span><span class="p">]</span></div>
+
+<div class="viewcode-block" id="Calculate.calculate_residue_charge"><a class="viewcode-back" href="../index_calculate.html#calculate.Calculate.calculate_residue_charge">[docs]</a>    <span class="k">def</span> <span class="nf">calculate_residue_charge</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+
+<span class="sd">        Method to sum the atomic charges and assign the net charge of the</span>
+<span class="sd">        resiude to a new variable that is attached to each atom.</span>
+
+<span class="sd">        Note</span>
+<span class="sd">        ----------</span>
+<span class="sd">        Requires that the atom_charge() attribute of object is complete        </span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        kwargs </span>
+<span class="sd">            optional future arguments</span>
+<span class="sd">                                                                                     </span>
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        float</span>
+<span class="sd">            charge per residue assigned to object</span>
+
+<span class="sd">        Examples</span>
+<span class="sd">        -------</span>
+
+<span class="sd">        &gt;&gt;&gt; import sasmol.system as system</span>
+<span class="sd">        &gt;&gt;&gt; molecule = system.Molecule(&#39;hiv1_gag.pdb&#39;)</span>
+<span class="sd">        &gt;&gt;&gt; molecule.calculate_residue_charge()</span>
+<span class="sd">        &gt;&gt;&gt; single_molecule.calculate_residue_charge()</span>
+<span class="sd">        &gt;&gt;&gt; residue_charge = single_molecule.residue_charge()</span>
+<span class="sd">        &gt;&gt;&gt; print(&#39;res-charge = &#39;,residue_charge[0])</span>
+
+<span class="sd">        &#39;&#39;&#39;</span>
+
+        <span class="n">resid</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">resid</span><span class="p">()</span>
+        <span class="n">natoms</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">natoms</span><span class="p">()</span>
+
+        <span class="c1">###</span>
+        <span class="c1"># needs a gentle failure if atom_charge() does not exist</span>
+        <span class="c1">###</span>
+
+        <span class="n">atom_charge</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">atom_charge</span><span class="p">()</span>
+
+        <span class="n">charge_sum</span> <span class="o">=</span> <span class="mf">0.0</span>
+        <span class="n">charge_residue_sum</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">last_resid</span> <span class="o">=</span> <span class="n">resid</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">xrange</span><span class="p">(</span><span class="n">natoms</span><span class="p">):</span>
+            <span class="n">this_resid</span> <span class="o">=</span> <span class="n">resid</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+            <span class="n">this_charge</span> <span class="o">=</span> <span class="n">atom_charge</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+
+            <span class="k">if</span><span class="p">(</span><span class="n">this_resid</span> <span class="o">!=</span> <span class="n">last_resid</span> <span class="ow">or</span> <span class="n">i</span> <span class="o">==</span> <span class="n">natoms</span> <span class="o">-</span> <span class="mi">1</span><span class="p">):</span>
+                <span class="n">charge_residue_sum</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">last_resid</span><span class="p">,</span> <span class="n">charge_sum</span><span class="p">])</span>
+                <span class="n">charge_sum</span> <span class="o">=</span> <span class="n">this_charge</span>
+                <span class="n">last_resid</span> <span class="o">=</span> <span class="n">this_resid</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">charge_sum</span> <span class="o">+=</span> <span class="n">this_charge</span>
+
+        <span class="n">last_resid</span> <span class="o">=</span> <span class="n">resid</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">charge_residue</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">xrange</span><span class="p">(</span><span class="n">natoms</span><span class="p">):</span>
+            <span class="n">this_resid</span> <span class="o">=</span> <span class="n">resid</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+            <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">xrange</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">charge_residue_sum</span><span class="p">)):</span>
+                <span class="k">if</span><span class="p">(</span><span class="n">this_resid</span> <span class="o">==</span> <span class="n">charge_residue_sum</span><span class="p">[</span><span class="n">j</span><span class="p">][</span><span class="mi">0</span><span class="p">]):</span>
+                    <span class="n">charge_residue</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">charge_residue_sum</span><span class="p">[</span><span class="n">j</span><span class="p">][</span><span class="mi">1</span><span class="p">])</span>
+                    <span class="k">continue</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">setResidue_charge</span><span class="p">(</span><span class="n">numpy</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">charge_residue</span><span class="p">,</span> <span class="n">numpy</span><span class="o">.</span><span class="n">float32</span><span class="p">))</span>
+
+        <span class="k">return</span></div>
+
+<div class="viewcode-block" id="Calculate.calculate_molecular_formula"><a class="viewcode-back" href="../index_calculate.html#calculate.Calculate.calculate_molecular_formula">[docs]</a>    <span class="k">def</span> <span class="nf">calculate_molecular_formula</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+
+<span class="sd">        Method to determine the number of each element in the molecule</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        kwargs </span>
+<span class="sd">            optional future arguments</span>
+<span class="sd">                                                                                     </span>
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        dictionary</span>
+<span class="sd">            {element : integer number, ... }</span>
+<span class="sd">        </span>
+<span class="sd">        Examples</span>
+<span class="sd">        -------</span>
+
+<span class="sd">        &gt;&gt;&gt; import sasmol.system as system</span>
+<span class="sd">        &gt;&gt;&gt; molecule = system.Molecule(&#39;hiv1_gag.pdb&#39;)</span>
+<span class="sd">        &gt;&gt;&gt; molecule.calculate_molecular_formula()</span>
+<span class="sd">        {&#39;H&#39;: 3378, &#39;C&#39;: 2080, &#39;S&#39;: 24, &#39;O&#39;: 632, &#39;N&#39;: 616}</span>
+
+<span class="sd">        &#39;&#39;&#39;</span>
+
+        <span class="n">my_formula</span> <span class="o">=</span> <span class="p">{}</span>
+
+        <span class="k">for</span> <span class="n">element</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_element</span><span class="p">:</span>
+
+            <span class="k">if</span> <span class="n">element</span> <span class="ow">in</span> <span class="n">my_formula</span><span class="p">:</span>
+                <span class="n">my_formula</span><span class="p">[</span><span class="n">element</span><span class="p">]</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">my_formula</span><span class="p">[</span><span class="n">element</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">setFormula</span><span class="p">(</span><span class="n">my_formula</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">my_formula</span></div></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  <li><a href="index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2016, Joseph E. Curtis, Ph.D..
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.4.1</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.8</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

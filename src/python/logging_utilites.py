@@ -7,9 +7,9 @@ import time
 import pkg_resources
 import json
 
-import sasconfig as sasconfig
+import config as config
 
-if sasconfig.__logging_level__ == "DEBUG":
+if config.__logging_level__ == "DEBUG":
     DEBUG = True
 
 
@@ -112,7 +112,7 @@ class run_utils():
     def setup_logging(self, other_self):
 
         self.logger = logging.getLogger(self.__application__)
-        if (sasconfig.__logging_level__ == 'DEBUG'):
+        if (config.__logging_level__ == 'DEBUG'):
             self.logger.setLevel(logging.DEBUG)
         else:
             # self.logger.setLevel(logging.ERROR)

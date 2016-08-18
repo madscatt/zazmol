@@ -13,7 +13,7 @@
 #    You should have received a copy of the GNU General Public License
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
-#	SASPDBRX
+#	TOPOLOGY
 #
 #	1/26/2012	--	initial coding				: jc
 #	12/26/2015	--	refactored for release      : jc
@@ -79,8 +79,7 @@ pprint.pprint(o.topology_info['ALA'],width=100)
 import os
 import numpy
 import copy
-import sasconfig as sasconfig
-
+import config as config
 
 class CharmmTopology(object):
 
@@ -380,7 +379,7 @@ class CharmmTopology(object):
         Patch N-ter for the first residue and C-ter for the last residue in each segment
         '''
         error = []
-        bin_path = sasconfig.__bin_path__
+        bin_path = config.__bin_path__
         self.read_charmm_topology(topology_file_path=bin_path + '/toppar/')
         self.setup_charmm_residue_atoms()
         self.initialize_children()
@@ -468,7 +467,7 @@ class CharmmTopology(object):
                                    1] = child.element()[new_indices[i]]
                     self.charge()[child_indices[i] -
                                   1] = child.charge()[new_indices[i]]
-                    # only frame-0 was handled in sassubset.init_child
+                    # only frame-0 was handled in subset.init_child
                     self.coor()[0][child_indices[i] -
                                    1] = child.coor()[0][new_indices[i]]
         return error
