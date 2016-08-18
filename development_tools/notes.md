@@ -7,6 +7,9 @@
 
 grep -rnw *.py -e "SASSIE_FLOATTYPE" 
 
+###  build docs into directory for github
+
+sphinx-build -b html . ../docs/
 
 ### 0. Identation
 
