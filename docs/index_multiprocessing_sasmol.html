@@ -1,0 +1,280 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Multiprocessing SasMol Documentation &mdash; sasmol 1.0 documentation</title>
+    
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '1.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="sasmol 1.0 documentation" href="index.html" />
+    <link rel="next" title="Operate Documentation" href="index_operate.html" />
+    <link rel="prev" title="Linear Algebra Documentation" href="index_linear_algebra.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="multiprocessing-sasmol-documentation">
+<h1>Multiprocessing SasMol Documentation<a class="headerlink" href="#multiprocessing-sasmol-documentation" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="module-multiprocessing_sasmol">
+<span id="multiprocessing-sasmol"></span><h2><code class="xref py py-mod docutils literal"><span class="pre">Multiprocessing</span> <span class="pre">SasMol</span></code><a class="headerlink" href="#module-multiprocessing_sasmol" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="multiprocessing_sasmol.Multiprocessing_SasMol">
+<em class="property">class </em><code class="descclassname">multiprocessing_sasmol.</code><code class="descname">Multiprocessing_SasMol</code><a class="reference internal" href="_modules/multiprocessing_sasmol.html#Multiprocessing_SasMol"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#multiprocessing_sasmol.Multiprocessing_SasMol" title="Permalink to this definition">¶</a></dt>
+<dd><p>Class containing methods to manage the creation and combination
+of sasmol.system objects and to manage multiprocessing jobs using
+these objects.</p>
+<p class="rubric">Examples</p>
+<p>First example shows how to use class methods from system object:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">sasmol.system</span> <span class="k">as</span> <span class="nn">system</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">molecule</span> <span class="o">=</span> <span class="n">system</span><span class="o">.</span><span class="n">Molecule</span><span class="p">(</span><span class="s1">&#39;hiv1_gag.pdb&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">molecule</span><span class="o">.</span><span class="n">read_dcd</span><span class="p">(</span><span class="s1">&#39;hiv1_gag_200_frames.dcd&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">number_of_batches</span> <span class="o">=</span> <span class="mi">10</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">test</span> <span class="o">=</span> <span class="n">Multiprocessing_SasMol</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">molecules</span> <span class="o">=</span> <span class="n">test</span><span class="o">.</span><span class="n">divide_molecule</span><span class="p">(</span><span class="n">number_of_batches</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">test</span><span class="o">.</span><span class="n">submit_jobs</span><span class="p">(</span><span class="n">molecules</span><span class="p">,</span> <span class="n">test</span><span class="o">.</span><span class="n">example_worker</span><span class="p">,</span> <span class="n">number_of_batches</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">molecules</span> <span class="o">=</span> <span class="n">molecule</span><span class="o">.</span><span class="n">divide_molecule</span><span class="p">(</span><span class="n">number_of_batches</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">test</span> <span class="o">=</span> <span class="n">Multiprocessing_SasMol</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">test</span><span class="o">.</span><span class="n">submit_jobs</span><span class="p">(</span><span class="n">molecules</span><span class="p">,</span> <span class="n">test</span><span class="o">.</span><span class="n">example_worker</span><span class="p">,</span> <span class="n">number_of_batches</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p>THIS CLASS IS NEW AND IS UNDER ACTIVE DEVELOPMENT AND MAY CHANGE DRAMATICALLY</p>
+<blockquote>
+<div><dl class="docutils">
+<dt>### LAST THREE LINES OF EXAMPLE ARE FOR CONSIDERATION FOR POTENTIAL</dt>
+<dd>WOULD REQUIRE CLASS TO INHERIT FROM SASMOL.SYSTEM.ATOM</dd>
+</dl>
+</div></blockquote>
+<p class="last"><cite>self</cite> parameter is not shown in the <code class="docutils literal"><span class="pre">Parameters</span></code> section in the documentation</p>
+</div>
+<dl class="method">
+<dt id="multiprocessing_sasmol.Multiprocessing_SasMol.divide_molecule">
+<code class="descname">divide_molecule</code><span class="sig-paren">(</span><em>molecule</em>, <em>number_of_batches</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/multiprocessing_sasmol.html#Multiprocessing_SasMol.divide_molecule"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#multiprocessing_sasmol.Multiprocessing_SasMol.divide_molecule" title="Permalink to this definition">¶</a></dt>
+<dd><p>Method makes a deep copy of frame 0 of the input molecule
+into a set of new molecules indicated by the number_of_batches
+input variable.</p>
+<p>After duplicating the molecule, the coordinates are assigned to
+the duplicate molecules.</p>
+<p>The number of frames per duplicate is the same, except perhaps
+when the number of frames is not an equal divisor of number_of_batches
+which leads to the remainder frames assigned to the last duplicate
+molecule.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>molecule</strong> &#8211; system object :</li>
+<li><strong>number_of_batches</strong> &#8211; integer : number of duplicate molecules to generate</li>
+<li><strong>kwargs</strong> &#8211; optional future arguments</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">updated self._coor</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://docs.python.org/library/constants.html#None" title="(in Python v2.7)">None</a></p>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Examples</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">sasmol.system</span> <span class="k">as</span> <span class="nn">system</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">molecule</span> <span class="o">=</span> <span class="n">system</span><span class="o">.</span><span class="n">Molecule</span><span class="p">(</span><span class="s1">&#39;hiv1_gag.pdb&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">molecule</span><span class="o">.</span><span class="n">read_dcd</span><span class="p">(</span><span class="s1">&#39;hiv1_gag_200_frames.dcd&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">number_of_batches</span> <span class="o">=</span> <span class="mi">10</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">test</span> <span class="o">=</span> <span class="n">Multiprocessing_SasMol</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">molecules</span> <span class="o">=</span> <span class="n">test</span><span class="o">.</span><span class="n">divide_molecule</span><span class="p">(</span><span class="n">number_of_batches</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">molecules</span> <span class="o">=</span> <span class="n">molecule</span><span class="o">.</span><span class="n">divide_molecule</span><span class="p">(</span><span class="n">number_of_batches</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Last line in the examples is an alternative use case to explore yet
+not implemented.</p>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="multiprocessing_sasmol.Multiprocessing_SasMol.example_worker">
+<code class="descname">example_worker</code><span class="sig-paren">(</span><em>i</em>, <em>molecule</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/multiprocessing_sasmol.html#Multiprocessing_SasMol.example_worker"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#multiprocessing_sasmol.Multiprocessing_SasMol.example_worker" title="Permalink to this definition">¶</a></dt>
+<dd><p>Example method to execute in parallel using multiprocessing</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>i</strong> &#8211; integer :  job number</li>
+<li><strong>molecule</strong> &#8211; sasmol object</li>
+<li><strong>kwargs</strong> &#8211; optional future arguments</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">list of float center_of_mass values</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">com</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="multiprocessing_sasmol.Multiprocessing_SasMol.get_frame_lists">
+<code class="descname">get_frame_lists</code><span class="sig-paren">(</span><em>number_of_frames</em>, <em>number_of_batches</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/multiprocessing_sasmol.html#Multiprocessing_SasMol.get_frame_lists"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#multiprocessing_sasmol.Multiprocessing_SasMol.get_frame_lists" title="Permalink to this definition">¶</a></dt>
+<dd><p>Utility method to determine individual frame lists for each
+of the total number_of_frames divided into number_of_batches</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>number_of_frames</strong> &#8211; integer : number of frames in complete molecule</li>
+<li><strong>number_of_batches</strong> &#8211; integer : number of frame groups to create</li>
+<li><strong>kwargs</strong> &#8211; optional future arguments</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">integer list of frame lists</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">frames</p>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Examples</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">frames</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_frame_lists</span><span class="p">(</span><span class="n">molecule</span><span class="o">.</span><span class="n">number_of_frames</span><span class="p">(),</span> <span class="n">number_of_batches</span><span class="p">)</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="multiprocessing_sasmol.Multiprocessing_SasMol.submit_jobs">
+<code class="descname">submit_jobs</code><span class="sig-paren">(</span><em>molecules</em>, <em>target_method</em>, <em>number_of_jobs</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/multiprocessing_sasmol.html#Multiprocessing_SasMol.submit_jobs"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#multiprocessing_sasmol.Multiprocessing_SasMol.submit_jobs" title="Permalink to this definition">¶</a></dt>
+<dd><p>Utility method to start a set of multiprocessing jobs</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>molecules</strong> &#8211; list : system objects</li>
+<li><strong>target_method</strong> &#8211; string : name of method to call</li>
+<li><strong>number_of_jobs</strong> &#8211; int : number of job / processes to run</li>
+<li><strong>kwargs</strong> &#8211; optional future arguments</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"></p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://docs.python.org/library/constants.html#None" title="(in Python v2.7)">None</a></p>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Examples</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">test</span><span class="o">.</span><span class="n">submit_jobs</span><span class="p">(</span><span class="n">molecules</span><span class="p">,</span> <span class="n">test</span><span class="o">.</span><span class="n">example_worker</span><span class="p">,</span> <span class="n">number_of_batches</span><span class="p">)</span>
+</pre></div>
+</div>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Multiprocessing SasMol Documentation</a><ul>
+<li><a class="reference internal" href="#module-multiprocessing_sasmol"><code class="docutils literal"><span class="pre">Multiprocessing</span> <span class="pre">SasMol</span></code></a></li>
+</ul>
+</li>
+</ul>
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+      <li>Previous: <a href="index_linear_algebra.html" title="previous chapter">Linear Algebra Documentation</a></li>
+      <li>Next: <a href="index_operate.html" title="next chapter">Operate Documentation</a></li>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/index_multiprocessing_sasmol.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2016, Joseph E. Curtis, Ph.D..
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.4.1</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.8</a>
+      
+      |
+      <a href="_sources/index_multiprocessing_sasmol.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>
