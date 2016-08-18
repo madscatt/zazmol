@@ -19,7 +19,7 @@ mocker
 
 ### [`basic usage`](doc_files/basic_usage.md)
 
-### [`library file structure`](docs/index.html)
+### [`library documentation`](https://madscatt.github.io/zazmol/index.html)
 
 ### [`developer notes`](development_tools/notes.md)
 
