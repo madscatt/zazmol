@@ -371,8 +371,16 @@ class Files(object):
         error = []
         element_name = ''
 	
-        hydrogen,carbon,nitrogen,oxygen,sulfur,phosphorus,other = self.charmm_names()	
-	
+        #hydrogen,carbon,nitrogen,oxygen,sulfur,phosphorus,other = self.charmm_names()	
+        charmm_names = self.charmm_names()
+        hydrogen = charmm_names['hydrogen']
+        carbon = charmm_names['carbon']
+        nitrogen = charmm_names['nitrogen']
+        oxygen = charmm_names['oxygen']
+        sulfur = charmm_names['sulfur']
+        phosphorus = charmm_names['phosphorus']
+        other = charmm_names['other']
+
         conflict_atoms = ['CD','CE','HE','HG','NE','ND','NB','PB','PA']
 	
         if(name in conflict_atoms and (name == resname)):
