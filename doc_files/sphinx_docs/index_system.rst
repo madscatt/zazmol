@@ -3,15 +3,15 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-Calculate 
-==========
+System
+======
 
-:mod:`Calculate`
----------------
+:mod:`System`
+-------------
 
-.. automodule:: calculate
+.. automodule:: system
     :members:
     :undoc-members:
-    :inherited-members:
-    :show-inheritance:
+
+
 

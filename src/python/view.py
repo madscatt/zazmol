@@ -2,6 +2,7 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 #from __future__ import unicode_literals
+#
 #   SASMOL: Copyright (C) 2011 Joseph E. Curtis, Ph.D. 
 #
 #    This program is free software: you can redistribute it and/or modify
@@ -21,6 +22,7 @@ from __future__ import print_function
 #
 #	11/27/2013	--	initial coding			:	jc
 #	12/29/2015	--	refactored for release  :   jc
+#	08/19/2016	--	added doc strings       :   jc
 #
 # LC	 1         2         3         4         5         6         7
 # LC4567890123456789012345678901234567890123456789012345678901234567890123456789
@@ -34,13 +36,7 @@ from __future__ import print_function
 	external to view / sasmol.  These methods merely allow 
 	coordinates to be passed between programs.
 
-	See the following sites for the IMD format:
-
-	http://www.ks.uiuc.edu/Research/vmd/
-	http://www.ks.uiuc.edu/Research/namd/
-
-	These classes are accessed by the SasAtm class found in
-	the sasmol module.
+	These classes are accessed by system objects
 
 '''
 
@@ -55,22 +51,78 @@ import sasmol.view_vmd
 
 class View(object):
 
-    def __init__(self, filename, flag):
-        pass
+    """ 
 
-    def check_error(self, error):
+        View is the main module that contains the base classes that 
+	    read and write atomic information from and to external viewers
+	    such as vmd and others in the future (PyMol, etc.).
+	
+	    To view the coordinates the viewer needs to be open and controlled
+	    external to view / sasmol.  These methods merely allow 
+	    coordinates to be passed between programs.
 
-        if(len(error) > 0):
-            print(error)
-            sys.exit()
+	    See the following sites for the IMD format:
+    
+	    http://www.ks.uiuc.edu/Research/vmd/
+	    http://www.ks.uiuc.edu/Research/namd/
+    
+	    This class is accessed by system objects
 
-        return
+        Examples
+        ========
 
-    def send_coordinates_to_vmd(self, port, flag):
-        '''
+        How to use send coordinates to VMD 
+
+        >>> import sasmol.system as system
+        >>> molecule = system.Molecule('hiv1_gag.pdb')
+        >>> flag = False
+        >>> molecule.send_coordinates_to_vmd(1085, flag)
+
+        Note
+        ----
+    
+        `self` parameter is not shown in the ``Parameters`` section in the documentation
+
+    """ 
+
+    def send_coordinates_to_vmd(self, port, flag, **kwargs):
+        """
         This method opens a socket to send and receive coordinates
         by calling a pre-compiled C module (view_vmd).
-        '''
+
+        
+        Parameters
+        ----------
+        port 
+            integer : port number to communicate 
+
+        flag
+            boolean : True to close existing connection
+
+        kwargs 
+            optional future arguments
+                                                                                     
+        Returns
+        -------
+        None
+
+        Examples
+        ========
+
+        How to use send coordinates to VMD 
+
+        >>> import sasmol.system as system
+        >>> molecule = system.Molecule('hiv1_gag.pdb')
+        >>> flag = False
+        >>> molecule.send_coordinates_to_vmd(1085, flag)
+
+        Note
+        ----
+        VMD needs to be open with your molecule already loaded for the
+        coordinates to be accepted via IMD.
+
+        """
+
         natoms = self._coor[0, :, 0].shape[0]
         frame = 0
         tx = self._coor[frame, :, 0].astype(numpy.float32)
@@ -78,7 +130,5 @@ class View(object):
         tz = self._coor[frame, :, 2].astype(numpy.float32)
 
         result = view_vmd.send_coordinates_to_vmd(tx, ty, tz, port, flag)
-
-        print('result = ', result)
 
         return
