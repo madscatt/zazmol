@@ -205,7 +205,7 @@ class Calculate(object):
 
     def calculate_root_mean_square_deviation(self, other, **kwargs):
         '''	
-        This method calculates the radius root mean square deviation
+        This method calculates the radius root mean square deviation (rmsd)
         of one set of coordinates compared to another
 
         self contains the coordinates of set 1

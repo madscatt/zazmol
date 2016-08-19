@@ -15,6 +15,7 @@ Contents:
    index_linear_algebra
    index_multiprocessing_sasmol  
    index_operate
+   index_topology
 
 
 Indices and tables

@@ -41,7 +41,19 @@ class Test_unit_properties_Atomic_charmm_names(MockerTestCase):
 
    def setUp(self):
       self.o=system.Molecule(0)
-      (self.hl, self.cl, self.nl, self.ol, self.sl, self.pl, self.otherl)=self.o.charmm_names()
+      charmm_names = self.o.charmm_names()
+        
+      hl = charmm_names['hydrogen']
+      cl = charmm_names['carbon']
+      nl = charmm_names['nitrogen']
+      ol = charmm_names['oxygen']
+      sl = charmm_names['sulfur']
+      pl = charmm_names['phosphorus']
+      otherl = charmm_names['other']
+
+      (self.hl, self.cl, self.nl, self.ol, self.sl, self.pl, self.otherl) = (hl, cl,nl, ol, sl, pl, otherl)
+
+      #(self.hl, self.cl, self.nl, self.ol, self.sl, self.pl, self.otherl)=self.o.charmm_names()
 
    def unique(self,seq):
       '''

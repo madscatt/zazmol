@@ -7,7 +7,7 @@ Linear Algebra Documentation
 ==================================
 
 :mod:`Linear Algebra`
-----------------
+---------------------
 
 .. automodule:: linear_algebra
     :members:
