@@ -7,7 +7,7 @@ Properties Documentation
 ==================================
 
 :mod:`Properties`
-----------------
+------------------
 
 .. automodule:: properties
     :members:
