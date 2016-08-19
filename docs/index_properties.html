@@ -1,0 +1,303 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Properties Documentation &mdash; sasmol 1.0 documentation</title>
+    
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '1.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="sasmol 1.0 documentation" href="index.html" />
+    <link rel="next" title="Topology Documentation" href="index_topology.html" />
+    <link rel="prev" title="Operate Documentation" href="index_operate.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="properties-documentation">
+<h1>Properties Documentation<a class="headerlink" href="#properties-documentation" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="properties">
+<h2><code class="xref py py-mod docutils literal"><span class="pre">Properties</span></code><a class="headerlink" href="#properties" title="Permalink to this headline">¶</a></h2>
+<span class="target" id="module-properties"></span><dl class="class">
+<dt id="properties.Atomic">
+<em class="property">class </em><code class="descclassname">properties.</code><code class="descname">Atomic</code><a class="reference internal" href="_modules/properties.html#Atomic"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#properties.Atomic" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/library/functions.html#object" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">object</span></code></a></p>
+<p>Class containing methods to define physical properties</p>
+<p>and atomic information used by other modules.</p>
+<p><a class="reference external" href="http://physics.nist.gov/cgi-bin/Compositions/stand_alone.pl?ele=&amp;ascii=html&amp;isotype=some">http://physics.nist.gov/cgi-bin/Compositions/stand_alone.pl?ele=&amp;ascii=html&amp;isotype=some</a></p>
+<p>standard atomic weight is based on the natural istopic composition</p>
+<p class="rubric">Examples</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">sasmol.properties</span> <span class="k">as</span> <span class="nn">properties</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">properties</span> <span class="o">=</span> <span class="n">properties</span><span class="o">.</span><span class="n">Atomic</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">properties</span><span class="o">.</span><span class="n">amu</span><span class="p">()[</span><span class="s1">&#39;FE&#39;</span><span class="p">]</span>
+<span class="go">55.8452</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last"><cite>self</cite> parameter is not shown in the <code class="docutils literal"><span class="pre">Parameters</span></code> section in the documentation</p>
+</div>
+<dl class="method">
+<dt id="properties.Atomic.amino_acid_sld">
+<code class="descname">amino_acid_sld</code><span class="sig-paren">(</span><em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/properties.html#Atomic.amino_acid_sld"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#properties.Atomic.amino_acid_sld" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>kwargs</strong> &#8211; optional future arguments</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">dictionary : residue name, and sld information
+residue name : [vol Ang^3, eSL, SLprot Ang, SLdeut Ang, #exchngH]</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">residue_scattering</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Examples</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">sasmol.properties</span> <span class="k">as</span> <span class="nn">properties</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">properties</span> <span class="o">=</span> <span class="n">properties</span><span class="o">.</span><span class="n">Atomic</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">properties</span><span class="o">.</span><span class="n">amino_acid_sld</span><span class="p">()[</span><span class="s1">&#39;PRO&#39;</span><span class="p">]</span>
+<span class="go">[112.7, 52, 22.2207, 95.104, 0]</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Need to validate units here used in neutron reflectivity versus
+small-angle scattering</p>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="properties.Atomic.amu">
+<code class="descname">amu</code><span class="sig-paren">(</span><em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/properties.html#Atomic.amu"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#properties.Atomic.amu" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>kwargs</strong> &#8211; optional future arguments</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">dictionary : containing standard atomic weights</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">standard_atomic_weights</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Examples</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">sasmol.properties</span> <span class="k">as</span> <span class="nn">properties</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">properties</span> <span class="o">=</span> <span class="n">properties</span><span class="o">.</span><span class="n">Atomic</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">properties</span><span class="o">.</span><span class="n">amu</span><span class="p">()[</span><span class="s1">&#39;FE&#39;</span><span class="p">]</span>
+<span class="go">55.8452</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="properties.Atomic.charmm_names">
+<code class="descname">charmm_names</code><span class="sig-paren">(</span><em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/properties.html#Atomic.charmm_names"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#properties.Atomic.charmm_names" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>kwargs</strong> &#8211; optional future arguments</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">dictionary : atom_name and list of atom names for
+hydrogen, carbon, nitrogen, oxygen, sulfur, phosphorus, other</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference internal" href="#properties.Atomic.charmm_names" title="properties.Atomic.charmm_names">charmm_names</a></td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Examples</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">sasmol.properties</span> <span class="k">as</span> <span class="nn">properties</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">properties</span> <span class="o">=</span> <span class="n">properties</span><span class="o">.</span><span class="n">Atomic</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">properties</span><span class="o">.</span><span class="n">charmm_names</span><span class="p">()[</span><span class="s1">&#39;sulfur&#39;</span><span class="p">]</span>
+<span class="go">[&#39;SG&#39;, &#39;SD&#39;, &#39;1SG&#39;, &#39;2SG&#39;]</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="properties.Atomic.create_fasta">
+<code class="descname">create_fasta</code><span class="sig-paren">(</span><em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/properties.html#Atomic.create_fasta"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#properties.Atomic.create_fasta" title="Permalink to this definition">¶</a></dt>
+<dd><p>Method to make a fasta file compatible lists of residue names</p>
+<p><a class="reference external" href="http://en.wikipedia.org/wiki/FASTA_format">http://en.wikipedia.org/wiki/FASTA_format</a></p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>kwargs</strong> &#8211; optional future arguments</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">sets the fasta attribute in a system object</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">self._fasta</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Examples</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">sasmol.system</span> <span class="k">as</span> <span class="nn">system</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">molecule</span> <span class="o">=</span> <span class="n">system</span><span class="o">.</span><span class="n">Molecule</span><span class="p">(</span><span class="s2">&quot;hiv1_gag.pdb&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">molecule</span><span class="o">.</span><span class="n">create_fasta</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">molecule</span><span class="o">.</span><span class="n">fasta</span><span class="p">()[:</span><span class="mi">5</span><span class="p">]</span>
+<span class="go">[&#39;G&#39;, &#39;A&#39;, &#39;R&#39;, &#39;A&#39;, &#39;S&#39;]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">m</span><span class="o">.</span><span class="n">create_fasta</span><span class="p">(</span><span class="n">fasta_format</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span> <span class="n">molecule</span><span class="o">.</span><span class="n">fasta</span><span class="p">()[:</span><span class="mi">5</span><span class="p">]</span>
+<span class="go">&gt;</span>
+<span class="go">GAR</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">m</span><span class="o">.</span><span class="n">create_fasta</span><span class="p">(</span><span class="n">fasta_format</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span><span class="n">width</span><span class="o">=</span><span class="s1">&#39;60&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span> <span class="n">molecule</span><span class="o">.</span><span class="n">fasta</span><span class="p">()</span>
+<span class="go">&gt;</span>
+<span class="go">GARASVLSGGELDKWEKIRLRPGGKKQYKLKHIVWASRELERFAVNPGLLETSEGCRQIL</span>
+<span class="go">GQLQPSLQTGSEELRSLYNTIAVLYCVHQRIDVKDTKEALDKIEEEQNKSKKKAQQAAAD</span>
+<span class="go">TGNNSQVSQNYPIVQNLQGQMVHQAISPRTLNAWVKVVEEKAFSPEVIPMFSALSEGATP</span>
+<span class="go">QDLNTMLNTVGGHQAAMQMLKETINEEAAEWDRVHPVHAGPIAPGQMREPRGSDIAGTTS</span>
+<span class="go">TLQEQIGWMTNNPPIPVGEIYKRWIILGLNKIVRMYSPTSILDIRQGPKEPFRDYVDRFY</span>
+<span class="go">KTLRAEQASQEVKNAATETLLVQNANPDCKTILKALGPAATLEEMMTACQGVGGPGHKAR</span>
+<span class="go">VIAEAMSQVTNSATIMMQKGNFRNQRKTVKCFNCGKEGHIAKNCRAPRKKGCWKCGKEGH</span>
+<span class="go">QMKDCTERQAN</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">molecule</span><span class="o">.</span><span class="n">create_fasta</span><span class="p">(</span><span class="n">fasta_format</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span><span class="n">width</span><span class="o">=</span><span class="s1">&#39;60&#39;</span><span class="p">,</span><span class="n">name</span><span class="o">=</span><span class="s1">&#39;aar&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span> <span class="n">molecule</span><span class="o">.</span><span class="n">fasta</span><span class="p">()[:</span><span class="mi">90</span><span class="p">]</span>
+<span class="go">&gt;aar</span>
+<span class="go">GARASVLSGGELDKWEKIRLRPGGKKQYKLKHIVWASRELERFAVNPGLLETSEGCRQIL</span>
+<span class="go">GQLQPSLQTGSEELRSLYNTIAVL</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p>Other use types below</p>
+<p>molecule.create_fasta(fasta_format=True,exclude_hetatm=True,by_chain=True)
+print molecule.fasta()</p>
+<p>print &#8216;&gt;&gt;&gt; testing by_chain with HETATM (t.py): &#8216;</p>
+<p>molecule.create_fasta(fasta_format=True,by_chain=True)
+print molecule.fasta()</p>
+<p>print &#8216;&gt;&gt;&gt; testing by_segname (t.py): &#8216;</p>
+<p>molecule.create_fasta(fasta_format=True,exclude_hetatm=True,by_segname=True)
+print molecule.fasta()</p>
+<p class="last">Note that this creates a simple string that is associated with the molecule (self)
+and it will return without assigning a string if a non-standard three letter code
+is supplied.</p>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="properties.Atomic.set_average_vdw">
+<code class="descname">set_average_vdw</code><span class="sig-paren">(</span><em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/properties.html#Atomic.set_average_vdw"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#properties.Atomic.set_average_vdw" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>kwargs</strong> &#8211; optional future arguments</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"></td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">self._atom_vdw updated in system object</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Examples</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">sasmol.system</span> <span class="k">as</span> <span class="nn">system</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">molecule</span> <span class="o">=</span> <span class="n">system</span><span class="o">.</span><span class="n">Molecule</span><span class="p">(</span><span class="s1">&#39;hiv1_gag.pdb&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">molecule</span><span class="o">.</span><span class="n">set_average_vdw</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">molecule</span><span class="o">.</span><span class="n">atom_vdw</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
+<span class="go">[-0.2, 1.85]</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Need to add citations.</p>
+</div>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Properties Documentation</a><ul>
+<li><a class="reference internal" href="#properties"><code class="docutils literal"><span class="pre">Properties</span></code></a></li>
+</ul>
+</li>
+</ul>
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+      <li>Previous: <a href="index_operate.html" title="previous chapter">Operate Documentation</a></li>
+      <li>Next: <a href="index_topology.html" title="next chapter">Topology Documentation</a></li>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/index_properties.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2016, Joseph E. Curtis, Ph.D..
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.4.1</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.8</a>
+      
+      |
+      <a href="_sources/index_properties.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>
