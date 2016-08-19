@@ -1,0 +1,970 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>system &mdash; sasmol 1.0 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '1.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="sasmol 1.0 documentation" href="../index.html" />
+    <link rel="up" title="Module code" href="index.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for system</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">absolute_import</span>
+<span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">division</span>
+<span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">print_function</span>
+<span class="c1">#from __future__ import unicode_literals</span>
+<span class="c1">#</span>
+<span class="c1">#    SASMOL: Copyright (C) 2011 Joseph E. Curtis, Ph.D. </span>
+<span class="c1">#</span>
+<span class="c1">#    This program is free software: you can redistribute it and/or modify</span>
+<span class="c1">#    it under the terms of the GNU General Public License as published by</span>
+<span class="c1">#    the Free Software Foundation, either version 3 of the License, or</span>
+<span class="c1">#    (at your option) any later version.</span>
+<span class="c1">#</span>
+<span class="c1">#    This program is distributed in the hope that it will be useful,</span>
+<span class="c1">#    but WITHOUT ANY WARRANTY; without even the implied warranty of</span>
+<span class="c1">#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the</span>
+<span class="c1">#    GNU General Public License for more details.</span>
+<span class="c1">#</span>
+<span class="c1">#    You should have received a copy of the GNU General Public License</span>
+<span class="c1">#    along with this program.  If not, see &lt;http://www.gnu.org/licenses/&gt;.</span>
+<span class="c1">#</span>
+<span class="c1">#   SYSTEM</span>
+<span class="c1">#</span>
+<span class="c1">#	12/4/2009	--	initial coding			:	jc</span>
+<span class="c1">#	12/10/2009	--	doc strings 			:	jc</span>
+<span class="c1">#	01/11/2010	--	new design pattern		:	jc</span>
+<span class="c1">#	12/25/2015	--	refactored for release  :   jc</span>
+<span class="c1">#	07/23/2016	--	refactored for Python 3 :   jc</span>
+<span class="c1">#	08/19/2016	--	added doc strings       :   jc</span>
+<span class="c1">#</span>
+<span class="c1">#	 1         2         3         4         5         6         7</span>
+<span class="c1"># LC4567890123456789012345678901234567890123456789012345678901234567890123456789</span>
+<span class="c1">#								       *      **</span>
+<span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">	System is the main module that contains the base classes that </span>
+<span class="sd">	describe the objects in the system.  An instance of the system </span>
+<span class="sd">	can be created of Atom, Molecule, or System classes.</span>
+<span class="sd">	</span>
+<span class="sd">	For purely atomic based systems, a set of utilities are provided</span>
+<span class="sd">	to hold information, to calculate properties, and to manipulate</span>
+<span class="sd">	the structures in space.  In addition, basic file input / output</span>
+<span class="sd">	is provided in the Mol class (and inherited up the classes</span>
+<span class="sd">	as dictated by the calling code).</span>
+
+<span class="sd">&#39;&#39;&#39;</span>
+
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">numpy</span>
+<span class="kn">import</span> <span class="nn">sasmol.file_io</span> <span class="kn">as</span> <span class="nn">file_io</span>
+<span class="kn">import</span> <span class="nn">sasmol.calculate</span> <span class="kn">as</span> <span class="nn">calculate</span>
+<span class="kn">import</span> <span class="nn">sasmol.operate</span> <span class="kn">as</span> <span class="nn">operate</span>
+<span class="kn">import</span> <span class="nn">sasmol.subset</span> <span class="kn">as</span> <span class="nn">subset</span>
+<span class="kn">import</span> <span class="nn">sasmol.properties</span> <span class="kn">as</span> <span class="nn">properties</span>
+<span class="kn">import</span> <span class="nn">sasmol.topology</span> <span class="kn">as</span> <span class="nn">topology</span>
+<span class="kn">import</span> <span class="nn">sasmol.view</span> <span class="kn">as</span> <span class="nn">view</span>
+
+<span class="kn">import</span> <span class="nn">sasmol.config</span> <span class="kn">as</span> <span class="nn">config</span>
+
+<div class="viewcode-block" id="Atom"><a class="viewcode-back" href="../index_system.html#system.Atom">[docs]</a><span class="k">class</span> <span class="nc">Atom</span><span class="p">(</span><span class="n">file_io</span><span class="o">.</span><span class="n">Files</span><span class="p">,</span> <span class="n">calculate</span><span class="o">.</span><span class="n">Calculate</span><span class="p">,</span> <span class="n">operate</span><span class="o">.</span><span class="n">Move</span><span class="p">,</span> <span class="n">subset</span><span class="o">.</span><span class="n">Mask</span><span class="p">,</span> <span class="n">properties</span><span class="o">.</span><span class="n">Atomic</span><span class="p">,</span> <span class="n">topology</span><span class="o">.</span><span class="n">CharmmTopology</span><span class="p">,</span> <span class="n">view</span><span class="o">.</span><span class="n">View</span><span class="p">):</span>
+
+    <span class="sd">&quot;&quot;&quot; Base class containing methods to define system objects.</span>
+
+<span class="sd">        Atom is the base class to build and deal with molecular systems.</span>
+<span class="sd">        The class inherits file input/output, calcuation, manipulation, subset,</span>
+<span class="sd">        atom properties, topology, and viewing from other samsol classes.</span>
+<span class="sd">        </span>
+<span class="sd">        Class has several initialization options</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        args </span>
+<span class="sd">            optional integer : self._id</span>
+
+<span class="sd">        kwargs </span>
+<span class="sd">            optional keyword arguments</span>
+<span class="sd">            {</span>
+<span class="sd">                string filename (filename = &#39;hiv1_gag.pdb&#39;) : default = None</span>
+<span class="sd">                integet id (id=3) : default = 0</span>
+<span class="sd">                boolean debug (debug = True) : default = None</span>
+<span class="sd">                </span>
+<span class="sd">            }</span>
+<span class="sd">                                                                                       </span>
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        system object</span>
+<span class="sd">            if called with string (or with filename kwarg) returns</span>
+<span class="sd">            an initialized system object with data read in using</span>
+<span class="sd">            file_io.read_pdb()</span>
+
+<span class="sd">        Examples</span>
+<span class="sd">        -------</span>
+
+<span class="sd">        Define instance of class and read in PDB file at same time</span>
+
+<span class="sd">        &gt;&gt;&gt; import sasmol.system as system</span>
+<span class="sd">        &gt;&gt;&gt; molecule = system.Molecule(filename=&#39;hiv1_gag.pdb&#39;)</span>
+<span class="sd">     </span>
+<span class="sd">        Other instance definition examples (not-exhaustive) </span>
+<span class="sd">        </span>
+<span class="sd">        &gt;&gt;&gt; molecule = system.Molecule()</span>
+<span class="sd">        &gt;&gt;&gt; molecule = system.Molecule(id=7)</span>
+<span class="sd">        &gt;&gt;&gt; molecule = system.Molecule(debug=True)</span>
+<span class="sd">        &gt;&gt;&gt; molecule = system.Molecule(&#39;hiv1_gag.pdb&#39;)</span>
+<span class="sd">        &gt;&gt;&gt; molecule = system.Molecule(filename=&#39;hiv1_gag.pdb&#39;, id=0, debug=False)</span>
+<span class="sd">  </span>
+<span class="sd">        Example of how setters and getters work.  Below, the original index</span>
+<span class="sd">        values are adjusted by a value (-10) and setIndex() is used to assign</span>
+<span class="sd">        the new list to the molecule </span>
+<span class="sd">   </span>
+<span class="sd">        &gt;&gt;&gt; molecule.index()[0] </span>
+<span class="sd">        1 </span>
+<span class="sd">        &gt;&gt;&gt; offset = -10 </span>
+<span class="sd">        &gt;&gt;&gt; index = [x + offset for x in xrange(molecule.natoms())]  </span>
+<span class="sd">        &gt;&gt;&gt; molecule.setIndex(index) </span>
+<span class="sd">        &gt;&gt;&gt; molecule.index()[0] </span>
+<span class="sd">        -10</span>
+<span class="sd">        </span>
+<span class="sd">        Note</span>
+<span class="sd">        ----</span>
+<span class="sd">    </span>
+<span class="sd">        `self` parameter is not shown in the ``Parameters`` section in the documentation</span>
+
+<span class="sd">    </span>
+<span class="sd">        Many &quot;setters&quot; and &quot;getters&quot; methods are defined in this class.  See source</span>
+<span class="sd">        code for details.  </span>
+<span class="sd">        </span>
+<span class="sd">    &quot;&quot;&quot;</span> 
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_filename</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;filename&#39;</span><span class="p">,</span> <span class="bp">None</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_id</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;id&#39;</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_debug</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;debug&#39;</span><span class="p">,</span> <span class="bp">None</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_total_mass</span> <span class="o">=</span> <span class="mf">0.0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_natoms</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_mass</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_coor</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_com</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_conect</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="k">if</span> <span class="n">config</span><span class="o">.</span><span class="n">__logging_level__</span> <span class="o">==</span> <span class="s1">&#39;DEBUG&#39;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_debug</span> <span class="o">=</span> <span class="bp">True</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_defined_with_input_file</span> <span class="o">=</span> <span class="bp">False</span>
+        <span class="n">argument_flag</span> <span class="o">=</span> <span class="bp">True</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">argument</span> <span class="ow">in</span> <span class="n">args</span><span class="p">:</span>
+                <span class="k">if</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">argument</span><span class="p">))):</span>
+                    <span class="k">try</span><span class="p">:</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">read_pdb</span><span class="p">(</span><span class="n">argument</span><span class="p">)</span>
+                        <span class="n">argument_flag</span> <span class="o">=</span> <span class="bp">False</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">_defined_with_input_file</span> <span class="o">=</span> <span class="bp">True</span>
+                    <span class="k">except</span><span class="p">:</span>
+                        <span class="k">pass</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_id</span> <span class="o">=</span> <span class="n">argument</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="n">argument_flag</span> <span class="o">=</span> <span class="bp">False</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_filename</span> <span class="ow">and</span> <span class="n">argument_flag</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">read_pdb</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_filename</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_defined_with_input_file</span> <span class="o">=</span> <span class="bp">True</span>
+            <span class="k">except</span><span class="p">:</span>
+                <span class="k">pass</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">setId</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_id</span><span class="p">)</span> 
+
+                                                    
+    <span class="k">def</span> <span class="nf">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_filename</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">_defined_with_input_file</span><span class="p">:</span>
+            <span class="k">return</span> <span class="s2">&quot;sasmol object initialied with filename = &quot;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">_filename</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="s2">&quot;sasmol object&quot;</span>
+
+<div class="viewcode-block" id="Atom.setId"><a class="viewcode-back" href="../index_system.html#system.Atom.setId">[docs]</a>    <span class="k">def</span> <span class="nf">setId</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">newValue</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_id</span> <span class="o">=</span> <span class="n">newValue</span></div>
+
+<div class="viewcode-block" id="Atom.id"><a class="viewcode-back" href="../index_system.html#system.Atom.id">[docs]</a>    <span class="k">def</span> <span class="nf">id</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_id</span></div>
+
+<div class="viewcode-block" id="Atom.maketop"><a class="viewcode-back" href="../index_system.html#system.Atom.maketop">[docs]</a>    <span class="k">def</span> <span class="nf">maketop</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">pass</span></div>
+
+<div class="viewcode-block" id="Atom.setFilename"><a class="viewcode-back" href="../index_system.html#system.Atom.setFilename">[docs]</a>    <span class="k">def</span> <span class="nf">setFilename</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">newValue</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_filename</span> <span class="o">=</span> <span class="n">newValue</span></div>
+
+<div class="viewcode-block" id="Atom.filename"><a class="viewcode-back" href="../index_system.html#system.Atom.filename">[docs]</a>    <span class="k">def</span> <span class="nf">filename</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_filename</span></div>
+
+<div class="viewcode-block" id="Atom.setType"><a class="viewcode-back" href="../index_system.html#system.Atom.setType">[docs]</a>    <span class="k">def</span> <span class="nf">setType</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">newValue</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_type</span> <span class="o">=</span> <span class="n">newValue</span></div>
+
+<div class="viewcode-block" id="Atom.type"><a class="viewcode-back" href="../index_system.html#system.Atom.type">[docs]</a>    <span class="k">def</span> <span class="nf">type</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_type</span></div>
+
+<div class="viewcode-block" id="Atom.setCharmm_type"><a class="viewcode-back" href="../index_system.html#system.Atom.setCharmm_type">[docs]</a>    <span class="k">def</span> <span class="nf">setCharmm_type</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">newValue</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_charmm_type</span> <span class="o">=</span> <span class="n">newValue</span></div>
+
+<div class="viewcode-block" id="Atom.charmm_type"><a class="viewcode-back" href="../index_system.html#system.Atom.charmm_type">[docs]</a>    <span class="k">def</span> <span class="nf">charmm_type</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_charmm_type</span></div>
+
+        <span class="c1"># file stuff</span>
+
+<div class="viewcode-block" id="Atom.load"><a class="viewcode-back" href="../index_system.html#system.Atom.load">[docs]</a>    <span class="k">def</span> <span class="nf">load</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">pass</span></div>
+
+<div class="viewcode-block" id="Atom.delete"><a class="viewcode-back" href="../index_system.html#system.Atom.delete">[docs]</a>    <span class="k">def</span> <span class="nf">delete</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">pass</span></div>
+
+<div class="viewcode-block" id="Atom.save"><a class="viewcode-back" href="../index_system.html#system.Atom.save">[docs]</a>    <span class="k">def</span> <span class="nf">save</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">pass</span></div>
+
+<div class="viewcode-block" id="Atom.delframes"><a class="viewcode-back" href="../index_system.html#system.Atom.delframes">[docs]</a>    <span class="k">def</span> <span class="nf">delframes</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">pass</span></div>
+
+        <span class="c1"># properties</span>
+
+<div class="viewcode-block" id="Atom.number_of_frames"><a class="viewcode-back" href="../index_system.html#system.Atom.number_of_frames">[docs]</a>    <span class="k">def</span> <span class="nf">number_of_frames</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_coor</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span></div>
+
+<div class="viewcode-block" id="Atom.setNumber_of_frames"><a class="viewcode-back" href="../index_system.html#system.Atom.setNumber_of_frames">[docs]</a>    <span class="k">def</span> <span class="nf">setNumber_of_frames</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">newValue</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_number_of_frames</span> <span class="o">=</span> <span class="n">newValue</span></div>
+
+<div class="viewcode-block" id="Atom.atom"><a class="viewcode-back" href="../index_system.html#system.Atom.atom">[docs]</a>    <span class="k">def</span> <span class="nf">atom</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_atom</span></div>
+
+<div class="viewcode-block" id="Atom.setAtom"><a class="viewcode-back" href="../index_system.html#system.Atom.setAtom">[docs]</a>    <span class="k">def</span> <span class="nf">setAtom</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">newValue</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_atom</span> <span class="o">=</span> <span class="n">newValue</span></div>
+
+<div class="viewcode-block" id="Atom.index"><a class="viewcode-back" href="../index_system.html#system.Atom.index">[docs]</a>    <span class="k">def</span> <span class="nf">index</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_index</span></div>
+
+<div class="viewcode-block" id="Atom.setIndex"><a class="viewcode-back" href="../index_system.html#system.Atom.setIndex">[docs]</a>    <span class="k">def</span> <span class="nf">setIndex</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">newValue</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_index</span> <span class="o">=</span> <span class="n">newValue</span></div>
+
+<div class="viewcode-block" id="Atom.header"><a class="viewcode-back" href="../index_system.html#system.Atom.header">[docs]</a>    <span class="k">def</span> <span class="nf">header</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_header</span></div>
+
+<div class="viewcode-block" id="Atom.setHeader"><a class="viewcode-back" href="../index_system.html#system.Atom.setHeader">[docs]</a>    <span class="k">def</span> <span class="nf">setHeader</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">newValue</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_header</span> <span class="o">=</span> <span class="n">newValue</span></div>
+
+<div class="viewcode-block" id="Atom.original_index"><a class="viewcode-back" href="../index_system.html#system.Atom.original_index">[docs]</a>    <span class="k">def</span> <span class="nf">original_index</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_original_index</span></div>
+
+<div class="viewcode-block" id="Atom.setOriginal_index"><a class="viewcode-back" href="../index_system.html#system.Atom.setOriginal_index">[docs]</a>    <span class="k">def</span> <span class="nf">setOriginal_index</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">newValue</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_original_index</span> <span class="o">=</span> <span class="n">newValue</span></div>
+
+<div class="viewcode-block" id="Atom.original_resid"><a class="viewcode-back" href="../index_system.html#system.Atom.original_resid">[docs]</a>    <span class="k">def</span> <span class="nf">original_resid</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_original_resid</span></div>
+
+<div class="viewcode-block" id="Atom.setOriginal_resid"><a class="viewcode-back" href="../index_system.html#system.Atom.setOriginal_resid">[docs]</a>    <span class="k">def</span> <span class="nf">setOriginal_resid</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">newValue</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_original_resid</span> <span class="o">=</span> <span class="n">newValue</span></div>
+
+<div class="viewcode-block" id="Atom.conect"><a class="viewcode-back" href="../index_system.html#system.Atom.conect">[docs]</a>    <span class="k">def</span> <span class="nf">conect</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_conect</span></div>
+
+<div class="viewcode-block" id="Atom.setConect"><a class="viewcode-back" href="../index_system.html#system.Atom.setConect">[docs]</a>    <span class="k">def</span> <span class="nf">setConect</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">newValue</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_conect</span> <span class="o">=</span> <span class="n">newValue</span></div>
+
+<div class="viewcode-block" id="Atom.residue_flag"><a class="viewcode-back" href="../index_system.html#system.Atom.residue_flag">[docs]</a>    <span class="k">def</span> <span class="nf">residue_flag</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_residue_flag</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_residue_flag</span> <span class="o">=</span> <span class="bp">False</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_residue_flag</span></div>
+
+<div class="viewcode-block" id="Atom.setResidue_flag"><a class="viewcode-back" href="../index_system.html#system.Atom.setResidue_flag">[docs]</a>    <span class="k">def</span> <span class="nf">setResidue_flag</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">newValue</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_residue_flag</span> <span class="o">=</span> <span class="n">newValue</span></div>
+
+<div class="viewcode-block" id="Atom.name"><a class="viewcode-back" href="../index_system.html#system.Atom.name">[docs]</a>    <span class="k">def</span> <span class="nf">name</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_name</span></div>
+
+<div class="viewcode-block" id="Atom.setName"><a class="viewcode-back" href="../index_system.html#system.Atom.setName">[docs]</a>    <span class="k">def</span> <span class="nf">setName</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">newValue</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_name</span> <span class="o">=</span> <span class="n">newValue</span></div>
+
+<div class="viewcode-block" id="Atom.loc"><a class="viewcode-back" href="../index_system.html#system.Atom.loc">[docs]</a>    <span class="k">def</span> <span class="nf">loc</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_loc</span></div>
+
+<div class="viewcode-block" id="Atom.setLoc"><a class="viewcode-back" href="../index_system.html#system.Atom.setLoc">[docs]</a>    <span class="k">def</span> <span class="nf">setLoc</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">newValue</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_loc</span> <span class="o">=</span> <span class="n">newValue</span></div>
+
+<div class="viewcode-block" id="Atom.resname"><a class="viewcode-back" href="../index_system.html#system.Atom.resname">[docs]</a>    <span class="k">def</span> <span class="nf">resname</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_resname</span></div>
+
+<div class="viewcode-block" id="Atom.setResname"><a class="viewcode-back" href="../index_system.html#system.Atom.setResname">[docs]</a>    <span class="k">def</span> <span class="nf">setResname</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">newValue</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_resname</span> <span class="o">=</span> <span class="n">newValue</span></div>
+
+<div class="viewcode-block" id="Atom.chain"><a class="viewcode-back" href="../index_system.html#system.Atom.chain">[docs]</a>    <span class="k">def</span> <span class="nf">chain</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_chain</span></div>
+
+<div class="viewcode-block" id="Atom.setChain"><a class="viewcode-back" href="../index_system.html#system.Atom.setChain">[docs]</a>    <span class="k">def</span> <span class="nf">setChain</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">newValue</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_chain</span> <span class="o">=</span> <span class="n">newValue</span></div>
+
+<div class="viewcode-block" id="Atom.resid"><a class="viewcode-back" href="../index_system.html#system.Atom.resid">[docs]</a>    <span class="k">def</span> <span class="nf">resid</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_resid</span></div>
+
+<div class="viewcode-block" id="Atom.setResid"><a class="viewcode-back" href="../index_system.html#system.Atom.setResid">[docs]</a>    <span class="k">def</span> <span class="nf">setResid</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">newValue</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_resid</span> <span class="o">=</span> <span class="n">newValue</span></div>
+
+<div class="viewcode-block" id="Atom.coor"><a class="viewcode-back" href="../index_system.html#system.Atom.coor">[docs]</a>    <span class="k">def</span> <span class="nf">coor</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_coor</span></div>
+
+<div class="viewcode-block" id="Atom.setCoor"><a class="viewcode-back" href="../index_system.html#system.Atom.setCoor">[docs]</a>    <span class="k">def</span> <span class="nf">setCoor</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">newValue</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_coor</span> <span class="o">=</span> <span class="n">newValue</span></div>
+
+<div class="viewcode-block" id="Atom.rescode"><a class="viewcode-back" href="../index_system.html#system.Atom.rescode">[docs]</a>    <span class="k">def</span> <span class="nf">rescode</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_rescode</span></div>
+
+<div class="viewcode-block" id="Atom.setRescode"><a class="viewcode-back" href="../index_system.html#system.Atom.setRescode">[docs]</a>    <span class="k">def</span> <span class="nf">setRescode</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">newValue</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_rescode</span> <span class="o">=</span> <span class="n">newValue</span></div>
+
+<div class="viewcode-block" id="Atom.occupancy"><a class="viewcode-back" href="../index_system.html#system.Atom.occupancy">[docs]</a>    <span class="k">def</span> <span class="nf">occupancy</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_occupancy</span></div>
+
+<div class="viewcode-block" id="Atom.setOccupancy"><a class="viewcode-back" href="../index_system.html#system.Atom.setOccupancy">[docs]</a>    <span class="k">def</span> <span class="nf">setOccupancy</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">newValue</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_occupancy</span> <span class="o">=</span> <span class="n">newValue</span></div>
+
+<div class="viewcode-block" id="Atom.beta"><a class="viewcode-back" href="../index_system.html#system.Atom.beta">[docs]</a>    <span class="k">def</span> <span class="nf">beta</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_beta</span></div>
+
+<div class="viewcode-block" id="Atom.setBeta"><a class="viewcode-back" href="../index_system.html#system.Atom.setBeta">[docs]</a>    <span class="k">def</span> <span class="nf">setBeta</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">newValue</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_beta</span> <span class="o">=</span> <span class="n">newValue</span></div>
+
+<div class="viewcode-block" id="Atom.segname"><a class="viewcode-back" href="../index_system.html#system.Atom.segname">[docs]</a>    <span class="k">def</span> <span class="nf">segname</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_segname</span></div>
+
+<div class="viewcode-block" id="Atom.setSegname"><a class="viewcode-back" href="../index_system.html#system.Atom.setSegname">[docs]</a>    <span class="k">def</span> <span class="nf">setSegname</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">newValue</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_segname</span> <span class="o">=</span> <span class="n">newValue</span></div>
+
+<div class="viewcode-block" id="Atom.element"><a class="viewcode-back" href="../index_system.html#system.Atom.element">[docs]</a>    <span class="k">def</span> <span class="nf">element</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_element</span></div>
+
+<div class="viewcode-block" id="Atom.setElement"><a class="viewcode-back" href="../index_system.html#system.Atom.setElement">[docs]</a>    <span class="k">def</span> <span class="nf">setElement</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">newValue</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_element</span> <span class="o">=</span> <span class="n">newValue</span></div>
+
+<div class="viewcode-block" id="Atom.charge"><a class="viewcode-back" href="../index_system.html#system.Atom.charge">[docs]</a>    <span class="k">def</span> <span class="nf">charge</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_charge</span></div>
+
+<div class="viewcode-block" id="Atom.setCharge"><a class="viewcode-back" href="../index_system.html#system.Atom.setCharge">[docs]</a>    <span class="k">def</span> <span class="nf">setCharge</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">newValue</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_charge</span> <span class="o">=</span> <span class="n">newValue</span></div>
+
+<div class="viewcode-block" id="Atom.atom_charge"><a class="viewcode-back" href="../index_system.html#system.Atom.atom_charge">[docs]</a>    <span class="k">def</span> <span class="nf">atom_charge</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_atom_charge</span></div>
+
+<div class="viewcode-block" id="Atom.setAtom_charge"><a class="viewcode-back" href="../index_system.html#system.Atom.setAtom_charge">[docs]</a>    <span class="k">def</span> <span class="nf">setAtom_charge</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">newValue</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_atom_charge</span> <span class="o">=</span> <span class="n">newValue</span></div>
+
+<div class="viewcode-block" id="Atom.atom_vdw"><a class="viewcode-back" href="../index_system.html#system.Atom.atom_vdw">[docs]</a>    <span class="k">def</span> <span class="nf">atom_vdw</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_atom_vdw</span></div>
+
+<div class="viewcode-block" id="Atom.setAtom_vdw"><a class="viewcode-back" href="../index_system.html#system.Atom.setAtom_vdw">[docs]</a>    <span class="k">def</span> <span class="nf">setAtom_vdw</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">newValue</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_atom_vdw</span> <span class="o">=</span> <span class="n">newValue</span></div>
+
+<div class="viewcode-block" id="Atom.residue_charge"><a class="viewcode-back" href="../index_system.html#system.Atom.residue_charge">[docs]</a>    <span class="k">def</span> <span class="nf">residue_charge</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_residue_charge</span></div>
+
+<div class="viewcode-block" id="Atom.setResidue_charge"><a class="viewcode-back" href="../index_system.html#system.Atom.setResidue_charge">[docs]</a>    <span class="k">def</span> <span class="nf">setResidue_charge</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">newValue</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_residue_charge</span> <span class="o">=</span> <span class="n">newValue</span></div>
+
+<div class="viewcode-block" id="Atom.energy"><a class="viewcode-back" href="../index_system.html#system.Atom.energy">[docs]</a>    <span class="k">def</span> <span class="nf">energy</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_energy</span></div>
+
+<div class="viewcode-block" id="Atom.setEnergy"><a class="viewcode-back" href="../index_system.html#system.Atom.setEnergy">[docs]</a>    <span class="k">def</span> <span class="nf">setEnergy</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">newValue</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_energy</span> <span class="o">=</span> <span class="n">newValue</span></div>
+
+<div class="viewcode-block" id="Atom.formula"><a class="viewcode-back" href="../index_system.html#system.Atom.formula">[docs]</a>    <span class="k">def</span> <span class="nf">formula</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_formula</span></div>
+
+<div class="viewcode-block" id="Atom.setFormula"><a class="viewcode-back" href="../index_system.html#system.Atom.setFormula">[docs]</a>    <span class="k">def</span> <span class="nf">setFormula</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">newValue</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_formula</span> <span class="o">=</span> <span class="n">newValue</span></div>
+
+<div class="viewcode-block" id="Atom.mass"><a class="viewcode-back" href="../index_system.html#system.Atom.mass">[docs]</a>    <span class="k">def</span> <span class="nf">mass</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_mass</span></div>
+
+<div class="viewcode-block" id="Atom.setMass"><a class="viewcode-back" href="../index_system.html#system.Atom.setMass">[docs]</a>    <span class="k">def</span> <span class="nf">setMass</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">newValue</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_mass</span> <span class="o">=</span> <span class="n">newValue</span></div>
+
+<div class="viewcode-block" id="Atom.total_mass"><a class="viewcode-back" href="../index_system.html#system.Atom.total_mass">[docs]</a>    <span class="k">def</span> <span class="nf">total_mass</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_total_mass</span> <span class="o">==</span> <span class="bp">None</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_total_mass</span> <span class="o">=</span> <span class="n">calculate</span><span class="o">.</span><span class="n">Calculate</span><span class="o">.</span><span class="n">calcmass</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_total_mass</span></div>
+
+<div class="viewcode-block" id="Atom.setTotal_mass"><a class="viewcode-back" href="../index_system.html#system.Atom.setTotal_mass">[docs]</a>    <span class="k">def</span> <span class="nf">setTotal_mass</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">newValue</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_total_mass</span> <span class="o">=</span> <span class="n">newValue</span></div>
+
+<div class="viewcode-block" id="Atom.unitcell"><a class="viewcode-back" href="../index_system.html#system.Atom.unitcell">[docs]</a>    <span class="k">def</span> <span class="nf">unitcell</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_unitcell</span></div>
+
+<div class="viewcode-block" id="Atom.setUnitcell"><a class="viewcode-back" href="../index_system.html#system.Atom.setUnitcell">[docs]</a>    <span class="k">def</span> <span class="nf">setUnitcell</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">newValue</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_unitcell</span> <span class="o">=</span> <span class="n">newValue</span></div>
+
+<div class="viewcode-block" id="Atom.com"><a class="viewcode-back" href="../index_system.html#system.Atom.com">[docs]</a>    <span class="k">def</span> <span class="nf">com</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_com</span></div>
+
+<div class="viewcode-block" id="Atom.setCom"><a class="viewcode-back" href="../index_system.html#system.Atom.setCom">[docs]</a>    <span class="k">def</span> <span class="nf">setCom</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">newValue</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_com</span> <span class="o">=</span> <span class="n">newValue</span></div>
+
+<div class="viewcode-block" id="Atom.natoms"><a class="viewcode-back" href="../index_system.html#system.Atom.natoms">[docs]</a>    <span class="k">def</span> <span class="nf">natoms</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_natoms</span></div>
+
+<div class="viewcode-block" id="Atom.setNatoms"><a class="viewcode-back" href="../index_system.html#system.Atom.setNatoms">[docs]</a>    <span class="k">def</span> <span class="nf">setNatoms</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">newValue</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_natoms</span> <span class="o">=</span> <span class="n">newValue</span></div>
+
+<div class="viewcode-block" id="Atom.rg"><a class="viewcode-back" href="../index_system.html#system.Atom.rg">[docs]</a>    <span class="k">def</span> <span class="nf">rg</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_rg</span></div>
+
+<div class="viewcode-block" id="Atom.setRg"><a class="viewcode-back" href="../index_system.html#system.Atom.setRg">[docs]</a>    <span class="k">def</span> <span class="nf">setRg</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">newValue</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_rg</span> <span class="o">=</span> <span class="n">newValue</span></div>
+
+<div class="viewcode-block" id="Atom.pmi"><a class="viewcode-back" href="../index_system.html#system.Atom.pmi">[docs]</a>    <span class="k">def</span> <span class="nf">pmi</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_pmi</span></div>
+
+<div class="viewcode-block" id="Atom.setPmi"><a class="viewcode-back" href="../index_system.html#system.Atom.setPmi">[docs]</a>    <span class="k">def</span> <span class="nf">setPmi</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">newValue</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_pmi</span> <span class="o">=</span> <span class="n">newValue</span></div>
+
+<div class="viewcode-block" id="Atom.minimum"><a class="viewcode-back" href="../index_system.html#system.Atom.minimum">[docs]</a>    <span class="k">def</span> <span class="nf">minimum</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_minimum</span></div>
+
+<div class="viewcode-block" id="Atom.setMinimum"><a class="viewcode-back" href="../index_system.html#system.Atom.setMinimum">[docs]</a>    <span class="k">def</span> <span class="nf">setMinimum</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">newValue</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_minimum</span> <span class="o">=</span> <span class="n">newValue</span></div>
+
+<div class="viewcode-block" id="Atom.maximum"><a class="viewcode-back" href="../index_system.html#system.Atom.maximum">[docs]</a>    <span class="k">def</span> <span class="nf">maximum</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_maximum</span></div>
+
+<div class="viewcode-block" id="Atom.setMaximum"><a class="viewcode-back" href="../index_system.html#system.Atom.setMaximum">[docs]</a>    <span class="k">def</span> <span class="nf">setMaximum</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">newValue</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_maximum</span> <span class="o">=</span> <span class="n">newValue</span></div>
+
+<div class="viewcode-block" id="Atom.shape"><a class="viewcode-back" href="../index_system.html#system.Atom.shape">[docs]</a>    <span class="k">def</span> <span class="nf">shape</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_shape</span></div>
+
+<div class="viewcode-block" id="Atom.setShape"><a class="viewcode-back" href="../index_system.html#system.Atom.setShape">[docs]</a>    <span class="k">def</span> <span class="nf">setShape</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">newValue</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_shape</span> <span class="o">=</span> <span class="n">newValue</span></div>
+
+<div class="viewcode-block" id="Atom.moltype"><a class="viewcode-back" href="../index_system.html#system.Atom.moltype">[docs]</a>    <span class="k">def</span> <span class="nf">moltype</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_moltype</span></div>
+
+<div class="viewcode-block" id="Atom.setMoltype"><a class="viewcode-back" href="../index_system.html#system.Atom.setMoltype">[docs]</a>    <span class="k">def</span> <span class="nf">setMoltype</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">newValue</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_moltype</span> <span class="o">=</span> <span class="n">newValue</span></div>
+
+<div class="viewcode-block" id="Atom.number_of_names"><a class="viewcode-back" href="../index_system.html#system.Atom.number_of_names">[docs]</a>    <span class="k">def</span> <span class="nf">number_of_names</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_number_of_names</span></div>
+
+<div class="viewcode-block" id="Atom.setNumber_of_names"><a class="viewcode-back" href="../index_system.html#system.Atom.setNumber_of_names">[docs]</a>    <span class="k">def</span> <span class="nf">setNumber_of_names</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">newValue</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_number_of_names</span> <span class="o">=</span> <span class="n">newValue</span></div>
+
+<div class="viewcode-block" id="Atom.number_of_resnames"><a class="viewcode-back" href="../index_system.html#system.Atom.number_of_resnames">[docs]</a>    <span class="k">def</span> <span class="nf">number_of_resnames</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_number_of_resnames</span></div>
+
+<div class="viewcode-block" id="Atom.setNumber_of_resnames"><a class="viewcode-back" href="../index_system.html#system.Atom.setNumber_of_resnames">[docs]</a>    <span class="k">def</span> <span class="nf">setNumber_of_resnames</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">newValue</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_number_of_resnames</span> <span class="o">=</span> <span class="n">newValue</span></div>
+
+<div class="viewcode-block" id="Atom.number_of_resids"><a class="viewcode-back" href="../index_system.html#system.Atom.number_of_resids">[docs]</a>    <span class="k">def</span> <span class="nf">number_of_resids</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_number_of_resids</span></div>
+
+<div class="viewcode-block" id="Atom.setNumber_of_resids"><a class="viewcode-back" href="../index_system.html#system.Atom.setNumber_of_resids">[docs]</a>    <span class="k">def</span> <span class="nf">setNumber_of_resids</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">newValue</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_number_of_resids</span> <span class="o">=</span> <span class="n">newValue</span></div>
+
+<div class="viewcode-block" id="Atom.number_of_chains"><a class="viewcode-back" href="../index_system.html#system.Atom.number_of_chains">[docs]</a>    <span class="k">def</span> <span class="nf">number_of_chains</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_number_of_chains</span></div>
+
+<div class="viewcode-block" id="Atom.setNumber_of_chains"><a class="viewcode-back" href="../index_system.html#system.Atom.setNumber_of_chains">[docs]</a>    <span class="k">def</span> <span class="nf">setNumber_of_chains</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">newValue</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_number_of_chains</span> <span class="o">=</span> <span class="n">newValue</span></div>
+
+<div class="viewcode-block" id="Atom.number_of_segnames"><a class="viewcode-back" href="../index_system.html#system.Atom.number_of_segnames">[docs]</a>    <span class="k">def</span> <span class="nf">number_of_segnames</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_number_of_segnames</span></div>
+
+<div class="viewcode-block" id="Atom.setNumber_of_segnames"><a class="viewcode-back" href="../index_system.html#system.Atom.setNumber_of_segnames">[docs]</a>    <span class="k">def</span> <span class="nf">setNumber_of_segnames</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">newValue</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_number_of_segnames</span> <span class="o">=</span> <span class="n">newValue</span></div>
+
+<div class="viewcode-block" id="Atom.number_of_occupancies"><a class="viewcode-back" href="../index_system.html#system.Atom.number_of_occupancies">[docs]</a>    <span class="k">def</span> <span class="nf">number_of_occupancies</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_number_of_occupancies</span></div>
+
+<div class="viewcode-block" id="Atom.setNumber_of_occupancies"><a class="viewcode-back" href="../index_system.html#system.Atom.setNumber_of_occupancies">[docs]</a>    <span class="k">def</span> <span class="nf">setNumber_of_occupancies</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">newValue</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_number_of_occupancies</span> <span class="o">=</span> <span class="n">newValue</span></div>
+
+<div class="viewcode-block" id="Atom.number_of_betas"><a class="viewcode-back" href="../index_system.html#system.Atom.number_of_betas">[docs]</a>    <span class="k">def</span> <span class="nf">number_of_betas</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_number_of_betas</span></div>
+
+<div class="viewcode-block" id="Atom.setNumber_of_betas"><a class="viewcode-back" href="../index_system.html#system.Atom.setNumber_of_betas">[docs]</a>    <span class="k">def</span> <span class="nf">setNumber_of_betas</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">newValue</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_number_of_betas</span> <span class="o">=</span> <span class="n">newValue</span></div>
+
+<div class="viewcode-block" id="Atom.number_of_moltypes"><a class="viewcode-back" href="../index_system.html#system.Atom.number_of_moltypes">[docs]</a>    <span class="k">def</span> <span class="nf">number_of_moltypes</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_number_of_moltypes</span></div>
+
+<div class="viewcode-block" id="Atom.setNumber_of_moltypes"><a class="viewcode-back" href="../index_system.html#system.Atom.setNumber_of_moltypes">[docs]</a>    <span class="k">def</span> <span class="nf">setNumber_of_moltypes</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">newValue</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_number_of_moltypes</span> <span class="o">=</span> <span class="n">newValue</span></div>
+
+<div class="viewcode-block" id="Atom.number_of_elements"><a class="viewcode-back" href="../index_system.html#system.Atom.number_of_elements">[docs]</a>    <span class="k">def</span> <span class="nf">number_of_elements</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_number_of_elements</span></div>
+
+<div class="viewcode-block" id="Atom.setNumber_of_elements"><a class="viewcode-back" href="../index_system.html#system.Atom.setNumber_of_elements">[docs]</a>    <span class="k">def</span> <span class="nf">setNumber_of_elements</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">newValue</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_number_of_elements</span> <span class="o">=</span> <span class="n">newValue</span></div>
+
+<div class="viewcode-block" id="Atom.names"><a class="viewcode-back" href="../index_system.html#system.Atom.names">[docs]</a>    <span class="k">def</span> <span class="nf">names</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_names</span></div>
+
+<div class="viewcode-block" id="Atom.setNames"><a class="viewcode-back" href="../index_system.html#system.Atom.setNames">[docs]</a>    <span class="k">def</span> <span class="nf">setNames</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">newValue</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_names</span> <span class="o">=</span> <span class="n">newValue</span></div>
+
+<div class="viewcode-block" id="Atom.resnames"><a class="viewcode-back" href="../index_system.html#system.Atom.resnames">[docs]</a>    <span class="k">def</span> <span class="nf">resnames</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_resnames</span></div>
+
+<div class="viewcode-block" id="Atom.setResnames"><a class="viewcode-back" href="../index_system.html#system.Atom.setResnames">[docs]</a>    <span class="k">def</span> <span class="nf">setResnames</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">newValue</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_resnames</span> <span class="o">=</span> <span class="n">newValue</span></div>
+
+<div class="viewcode-block" id="Atom.resids"><a class="viewcode-back" href="../index_system.html#system.Atom.resids">[docs]</a>    <span class="k">def</span> <span class="nf">resids</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_resids</span></div>
+
+<div class="viewcode-block" id="Atom.setResids"><a class="viewcode-back" href="../index_system.html#system.Atom.setResids">[docs]</a>    <span class="k">def</span> <span class="nf">setResids</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">newValue</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_resids</span> <span class="o">=</span> <span class="n">newValue</span></div>
+
+<div class="viewcode-block" id="Atom.chains"><a class="viewcode-back" href="../index_system.html#system.Atom.chains">[docs]</a>    <span class="k">def</span> <span class="nf">chains</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_chains</span></div>
+
+<div class="viewcode-block" id="Atom.setChains"><a class="viewcode-back" href="../index_system.html#system.Atom.setChains">[docs]</a>    <span class="k">def</span> <span class="nf">setChains</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">newValue</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_chains</span> <span class="o">=</span> <span class="n">newValue</span></div>
+
+<div class="viewcode-block" id="Atom.segnames"><a class="viewcode-back" href="../index_system.html#system.Atom.segnames">[docs]</a>    <span class="k">def</span> <span class="nf">segnames</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_segnames</span></div>
+
+<div class="viewcode-block" id="Atom.setSegnames"><a class="viewcode-back" href="../index_system.html#system.Atom.setSegnames">[docs]</a>    <span class="k">def</span> <span class="nf">setSegnames</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">newValue</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_segnames</span> <span class="o">=</span> <span class="n">newValue</span></div>
+
+<div class="viewcode-block" id="Atom.occupancies"><a class="viewcode-back" href="../index_system.html#system.Atom.occupancies">[docs]</a>    <span class="k">def</span> <span class="nf">occupancies</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_occupancies</span></div>
+
+<div class="viewcode-block" id="Atom.setOccupancies"><a class="viewcode-back" href="../index_system.html#system.Atom.setOccupancies">[docs]</a>    <span class="k">def</span> <span class="nf">setOccupancies</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">newValue</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_occupancies</span> <span class="o">=</span> <span class="n">newValue</span></div>
+
+<div class="viewcode-block" id="Atom.betas"><a class="viewcode-back" href="../index_system.html#system.Atom.betas">[docs]</a>    <span class="k">def</span> <span class="nf">betas</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_betas</span></div>
+
+<div class="viewcode-block" id="Atom.setBetas"><a class="viewcode-back" href="../index_system.html#system.Atom.setBetas">[docs]</a>    <span class="k">def</span> <span class="nf">setBetas</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">newValue</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_betas</span> <span class="o">=</span> <span class="n">newValue</span></div>
+
+<div class="viewcode-block" id="Atom.moltypes"><a class="viewcode-back" href="../index_system.html#system.Atom.moltypes">[docs]</a>    <span class="k">def</span> <span class="nf">moltypes</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_moltypes</span></div>
+
+<div class="viewcode-block" id="Atom.setMoltypes"><a class="viewcode-back" href="../index_system.html#system.Atom.setMoltypes">[docs]</a>    <span class="k">def</span> <span class="nf">setMoltypes</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">newValue</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_moltypes</span> <span class="o">=</span> <span class="n">newValue</span></div>
+
+<div class="viewcode-block" id="Atom.elements"><a class="viewcode-back" href="../index_system.html#system.Atom.elements">[docs]</a>    <span class="k">def</span> <span class="nf">elements</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_elements</span></div>
+
+<div class="viewcode-block" id="Atom.setElements"><a class="viewcode-back" href="../index_system.html#system.Atom.setElements">[docs]</a>    <span class="k">def</span> <span class="nf">setElements</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">newValue</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_elements</span> <span class="o">=</span> <span class="n">newValue</span></div>
+
+<div class="viewcode-block" id="Atom.names_mask"><a class="viewcode-back" href="../index_system.html#system.Atom.names_mask">[docs]</a>    <span class="k">def</span> <span class="nf">names_mask</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_names_mask</span></div>
+
+<div class="viewcode-block" id="Atom.setNames_mask"><a class="viewcode-back" href="../index_system.html#system.Atom.setNames_mask">[docs]</a>    <span class="k">def</span> <span class="nf">setNames_mask</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">newValue</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_names_mask</span> <span class="o">=</span> <span class="n">newValue</span></div>
+
+<div class="viewcode-block" id="Atom.resnames_mask"><a class="viewcode-back" href="../index_system.html#system.Atom.resnames_mask">[docs]</a>    <span class="k">def</span> <span class="nf">resnames_mask</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_resnames_mask</span></div>
+
+<div class="viewcode-block" id="Atom.setResnames_mask"><a class="viewcode-back" href="../index_system.html#system.Atom.setResnames_mask">[docs]</a>    <span class="k">def</span> <span class="nf">setResnames_mask</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">newValue</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_resnames_mask</span> <span class="o">=</span> <span class="n">newValue</span></div>
+
+<div class="viewcode-block" id="Atom.resids_mask"><a class="viewcode-back" href="../index_system.html#system.Atom.resids_mask">[docs]</a>    <span class="k">def</span> <span class="nf">resids_mask</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_resids_mask</span></div>
+
+<div class="viewcode-block" id="Atom.setResids_mask"><a class="viewcode-back" href="../index_system.html#system.Atom.setResids_mask">[docs]</a>    <span class="k">def</span> <span class="nf">setResids_mask</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">newValue</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_resids_mask</span> <span class="o">=</span> <span class="n">newValue</span></div>
+
+<div class="viewcode-block" id="Atom.chains_mask"><a class="viewcode-back" href="../index_system.html#system.Atom.chains_mask">[docs]</a>    <span class="k">def</span> <span class="nf">chains_mask</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_chains_mask</span></div>
+
+<div class="viewcode-block" id="Atom.setChains_mask"><a class="viewcode-back" href="../index_system.html#system.Atom.setChains_mask">[docs]</a>    <span class="k">def</span> <span class="nf">setChains_mask</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">newValue</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_chains_mask</span> <span class="o">=</span> <span class="n">newValue</span></div>
+
+<div class="viewcode-block" id="Atom.occupancies_mask"><a class="viewcode-back" href="../index_system.html#system.Atom.occupancies_mask">[docs]</a>    <span class="k">def</span> <span class="nf">occupancies_mask</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_occupancies_mask</span></div>
+
+<div class="viewcode-block" id="Atom.setOccupancies_mask"><a class="viewcode-back" href="../index_system.html#system.Atom.setOccupancies_mask">[docs]</a>    <span class="k">def</span> <span class="nf">setOccupancies_mask</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">newValue</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_occupancies_mask</span> <span class="o">=</span> <span class="n">newValue</span></div>
+
+<div class="viewcode-block" id="Atom.betas_mask"><a class="viewcode-back" href="../index_system.html#system.Atom.betas_mask">[docs]</a>    <span class="k">def</span> <span class="nf">betas_mask</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_betas_mask</span></div>
+
+<div class="viewcode-block" id="Atom.setBetas_mask"><a class="viewcode-back" href="../index_system.html#system.Atom.setBetas_mask">[docs]</a>    <span class="k">def</span> <span class="nf">setBetas_mask</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">newValue</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_betas_mask</span> <span class="o">=</span> <span class="n">newValue</span></div>
+
+<div class="viewcode-block" id="Atom.elements_mask"><a class="viewcode-back" href="../index_system.html#system.Atom.elements_mask">[docs]</a>    <span class="k">def</span> <span class="nf">elements_mask</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_elements_mask</span></div>
+
+<div class="viewcode-block" id="Atom.setElements_mask"><a class="viewcode-back" href="../index_system.html#system.Atom.setElements_mask">[docs]</a>    <span class="k">def</span> <span class="nf">setElements_mask</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">newValue</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_elements_mask</span> <span class="o">=</span> <span class="n">newValue</span></div>
+
+<div class="viewcode-block" id="Atom.segnames_mask"><a class="viewcode-back" href="../index_system.html#system.Atom.segnames_mask">[docs]</a>    <span class="k">def</span> <span class="nf">segnames_mask</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_segnames_mask</span></div>
+
+<div class="viewcode-block" id="Atom.setSegnames_mask"><a class="viewcode-back" href="../index_system.html#system.Atom.setSegnames_mask">[docs]</a>    <span class="k">def</span> <span class="nf">setSegnames_mask</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">newValue</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_segnames_mask</span> <span class="o">=</span> <span class="n">newValue</span></div>
+
+<div class="viewcode-block" id="Atom.effective_charge"><a class="viewcode-back" href="../index_system.html#system.Atom.effective_charge">[docs]</a>    <span class="k">def</span> <span class="nf">effective_charge</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_effective_charge</span></div>
+
+<div class="viewcode-block" id="Atom.setEffective_charge"><a class="viewcode-back" href="../index_system.html#system.Atom.setEffective_charge">[docs]</a>    <span class="k">def</span> <span class="nf">setEffective_charge</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">newValue</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_effective_charge</span> <span class="o">=</span> <span class="n">newValue</span></div>
+
+<div class="viewcode-block" id="Atom.long_range_potential"><a class="viewcode-back" href="../index_system.html#system.Atom.long_range_potential">[docs]</a>    <span class="k">def</span> <span class="nf">long_range_potential</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_long_range_potential</span></div>
+
+<div class="viewcode-block" id="Atom.setLong_range_potential"><a class="viewcode-back" href="../index_system.html#system.Atom.setLong_range_potential">[docs]</a>    <span class="k">def</span> <span class="nf">setLong_range_potential</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">newValue</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_long_range_potential</span> <span class="o">=</span> <span class="n">newValue</span></div>
+
+<div class="viewcode-block" id="Atom.short_range_potential"><a class="viewcode-back" href="../index_system.html#system.Atom.short_range_potential">[docs]</a>    <span class="k">def</span> <span class="nf">short_range_potential</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_short_range_potential</span></div>
+
+<div class="viewcode-block" id="Atom.setShort_range_potential"><a class="viewcode-back" href="../index_system.html#system.Atom.setShort_range_potential">[docs]</a>    <span class="k">def</span> <span class="nf">setShort_range_potential</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">newValue</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_short_range_potential</span> <span class="o">=</span> <span class="n">newValue</span></div>
+
+<div class="viewcode-block" id="Atom.effective_van_der_waals"><a class="viewcode-back" href="../index_system.html#system.Atom.effective_van_der_waals">[docs]</a>    <span class="k">def</span> <span class="nf">effective_van_der_waals</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_effective_van_der_waals</span></div>
+
+<div class="viewcode-block" id="Atom.setEffective_van_der_waals"><a class="viewcode-back" href="../index_system.html#system.Atom.setEffective_van_der_waals">[docs]</a>    <span class="k">def</span> <span class="nf">setEffective_van_der_waals</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">newValue</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_effective_van_der_waals</span> <span class="o">=</span> <span class="n">newValue</span></div>
+
+<div class="viewcode-block" id="Atom.fasta"><a class="viewcode-back" href="../index_system.html#system.Atom.fasta">[docs]</a>    <span class="k">def</span> <span class="nf">fasta</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_fasta</span></div>
+
+<div class="viewcode-block" id="Atom.setFasta"><a class="viewcode-back" href="../index_system.html#system.Atom.setFasta">[docs]</a>    <span class="k">def</span> <span class="nf">setFasta</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">newValue</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_fasta</span> <span class="o">=</span> <span class="n">newValue</span></div>
+
+<div class="viewcode-block" id="Atom.one_letter_resname"><a class="viewcode-back" href="../index_system.html#system.Atom.one_letter_resname">[docs]</a>    <span class="k">def</span> <span class="nf">one_letter_resname</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_one_letter_resname</span></div>
+
+<div class="viewcode-block" id="Atom.setOne_letter_resname"><a class="viewcode-back" href="../index_system.html#system.Atom.setOne_letter_resname">[docs]</a>    <span class="k">def</span> <span class="nf">setOne_letter_resname</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">newValue</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_one_letter_resname</span> <span class="o">=</span> <span class="n">newValue</span></div></div>
+
+<div class="viewcode-block" id="Molecule"><a class="viewcode-back" href="../index_system.html#system.Molecule">[docs]</a><span class="k">class</span> <span class="nc">Molecule</span><span class="p">(</span><span class="n">Atom</span><span class="p">):</span>
+
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Molecule is a class that is used to describe molecules. It inherits</span>
+<span class="sd">        all of attributes from Atom.  An example of a molecule is</span>
+<span class="sd">        a single protein, a single nucleic acid strand.</span>
+
+<span class="sd">        Class has several initialization options</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        args </span>
+<span class="sd">            optional integer : self._id</span>
+
+<span class="sd">        kwargs </span>
+<span class="sd">            optional keyword arguments</span>
+<span class="sd">            {</span>
+<span class="sd">                string filename (filename = &#39;hiv1_gag.pdb&#39;) : default = None</span>
+<span class="sd">                integet id (id=3) : default = 0</span>
+<span class="sd">                boolean debug (debug = True) : default = None</span>
+<span class="sd">                </span>
+<span class="sd">            }</span>
+<span class="sd">                                                                                       </span>
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        system object</span>
+<span class="sd">            if called with string (or with filename kwarg) returns</span>
+<span class="sd">            an initialized system object with data read in using</span>
+<span class="sd">            file_io.read_pdb()</span>
+
+<span class="sd">        Examples</span>
+<span class="sd">        -------</span>
+
+<span class="sd">        &gt;&gt;&gt; import sasmol.system as system</span>
+<span class="sd">        &gt;&gt;&gt; molecule = system.Molecule(filename=&#39;hiv1_gag.pdb&#39;)</span>
+<span class="sd">      </span>
+<span class="sd">        </span>
+<span class="sd">        &gt;&gt;&gt; molecule = system.Molecule()</span>
+<span class="sd">        &gt;&gt;&gt; molecule = system.Molecule(id=7)</span>
+<span class="sd">        &gt;&gt;&gt; molecule = system.Molecule(debug=True)</span>
+<span class="sd">        &gt;&gt;&gt; molecule = system.Molecule(&#39;hiv1_gag.pdb&#39;)</span>
+<span class="sd">        &gt;&gt;&gt; molecule = system.Molecule(filename=&#39;hiv1_gag.pdb&#39;, id=0, debug=False)</span>
+<span class="sd">        </span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        
+        <span class="n">Atom</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="System"><a class="viewcode-back" href="../index_system.html#system.System">[docs]</a><span class="k">class</span> <span class="nc">System</span><span class="p">(</span><span class="n">Atom</span><span class="p">):</span>
+
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        System is a class that is used to aggregate all components. It inherits</span>
+<span class="sd">        all of attributes from Atom.  </span>
+
+<span class="sd">        Class has several initialization options</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        args </span>
+<span class="sd">            optional integer : self._id</span>
+
+<span class="sd">        kwargs </span>
+<span class="sd">            optional keyword arguments</span>
+<span class="sd">            {</span>
+<span class="sd">                string filename (filename = &#39;hiv1_gag.pdb&#39;) : default = None</span>
+<span class="sd">                integet id (id=3) : default = 0</span>
+<span class="sd">                boolean debug (debug = True) : default = None</span>
+<span class="sd">                </span>
+<span class="sd">            }</span>
+<span class="sd">                                                                                       </span>
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        system object</span>
+<span class="sd">            if called with string (or with filename kwarg) returns</span>
+<span class="sd">            an initialized system object with data read in using</span>
+<span class="sd">            file_io.read_pdb()</span>
+
+<span class="sd">        Examples</span>
+<span class="sd">        -------</span>
+
+<span class="sd">        &gt;&gt;&gt; import sasmol.system as system</span>
+<span class="sd">        &gt;&gt;&gt; molecule = system.Molecule(filename=&#39;hiv1_gag.pdb&#39;)</span>
+<span class="sd">      </span>
+<span class="sd">        </span>
+<span class="sd">        &gt;&gt;&gt; molecule = system.Molecule()</span>
+<span class="sd">        &gt;&gt;&gt; molecule = system.Molecule(id=7)</span>
+<span class="sd">        &gt;&gt;&gt; molecule = system.Molecule(debug=True)</span>
+<span class="sd">        &gt;&gt;&gt; molecule = system.Molecule(&#39;hiv1_gag.pdb&#39;)</span>
+<span class="sd">        &gt;&gt;&gt; molecule = system.Molecule(filename=&#39;hiv1_gag.pdb&#39;, id=0, debug=False)</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Class has several initialization options</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        args </span>
+<span class="sd">            optional integer : self._id</span>
+
+<span class="sd">        kwargs </span>
+<span class="sd">            optional keyword arguments</span>
+<span class="sd">            {</span>
+<span class="sd">                string filename (filename = &#39;hiv1_gag.pdb&#39;) : default = None</span>
+<span class="sd">                integet id (id=3) : default = 0</span>
+<span class="sd">                boolean debug (debug = True) : default = None</span>
+<span class="sd">                </span>
+<span class="sd">            }</span>
+<span class="sd">                                                                                       </span>
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        system object</span>
+<span class="sd">            if called with string (or with filename kwarg) returns</span>
+<span class="sd">            an initialized system object with data read in using</span>
+<span class="sd">            file_io.read_pdb()</span>
+
+<span class="sd">        Examples</span>
+<span class="sd">        -------</span>
+
+<span class="sd">        &gt;&gt;&gt; import sasmol.system as system</span>
+<span class="sd">        &gt;&gt;&gt; molecule = system.Molecule(filename=&#39;hiv1_gag.pdb&#39;)</span>
+<span class="sd">      </span>
+<span class="sd">        </span>
+<span class="sd">        &gt;&gt;&gt; molecule = system.Molecule()</span>
+<span class="sd">        &gt;&gt;&gt; molecule = system.Molecule(id=7)</span>
+<span class="sd">        &gt;&gt;&gt; molecule = system.Molecule(debug=True)</span>
+<span class="sd">        &gt;&gt;&gt; molecule = system.Molecule(&#39;hiv1_gag.pdb&#39;)</span>
+<span class="sd">        &gt;&gt;&gt; molecule = system.Molecule(filename=&#39;hiv1_gag.pdb&#39;, id=0, debug=False)</span>
+<span class="sd">        </span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">Atom</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="Molecule_Maker"><a class="viewcode-back" href="../index_system.html#system.Molecule_Maker">[docs]</a><span class="k">class</span> <span class="nc">Molecule_Maker</span><span class="p">(</span><span class="n">Atom</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This class is used to define the minimum number of fields required to </span>
+<span class="sd">        use within sasmol to use read_pdb() and write_pdb() methods in file_io.</span>
+
+<span class="sd">        Default inputs are listed in the variables in __init__ and itemized below.</span>
+<span class="sd">        The values are assigned to all atoms in the molecule.</span>
+
+<span class="sd">        Once defined, attributes can be set using setters in the Atom class.</span>
+
+<span class="sd">        Class has several initialization options</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        natoms</span>
+<span class="sd">            integer : number of atoms in the molecule</span>
+
+<span class="sd">        atom    </span>
+<span class="sd">            string  : name of ATOM keyword, typically either ATOM or HETATM</span>
+
+<span class="sd">        index</span>
+<span class="sd">            integer list : atom number</span>
+<span class="sd">            </span>
+<span class="sd">        name</span>
+<span class="sd">            string : atom name</span>
+<span class="sd">            </span>
+<span class="sd">        loc</span>
+<span class="sd">            string : alt loc</span>
+<span class="sd">        </span>
+<span class="sd">        resname</span>
+<span class="sd">            string  : residue name     </span>
+
+<span class="sd">        chain</span>
+<span class="sd">            string  : chain name</span>
+
+<span class="sd">        resid</span>
+<span class="sd">            integer list : residue number</span>
+
+<span class="sd">        rescode</span>
+<span class="sd">            string  : residue code</span>
+
+<span class="sd">        coor</span>
+<span class="sd">            numpy float array : x, y, z coordinates</span>
+
+<span class="sd">        occupancy</span>
+<span class="sd">            string  : occupancy value </span>
+
+<span class="sd">        beta</span>
+<span class="sd">            string  : beta value </span>
+
+<span class="sd">        segname</span>
+<span class="sd">            string  : segment name</span>
+
+<span class="sd">        element</span>
+<span class="sd">            string  : element name</span>
+
+<span class="sd">        charge</span>
+<span class="sd">            string  : element charge</span>
+
+<span class="sd">        kwargs </span>
+<span class="sd">            optional future arguments</span>
+<span class="sd">                                                                                       </span>
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        system object</span>
+
+<span class="sd">        Examples</span>
+<span class="sd">        -------</span>
+
+<span class="sd">        &gt;&gt;&gt; import sasmol.system as system</span>
+<span class="sd">        &gt;&gt;&gt; molecule = system.Molecule_Maker(2048)</span>
+<span class="sd">        &gt;&gt;&gt; molecule = system.Molecule_Maker(2048, name=&#39;Ar&#39;)</span>
+<span class="sd">        &gt;&gt;&gt; molecule = system.Molecule_Maker(2048, name=&#39;Ar&#39;, segname=&#39;ARG0&#39;)</span>
+<span class="sd">        &gt;&gt;&gt; index = [x for x in xrange(340,1000)]</span>
+<span class="sd">        &gt;&gt;&gt; molecule = system.Molecule_Maker(660, name=&#39;Ar&#39;, index=index)</span>
+<span class="sd">        &gt;&gt;&gt; molecule.index()[0]</span>
+<span class="sd">        340</span>
+<span class="sd">        </span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">natoms</span><span class="p">,</span> <span class="n">atom</span><span class="o">=</span><span class="s1">&#39;ATOM&#39;</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;C&#39;</span><span class="p">,</span> <span class="n">loc</span><span class="o">=</span><span class="s1">&#39; &#39;</span><span class="p">,</span>
+        <span class="n">resname</span><span class="o">=</span><span class="s1">&#39;DUM&#39;</span><span class="p">,</span> <span class="n">chain</span><span class="o">=</span><span class="s1">&#39;A&#39;</span><span class="p">,</span> <span class="n">resid</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">rescode</span><span class="o">=</span><span class="s1">&#39; &#39;</span><span class="p">,</span> <span class="n">coor</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+        <span class="n">occupancy</span><span class="o">=</span><span class="s1">&#39;0.00&#39;</span><span class="p">,</span> <span class="n">beta</span><span class="o">=</span><span class="s1">&#39;0.00&#39;</span><span class="p">,</span> <span class="n">segname</span><span class="o">=</span><span class="s1">&#39;DUM&#39;</span><span class="p">,</span> <span class="n">element</span><span class="o">=</span><span class="s1">&#39;C&#39;</span><span class="p">,</span> <span class="n">charge</span><span class="o">=</span><span class="s1">&#39; &#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+
+        <span class="n">Atom</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_atom</span> <span class="o">=</span> <span class="p">[</span><span class="n">atom</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">xrange</span><span class="p">(</span><span class="n">natoms</span><span class="p">)]</span>
+        
+        <span class="k">if</span> <span class="n">index</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_index</span> <span class="o">=</span> <span class="n">index</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_index</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">x</span><span class="o">+</span><span class="mi">1</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">xrange</span><span class="p">(</span><span class="n">natoms</span><span class="p">)],</span><span class="n">numpy</span><span class="o">.</span><span class="n">int</span><span class="p">)</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">_name</span> <span class="o">=</span> <span class="p">[</span><span class="n">name</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">xrange</span><span class="p">(</span><span class="n">natoms</span><span class="p">)]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_loc</span> <span class="o">=</span> <span class="p">[</span><span class="n">loc</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">xrange</span><span class="p">(</span><span class="n">natoms</span><span class="p">)]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_resname</span> <span class="o">=</span> <span class="p">[</span><span class="n">resname</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">xrange</span><span class="p">(</span><span class="n">natoms</span><span class="p">)]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_chain</span> <span class="o">=</span> <span class="p">[</span><span class="n">chain</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">xrange</span><span class="p">(</span><span class="n">natoms</span><span class="p">)]</span>
+
+        <span class="k">if</span> <span class="n">resid</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_resid</span> <span class="o">=</span> <span class="n">resid</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_resid</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">x</span><span class="o">+</span><span class="mi">1</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">xrange</span><span class="p">(</span><span class="n">natoms</span><span class="p">)],</span><span class="n">numpy</span><span class="o">.</span><span class="n">int</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_rescode</span> <span class="o">=</span> <span class="p">[</span><span class="n">rescode</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">xrange</span><span class="p">(</span><span class="n">natoms</span><span class="p">)]</span>
+        
+        <span class="k">if</span> <span class="n">coor</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_coor</span> <span class="o">=</span> <span class="n">coor</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_coor</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="mi">1</span><span class="p">,</span><span class="n">natoms</span><span class="p">,</span><span class="mi">3</span><span class="p">),</span><span class="n">numpy</span><span class="o">.</span><span class="n">float</span><span class="p">)</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">_occupancy</span> <span class="o">=</span> <span class="p">[</span><span class="n">occupancy</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">xrange</span><span class="p">(</span><span class="n">natoms</span><span class="p">)]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_beta</span> <span class="o">=</span> <span class="p">[</span><span class="n">beta</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">xrange</span><span class="p">(</span><span class="n">natoms</span><span class="p">)]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_charge</span> <span class="o">=</span> <span class="p">[</span><span class="n">charge</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">xrange</span><span class="p">(</span><span class="n">natoms</span><span class="p">)]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_segname</span> <span class="o">=</span> <span class="p">[</span><span class="n">segname</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">xrange</span><span class="p">(</span><span class="n">natoms</span><span class="p">)]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_element</span> <span class="o">=</span> <span class="p">[</span><span class="n">element</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">xrange</span><span class="p">(</span><span class="n">natoms</span><span class="p">)]</span></div>
+
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  <li><a href="index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2016, Joseph E. Curtis, Ph.D..
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.4.1</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.8</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

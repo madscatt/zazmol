@@ -1,0 +1,220 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>view &mdash; sasmol 1.0 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '1.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="sasmol 1.0 documentation" href="../index.html" />
+    <link rel="up" title="Module code" href="index.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for view</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">absolute_import</span>
+<span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">division</span>
+<span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">print_function</span>
+<span class="c1">#from __future__ import unicode_literals</span>
+<span class="c1">#</span>
+<span class="c1">#   SASMOL: Copyright (C) 2011 Joseph E. Curtis, Ph.D. </span>
+<span class="c1">#</span>
+<span class="c1">#    This program is free software: you can redistribute it and/or modify</span>
+<span class="c1">#    it under the terms of the GNU General Public License as published by</span>
+<span class="c1">#    the Free Software Foundation, either version 3 of the License, or</span>
+<span class="c1">#    (at your option) any later version.</span>
+<span class="c1">#</span>
+<span class="c1">#    This program is distributed in the hope that it will be useful,</span>
+<span class="c1">#    but WITHOUT ANY WARRANTY; without even the implied warranty of</span>
+<span class="c1">#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the</span>
+<span class="c1">#    GNU General Public License for more details.</span>
+<span class="c1">#</span>
+<span class="c1">#    You should have received a copy of the GNU General Public License</span>
+<span class="c1">#    along with this program.  If not, see &lt;http://www.gnu.org/licenses/&gt;.</span>
+<span class="c1">#</span>
+<span class="c1">#	VIEW</span>
+<span class="c1">#</span>
+<span class="c1">#	11/27/2013	--	initial coding			:	jc</span>
+<span class="c1">#	12/29/2015	--	refactored for release  :   jc</span>
+<span class="c1">#	08/19/2016	--	added doc strings       :   jc</span>
+<span class="c1">#</span>
+<span class="c1"># LC	 1         2         3         4         5         6         7</span>
+<span class="c1"># LC4567890123456789012345678901234567890123456789012345678901234567890123456789</span>
+<span class="c1">#								       *      **</span>
+<span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">	View is the main module that contains the base classes that </span>
+<span class="sd">	read and write atomic information from and to external viewers</span>
+<span class="sd">	such as vmd and others in the future (PyMol, etc.).</span>
+<span class="sd">	</span>
+<span class="sd">	To view the coordinates the viewer needs to be open and controlled</span>
+<span class="sd">	external to view / sasmol.  These methods merely allow </span>
+<span class="sd">	coordinates to be passed between programs.</span>
+
+<span class="sd">	These classes are accessed by system objects</span>
+
+<span class="sd">&#39;&#39;&#39;</span>
+
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">import</span> <span class="nn">string</span>
+<span class="kn">import</span> <span class="nn">locale</span>
+<span class="kn">import</span> <span class="nn">struct</span>
+<span class="kn">import</span> <span class="nn">numpy</span>
+<span class="kn">import</span> <span class="nn">time</span>
+<span class="kn">import</span> <span class="nn">sasmol.view_vmd</span>
+
+<div class="viewcode-block" id="View"><a class="viewcode-back" href="../index_view.html#view.View">[docs]</a><span class="k">class</span> <span class="nc">View</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+
+    <span class="sd">&quot;&quot;&quot; </span>
+
+<span class="sd">        View is the main module that contains the base classes that </span>
+<span class="sd">	    read and write atomic information from and to external viewers</span>
+<span class="sd">	    such as vmd and others in the future (PyMol, etc.).</span>
+<span class="sd">	</span>
+<span class="sd">	    To view the coordinates the viewer needs to be open and controlled</span>
+<span class="sd">	    external to view / sasmol.  These methods merely allow </span>
+<span class="sd">	    coordinates to be passed between programs.</span>
+
+<span class="sd">	    See the following sites for the IMD format:</span>
+<span class="sd">    </span>
+<span class="sd">	    http://www.ks.uiuc.edu/Research/vmd/</span>
+<span class="sd">	    http://www.ks.uiuc.edu/Research/namd/</span>
+<span class="sd">    </span>
+<span class="sd">	    This class is accessed by system objects</span>
+
+<span class="sd">        Examples</span>
+<span class="sd">        ========</span>
+
+<span class="sd">        How to use send coordinates to VMD </span>
+
+<span class="sd">        &gt;&gt;&gt; import sasmol.system as system</span>
+<span class="sd">        &gt;&gt;&gt; molecule = system.Molecule(&#39;hiv1_gag.pdb&#39;)</span>
+<span class="sd">        &gt;&gt;&gt; flag = False</span>
+<span class="sd">        &gt;&gt;&gt; molecule.send_coordinates_to_vmd(1085, flag)</span>
+
+<span class="sd">        Note</span>
+<span class="sd">        ----</span>
+<span class="sd">    </span>
+<span class="sd">        `self` parameter is not shown in the ``Parameters`` section in the documentation</span>
+
+<span class="sd">    &quot;&quot;&quot;</span> 
+
+<div class="viewcode-block" id="View.send_coordinates_to_vmd"><a class="viewcode-back" href="../index_view.html#view.View.send_coordinates_to_vmd">[docs]</a>    <span class="k">def</span> <span class="nf">send_coordinates_to_vmd</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">port</span><span class="p">,</span> <span class="n">flag</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This method opens a socket to send and receive coordinates</span>
+<span class="sd">        by calling a pre-compiled C module (view_vmd).</span>
+
+<span class="sd">        </span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        port </span>
+<span class="sd">            integer : port number to communicate </span>
+
+<span class="sd">        flag</span>
+<span class="sd">            boolean : True to close existing connection</span>
+
+<span class="sd">        kwargs </span>
+<span class="sd">            optional future arguments</span>
+<span class="sd">                                                                                     </span>
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        None</span>
+
+<span class="sd">        Examples</span>
+<span class="sd">        ========</span>
+
+<span class="sd">        How to use send coordinates to VMD </span>
+
+<span class="sd">        &gt;&gt;&gt; import sasmol.system as system</span>
+<span class="sd">        &gt;&gt;&gt; molecule = system.Molecule(&#39;hiv1_gag.pdb&#39;)</span>
+<span class="sd">        &gt;&gt;&gt; flag = False</span>
+<span class="sd">        &gt;&gt;&gt; molecule.send_coordinates_to_vmd(1085, flag)</span>
+
+<span class="sd">        Note</span>
+<span class="sd">        ----</span>
+<span class="sd">        VMD needs to be open with your molecule already loaded for the</span>
+<span class="sd">        coordinates to be accepted via IMD.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">natoms</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_coor</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="p">:,</span> <span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">frame</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">tx</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_coor</span><span class="p">[</span><span class="n">frame</span><span class="p">,</span> <span class="p">:,</span> <span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">numpy</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
+        <span class="n">ty</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_coor</span><span class="p">[</span><span class="n">frame</span><span class="p">,</span> <span class="p">:,</span> <span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">numpy</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
+        <span class="n">tz</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_coor</span><span class="p">[</span><span class="n">frame</span><span class="p">,</span> <span class="p">:,</span> <span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">numpy</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
+
+        <span class="n">result</span> <span class="o">=</span> <span class="n">view_vmd</span><span class="o">.</span><span class="n">send_coordinates_to_vmd</span><span class="p">(</span><span class="n">tx</span><span class="p">,</span> <span class="n">ty</span><span class="p">,</span> <span class="n">tz</span><span class="p">,</span> <span class="n">port</span><span class="p">,</span> <span class="n">flag</span><span class="p">)</span>
+
+        <span class="k">return</span></div></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  <li><a href="index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2016, Joseph E. Curtis, Ph.D..
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.4.1</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.8</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

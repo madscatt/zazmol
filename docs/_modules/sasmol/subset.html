@@ -1,0 +1,1223 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>sasmol.subset &mdash; sasmol 1.0 documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '1.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="sasmol 1.0 documentation" href="../../index.html" />
+    <link rel="up" title="Module code" href="../index.html" />
+   
+  <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for sasmol.subset</h1><div class="highlight"><pre>
+<span></span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    SASSIE: Copyright (C) 2011 Joseph E. Curtis, Ph.D. </span>
+
+<span class="sd">    This program is free software: you can redistribute it and/or modify</span>
+<span class="sd">    it under the terms of the GNU General Public License as published by</span>
+<span class="sd">    the Free Software Foundation, either version 3 of the License, or</span>
+<span class="sd">    (at your option) any later version.</span>
+
+<span class="sd">    This program is distributed in the hope that it will be useful,</span>
+<span class="sd">    but WITHOUT ANY WARRANTY; without even the implied warranty of</span>
+<span class="sd">    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the</span>
+<span class="sd">    GNU General Public License for more details.</span>
+
+<span class="sd">    You should have received a copy of the GNU General Public License</span>
+<span class="sd">    along with this program.  If not, see &lt;http://www.gnu.org/licenses/&gt;.</span>
+<span class="sd">&#39;&#39;&#39;</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">import</span> <span class="nn">string</span>
+<span class="kn">import</span> <span class="nn">locale</span>
+<span class="kn">import</span> <span class="nn">struct</span>
+<span class="kn">import</span> <span class="nn">numpy</span>
+<span class="kn">import</span> <span class="nn">time</span>
+<span class="kn">import</span> <span class="nn">mask</span>
+<span class="kn">import</span> <span class="nn">random</span>
+
+<span class="c1">#	SASSUBSET</span>
+<span class="c1">#</span>
+<span class="c1">#	01/04/2011	--	initial coding 			:	jc</span>
+<span class="c1">#</span>
+<span class="c1"># LC	 1         2         3         4         5         6         7</span>
+<span class="c1"># LC4567890123456789012345678901234567890123456789012345678901234567890123456789</span>
+<span class="c1">#								       *      **</span>
+<span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">	Sassubset is the module that contains the classes that </span>
+<span class="sd">	allow users to extract a subset of objects or values from </span>
+<span class="sd">	objects.  These subsets are used to do things like align</span>
+<span class="sd">	molecules, check for overlap, filter molecular data to</span>
+<span class="sd">	select for fields in the PDB file.	</span>
+
+<span class="sd">	These classes are accessed by the SasAtm class found in</span>
+<span class="sd">	the sasmol module.</span>
+
+<span class="sd">&#39;&#39;&#39;</span>
+
+
+<span class="k">class</span> <span class="nc">Mask</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">basis_filter</span><span class="p">):</span>
+        <span class="c1">#		self._basis=None</span>
+        <span class="k">pass</span>
+
+    <span class="k">def</span> <span class="nf">get_dihedral_subset_mask</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">flexible_residues</span><span class="p">,</span> <span class="n">mtype</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        This method creates an array of ones and/or zeros</span>
+<span class="sd">        of the length of the number of atoms in &quot;self&quot;. It</span>
+<span class="sd">        uses the user-supplied flexible_residue array to</span>
+<span class="sd">        determine which atoms to include in the mask.</span>
+<span class="sd">        This version is hard-wired for proteins or rna to choose</span>
+<span class="sd">        the C(n-1), N(n), CA(n), C(n), and N(n+1) atoms		</span>
+<span class="sd">        or the O3&#39;(n-1), P(n), O5&#39;(n), C5&#39;(n), C4&#39;(n), </span>
+<span class="sd">        C3&#39;(n), O3&#39;(n) and P(n+1) atoms that form the basis set		</span>
+<span class="sd">        for the rotation phi &amp; psi or alpha, beta, delta, epsilon, and eta</span>
+<span class="sd">        angles respectively.  This method calles a c-method called</span>
+<span class="sd">        mask to speed up the calculation (24.5 X faster).	</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="n">natoms</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">natoms</span><span class="p">()</span>
+        <span class="n">name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">()</span>
+        <span class="n">resid</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">resid</span><span class="p">()</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">numpy</span><span class="o">.</span><span class="n">long</span><span class="p">)</span>
+        <span class="n">nflexible</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">flexible_residues</span><span class="p">)</span>
+
+        <span class="n">nresidues</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">resid</span><span class="p">()[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">resid</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+
+        <span class="n">farray</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">nflexible</span><span class="p">,</span> <span class="n">natoms</span><span class="p">),</span> <span class="n">numpy</span><span class="o">.</span><span class="n">long</span><span class="p">)</span>
+
+        <span class="n">mask</span><span class="o">.</span><span class="n">get_mask_array</span><span class="p">(</span><span class="n">farray</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">resid</span><span class="p">,</span>
+                            <span class="n">flexible_residues</span><span class="p">,</span> <span class="n">nresidues</span><span class="p">,</span> <span class="n">mtype</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">farray</span>
+
+    <span class="k">def</span> <span class="nf">init_child</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">descriptor</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        This method allows one to create a list of Molecule objects</span>
+<span class="sd">        that are defined by the input descriptor.</span>
+
+
+<span class="sd">        usage:</span>
+
+<span class="sd">                This is a way to create a mask to be used somewhere else:</span>
+
+<span class="sd">                m1=system.Molecule(0)	### create a molecule m1</span>
+<span class="sd">                m1.read_pdb(filename)	### read in variables, coor, etc.</span>
+<span class="sd">                m1.initialize_children()   ### set up the masks etc.</span>
+
+<span class="sd">                . . . do stuff . . . </span>
+
+<span class="sd">                This initializes the following &quot;children&quot; with their</span>
+<span class="sd">                masks already defined to the &quot;parent&quot; molecule</span>
+
+<span class="sd">                names() 		: names_mask()</span>
+<span class="sd">                resnames()		: resnames_mask()</span>
+<span class="sd">                resids()		: resids_mask()</span>
+<span class="sd">                chains()		: chains_mask()</span>
+<span class="sd">                segnames()		: segnames_mask()</span>
+<span class="sd">                occupancies()		: occupancies_mask()</span>
+<span class="sd">                betas()			: betas_mask()</span>
+<span class="sd">                elements()		: elements_mask()</span>
+
+<span class="sd">                The objects on the left contain the unique values and</span>
+<span class="sd">                the objects on the right contain the masks that have</span>
+<span class="sd">                the indices to extract the information for each unique</span>
+<span class="sd">                value from the parent molecule.</span>
+
+<span class="sd">                NOTE: the pluarity of the words is chosen for a reason</span>
+<span class="sd">                to distinguish the singular words used to keep track</span>
+<span class="sd">                of the parent variables (name --&gt; name[i] for each</span>
+<span class="sd">                atom, while names --&gt; corresponds to the unique names</span>
+<span class="sd">                in the parent: len(names) &lt;= len(name))</span>
+
+<span class="sd">                For &quot;min3.pdb&quot; if one wants to know the unique elements</span>
+<span class="sd">                you would type:</span>
+
+<span class="sd">                m1.elements()</span>
+
+<span class="sd">                which yields:</span>
+
+<span class="sd">                [&#39;N&#39;, &#39;H&#39;, &#39;C&#39;, &#39;O&#39;, &#39;S&#39;, &#39;ZN&#39;]</span>
+
+<span class="sd">                So, given a pre-defined object that has atomic information</span>
+<span class="sd">                initialized by reading in the PDB file and intializing all</span>
+<span class="sd">                children as shown above, one can get a list of subset</span>
+<span class="sd">                objects for each type of element by typing:</span>
+
+<span class="sd">                element_molecules = m1.init_child(&#39;elements&#39;)</span>
+
+<span class="sd">                then you could parse the full-subset molecule as its own</span>
+<span class="sd">                entity</span>
+
+<span class="sd">                com = element_molecules[0].calccom(0)</span>
+
+<span class="sd">                which would give the center of mass for all the &quot;N&quot; atoms</span>
+<span class="sd">                in the parent molecule.</span>
+
+<span class="sd">                Another example would be to get the COM of each amino acid</span>
+<span class="sd">                in a protein.</span>
+
+<span class="sd">                residue_molecules = m1.init_child(&#39;resids&#39;)</span>
+
+<span class="sd">                for i in xrange(m1.number_of_resids()):</span>
+<span class="sd">                        print residue_molecules[i].calccom(0)</span>
+
+<span class="sd">                NOTE: coordinates will have to be updated separately using</span>
+<span class="sd">                        get_coor_using_mask ... using the mask(s) generated</span>
+<span class="sd">                        by file_io.initialize_children()</span>
+
+<span class="sd">        &#39;&#39;&#39;</span>
+
+        <span class="kn">import</span> <span class="nn">sasmol.system</span> <span class="kn">as</span> <span class="nn">system</span>
+
+        <span class="n">at</span> <span class="o">=</span> <span class="s1">&#39;len(self.&#39;</span> <span class="o">+</span> <span class="n">descriptor</span> <span class="o">+</span> <span class="s1">&#39;())&#39;</span>
+        <span class="n">number_of_objects</span> <span class="o">=</span> <span class="nb">eval</span><span class="p">(</span><span class="n">at</span><span class="p">)</span>
+
+        <span class="n">frame</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">object_list</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">xrange</span><span class="p">(</span><span class="n">number_of_objects</span><span class="p">):</span>
+
+            <span class="n">new_object</span> <span class="o">=</span> <span class="n">system</span><span class="o">.</span><span class="n">Molecule</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+            <span class="n">at</span> <span class="o">=</span> <span class="s1">&#39;self.&#39;</span> <span class="o">+</span> <span class="n">descriptor</span> <span class="o">+</span> <span class="s1">&#39;_mask()[&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;]&#39;</span>
+            <span class="n">mask</span> <span class="o">=</span> <span class="nb">eval</span><span class="p">(</span><span class="n">at</span><span class="p">)</span>
+            <span class="n">error</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">copy_molecule_using_mask</span><span class="p">(</span><span class="n">new_object</span><span class="p">,</span> <span class="n">mask</span><span class="p">,</span> <span class="n">frame</span><span class="p">)</span>
+
+            <span class="n">object_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">new_object</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">object_list</span>
+
+    <span class="k">def</span> <span class="nf">get_subset_mask</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">basis_filter</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        This method creates an array of ones and/or zeros</span>
+<span class="sd">        of the length of the number of atoms in &quot;self&quot; and</span>
+<span class="sd">        uses the user-supplied filter string to filter the</span>
+<span class="sd">        parameter descriptors to obtain a subset array</span>
+<span class="sd">        that can be used to filter entities in other methods</span>
+<span class="sd">        either in this class or elsewhere.</span>
+
+<span class="sd">        usage:</span>
+
+<span class="sd">                Here is a way to create a mask to be used somewhere else:</span>
+
+<span class="sd">                m1=system.Molecule(0)	### create a molecule m1</span>
+<span class="sd">                m1.read_pdb(filename)	### read in variables, coor, etc.</span>
+
+<span class="sd">                . . . do stuff . . . </span>
+
+<span class="sd">                basis_filter = XXXX     ### your (see examples below)</span>
+
+<span class="sd">                error,mask = m1.get_subset_mask(basis_filter)  ### get a mask</span>
+
+<span class="sd">                . . . do something with the mask using other functions in this class . . . </span>
+
+<span class="sd">                Here are some example basis_filter strings:</span>
+
+<span class="sd">                basis_filter = &#39;name[i] == &quot;CA&quot; and resid[i] &lt; 10&#39;</span>
+<span class="sd">                basis_filter = &#39;name[i][0] == &quot;H&quot; and resid[i] &lt; 10&#39;</span>
+<span class="sd">                basis_filter = &#39;name[i] == &quot;CA&quot; and resid[i] &gt;= 1 and resid[i] &lt; 10&#39;</span>
+
+<span class="sd">                The syntax for basis selection can be quite eloborate.  For example,</span>
+
+<span class="sd">                basis_filter = &#39;name[i] == &quot;CA&quot; and resid[i] &gt;= 1 and resid[i] &lt; 10 and moltype==&quot;protein&quot; and chain==&quot;F&quot; and occupancy==1 and beta&gt;10.0 and element==&quot;C&quot; ...&#39;</span>
+
+<span class="sd">                could be used for advanced selection needs.  See API for full details.</span>
+
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="n">index</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">index</span><span class="p">()</span>
+        <span class="n">name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">()</span>
+        <span class="n">loc</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">loc</span><span class="p">()</span>
+        <span class="n">resname</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">resname</span><span class="p">()</span>
+        <span class="n">chain</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">chain</span><span class="p">()</span>
+        <span class="n">resid</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">resid</span><span class="p">()</span>
+        <span class="n">rescode</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">rescode</span><span class="p">()</span>
+        <span class="n">occupancy</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">occupancy</span><span class="p">()</span>
+        <span class="n">beta</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">beta</span><span class="p">()</span>
+        <span class="n">segname</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">segname</span><span class="p">()</span>
+        <span class="n">element</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">element</span><span class="p">()</span>
+        <span class="n">charge</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">charge</span><span class="p">()</span>
+        <span class="n">moltype</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">moltype</span><span class="p">()</span>
+        <span class="n">residue_flag</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">residue_flag</span><span class="p">()</span>
+
+<span class="c1">#</span>
+<span class="c1"># OPEN	Need to add other properties (surface, buried, helix, sheet, turn, polar</span>
+<span class="c1">#</span>
+<span class="c1"># OPEN	Need to add other properties (hydrophobic, etc.)</span>
+<span class="c1">#</span>
+<span class="c1"># OPEN	Need to filter string and replace certain keywords with atom names (calpha, backbone)</span>
+<span class="c1">#</span>
+<span class="c1"># OPEN	Need to handle &quot;all&quot; keyword as well</span>
+<span class="c1">#</span>
+<span class="c1"># OPEN	Need to add a distance selection logic: find atoms greater than 5 angstroms from ...</span>
+<span class="c1">#</span>
+<span class="c1">#</span>
+<span class="c1">#	basis_filter == &#39;name[i] == &quot;CA&quot; less_than 5 angstroms from name[j] == &quot;N&quot; &#39;</span>
+<span class="c1">#</span>
+<span class="c1">#	basis_filter == &#39;name[i] == &quot;CA&quot; greater_than 5 angstroms from name[j] == &quot;N&quot; &#39;</span>
+<span class="c1">#</span>
+<span class="c1">#	basis_filter == &#39;name[i] == &quot;CA&quot; between 3 and 5 angstroms from name[j] == &quot;N&quot; &#39;</span>
+<span class="c1">#</span>
+<span class="c1">#	ANGLES</span>
+<span class="c1">#</span>
+<span class="c1">#	basis_filter == &#39;(segname[i] == &quot;WAT&quot; and (name[i] == &quot;OH2&quot; or name[i] == &quot;H1&quot;)) less_than 104 degrees from (segname[j] == &quot;WAT&quot; and name[j] == &quot;H1&quot;) &#39;</span>
+<span class="c1">#</span>
+<span class="c1">#	basis_filter == &#39;(segname[i] == &quot;WAT&quot; and name[i] == &quot;OH2&quot;) between 100 and 106 degrees from (segname[j] == &quot;WAT&quot; and name[j] == &quot;H1&quot;) &#39;</span>
+<span class="c1">#</span>
+<span class="c1"># 	--- or have the code pull out the donors and acceptors from selections?</span>
+<span class="c1">#</span>
+<span class="c1">#	basis_filter == &#39;(resid[i] == &quot;TIP3&quot;) between 100 and 106 degrees from (resid[j] == &quot;TIP3&quot;)&#39;</span>
+<span class="c1">#</span>
+<span class="c1">#	--- or define a hydrogen_bonded keyword that takes care of distance/angle &amp; donor/acceptor</span>
+<span class="c1">#</span>
+<span class="c1">#	basis_filter == &#39;(resid[i] == &quot;TIP3&quot;) hydrogen_bonded to (resid[j] == &quot;TIP3&quot;)&#39;</span>
+<span class="c1">#	basis_filter == &#39;(segment[i] == &quot;RNA&quot;) hydrogen_bonded to (resid[j] == &quot;TIP3&quot;)&#39;</span>
+<span class="c1">#	basis_filter == &#39;(segment[i] == &quot;RNA&quot;) hydrogen_bonded to (segment[j] == &quot;RNA&quot;)&#39;</span>
+<span class="c1">#</span>
+<span class="c1">#	--- or define an atom as a donor or acceptor and use hydrogen_bonded keyword for distance/angle</span>
+<span class="c1">#</span>
+<span class="c1">#	basis_filter == &#39;(segment[i] == &quot;RNA&quot; and donor[i] == 1) hydrogen_bonded to (resid[j] == &quot;TIP3&quot;)&#39;</span>
+<span class="c1">#	basis_filter == &#39;(segment[i] == &quot;RNA&quot; and acceptor[i] == 1) hydrogen_bonded to (resid[j] == &quot;TIP3&quot;)&#39;</span>
+<span class="c1">#</span>
+<span class="c1">#</span>
+        <span class="n">error</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="n">preliminary_mask_array</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="n">natoms</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">natoms</span><span class="p">()</span>
+
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">xrange</span><span class="p">(</span><span class="n">natoms</span><span class="p">):</span>
+
+            <span class="k">try</span><span class="p">:</span>
+                <span class="k">if</span><span class="p">(</span><span class="nb">eval</span><span class="p">(</span><span class="n">basis_filter</span><span class="p">)):</span>
+                    <span class="n">preliminary_mask_array</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">preliminary_mask_array</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+            <span class="k">except</span><span class="p">:</span>
+                <span class="n">error</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;failed to evaluate filter selection &#39;</span> <span class="o">+</span>
+                             <span class="n">basis_filter</span> <span class="o">+</span> <span class="s1">&#39; for atom &#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="p">))</span>
+                <span class="k">return</span> <span class="n">error</span><span class="p">,</span> <span class="n">preliminary_mask_array</span>
+
+        <span class="k">if</span><span class="p">(</span><span class="n">numpy</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">preliminary_mask_array</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">):</span>
+            <span class="n">error</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                <span class="s1">&#39;found no atoms using filter selection &#39;</span> <span class="o">+</span> <span class="n">basis_filter</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">error</span><span class="p">,</span> <span class="n">preliminary_mask_array</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">mask_array</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">preliminary_mask_array</span><span class="p">,</span> <span class="n">numpy</span><span class="o">.</span><span class="n">int32</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">error</span><span class="p">,</span> <span class="n">mask_array</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+
+
+<span class="sd">		natoms = self.natoms()</span>
+<span class="sd">		mask_array = numpy.zeros(natoms,numpy.int32)</span>
+
+<span class="sd">		for i in xrange(natoms):</span>
+<span class="sd">			try:</span>
+<span class="sd">				if(eval(basis_filter)):</span>
+<span class="sd">					mask_array[i]=1</span>
+<span class="sd">			except:</span>
+<span class="sd">				error.append(&#39;failed to evaluate filter selection &#39;+basis_filter+&#39; for atom &#39;+str(i))</span>
+<span class="sd">				return error, mask_array		</span>
+<span class="sd">		if(numpy.sum(mask_array) == 0):</span>
+<span class="sd">				error.append(&#39;found no atoms using filter selection &#39;+basis_filter)</span>
+<span class="sd">				return error, mask_array		</span>
+<span class="sd">		#if not qfound:</span>
+<span class="sd">		#		error.append(&#39;found no atoms using filter selection &#39;+basis_filter)</span>
+<span class="sd">		#		return error, mask_array	</span>
+<span class="sd">		return error, mask_array</span>
+<span class="sd">		&#39;&#39;&#39;</span>
+
+    <span class="k">def</span> <span class="nf">merge_two_molecules</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mol1</span><span class="p">,</span> <span class="n">mol2</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        This method combines two molecules into a single, new molecule. </span>
+<span class="sd">        It will assign coordinates from the first frame of a molecule.</span>
+
+<span class="sd">        usage:</span>
+
+
+<span class="sd">                m1=system.Molecule(0)	### create a molecule m1</span>
+<span class="sd">                m1.read_pdb(filename1)	### read in variables, coor, etc.</span>
+
+<span class="sd">                m2=system.Molecule(1)	### create a molecule m2</span>
+<span class="sd">                m2.read_pdb(filename2)	### read in variables, coor, etc.</span>
+
+<span class="sd">                m3=system.Molecule(2)	### create a molecule m3</span>
+
+
+<span class="sd">                . . . do stuff . . . </span>
+
+<span class="sd">                error = m3.merge_two_molecules(m1,m2) 	### sets the values that define mol3</span>
+
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="n">error</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">atom</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">index</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">name</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">loc</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">resname</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">chain</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">resid</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">rescode</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">y</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">z</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">occupancy</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">beta</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">segname</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">element</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">charge</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">moltype</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">original_index</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">original_resid</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">residue_flag</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="n">unique_names</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">unique_resnames</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">unique_resids</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">unique_chains</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">unique_segnames</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">unique_occupancies</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">unique_betas</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">unique_elements</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">unique_moltypes</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="n">natoms1</span> <span class="o">=</span> <span class="n">mol1</span><span class="o">.</span><span class="n">natoms</span><span class="p">()</span>
+        <span class="n">natoms2</span> <span class="o">=</span> <span class="n">mol2</span><span class="o">.</span><span class="n">natoms</span><span class="p">()</span>
+
+        <span class="k">print</span> <span class="s1">&#39;natoms1 = &#39;</span><span class="p">,</span> <span class="n">natoms1</span>
+        <span class="k">print</span> <span class="s1">&#39;natoms2 = &#39;</span><span class="p">,</span> <span class="n">natoms2</span>
+
+        <span class="n">frame</span> <span class="o">=</span> <span class="mi">0</span>
+
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">xrange</span><span class="p">(</span><span class="n">natoms1</span><span class="p">):</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="c1"># if True:</span>
+                <span class="n">atom</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">mol1</span><span class="o">.</span><span class="n">_atom</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+                <span class="n">index</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">mol1</span><span class="o">.</span><span class="n">_index</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+                <span class="n">name</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">mol1</span><span class="o">.</span><span class="n">_name</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+                <span class="n">loc</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">mol1</span><span class="o">.</span><span class="n">_loc</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+                <span class="n">resname</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">mol1</span><span class="o">.</span><span class="n">_resname</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+                <span class="n">chain</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">mol1</span><span class="o">.</span><span class="n">_chain</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+                <span class="n">resid</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">mol1</span><span class="o">.</span><span class="n">_resid</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+                <span class="n">rescode</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">mol1</span><span class="o">.</span><span class="n">_rescode</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+                <span class="n">x</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">mol1</span><span class="o">.</span><span class="n">coor</span><span class="p">()[</span><span class="n">frame</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="mi">0</span><span class="p">])</span>
+                <span class="n">y</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">mol1</span><span class="o">.</span><span class="n">coor</span><span class="p">()[</span><span class="n">frame</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="mi">1</span><span class="p">])</span>
+                <span class="n">z</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">mol1</span><span class="o">.</span><span class="n">coor</span><span class="p">()[</span><span class="n">frame</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="mi">2</span><span class="p">])</span>
+                <span class="n">occupancy</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">mol1</span><span class="o">.</span><span class="n">_occupancy</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+                <span class="n">beta</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">mol1</span><span class="o">.</span><span class="n">_beta</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+                <span class="n">segname</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">mol1</span><span class="o">.</span><span class="n">_segname</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+                <span class="n">element</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">mol1</span><span class="o">.</span><span class="n">_element</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+                <span class="n">charge</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">mol1</span><span class="o">.</span><span class="n">_charge</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+                <span class="n">moltype</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">mol1</span><span class="o">.</span><span class="n">_moltype</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+                <span class="n">original_index</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">mol1</span><span class="o">.</span><span class="n">_original_index</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+                <span class="n">original_resid</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">mol1</span><span class="o">.</span><span class="n">_original_resid</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+                <span class="n">residue_flag</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">mol1</span><span class="o">.</span><span class="n">_residue_flag</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+
+                <span class="k">if</span><span class="p">(</span><span class="n">mol1</span><span class="o">.</span><span class="n">_name</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">unique_names</span><span class="p">):</span>
+                    <span class="n">unique_names</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">mol1</span><span class="o">.</span><span class="n">_name</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+                <span class="k">if</span><span class="p">(</span><span class="n">mol1</span><span class="o">.</span><span class="n">_resname</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">unique_resnames</span><span class="p">):</span>
+                    <span class="n">unique_resnames</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">mol1</span><span class="o">.</span><span class="n">_resname</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+                <span class="k">if</span><span class="p">(</span><span class="n">mol1</span><span class="o">.</span><span class="n">_resid</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">unique_resids</span><span class="p">):</span>
+                    <span class="n">unique_resids</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">mol1</span><span class="o">.</span><span class="n">_resid</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+                <span class="k">if</span><span class="p">(</span><span class="n">mol1</span><span class="o">.</span><span class="n">_chain</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">unique_chains</span><span class="p">):</span>
+                    <span class="n">unique_chains</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">mol1</span><span class="o">.</span><span class="n">_chain</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+                <span class="k">if</span><span class="p">(</span><span class="n">mol1</span><span class="o">.</span><span class="n">_segname</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">unique_segnames</span><span class="p">):</span>
+                    <span class="n">unique_segnames</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">mol1</span><span class="o">.</span><span class="n">_segname</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+                <span class="k">if</span><span class="p">(</span><span class="n">mol1</span><span class="o">.</span><span class="n">_occupancy</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">unique_occupancies</span><span class="p">):</span>
+                    <span class="n">unique_occupancies</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">mol1</span><span class="o">.</span><span class="n">_occupancy</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+                <span class="k">if</span><span class="p">(</span><span class="n">mol1</span><span class="o">.</span><span class="n">_beta</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">unique_betas</span><span class="p">):</span>
+                    <span class="n">unique_betas</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">mol1</span><span class="o">.</span><span class="n">_beta</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+                <span class="k">if</span><span class="p">(</span><span class="n">mol1</span><span class="o">.</span><span class="n">_element</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">unique_elements</span><span class="p">):</span>
+                    <span class="n">unique_elements</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">mol1</span><span class="o">.</span><span class="n">_element</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+                <span class="k">if</span><span class="p">(</span><span class="n">mol1</span><span class="o">.</span><span class="n">_moltype</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">unique_moltypes</span><span class="p">):</span>
+                    <span class="n">unique_moltypes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">mol1</span><span class="o">.</span><span class="n">_moltype</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+
+            <span class="k">except</span><span class="p">:</span>
+                <span class="n">error</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                    <span class="s1">&#39;failed in copy_molecule when attempting to assign descriptors to atom &#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39; from mol1&#39;</span><span class="p">)</span>
+                <span class="k">return</span> <span class="n">error</span>
+
+        <span class="n">last_index_mol1</span> <span class="o">=</span> <span class="n">mol1</span><span class="o">.</span><span class="n">_index</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+        <span class="n">this_index</span> <span class="o">=</span> <span class="n">last_index_mol1</span> <span class="o">+</span> <span class="mi">1</span>
+
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">xrange</span><span class="p">(</span><span class="n">natoms2</span><span class="p">):</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="c1"># if True:</span>
+                <span class="n">atom</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">mol2</span><span class="o">.</span><span class="n">_atom</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+                <span class="n">index</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">this_index</span><span class="p">)</span>
+                <span class="n">name</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">mol2</span><span class="o">.</span><span class="n">_name</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+                <span class="n">loc</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">mol2</span><span class="o">.</span><span class="n">_loc</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+                <span class="n">resname</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">mol2</span><span class="o">.</span><span class="n">_resname</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+                <span class="n">chain</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">mol2</span><span class="o">.</span><span class="n">_chain</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+                <span class="n">resid</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">mol2</span><span class="o">.</span><span class="n">_resid</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+                <span class="n">rescode</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">mol2</span><span class="o">.</span><span class="n">_rescode</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+                <span class="n">x</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">mol2</span><span class="o">.</span><span class="n">coor</span><span class="p">()[</span><span class="n">frame</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="mi">0</span><span class="p">])</span>
+                <span class="n">y</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">mol2</span><span class="o">.</span><span class="n">coor</span><span class="p">()[</span><span class="n">frame</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="mi">1</span><span class="p">])</span>
+                <span class="n">z</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">mol2</span><span class="o">.</span><span class="n">coor</span><span class="p">()[</span><span class="n">frame</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="mi">2</span><span class="p">])</span>
+                <span class="n">occupancy</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">mol2</span><span class="o">.</span><span class="n">_occupancy</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+                <span class="n">beta</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">mol2</span><span class="o">.</span><span class="n">_beta</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+                <span class="n">segname</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">mol2</span><span class="o">.</span><span class="n">_segname</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+                <span class="n">element</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">mol2</span><span class="o">.</span><span class="n">_element</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+                <span class="n">charge</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">mol2</span><span class="o">.</span><span class="n">_charge</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+                <span class="n">moltype</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">mol2</span><span class="o">.</span><span class="n">_moltype</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+                <span class="n">original_index</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">mol2</span><span class="o">.</span><span class="n">_original_index</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+                <span class="n">original_resid</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">mol2</span><span class="o">.</span><span class="n">_original_resid</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+                <span class="n">residue_flag</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">mol2</span><span class="o">.</span><span class="n">_residue_flag</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+                <span class="n">this_index</span> <span class="o">=</span> <span class="n">this_index</span> <span class="o">+</span> <span class="mi">1</span>
+
+                <span class="k">if</span><span class="p">(</span><span class="n">mol2</span><span class="o">.</span><span class="n">_name</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">unique_names</span><span class="p">):</span>
+                    <span class="n">unique_names</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">mol2</span><span class="o">.</span><span class="n">_name</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+                <span class="k">if</span><span class="p">(</span><span class="n">mol2</span><span class="o">.</span><span class="n">_resname</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">unique_resnames</span><span class="p">):</span>
+                    <span class="n">unique_resnames</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">mol2</span><span class="o">.</span><span class="n">_resname</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+                <span class="k">if</span><span class="p">(</span><span class="n">mol2</span><span class="o">.</span><span class="n">_resid</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">unique_resids</span><span class="p">):</span>
+                    <span class="n">unique_resids</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">mol2</span><span class="o">.</span><span class="n">_resid</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+                <span class="k">if</span><span class="p">(</span><span class="n">mol2</span><span class="o">.</span><span class="n">_chain</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">unique_chains</span><span class="p">):</span>
+                    <span class="n">unique_chains</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">mol2</span><span class="o">.</span><span class="n">_chain</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+                <span class="k">if</span><span class="p">(</span><span class="n">mol2</span><span class="o">.</span><span class="n">_segname</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">unique_segnames</span><span class="p">):</span>
+                    <span class="n">unique_segnames</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">mol2</span><span class="o">.</span><span class="n">_segname</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+                <span class="k">if</span><span class="p">(</span><span class="n">mol2</span><span class="o">.</span><span class="n">_occupancy</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">unique_occupancies</span><span class="p">):</span>
+                    <span class="n">unique_occupancies</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">mol2</span><span class="o">.</span><span class="n">_occupancy</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+                <span class="k">if</span><span class="p">(</span><span class="n">mol2</span><span class="o">.</span><span class="n">_beta</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">unique_betas</span><span class="p">):</span>
+                    <span class="n">unique_betas</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">mol2</span><span class="o">.</span><span class="n">_beta</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+                <span class="k">if</span><span class="p">(</span><span class="n">mol2</span><span class="o">.</span><span class="n">_element</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">unique_elements</span><span class="p">):</span>
+                    <span class="n">unique_elements</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">mol2</span><span class="o">.</span><span class="n">_element</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+                <span class="k">if</span><span class="p">(</span><span class="n">mol2</span><span class="o">.</span><span class="n">_moltype</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">unique_moltypes</span><span class="p">):</span>
+                    <span class="n">unique_moltypes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">mol2</span><span class="o">.</span><span class="n">_moltype</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+
+            <span class="k">except</span><span class="p">:</span>
+                <span class="n">error</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                    <span class="s1">&#39;failed in copy_molecule when attempting to assign descriptors to atom &#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39; from mol2&#39;</span><span class="p">)</span>
+                <span class="k">return</span> <span class="n">error</span>
+
+        <span class="n">x</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">numpy</span><span class="o">.</span><span class="n">float</span><span class="p">)</span>
+        <span class="n">y</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">numpy</span><span class="o">.</span><span class="n">float</span><span class="p">)</span>
+        <span class="n">z</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">z</span><span class="p">,</span> <span class="n">numpy</span><span class="o">.</span><span class="n">float</span><span class="p">)</span>
+
+        <span class="n">coor</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="mi">1</span><span class="p">,</span> <span class="n">natoms1</span> <span class="o">+</span> <span class="n">natoms2</span><span class="p">,</span> <span class="mi">3</span><span class="p">),</span> <span class="n">numpy</span><span class="o">.</span><span class="n">float</span><span class="p">)</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">coor</span><span class="p">[</span><span class="n">frame</span><span class="p">,</span> <span class="p">:,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">x</span>
+            <span class="n">coor</span><span class="p">[</span><span class="n">frame</span><span class="p">,</span> <span class="p">:,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">y</span>
+            <span class="n">coor</span><span class="p">[</span><span class="n">frame</span><span class="p">,</span> <span class="p">:,</span> <span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="n">z</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="n">error</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;failed in merge molecule when assigning coordinates&#39;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">error</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_atom</span> <span class="o">=</span> <span class="n">atom</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_index</span> <span class="o">=</span> <span class="n">index</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_name</span> <span class="o">=</span> <span class="n">name</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_loc</span> <span class="o">=</span> <span class="n">loc</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_resname</span> <span class="o">=</span> <span class="n">resname</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_chain</span> <span class="o">=</span> <span class="n">chain</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_resid</span> <span class="o">=</span> <span class="n">resid</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_rescode</span> <span class="o">=</span> <span class="n">rescode</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_occupancy</span> <span class="o">=</span> <span class="n">occupancy</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_beta</span> <span class="o">=</span> <span class="n">beta</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_segname</span> <span class="o">=</span> <span class="n">segname</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_element</span> <span class="o">=</span> <span class="n">element</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_charge</span> <span class="o">=</span> <span class="n">charge</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_moltype</span> <span class="o">=</span> <span class="n">moltype</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_coor</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">coor</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_natoms</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">index</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_original_index</span> <span class="o">=</span> <span class="n">original_index</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_original_resid</span> <span class="o">=</span> <span class="n">original_resid</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_residue_flag</span> <span class="o">=</span> <span class="n">residue_flag</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_number_of_names</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">unique_names</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_names</span> <span class="o">=</span> <span class="n">unique_names</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_number_of_resnames</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">unique_resnames</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_resnames</span> <span class="o">=</span> <span class="n">unique_resnames</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_number_of_resids</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">unique_resids</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_resids</span> <span class="o">=</span> <span class="n">unique_resids</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_number_of_chains</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">unique_chains</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_chains</span> <span class="o">=</span> <span class="n">unique_chains</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_number_of_segnames</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">unique_segnames</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_segnames</span> <span class="o">=</span> <span class="n">unique_segnames</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_number_of_occupancies</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">unique_occupancies</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_occupancies</span> <span class="o">=</span> <span class="n">unique_occupancies</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_number_of_betas</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">unique_betas</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_betas</span> <span class="o">=</span> <span class="n">unique_betas</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_number_of_elements</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">unique_elements</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_elements</span> <span class="o">=</span> <span class="n">unique_elements</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_number_of_moltypes</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">unique_moltypes</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_moltypes</span> <span class="o">=</span> <span class="n">unique_moltypes</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_conect</span> <span class="o">=</span> <span class="n">mol1</span><span class="o">.</span><span class="n">_conect</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">ndx</span><span class="p">,</span> <span class="n">list_ndxs</span> <span class="ow">in</span> <span class="n">mol2</span><span class="o">.</span><span class="n">_conect</span><span class="o">.</span><span class="n">iteritems</span><span class="p">():</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_conect</span><span class="p">[</span><span class="n">ndx</span><span class="p">]</span> <span class="o">=</span> <span class="n">list_ndxs</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="k">pass</span>
+
+        <span class="k">return</span> <span class="n">error</span>
+
+    <span class="k">def</span> <span class="nf">copy_molecule_using_mask</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">,</span> <span class="n">mask</span><span class="p">,</span> <span class="n">frame</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        This method initializes the standard descriptors and</span>
+<span class="sd">        coordinates for a subset molecule defined by the</span>
+<span class="sd">        supplied mask array.</span>
+
+<span class="sd">        usage:</span>
+
+<span class="sd">                Here is a way to create a mask to be used somewhere else:</span>
+
+<span class="sd">                m1=system.Molecule(0)	### create a molecule m1</span>
+<span class="sd">                m1.read_pdb(filename)	### read in variables, coor, etc.</span>
+
+<span class="sd">                . . . do stuff . . . </span>
+
+<span class="sd">                basis_filter = XXXX     ### your (see examples below)</span>
+
+<span class="sd">                error,mask = m1.get_subset_mask(basis_filter)  ### get a mask</span>
+
+<span class="sd">                sub_m1=system.Molecule(1)		### create a new molecule sub_m1</span>
+
+<span class="sd">                error = m1.copy_molecule_using_mask(sub_m1,mask,frame) ### initializes sub_m1</span>
+
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="n">error</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">atom</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">index</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">name</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">loc</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">resname</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">chain</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">resid</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">rescode</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">occupancy</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">beta</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">segname</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">element</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">charge</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">moltype</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">charmm_type</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">atom_charge</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">atom_vdw</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">residue_flag</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">original_index</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">original_resid</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">unique_names</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">unique_resnames</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">unique_resids</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">unique_chains</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">unique_segnames</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">unique_occupancies</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">unique_betas</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">unique_elements</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">unique_moltypes</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">unique_charmm_type</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">conect</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="n">natoms</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">natoms</span><span class="p">()</span>
+
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">xrange</span><span class="p">(</span><span class="n">natoms</span><span class="p">):</span>
+            <span class="k">if</span><span class="p">(</span><span class="n">mask</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">==</span> <span class="mi">1</span><span class="p">):</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="c1"># if True:</span>
+                    <span class="n">atom</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_atom</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+                    <span class="n">index</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_index</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+                    <span class="n">original_index</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_original_index</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+                    <span class="n">name</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_name</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+                    <span class="n">loc</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_loc</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+                    <span class="n">resname</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_resname</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+                    <span class="n">chain</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_chain</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+                    <span class="n">resid</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_resid</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+                    <span class="n">original_resid</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_original_resid</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+                    <span class="n">rescode</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_rescode</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+                    <span class="n">occupancy</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_occupancy</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+                    <span class="n">beta</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_beta</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+                    <span class="n">segname</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_segname</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+                    <span class="n">element</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_element</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+                    <span class="n">charge</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_charge</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+                    <span class="n">moltype</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_moltype</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+                    <span class="n">residue_flag</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_residue_flag</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+                    <span class="k">try</span><span class="p">:</span>
+                        <span class="n">charmm_type</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_charmm_type</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+                    <span class="k">except</span><span class="p">:</span>
+                        <span class="k">pass</span>
+                    <span class="k">try</span><span class="p">:</span>
+                        <span class="n">atom_charge</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_atom_charge</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+                    <span class="k">except</span><span class="p">:</span>
+                        <span class="k">pass</span>
+                    <span class="k">try</span><span class="p">:</span>
+                        <span class="n">atom_vdw</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_atom_vdw</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+                    <span class="k">except</span><span class="p">:</span>
+                        <span class="k">pass</span>
+
+                    <span class="k">if</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_name</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">unique_names</span><span class="p">):</span>
+                        <span class="n">unique_names</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_name</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+                    <span class="k">if</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_resname</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">unique_resnames</span><span class="p">):</span>
+                        <span class="n">unique_resnames</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_resname</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+                    <span class="k">if</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_resid</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">unique_resids</span><span class="p">):</span>
+                        <span class="n">unique_resids</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_resid</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+                    <span class="k">if</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_chain</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">unique_chains</span><span class="p">):</span>
+                        <span class="n">unique_chains</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_chain</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+                    <span class="k">if</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_segname</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">unique_segnames</span><span class="p">):</span>
+                        <span class="n">unique_segnames</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_segname</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+                    <span class="k">if</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_occupancy</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">unique_occupancies</span><span class="p">):</span>
+                        <span class="n">unique_occupancies</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_occupancy</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+                    <span class="k">if</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_beta</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">unique_betas</span><span class="p">):</span>
+                        <span class="n">unique_betas</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_beta</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+                    <span class="k">if</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_element</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">unique_elements</span><span class="p">):</span>
+                        <span class="n">unique_elements</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_element</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+                    <span class="k">if</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_moltype</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">unique_moltypes</span><span class="p">):</span>
+                        <span class="n">unique_moltypes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_moltype</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+
+                <span class="k">except</span><span class="p">:</span>
+                    <span class="n">error</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                        <span class="s1">&#39;failed in copy_molecule when attempting to assign descriptors to atom &#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="p">))</span>
+                    <span class="k">print</span> <span class="s1">&#39;</span><span class="se">\n\n</span><span class="s1">error = &#39;</span><span class="p">,</span> <span class="n">error</span>
+                    <span class="n">sys</span><span class="o">.</span><span class="n">stdout</span><span class="o">.</span><span class="n">flush</span><span class="p">()</span>
+                    <span class="k">return</span> <span class="n">error</span>
+
+        <span class="n">other</span><span class="o">.</span><span class="n">setAtom</span><span class="p">(</span><span class="n">atom</span><span class="p">)</span>
+        <span class="n">other</span><span class="o">.</span><span class="n">setIndex</span><span class="p">(</span><span class="n">numpy</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">index</span><span class="p">,</span> <span class="n">numpy</span><span class="o">.</span><span class="n">int</span><span class="p">))</span>
+
+        <span class="n">original_index</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">original_index</span><span class="p">,</span> <span class="n">numpy</span><span class="o">.</span><span class="n">int</span><span class="p">)</span>
+        <span class="n">other</span><span class="o">.</span><span class="n">setOriginal_index</span><span class="p">(</span><span class="n">original_index</span><span class="p">)</span>
+
+        <span class="n">other</span><span class="o">.</span><span class="n">setName</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+        <span class="n">other</span><span class="o">.</span><span class="n">setLoc</span><span class="p">(</span><span class="n">loc</span><span class="p">)</span>
+        <span class="n">other</span><span class="o">.</span><span class="n">setResname</span><span class="p">(</span><span class="n">resname</span><span class="p">)</span>
+        <span class="n">other</span><span class="o">.</span><span class="n">setChain</span><span class="p">(</span><span class="n">chain</span><span class="p">)</span>
+        <span class="n">other</span><span class="o">.</span><span class="n">setResid</span><span class="p">(</span><span class="n">numpy</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">resid</span><span class="p">,</span> <span class="n">numpy</span><span class="o">.</span><span class="n">int</span><span class="p">))</span>
+        <span class="n">other</span><span class="o">.</span><span class="n">setOriginal_resid</span><span class="p">(</span><span class="n">numpy</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">original_resid</span><span class="p">,</span> <span class="n">numpy</span><span class="o">.</span><span class="n">int</span><span class="p">))</span>
+        <span class="n">other</span><span class="o">.</span><span class="n">setRescode</span><span class="p">(</span><span class="n">rescode</span><span class="p">)</span>
+        <span class="n">other</span><span class="o">.</span><span class="n">setOccupancy</span><span class="p">(</span><span class="n">occupancy</span><span class="p">)</span>
+        <span class="n">other</span><span class="o">.</span><span class="n">setBeta</span><span class="p">(</span><span class="n">beta</span><span class="p">)</span>
+        <span class="n">other</span><span class="o">.</span><span class="n">setSegname</span><span class="p">(</span><span class="n">segname</span><span class="p">)</span>
+        <span class="n">other</span><span class="o">.</span><span class="n">setElement</span><span class="p">(</span><span class="n">element</span><span class="p">)</span>
+        <span class="n">other</span><span class="o">.</span><span class="n">setCharge</span><span class="p">(</span><span class="n">charge</span><span class="p">)</span>
+        <span class="n">other</span><span class="o">.</span><span class="n">setMoltype</span><span class="p">(</span><span class="n">moltype</span><span class="p">)</span>
+        <span class="n">other</span><span class="o">.</span><span class="n">setCharmm_type</span><span class="p">(</span><span class="n">charmm_type</span><span class="p">)</span>
+        <span class="n">error</span><span class="p">,</span> <span class="n">coor</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_coor_using_mask</span><span class="p">(</span><span class="n">frame</span><span class="p">,</span> <span class="n">mask</span><span class="p">)</span>
+        <span class="n">other</span><span class="o">.</span><span class="n">setCoor</span><span class="p">(</span><span class="n">coor</span><span class="p">)</span>
+        <span class="n">other</span><span class="o">.</span><span class="n">setNatoms</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">index</span><span class="p">))</span>
+        <span class="n">other</span><span class="o">.</span><span class="n">setResidue_flag</span><span class="p">(</span><span class="n">residue_flag</span><span class="p">)</span>
+
+        <span class="n">other</span><span class="o">.</span><span class="n">setAtom_charge</span><span class="p">(</span><span class="n">numpy</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">atom_charge</span><span class="p">,</span> <span class="n">numpy</span><span class="o">.</span><span class="n">float32</span><span class="p">))</span>
+        <span class="n">other</span><span class="o">.</span><span class="n">setAtom_vdw</span><span class="p">(</span><span class="n">numpy</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">atom_vdw</span><span class="p">,</span> <span class="n">numpy</span><span class="o">.</span><span class="n">float32</span><span class="p">))</span>
+
+        <span class="n">other</span><span class="o">.</span><span class="n">_number_of_names</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">unique_names</span><span class="p">)</span>
+        <span class="n">other</span><span class="o">.</span><span class="n">_names</span> <span class="o">=</span> <span class="n">unique_names</span>
+        <span class="n">other</span><span class="o">.</span><span class="n">_number_of_resnames</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">unique_resnames</span><span class="p">)</span>
+        <span class="n">other</span><span class="o">.</span><span class="n">_resnames</span> <span class="o">=</span> <span class="n">unique_resnames</span>
+        <span class="n">other</span><span class="o">.</span><span class="n">_number_of_resids</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">unique_resids</span><span class="p">)</span>
+        <span class="n">other</span><span class="o">.</span><span class="n">_resids</span> <span class="o">=</span> <span class="n">unique_resids</span>
+        <span class="n">other</span><span class="o">.</span><span class="n">_number_of_chains</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">unique_chains</span><span class="p">)</span>
+        <span class="n">other</span><span class="o">.</span><span class="n">_chains</span> <span class="o">=</span> <span class="n">unique_chains</span>
+        <span class="n">other</span><span class="o">.</span><span class="n">_number_of_segnames</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">unique_segnames</span><span class="p">)</span>
+        <span class="n">other</span><span class="o">.</span><span class="n">_segnames</span> <span class="o">=</span> <span class="n">unique_segnames</span>
+        <span class="n">other</span><span class="o">.</span><span class="n">_number_of_occupancies</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">unique_occupancies</span><span class="p">)</span>
+        <span class="n">other</span><span class="o">.</span><span class="n">_occupancies</span> <span class="o">=</span> <span class="n">unique_occupancies</span>
+        <span class="n">other</span><span class="o">.</span><span class="n">_number_of_betas</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">unique_betas</span><span class="p">)</span>
+        <span class="n">other</span><span class="o">.</span><span class="n">_betas</span> <span class="o">=</span> <span class="n">unique_betas</span>
+        <span class="n">other</span><span class="o">.</span><span class="n">_number_of_elements</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">unique_elements</span><span class="p">)</span>
+        <span class="n">other</span><span class="o">.</span><span class="n">_elements</span> <span class="o">=</span> <span class="n">unique_elements</span>
+        <span class="n">other</span><span class="o">.</span><span class="n">_number_of_moltypes</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">unique_moltypes</span><span class="p">)</span>
+        <span class="n">other</span><span class="o">.</span><span class="n">_moltypes</span> <span class="o">=</span> <span class="n">unique_moltypes</span>
+
+        <span class="k">for</span> <span class="n">oindex</span> <span class="ow">in</span> <span class="n">original_index</span><span class="p">:</span>
+
+            <span class="k">if</span> <span class="n">oindex</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">conect</span><span class="p">():</span>
+
+                <span class="n">conect</span><span class="p">[</span><span class="n">oindex</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">conect</span><span class="p">()[</span><span class="n">oindex</span><span class="p">]</span>
+
+        <span class="n">other</span><span class="o">.</span><span class="n">setConect</span><span class="p">(</span><span class="n">conect</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">error</span>
+
+    <span class="k">def</span> <span class="nf">duplicate_molecule</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">,</span> <span class="n">number_of_duplicates</span><span class="p">,</span> <span class="n">frame</span><span class="p">,</span> <span class="n">com_coor</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        This method assigns all fields from one molecule to another</span>
+<span class="sd">        for a user-supplied number_of_duplicates</span>
+
+<span class="sd">        usage:</span>
+
+<span class="sd">                Here is a way to create a mask to be used somewhere else:</span>
+
+<span class="sd">                m1=system.Molecule(0)	### create a molecule m1</span>
+<span class="sd">                m1.read_pdb(filename)	### read in variables, coor, etc.</span>
+
+<span class="sd">                # you need an array of x,y,z coords that set the com position</span>
+<span class="sd">                # of each duplicate : com_coor</span>
+
+<span class="sd">                . . . do stuff . . . </span>
+
+<span class="sd">                m2=system.Molecule(1)  	### create a second molecule m2</span>
+
+<span class="sd">                error = m1.duplicate_molecule(m2,number_of_duplicates,frame,com_coor) </span>
+
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="n">frame</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">number_of_frames</span> <span class="o">=</span> <span class="mi">1</span>
+        <span class="n">error</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">atom</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">index</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">name</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">loc</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">resname</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">chain</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">resid</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">rescode</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">occupancy</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">beta</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">segname</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">element</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">charge</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">moltype</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">atom_charge</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">atom_vdw</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">residue_flag</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">original_index</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">original_resid</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">unique_names</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">unique_resnames</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">unique_resids</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">unique_chains</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">unique_segnames</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">unique_occupancies</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">unique_betas</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">unique_elements</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">natoms</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">natoms</span><span class="p">()</span>
+        <span class="n">count</span> <span class="o">=</span> <span class="mi">1</span>
+
+        <span class="n">self_com</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">calccom</span><span class="p">(</span><span class="n">frame</span><span class="p">)</span>
+
+        <span class="n">separate_resids</span> <span class="o">=</span> <span class="s1">&#39;no&#39;</span>
+
+        <span class="n">new_coor</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span>
+            <span class="p">(</span><span class="n">number_of_frames</span><span class="p">,</span> <span class="n">number_of_duplicates</span> <span class="o">*</span> <span class="n">natoms</span><span class="p">,</span> <span class="mi">3</span><span class="p">),</span> <span class="n">numpy</span><span class="o">.</span><span class="n">float</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">xrange</span><span class="p">(</span><span class="n">number_of_duplicates</span><span class="p">):</span>
+            <span class="k">if</span><span class="p">(</span><span class="n">i</span> <span class="o">&lt;</span> <span class="mi">10</span><span class="p">):</span>
+                <span class="n">this_segment</span> <span class="o">=</span> <span class="s1">&#39;000&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
+            <span class="k">elif</span><span class="p">(</span><span class="n">i</span> <span class="o">&lt;</span> <span class="mi">100</span><span class="p">):</span>
+                <span class="n">this_segment</span> <span class="o">=</span> <span class="s1">&#39;00&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
+            <span class="k">elif</span><span class="p">(</span><span class="n">i</span> <span class="o">&lt;</span> <span class="mi">1000</span><span class="p">):</span>
+                <span class="n">this_segment</span> <span class="o">=</span> <span class="s1">&#39;0&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">this_segment</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
+
+            <span class="k">if</span><span class="p">(</span><span class="n">separate_resids</span> <span class="o">==</span> <span class="s1">&#39;yes&#39;</span><span class="p">):</span>
+                <span class="k">if</span><span class="p">(</span><span class="n">i</span> <span class="o">==</span> <span class="mi">0</span><span class="p">):</span>
+                    <span class="n">this_resid</span> <span class="o">=</span> <span class="mi">1</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">this_resid</span> <span class="o">+=</span> <span class="mi">1</span>
+
+            <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">xrange</span><span class="p">(</span><span class="n">natoms</span><span class="p">):</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="n">atom</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_atom</span><span class="p">[</span><span class="n">j</span><span class="p">])</span>
+                    <span class="c1"># index.append(self._index[j])</span>
+                    <span class="n">index</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">count</span><span class="p">))</span>
+                    <span class="n">count</span> <span class="o">+=</span> <span class="mi">1</span>
+                    <span class="n">original_index</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_original_index</span><span class="p">[</span><span class="n">j</span><span class="p">])</span>
+                    <span class="n">name</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_name</span><span class="p">[</span><span class="n">j</span><span class="p">])</span>
+                    <span class="n">loc</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_loc</span><span class="p">[</span><span class="n">j</span><span class="p">])</span>
+                    <span class="n">resname</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_resname</span><span class="p">[</span><span class="n">j</span><span class="p">])</span>
+                    <span class="n">chain</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_chain</span><span class="p">[</span><span class="n">j</span><span class="p">])</span>
+                    <span class="k">if</span><span class="p">(</span><span class="n">separate_resids</span> <span class="o">==</span> <span class="s1">&#39;yes&#39;</span><span class="p">):</span>
+                        <span class="n">resid</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">this_resid</span><span class="p">)</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">resid</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_resid</span><span class="p">[</span><span class="n">j</span><span class="p">])</span>
+                    <span class="n">original_resid</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_original_resid</span><span class="p">[</span><span class="n">j</span><span class="p">])</span>
+                    <span class="n">rescode</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_rescode</span><span class="p">[</span><span class="n">j</span><span class="p">])</span>
+                    <span class="n">occupancy</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_occupancy</span><span class="p">[</span><span class="n">j</span><span class="p">])</span>
+                    <span class="n">beta</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_beta</span><span class="p">[</span><span class="n">j</span><span class="p">])</span>
+                    <span class="c1"># segname.append(self._segname[j])</span>
+                    <span class="n">segname</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">this_segment</span><span class="p">)</span>
+                    <span class="n">element</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_element</span><span class="p">[</span><span class="n">j</span><span class="p">])</span>
+                    <span class="n">charge</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_charge</span><span class="p">[</span><span class="n">j</span><span class="p">])</span>
+                    <span class="n">moltype</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_moltype</span><span class="p">[</span><span class="n">j</span><span class="p">])</span>
+                    <span class="n">residue_flag</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_residue_flag</span><span class="p">[</span><span class="n">j</span><span class="p">])</span>
+
+                    <span class="k">try</span><span class="p">:</span>
+                        <span class="n">atom_charge</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_atom_charge</span><span class="p">[</span><span class="n">j</span><span class="p">])</span>
+                    <span class="k">except</span><span class="p">:</span>
+                        <span class="k">pass</span>
+                    <span class="k">try</span><span class="p">:</span>
+                        <span class="n">atom_vdw</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_atom_vdw</span><span class="p">[</span><span class="n">j</span><span class="p">])</span>
+                    <span class="k">except</span><span class="p">:</span>
+                        <span class="k">pass</span>
+
+                    <span class="k">if</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_name</span><span class="p">[</span><span class="n">j</span><span class="p">]</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">unique_names</span><span class="p">):</span>
+                        <span class="n">unique_names</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_name</span><span class="p">[</span><span class="n">j</span><span class="p">])</span>
+                    <span class="k">if</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_resname</span><span class="p">[</span><span class="n">j</span><span class="p">]</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">unique_resnames</span><span class="p">):</span>
+                        <span class="n">unique_resnames</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_resname</span><span class="p">[</span><span class="n">j</span><span class="p">])</span>
+                    <span class="k">if</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_resid</span><span class="p">[</span><span class="n">j</span><span class="p">]</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">unique_resids</span><span class="p">):</span>
+                        <span class="n">unique_resids</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_resid</span><span class="p">[</span><span class="n">j</span><span class="p">])</span>
+                    <span class="k">if</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_chain</span><span class="p">[</span><span class="n">j</span><span class="p">]</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">unique_chains</span><span class="p">):</span>
+                        <span class="n">unique_chains</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_chain</span><span class="p">[</span><span class="n">j</span><span class="p">])</span>
+                    <span class="k">if</span><span class="p">(</span><span class="n">this_segment</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">unique_segnames</span><span class="p">):</span>
+                        <span class="n">unique_segnames</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">this_segment</span><span class="p">)</span>
+                    <span class="k">if</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_occupancy</span><span class="p">[</span><span class="n">j</span><span class="p">]</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">unique_occupancies</span><span class="p">):</span>
+                        <span class="n">unique_occupancies</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_occupancy</span><span class="p">[</span><span class="n">j</span><span class="p">])</span>
+                    <span class="k">if</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_beta</span><span class="p">[</span><span class="n">j</span><span class="p">]</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">unique_betas</span><span class="p">):</span>
+                        <span class="n">unique_betas</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_beta</span><span class="p">[</span><span class="n">j</span><span class="p">])</span>
+                    <span class="k">if</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_element</span><span class="p">[</span><span class="n">j</span><span class="p">]</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">unique_elements</span><span class="p">):</span>
+                        <span class="n">unique_elements</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_element</span><span class="p">[</span><span class="n">j</span><span class="p">])</span>
+
+                <span class="k">except</span><span class="p">:</span>
+                    <span class="n">error</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                        <span class="s1">&#39;failed in copy_molecule when attempting to assign descriptors to atom &#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="p">))</span>
+                    <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">()</span>
+                    <span class="k">return</span> <span class="n">error</span>
+
+            <span class="n">axis_int</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
+            <span class="k">if</span><span class="p">(</span><span class="n">axis_int</span> <span class="o">==</span> <span class="mi">1</span><span class="p">):</span>
+                <span class="n">axis</span> <span class="o">=</span> <span class="s1">&#39;x&#39;</span>
+            <span class="k">elif</span><span class="p">(</span><span class="n">axis_int</span> <span class="o">==</span> <span class="mi">2</span><span class="p">):</span>
+                <span class="n">axis</span> <span class="o">=</span> <span class="s1">&#39;y&#39;</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">axis</span> <span class="o">=</span> <span class="s1">&#39;z&#39;</span>
+
+            <span class="n">theta</span> <span class="o">=</span> <span class="mf">360.0</span> <span class="o">*</span> <span class="n">random</span><span class="o">.</span><span class="n">random</span><span class="p">()</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">rotate</span><span class="p">(</span><span class="n">frame</span><span class="p">,</span> <span class="n">axis</span><span class="p">,</span> <span class="n">theta</span><span class="p">)</span>
+
+            <span class="n">new_coor</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="n">natoms</span> <span class="o">*</span> <span class="n">i</span><span class="p">:(</span><span class="n">natoms</span> <span class="o">*</span> <span class="p">(</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)),</span>
+                     <span class="p">:]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_coor</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="p">:,</span> <span class="p">:]</span> <span class="o">-</span> <span class="n">self_com</span> <span class="o">+</span> <span class="n">com_coor</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">rotate</span><span class="p">(</span><span class="n">frame</span><span class="p">,</span> <span class="n">axis</span><span class="p">,</span> <span class="o">-</span><span class="n">theta</span><span class="p">)</span>
+
+        <span class="n">other</span><span class="o">.</span><span class="n">setAtom</span><span class="p">(</span><span class="n">atom</span><span class="p">)</span>
+        <span class="n">other</span><span class="o">.</span><span class="n">setIndex</span><span class="p">(</span><span class="n">numpy</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">index</span><span class="p">,</span> <span class="n">numpy</span><span class="o">.</span><span class="n">int</span><span class="p">))</span>
+        <span class="n">other</span><span class="o">.</span><span class="n">setOriginal_index</span><span class="p">(</span><span class="n">original_index</span><span class="p">)</span>
+        <span class="n">other</span><span class="o">.</span><span class="n">setName</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+        <span class="n">other</span><span class="o">.</span><span class="n">setLoc</span><span class="p">(</span><span class="n">loc</span><span class="p">)</span>
+        <span class="n">other</span><span class="o">.</span><span class="n">setResname</span><span class="p">(</span><span class="n">resname</span><span class="p">)</span>
+        <span class="n">other</span><span class="o">.</span><span class="n">setChain</span><span class="p">(</span><span class="n">chain</span><span class="p">)</span>
+        <span class="n">other</span><span class="o">.</span><span class="n">setResid</span><span class="p">(</span><span class="n">numpy</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">resid</span><span class="p">,</span> <span class="n">numpy</span><span class="o">.</span><span class="n">int</span><span class="p">))</span>
+        <span class="n">other</span><span class="o">.</span><span class="n">setOriginal_resid</span><span class="p">(</span><span class="n">numpy</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">original_resid</span><span class="p">,</span> <span class="n">numpy</span><span class="o">.</span><span class="n">int</span><span class="p">))</span>
+        <span class="n">other</span><span class="o">.</span><span class="n">setRescode</span><span class="p">(</span><span class="n">rescode</span><span class="p">)</span>
+        <span class="n">other</span><span class="o">.</span><span class="n">setOccupancy</span><span class="p">(</span><span class="n">occupancy</span><span class="p">)</span>
+        <span class="n">other</span><span class="o">.</span><span class="n">setBeta</span><span class="p">(</span><span class="n">beta</span><span class="p">)</span>
+        <span class="n">other</span><span class="o">.</span><span class="n">setSegname</span><span class="p">(</span><span class="n">segname</span><span class="p">)</span>
+        <span class="n">other</span><span class="o">.</span><span class="n">setElement</span><span class="p">(</span><span class="n">element</span><span class="p">)</span>
+        <span class="n">other</span><span class="o">.</span><span class="n">setCharge</span><span class="p">(</span><span class="n">charge</span><span class="p">)</span>
+        <span class="n">other</span><span class="o">.</span><span class="n">setMoltype</span><span class="p">(</span><span class="n">moltype</span><span class="p">)</span>
+        <span class="n">other</span><span class="o">.</span><span class="n">setCoor</span><span class="p">(</span><span class="n">new_coor</span><span class="p">)</span>
+        <span class="n">other</span><span class="o">.</span><span class="n">setNatoms</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">index</span><span class="p">))</span>
+        <span class="n">other</span><span class="o">.</span><span class="n">setAtom_charge</span><span class="p">(</span><span class="n">numpy</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">atom_charge</span><span class="p">,</span> <span class="n">numpy</span><span class="o">.</span><span class="n">float32</span><span class="p">))</span>
+        <span class="n">other</span><span class="o">.</span><span class="n">setAtom_vdw</span><span class="p">(</span><span class="n">numpy</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">atom_vdw</span><span class="p">,</span> <span class="n">numpy</span><span class="o">.</span><span class="n">float32</span><span class="p">))</span>
+        <span class="n">other</span><span class="o">.</span><span class="n">setResidue_flag</span><span class="p">(</span><span class="n">residue_flag</span><span class="p">)</span>
+
+        <span class="n">other</span><span class="o">.</span><span class="n">setConect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">conect</span><span class="p">())</span>
+
+        <span class="n">other</span><span class="o">.</span><span class="n">_number_of_names</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">unique_names</span><span class="p">)</span>
+        <span class="n">other</span><span class="o">.</span><span class="n">_names</span> <span class="o">=</span> <span class="n">unique_names</span>
+        <span class="n">other</span><span class="o">.</span><span class="n">_number_of_resnames</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">unique_resnames</span><span class="p">)</span>
+        <span class="n">other</span><span class="o">.</span><span class="n">_resnames</span> <span class="o">=</span> <span class="n">unique_resnames</span>
+        <span class="n">other</span><span class="o">.</span><span class="n">_number_of_resids</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">unique_resids</span><span class="p">)</span>
+        <span class="n">other</span><span class="o">.</span><span class="n">_resids</span> <span class="o">=</span> <span class="n">unique_resids</span>
+        <span class="n">other</span><span class="o">.</span><span class="n">_number_of_chains</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">unique_chains</span><span class="p">)</span>
+        <span class="n">other</span><span class="o">.</span><span class="n">_chains</span> <span class="o">=</span> <span class="n">unique_chains</span>
+        <span class="n">other</span><span class="o">.</span><span class="n">_number_of_segnames</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">unique_segnames</span><span class="p">)</span>
+        <span class="n">other</span><span class="o">.</span><span class="n">_segnames</span> <span class="o">=</span> <span class="n">unique_segnames</span>
+        <span class="n">other</span><span class="o">.</span><span class="n">_number_of_occupancies</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">unique_occupancies</span><span class="p">)</span>
+        <span class="n">other</span><span class="o">.</span><span class="n">_occupancies</span> <span class="o">=</span> <span class="n">unique_occupancies</span>
+        <span class="n">other</span><span class="o">.</span><span class="n">_number_of_betas</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">unique_betas</span><span class="p">)</span>
+        <span class="n">other</span><span class="o">.</span><span class="n">_betas</span> <span class="o">=</span> <span class="n">unique_betas</span>
+        <span class="n">other</span><span class="o">.</span><span class="n">_number_of_elements</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">unique_elements</span><span class="p">)</span>
+        <span class="n">other</span><span class="o">.</span><span class="n">_elements</span> <span class="o">=</span> <span class="n">unique_elements</span>
+
+        <span class="k">return</span> <span class="n">error</span>
+
+    <span class="k">def</span> <span class="nf">get_indices_from_mask</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mask</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        This method returns the internal indices for the supplied</span>
+<span class="sd">        mask.  </span>
+<span class="sd">        &#39;&#39;&#39;</span>
+
+        <span class="n">natoms</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">natoms</span><span class="p">()</span>
+        <span class="n">indices</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">nonzero</span><span class="p">(</span><span class="n">mask</span> <span class="o">*</span> <span class="n">numpy</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">natoms</span> <span class="o">+</span> <span class="mi">1</span><span class="p">))[</span><span class="mi">0</span><span class="p">]</span>
+
+        <span class="k">return</span> <span class="n">indices</span>
+
+    <span class="k">def</span> <span class="nf">get_coor_using_mask</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">frame</span><span class="p">,</span> <span class="n">mask</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        This method extracts coordinates from frame=frame of self</span>
+<span class="sd">        using a supplied mask which has been created before this method is called.</span>
+<span class="sd">        Coorindates are chosen for the elements that are equal to 1 in the supplied mask array.</span>
+
+<span class="sd">        usage:</span>
+
+<span class="sd">                m1=system.Molecule(0)	### create a molecule m1</span>
+<span class="sd">                m1.read_pdb(filename)	### read in variables, coor, etc.</span>
+
+<span class="sd">                . . . do stuff . . . </span>
+
+<span class="sd">                basis_filter = XXXX     ### your filter information in a string</span>
+<span class="sd">                error,mask = m1.get_subset_mask(basis_filter)  ### get a mask</span>
+
+<span class="sd">                # now the commands that refer to the current method . . . </span>
+
+<span class="sd">                error,new_coor=m1.get_coor_using_mask(frame,mask)		</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="n">error</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">new_coor</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">natoms</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">natoms</span><span class="p">()</span>
+
+        <span class="n">indicies</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">nonzero</span><span class="p">(</span><span class="n">mask</span> <span class="o">*</span> <span class="n">numpy</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">natoms</span> <span class="o">+</span> <span class="mi">1</span><span class="p">))[</span><span class="mi">0</span><span class="p">]</span>
+
+        <span class="n">this_frame_coor</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_coor</span><span class="p">[</span><span class="n">frame</span><span class="p">,</span> <span class="p">:,</span> <span class="p">:]</span>
+
+        <span class="n">coor</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="mi">1</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">indicies</span><span class="p">),</span> <span class="mi">3</span><span class="p">),</span> <span class="n">numpy</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">coor</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">take</span><span class="p">(</span><span class="n">this_frame_coor</span><span class="p">[:,</span> <span class="p">:],</span> <span class="n">indicies</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="n">error</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                <span class="s1">&#39;failed to extract coordinates from frame &#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">frame</span><span class="p">))</span>
+            <span class="k">return</span> <span class="n">error</span><span class="p">,</span> <span class="n">coor</span>
+
+        <span class="k">return</span> <span class="n">error</span><span class="p">,</span> <span class="n">coor</span>
+
+    <span class="k">def</span> <span class="nf">set_coor_using_mask</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">,</span> <span class="n">frame</span><span class="p">,</span> <span class="n">mask</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        This method replaces coordinates from frame=frame of self</span>
+<span class="sd">        using a supplied mask which has been created before this method is called.</span>
+<span class="sd">        Coordinates are chosen for the elements that are equal to 1 in the supplied mask array.</span>
+
+<span class="sd">        usage:</span>
+
+<span class="sd">                m1=system.Molecule(0)	### create a molecule m1</span>
+<span class="sd">                m1.read_pdb(filename)	### read in variables, coor, etc.</span>
+
+<span class="sd">                m2=system.Molecule(1)	### create a molecule m2</span>
+
+<span class="sd">                . . . do stuff . . . </span>
+
+<span class="sd">                ### m2 gets coordinates in some way (copy, read a pdb, etc.)</span>
+
+<span class="sd">                basis_filter = XXXX     ### your filter information in a string</span>
+<span class="sd">                error,mask = m1.get_subset_mask(basis_filter)  ### get a mask</span>
+
+<span class="sd">                # now the commands that refer to the current method . . . </span>
+
+<span class="sd">                error = m1.set_coor_using_mask(m2,frame,mask)		</span>
+
+<span class="sd">                NOTE that m2 must be smaller or equal to m1 and that the coordinates in m2</span>
+<span class="sd">                are in the same order in m1 </span>
+
+<span class="sd">        ### OPEN NEEDS DESIGN REVIEW AND TESTING</span>
+<span class="sd">        ### OPEN NEEDS DESIGN REVIEW AND TESTING</span>
+<span class="sd">        ### OPEN NEEDS DESIGN REVIEW AND TESTING</span>
+
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="n">error</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">natoms_self</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">natoms</span><span class="p">()</span>
+        <span class="n">indicies_self</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">nonzero</span><span class="p">(</span>
+            <span class="n">mask</span> <span class="o">*</span> <span class="n">numpy</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">natoms_self</span> <span class="o">+</span> <span class="mi">1</span><span class="p">))[</span><span class="mi">0</span><span class="p">]</span>
+
+        <span class="n">three_indicies_self</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">xrange</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">indicies_self</span><span class="p">)):</span>
+            <span class="n">this_index</span> <span class="o">=</span> <span class="n">indicies_self</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">*</span> <span class="mi">3</span>
+            <span class="n">three_indicies_self</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                <span class="p">[</span><span class="n">this_index</span><span class="p">,</span> <span class="n">this_index</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">this_index</span> <span class="o">+</span> <span class="mi">2</span><span class="p">])</span>
+        <span class="n">three_indicies_self</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">three_indicies_self</span><span class="p">)</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span>
+
+        <span class="n">coor</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">coor</span><span class="p">()[:,</span> <span class="p">:,</span> <span class="p">:]</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="c1"># TAKE COORDS FROM OTHER</span>
+
+            <span class="c1">#			c = numpy.take(other._coor[frame,:,:],three_indicies_other)</span>
+            <span class="c1">#			c.shape = (-1,3)</span>
+
+            <span class="c1"># PUT OTHER INTO SELF</span>
+
+            <span class="c1">#			numpy.put(coor[frame],three_indicies_other,c)</span>
+            <span class="n">numpy</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="n">coor</span><span class="p">[</span><span class="n">frame</span><span class="p">],</span> <span class="n">three_indicies_self</span><span class="p">,</span>
+                      <span class="n">other</span><span class="o">.</span><span class="n">_coor</span><span class="p">[</span><span class="n">frame</span><span class="p">,</span> <span class="p">:,</span> <span class="p">:])</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">setCoor</span><span class="p">(</span><span class="n">coor</span><span class="p">)</span>
+
+<span class="c1">#			print &#39;I have put coordinates in their place&#39;</span>
+
+        <span class="k">except</span><span class="p">:</span>
+            <span class="n">error</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                <span class="s1">&#39;failed to replace coordinates from frame &#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">frame</span><span class="p">))</span>
+            <span class="k">return</span> <span class="n">error</span>
+
+        <span class="k">return</span> <span class="n">error</span>
+
+    <span class="k">def</span> <span class="nf">set_descriptor_using_mask</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mask</span><span class="p">,</span> <span class="n">descriptor</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        This method writes the &quot;value&quot; to the given descriptor to</span>
+<span class="sd">        the elements that are equal to 1 in the supplied mask array.</span>
+
+<span class="sd">        usage:</span>
+
+<span class="sd">                m1=system.Molecule(0)	### create a molecule m1</span>
+<span class="sd">                m1.read_pdb(filename)	### read in variables, coor, etc.</span>
+
+<span class="sd">                . . . do stuff . . . </span>
+
+<span class="sd">                basis_filter = XXXX     ### your filter information in a string</span>
+<span class="sd">                error,mask = m1.get_subset_mask(basis_filter)  ### get a mask</span>
+
+<span class="sd">                # now the commands that refer to the current method . . . </span>
+
+<span class="sd">                descriptor=m1.segname()	### get some property (for example here: segname)</span>
+<span class="sd">                value=&#39;ABCD&#39;		### some new value you want to use across basis_filter selection</span>
+<span class="sd">                error=m1.set_descriptor_using_mask(mask,descriptor,value)</span>
+
+<span class="sd">#		m1.setSegname(newdescriptor) ### in this example we reset segname to the new values</span>
+
+
+<span class="sd">        Note that natoms and coor arrays are NOT manipulated by this method.</span>
+
+<span class="sd">#</span>
+<span class="sd">###	OPEN	If possible, get rid of loop</span>
+<span class="sd">#</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="n">error</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="n">natoms</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">natoms</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">xrange</span><span class="p">(</span><span class="n">natoms</span><span class="p">):</span>
+            <span class="k">if</span><span class="p">(</span><span class="n">mask</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">==</span> <span class="mi">1</span><span class="p">):</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="n">descriptor</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span>
+                <span class="k">except</span><span class="p">:</span>
+                    <span class="n">error</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;failed to assign &#39;</span> <span class="o">+</span>
+                                 <span class="nb">str</span><span class="p">(</span><span class="n">value</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39; to atom &#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="p">))</span>
+                    <span class="k">return</span> <span class="n">error</span>
+        <span class="k">return</span> <span class="n">error</span>
+
+    <span class="k">def</span> <span class="nf">apply_biomt</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">frame</span><span class="p">,</span> <span class="n">selection</span><span class="p">,</span> <span class="n">U</span><span class="p">,</span> <span class="n">M</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Apply biological unit transforms (BIOMT) to the coordinates of the</span>
+<span class="sd">        chosen selection and frame.</span>
+
+<span class="sd">        Information on BIOMT available at:</span>
+<span class="sd">        http://pdb101.rcsb.org/learn/guide-to-understanding-pdb-data/biological-assemblies</span>
+
+<span class="sd">        @type  frame:      integer</span>
+<span class="sd">        @param frame:      Frame number of coordinates to transform</span>
+<span class="sd">        @type  selection:  string</span>
+<span class="sd">        @param selection:  Selection string in standard SASSIE format</span>
+<span class="sd">                                           specifying the coordinates to be transformed</span>
+<span class="sd">        @type  U:          numpy.array</span>
+<span class="sd">        @param U:          3 x 3 rotation matrix</span>
+<span class="sd">        @type  M:          numpy.array</span>
+<span class="sd">        @param M:          3 x 1 translation vector</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="c1"># Get the coordinates for just the chosen frame and selection</span>
+        <span class="c1"># as a masked numpy array</span>
+        <span class="n">coords</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">coor</span><span class="p">()</span>
+        <span class="n">err</span><span class="p">,</span> <span class="n">mask</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_subset_mask</span><span class="p">(</span><span class="n">selection</span><span class="p">)</span>
+        <span class="n">err</span><span class="p">,</span> <span class="n">sel_coords</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_coor_using_mask</span><span class="p">(</span><span class="n">frame</span><span class="p">,</span> <span class="n">mask</span><span class="p">)</span>
+
+        <span class="c1"># Transform coordinates</span>
+        <span class="n">new_coords</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">U</span><span class="p">,</span> <span class="n">sel_coords</span><span class="p">[</span><span class="n">frame</span><span class="p">]</span><span class="o">.</span><span class="n">T</span><span class="p">)</span><span class="o">.</span><span class="n">T</span>
+        <span class="n">new_coords</span> <span class="o">=</span> <span class="n">new_coords</span> <span class="o">+</span> <span class="n">M</span>
+
+        <span class="c1"># Re-write edited coordinates into original array</span>
+        <span class="n">coords</span><span class="p">[</span><span class="n">frame</span><span class="p">]</span> <span class="o">=</span> <span class="n">new_coords</span>
+
+        <span class="k">return</span>
+
+    <span class="k">def</span> <span class="nf">copy_apply_biomt</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">,</span> <span class="n">frame</span><span class="p">,</span> <span class="n">selection</span><span class="p">,</span> <span class="n">U</span><span class="p">,</span> <span class="n">M</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Copy selected atoms (with initial coordinates from the given frame)</span>
+<span class="sd">        to new Molecule object (other) and apply transforms taken from biological</span>
+<span class="sd">        unit (BIOMT) to the coordinates.</span>
+
+<span class="sd">        Information on BIOMT available at:</span>
+<span class="sd">        http://pdb101.rcsb.org/learn/guide-to-understanding-pdb-data/biological-assemblies</span>
+
+<span class="sd">        @type  frame:      Molecule</span>
+<span class="sd">        @param frame:      Object to copy transformed information into</span>
+<span class="sd">        @type  frame:      integer</span>
+<span class="sd">        @param frame:      Frame number of coordinates to transform</span>
+<span class="sd">        @type  selection:  string</span>
+<span class="sd">        @param selection:  Selection string in standard SASSIE format</span>
+<span class="sd">                                           specifying the coordinates to be transformed</span>
+<span class="sd">        @type  U:          numpy.array</span>
+<span class="sd">        @param U:          3 x 3 rotation matrix</span>
+<span class="sd">        @type  M:          numpy.array</span>
+<span class="sd">        @param M:          3 x 1 translation vector</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="c1"># Copy selected atoms to new molecule (other)</span>
+        <span class="n">err</span><span class="p">,</span> <span class="n">mask</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_subset_mask</span><span class="p">(</span><span class="n">selection</span><span class="p">)</span>
+        <span class="n">err</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">copy_molecule_using_mask</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="n">mask</span><span class="p">,</span> <span class="n">frame</span><span class="p">)</span>
+
+        <span class="n">err</span> <span class="o">=</span> <span class="n">other</span><span class="o">.</span><span class="n">apply_biomt</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">selection</span><span class="p">,</span> <span class="n">U</span><span class="p">,</span> <span class="n">M</span><span class="p">)</span>
+
+        <span class="k">return</span>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../index.html">Documentation overview</a><ul>
+  <li><a href="../index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2016, Joseph E. Curtis, Ph.D..
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.4.1</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.8</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

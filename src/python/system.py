@@ -2,6 +2,7 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 #from __future__ import unicode_literals
+#
 #    SASMOL: Copyright (C) 2011 Joseph E. Curtis, Ph.D. 
 #
 #    This program is free software: you can redistribute it and/or modify
@@ -24,6 +25,7 @@ from __future__ import print_function
 #	01/11/2010	--	new design pattern		:	jc
 #	12/25/2015	--	refactored for release  :   jc
 #	07/23/2016	--	refactored for Python 3 :   jc
+#	08/19/2016	--	added doc strings       :   jc
 #
 #	 1         2         3         4         5         6         7
 # LC4567890123456789012345678901234567890123456789012345678901234567890123456789
@@ -56,23 +58,75 @@ import sasmol.config as config
 
 class Atom(file_io.Files, calculate.Calculate, operate.Move, subset.Mask, properties.Atomic, topology.CharmmTopology, view.View):
 
-    '''
-        Molecule is the base class to build and deal with molecular systems.
-        The various methods described herein are separated in regards to
-        their function.  The class inherits file input/output and 
-        manipulation abilities from the file_io, calculate, and operate modules.
+    """ Base class containing methods to define system objects.
 
-    '''
+        Atom is the base class to build and deal with molecular systems.
+        The class inherits file input/output, calcuation, manipulation, subset,
+        atom properties, topology, and viewing from other samsol classes.
+        
+        Class has several initialization options
+
+        Parameters
+        ----------
+        args 
+            optional integer : self._id
+
+        kwargs 
+            optional keyword arguments
+            {
+                string filename (filename = 'hiv1_gag.pdb') : default = None
+                integet id (id=3) : default = 0
+                boolean debug (debug = True) : default = None
+                
+            }
+                                                                                       
+        Returns
+        -------
+        system object
+            if called with string (or with filename kwarg) returns
+            an initialized system object with data read in using
+            file_io.read_pdb()
+
+        Examples
+        -------
+
+        Define instance of class and read in PDB file at same time
+
+        >>> import sasmol.system as system
+        >>> molecule = system.Molecule(filename='hiv1_gag.pdb')
+     
+        Other instance definition examples (not-exhaustive) 
+        
+        >>> molecule = system.Molecule()
+        >>> molecule = system.Molecule(id=7)
+        >>> molecule = system.Molecule(debug=True)
+        >>> molecule = system.Molecule('hiv1_gag.pdb')
+        >>> molecule = system.Molecule(filename='hiv1_gag.pdb', id=0, debug=False)
+  
+        Example of how setters and getters work.  Below, the original index
+        values are adjusted by a value (-10) and setIndex() is used to assign
+        the new list to the molecule 
+   
+        >>> molecule.index()[0] 
+        1 
+        >>> offset = -10 
+        >>> index = [x + offset for x in xrange(molecule.natoms())]  
+        >>> molecule.setIndex(index) 
+        >>> molecule.index()[0] 
+        -10
+        
+        Note
+        ----
+    
+        `self` parameter is not shown in the ``Parameters`` section in the documentation
+
+    
+        Many "setters" and "getters" methods are defined in this class.  See source
+        code for details.  
+        
+    """ 
 
     def __init__(self, *args, **kwargs):
-  
-#        print(args)
-#        print(kwargs)
-          
-        #kwargs.setdefault('filename', None)
-        #kwargs.setdefault('id', 0)
-        #kwargs.setdefault('debug', False)
-    
         self._filename = kwargs.pop('filename', None)
         self._id = kwargs.pop('id', 0)
         self._debug = kwargs.pop('debug', None)
@@ -110,12 +164,11 @@ class Atom(file_io.Files, calculate.Calculate, operate.Move, subset.Mask, proper
             except:
                 pass
 
-        ### IS THE FOLLOWING LINE NEEDED? ###
-
         self.setId(self._id) 
 
                                                     
     def __repr__(self):
+
         if self._filename and self._defined_with_input_file:
             return "sasmol object initialied with filename = " + self._filename
         else:
@@ -580,29 +633,218 @@ class Atom(file_io.Files, calculate.Calculate, operate.Move, subset.Mask, proper
 
 class Molecule(Atom):
 
-    '''
+    """
         Molecule is a class that is used to describe molecules. It inherits
         all of attributes from Atom.  An example of a molecule is
         a single protein, a single nucleic acid strand.
 
-    '''
+        Class has several initialization options
+
+        Parameters
+        ----------
+        args 
+            optional integer : self._id
+
+        kwargs 
+            optional keyword arguments
+            {
+                string filename (filename = 'hiv1_gag.pdb') : default = None
+                integet id (id=3) : default = 0
+                boolean debug (debug = True) : default = None
+                
+            }
+                                                                                       
+        Returns
+        -------
+        system object
+            if called with string (or with filename kwarg) returns
+            an initialized system object with data read in using
+            file_io.read_pdb()
+
+        Examples
+        -------
+
+        >>> import sasmol.system as system
+        >>> molecule = system.Molecule(filename='hiv1_gag.pdb')
+      
+        
+        >>> molecule = system.Molecule()
+        >>> molecule = system.Molecule(id=7)
+        >>> molecule = system.Molecule(debug=True)
+        >>> molecule = system.Molecule('hiv1_gag.pdb')
+        >>> molecule = system.Molecule(filename='hiv1_gag.pdb', id=0, debug=False)
+        
+    """
 
     def __init__(self, *args, **kwargs):
+        
         Atom.__init__(self, *args, **kwargs)
 
 class System(Atom):
 
-    '''
+    """
         System is a class that is used to aggregate all components. It inherits
         all of attributes from Atom.  
 
-    '''
+        Class has several initialization options
+
+        Parameters
+        ----------
+        args 
+            optional integer : self._id
+
+        kwargs 
+            optional keyword arguments
+            {
+                string filename (filename = 'hiv1_gag.pdb') : default = None
+                integet id (id=3) : default = 0
+                boolean debug (debug = True) : default = None
+                
+            }
+                                                                                       
+        Returns
+        -------
+        system object
+            if called with string (or with filename kwarg) returns
+            an initialized system object with data read in using
+            file_io.read_pdb()
+
+        Examples
+        -------
+
+        >>> import sasmol.system as system
+        >>> molecule = system.Molecule(filename='hiv1_gag.pdb')
+      
+        
+        >>> molecule = system.Molecule()
+        >>> molecule = system.Molecule(id=7)
+        >>> molecule = system.Molecule(debug=True)
+        >>> molecule = system.Molecule('hiv1_gag.pdb')
+        >>> molecule = system.Molecule(filename='hiv1_gag.pdb', id=0, debug=False)
+
+    """
 
     def __init__(self, *args, **kwargs):
+        """
+        Class has several initialization options
+
+        Parameters
+        ----------
+        args 
+            optional integer : self._id
+
+        kwargs 
+            optional keyword arguments
+            {
+                string filename (filename = 'hiv1_gag.pdb') : default = None
+                integet id (id=3) : default = 0
+                boolean debug (debug = True) : default = None
+                
+            }
+                                                                                       
+        Returns
+        -------
+        system object
+            if called with string (or with filename kwarg) returns
+            an initialized system object with data read in using
+            file_io.read_pdb()
+
+        Examples
+        -------
+
+        >>> import sasmol.system as system
+        >>> molecule = system.Molecule(filename='hiv1_gag.pdb')
+      
+        
+        >>> molecule = system.Molecule()
+        >>> molecule = system.Molecule(id=7)
+        >>> molecule = system.Molecule(debug=True)
+        >>> molecule = system.Molecule('hiv1_gag.pdb')
+        >>> molecule = system.Molecule(filename='hiv1_gag.pdb', id=0, debug=False)
+        
+        """
         Atom.__init__(self, *args, **kwargs)
 
 
 class Molecule_Maker(Atom):
+    """
+        This class is used to define the minimum number of fields required to 
+        use within sasmol to use read_pdb() and write_pdb() methods in file_io.
+
+        Default inputs are listed in the variables in __init__ and itemized below.
+        The values are assigned to all atoms in the molecule.
+
+        Once defined, attributes can be set using setters in the Atom class.
+
+        Class has several initialization options
+
+        Parameters
+        ----------
+        natoms
+            integer : number of atoms in the molecule
+
+        atom    
+            string  : name of ATOM keyword, typically either ATOM or HETATM
+
+        index
+            integer list : atom number
+            
+        name
+            string : atom name
+            
+        loc
+            string : alt loc
+        
+        resname
+            string  : residue name     
+
+        chain
+            string  : chain name
+
+        resid
+            integer list : residue number
+
+        rescode
+            string  : residue code
+
+        coor
+            numpy float array : x, y, z coordinates
+
+        occupancy
+            string  : occupancy value 
+
+        beta
+            string  : beta value 
+
+        segname
+            string  : segment name
+
+        element
+            string  : element name
+
+        charge
+            string  : element charge
+
+        kwargs 
+            optional future arguments
+                                                                                       
+        Returns
+        -------
+        system object
+
+        Examples
+        -------
+
+        >>> import sasmol.system as system
+        >>> molecule = system.Molecule_Maker(2048)
+        >>> molecule = system.Molecule_Maker(2048, name='Ar')
+        >>> molecule = system.Molecule_Maker(2048, name='Ar', segname='ARG0')
+        >>> index = [x for x in xrange(340,1000)]
+        >>> molecule = system.Molecule_Maker(660, name='Ar', index=index)
+        >>> molecule.index()[0]
+        340
+        
+    """
 
     def __init__(self, natoms, atom='ATOM', index=None, name='C', loc=' ',
         resname='DUM', chain='A', resid=None, rescode=' ', coor=None,
@@ -639,6 +881,4 @@ class Molecule_Maker(Atom):
         self._charge = [charge for x in xrange(natoms)]
         self._segname = [segname for x in xrange(natoms)]
         self._element = [element for x in xrange(natoms)]
-
-
 
