@@ -90,6 +90,10 @@ class Atom(file_io.Files, calculate.Calculate, operate.Move, subset.Mask, proper
         Examples
         -------
 
+        Since subsequent classes in this file inherit from Atom and the
+        common use case involves molecules, examples will use the Molecule()
+        class instead of Atom.  
+
         Define instance of class and read in PDB file at same time
 
         >>> import sasmol.system as system
