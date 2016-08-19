@@ -1,19 +1,32 @@
-'''
-    SASSIE: Copyright (C) 2011 Joseph E. Curtis, Ph.D. 
-
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
-'''
+from __future__ import absolute_import
+from __future__ import division
+from __future__ import print_function
+#from __future__ import unicode_literals
+#
+#
+#    SASMOL: Copyright (C) 2011 Joseph E. Curtis, Ph.D.
+#
+#    This program is free software: you can redistribute it and/or modify
+#    it under the terms of the GNU General Public License as published by
+#    the Free Software Foundation, either version 3 of the License, or
+#    (at your option) any later version.
+#
+#    This program is distributed in the hope that it will be useful,
+#    but WITHOUT ANY WARRANTY; without even the implied warranty of
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#    GNU General Public License for more details.
+#
+#    You should have received a copy of the GNU General Public License
+#    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+#
+#	SUBSET
+#
+#	01/04/2011	--	initial coding 			            :	jc
+#	08/19/2016	--	added doc strings                   :	jc
+#
+# LC	 1         2         3         4         5         6         7
+# LC4567890123456789012345678901234567890123456789012345678901234567890123456789
+#								       *      **
 import os
 import sys
 import string
@@ -21,34 +34,46 @@ import locale
 import struct
 import numpy
 import time
-import mask
+import sasmol.mask
 import random
 
-#	SASSUBSET
-#
-#	01/04/2011	--	initial coding 			:	jc
-#
-# LC	 1         2         3         4         5         6         7
-# LC4567890123456789012345678901234567890123456789012345678901234567890123456789
-#								       *      **
 '''
-	Sassubset is the module that contains the classes that 
+	Subset is the module that contains the classes that 
 	allow users to extract a subset of objects or values from 
 	objects.  These subsets are used to do things like align
 	molecules, check for overlap, filter molecular data to
 	select for fields in the PDB file.	
 
-	These classes are accessed by the SasAtm class found in
-	the sasmol module.
+	These classes are accessed by the Atom class found in
+	the system module.
 
 '''
 
 
 class Mask(object):
 
-    def __init__(self, basis_filter):
-        #		self._basis=None
-        pass
+    """ Base class containing methods to extract or combine system objects
+        using numpy masks
+
+        Examples
+        ========
+
+        First example shows how to use class methods from system object:
+
+        >>> import sasmol.system as system
+        >>> molecule = system.Molecule('hiv1_gag.pdb')
+        >>> basis_filter = 'name[i] == "CA" and resid[i] < 10'
+        >>> error, mask = molecule.get_subset_mask(basis_filter)  
+        >>> import numpy
+        >>> numpy.nonzero(mask)
+        (array([  4,  11,  21,  45,  55,  66,  82, 101, 112]),) 
+
+        Note
+        ----
+
+        `self` parameter is not shown in the ``Parameters`` section in the documentation
+
+    """
 
     def get_dihedral_subset_mask(self, flexible_residues, mtype):
         '''
@@ -73,8 +98,8 @@ class Mask(object):
 
         farray = numpy.zeros((nflexible, natoms), numpy.long)
 
-        mask.get_mask_array(farray, name, resid,
-                            flexible_residues, nresidues, mtype)
+        sasmol.mask.get_mask_array(farray, name, resid,
+                                   flexible_residues, nresidues, mtype)
 
         return farray
 
@@ -147,7 +172,7 @@ class Mask(object):
                 residue_molecules = m1.init_child('resids')
 
                 for i in xrange(m1.number_of_resids()):
-                        print residue_molecules[i].calccom(0)
+                        print(residue_molecules[i].calccom(0))
 
                 NOTE: coordinates will have to be updated separately using
                         get_coor_using_mask ... using the mask(s) generated
@@ -371,8 +396,8 @@ class Mask(object):
         natoms1 = mol1.natoms()
         natoms2 = mol2.natoms()
 
-        print 'natoms1 = ', natoms1
-        print 'natoms2 = ', natoms2
+        print('natoms1 = ', natoms1)
+        print('natoms2 = ', natoms2)
 
         frame = 0
 
@@ -653,7 +678,7 @@ class Mask(object):
                 except:
                     error.append(
                         'failed in copy_molecule when attempting to assign descriptors to atom ' + str(i))
-                    print '\n\nerror = ', error
+                    print('\n\nerror = ', error)
                     sys.stdout.flush()
                     return error
 
@@ -1020,8 +1045,6 @@ class Mask(object):
 
             self.setCoor(coor)
 
-#			print 'I have put coordinates in their place'
-
         except:
             error.append(
                 'failed to replace coordinates from frame ' + str(frame))
@@ -1034,30 +1057,55 @@ class Mask(object):
         This method writes the "value" to the given descriptor to
         the elements that are equal to 1 in the supplied mask array.
 
-        usage:
+        Parameters
+        ----------
+        mask 
+            numpy integer array : mask array of length of the number of atoms
+                                  with 1 or 0 for each atom depending on the selection
+                                  used to create the mask
 
-                m1=system.Molecule(0)	### create a molecule m1
-                m1.read_pdb(filename)	### read in variables, coor, etc.
+        descriptor 
+            system property : a property defined in an instance of a system object
 
-                . . . do stuff . . . 
+        value
+            string : new value to apply to selection defined by mask
 
-                basis_filter = XXXX     ### your filter information in a string
-                error,mask = m1.get_subset_mask(basis_filter)  ### get a mask
+        kwargs 
+            point = True : will translate to a fixed point
+                           given by value variable                                                                             
+        Returns
+        -------
+        None
+            updated self._descriptor
 
-                # now the commands that refer to the current method . . . 
+        Examples
+        --------
 
-                descriptor=m1.segname()	### get some property (for example here: segname)
-                value='ABCD'		### some new value you want to use across basis_filter selection
-                error=m1.set_descriptor_using_mask(mask,descriptor,value)
+        >>> import sasmol.system as system
+        >>> molecule = system.Molecule('hiv1_gag.pdb')
+        >>> molecule.beta()[:10]
+        ['0.00', '0.00', '0.00', '0.00', '0.00', '0.00', '0.00', '0.00', '0.00', '0.00']
 
-#		m1.setSegname(newdescriptor) ### in this example we reset segname to the new values
+        >>> basis_filter = "name[i] == 'CA'"
+        >>> error, mask = molecule.get_subset_mask(basis_filter)
+        >>> descriptor = molecule.beta()
+        >>> value = '1.00'
+        >>> error = molecule.set_descriptor_using_mask(mask, descriptor, value)
+        >>> descriptor[:10]
+        ['0.00', '0.00', '0.00', '0.00', '1.00', '0.00', '0.00', '0.00', '0.00', '0.00']
+    
+        which can then be used to set the new values into the molecule 
 
+        >>> molecule.setBeta(descriptor)
+        >>> molecule.beta()[:10]
+        ['0.00', '0.00', '0.00', '0.00', '1.00', '0.00', '0.00', '0.00', '0.00', '0.00']
+       
+        Note
+        ____
+        Coordinate arrays can not be manipulated by this method.
 
-        Note that natoms and coor arrays are NOT manipulated by this method.
+        TODO: If possible, get rid of loop
 
-#
-###	OPEN	If possible, get rid of loop
-#
         '''
         error = []
 
@@ -1072,7 +1120,7 @@ class Mask(object):
                     return error
         return error
 
-    def apply_biomt(self, frame, selection, U, M):
+    def apply_biomt(self, frame, selection, U, M, **kwargs):
         """
         Apply biological unit transforms (BIOMT) to the coordinates of the
         chosen selection and frame.
@@ -1080,15 +1128,37 @@ class Mask(object):
         Information on BIOMT available at:
         http://pdb101.rcsb.org/learn/guide-to-understanding-pdb-data/biological-assemblies
 
-        @type  frame:      integer
-        @param frame:      Frame number of coordinates to transform
-        @type  selection:  string
-        @param selection:  Selection string in standard SASSIE format
-                                           specifying the coordinates to be transformed
-        @type  U:          numpy.array
-        @param U:          3 x 3 rotation matrix
-        @type  M:          numpy.array
-        @param M:          3 x 1 translation vector
+        Parameters
+        ----------
+        frame   
+            integer : frame number with coordinates to transform
+
+        selection
+            string  : selection string in standard SASMOL format  
+                      specifying the coordinates to be transformed
+
+        U
+            numpy array : 3 x 3 rotation matrix
+
+        M
+            numpy array : 3 x 1 translation vector
+
+        kwargs 
+            optional future arguments
+                                                                                     
+        Returns
+        -------
+        None
+            updated self._coor 
+
+        Examples
+        -------
+        
+        Note
+        ____
+
+        TODO: add example 
+
         """
 
         # Get the coordinates for just the chosen frame and selection
@@ -1106,7 +1176,7 @@ class Mask(object):
 
         return
 
-    def copy_apply_biomt(self, other, frame, selection, U, M):
+    def copy_apply_biomt(self, other, frame, selection, U, M, **kwargs):
         """
         Copy selected atoms (with initial coordinates from the given frame)
         to new Molecule object (other) and apply transforms taken from biological
@@ -1115,17 +1185,40 @@ class Mask(object):
         Information on BIOMT available at:
         http://pdb101.rcsb.org/learn/guide-to-understanding-pdb-data/biological-assemblies
 
-        @type  frame:      Molecule
-        @param frame:      Object to copy transformed information into
-        @type  frame:      integer
-        @param frame:      Frame number of coordinates to transform
-        @type  selection:  string
-        @param selection:  Selection string in standard SASSIE format
-                                           specifying the coordinates to be transformed
-        @type  U:          numpy.array
-        @param U:          3 x 3 rotation matrix
-        @type  M:          numpy.array
-        @param M:          3 x 1 translation vector
+        Parameters
+        ----------
+        other
+            system object : object to copy transformed information into
+        
+        frame   
+            integer : frame number with coordinates to transform
+
+        selection
+            string  : selection string in standard SASMOL format  
+                      specifying the coordinates to be transformed
+
+        U
+            numpy array : 3 x 3 rotation matrix
+
+        M
+            numpy array : 3 x 1 translation vector
+
+        kwargs 
+            optional future arguments
+                                                                                     
+        Returns
+        -------
+        None
+            updated self._coor 
+
+        Examples
+        -------
+
+        Note
+        ____
+
+        TODO: add example 
+
         """
 
         # Copy selected atoms to new molecule (other)

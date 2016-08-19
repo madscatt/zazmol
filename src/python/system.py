@@ -73,12 +73,9 @@ class Atom(file_io.Files, calculate.Calculate, operate.Move, subset.Mask, proper
 
         kwargs 
             optional keyword arguments
-            {
                 string filename (filename = 'hiv1_gag.pdb') : default = None
                 integet id (id=3) : default = 0
                 boolean debug (debug = True) : default = None
-                
-            }
                                                                                        
         Returns
         -------
@@ -637,8 +634,7 @@ class Atom(file_io.Files, calculate.Calculate, operate.Move, subset.Mask, proper
 
 class Molecule(Atom):
 
-    """
-        Molecule is a class that is used to describe molecules. It inherits
+    """ Molecule is a class that is used to describe molecules. It inherits
         all of attributes from Atom.  An example of a molecule is
         a single protein, a single nucleic acid strand.
 
@@ -651,12 +647,9 @@ class Molecule(Atom):
 
         kwargs 
             optional keyword arguments
-            {
                 string filename (filename = 'hiv1_gag.pdb') : default = None
                 integet id (id=3) : default = 0
                 boolean debug (debug = True) : default = None
-                
-            }
                                                                                        
         Returns
         -------
@@ -666,12 +659,10 @@ class Molecule(Atom):
             file_io.read_pdb()
 
         Examples
-        -------
+        --------
 
         >>> import sasmol.system as system
         >>> molecule = system.Molecule(filename='hiv1_gag.pdb')
-      
-        
         >>> molecule = system.Molecule()
         >>> molecule = system.Molecule(id=7)
         >>> molecule = system.Molecule(debug=True)
@@ -681,17 +672,15 @@ class Molecule(Atom):
     """
 
     def __init__(self, *args, **kwargs):
-        
         Atom.__init__(self, *args, **kwargs)
 
 class System(Atom):
 
-    """
-        System is a class that is used to aggregate all components. It inherits
+    """ System is a class that is used to aggregate all components. It inherits
         all of attributes from Atom.  
-
+    
         Class has several initialization options
-
+    
         Parameters
         ----------
         args 
@@ -699,13 +688,10 @@ class System(Atom):
 
         kwargs 
             optional keyword arguments
-            {
                 string filename (filename = 'hiv1_gag.pdb') : default = None
                 integet id (id=3) : default = 0
                 boolean debug (debug = True) : default = None
-                
-            }
-                                                                                       
+    
         Returns
         -------
         system object
@@ -729,44 +715,6 @@ class System(Atom):
     """
 
     def __init__(self, *args, **kwargs):
-        """
-        Class has several initialization options
-
-        Parameters
-        ----------
-        args 
-            optional integer : self._id
-
-        kwargs 
-            optional keyword arguments
-            {
-                string filename (filename = 'hiv1_gag.pdb') : default = None
-                integet id (id=3) : default = 0
-                boolean debug (debug = True) : default = None
-                
-            }
-                                                                                       
-        Returns
-        -------
-        system object
-            if called with string (or with filename kwarg) returns
-            an initialized system object with data read in using
-            file_io.read_pdb()
-
-        Examples
-        -------
-
-        >>> import sasmol.system as system
-        >>> molecule = system.Molecule(filename='hiv1_gag.pdb')
-      
-        
-        >>> molecule = system.Molecule()
-        >>> molecule = system.Molecule(id=7)
-        >>> molecule = system.Molecule(debug=True)
-        >>> molecule = system.Molecule('hiv1_gag.pdb')
-        >>> molecule = system.Molecule(filename='hiv1_gag.pdb', id=0, debug=False)
-        
-        """
         Atom.__init__(self, *args, **kwargs)
 
 
