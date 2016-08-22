@@ -1,5 +1,16 @@
 import copy
 
+class sasmol_keys():
+
+    def __init__(self):
+        self._all_keys = ['_resnames', '_resids', '_number_of_chains', '_mass', '_coor', '_chains', '_residue_flag', '_header', '_conect', '_elements', '_original_index', '_number_of_betas', '_number_of_resids', '_number_of_names', '_occupancy', '_charge', '_atom', '_debug', '_original_resid', '_segnames', '_chain', '_defined_with_input_file', '_segname', '_number_of_moltypes', '_betas', '_names', '_total_mass', '_beta', '_moltypes', '_number_of_resnames', '_loc', '_number_of_segnames', '_com', '_number_of_elements', '_occupancies', '_natoms', '_index', '_element', '_name', '_rescode', '_moltype', '_resname', '_filename', '_resid', '_id', '_number_of_occupancies']
+
+        self._short_keys = ['_resnames', '_resids', '_number_of_chains','_chains', '_header', '_conect', '_elements','_number_of_betas', '_number_of_resids', '_number_of_names', '_debug',  '_segnames', '_number_of_moltypes', '_betas', '_names', '_moltypes', '_number_of_resnames', '_number_of_segnames', '_com', '_number_of_elements', '_occupancies', '_id', '_number_of_occupancies' ]
+ 
+        self._list_keys = ['_resnames', '_residue_flag', '_occupancy', '_charge', '_atom', '_chain', '_segname', '_beta', '_loc', '_element', '_name', '_rescode', '_moltype', '_resname']
+
+        self._numpy_keys = ['_original_index', '_coor', '_mass', '_original_resid', '_index', '_resid'] 
+
 class Foo:
 
     def __init__(self): #, _var_a=None, _var_b=None):
@@ -21,6 +32,7 @@ class Foo:
     def from_foo(cls, class_instance,  mask, **kwargs):
         new_dict = {}
         natoms = len(class_instance.__dict__['_var_a'])
+        #natoms = len(class_instance.__dict__['_natoms'])
         all_data = [[] for x in xrange(natoms)]
         for i in xrange(natoms):
             if i in mask:

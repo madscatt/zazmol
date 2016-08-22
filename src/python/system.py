@@ -167,6 +167,7 @@ class Atom(file_io.Files, calculate.Calculate, operate.Move, subset.Mask, proper
 
         self.setId(self._id) 
 
+
                                                     
     def __repr__(self):
 
