@@ -16,6 +16,7 @@ Contents:
    index_multiprocessing_sasmol  
    index_operate
    index_properties
+   index_subset
    index_system
    index_topology
    index_view

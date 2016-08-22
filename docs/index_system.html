@@ -26,7 +26,7 @@
     <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <link rel="top" title="sasmol 1.0 documentation" href="index.html" />
     <link rel="next" title="Topology" href="index_topology.html" />
-    <link rel="prev" title="Properties" href="index_properties.html" />
+    <link rel="prev" title="Subset" href="index_subset.html" />
    
   <link rel="stylesheet" href="_static/custom.css" type="text/css" />
   
@@ -59,13 +59,12 @@ atom properties, topology, and viewing from other samsol classes.</p>
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
 <li><strong>args</strong> &#8211; optional integer : self._id</li>
-<li><strong>kwargs</strong> &#8211; <p>optional keyword arguments
-{</p>
-<blockquote>
-<div>string filename (filename = &#8216;hiv1_gag.pdb&#8217;) : default = None
+<li><strong>kwargs</strong> &#8211; <dl class="docutils">
+<dt>optional keyword arguments</dt>
+<dd>string filename (filename = &#8216;hiv1_gag.pdb&#8217;) : default = None
 integet id (id=3) : default = 0
-boolean debug (debug = True) : default = None</div></blockquote>
-<p>}</p>
+boolean debug (debug = True) : default = None</dd>
+</dl>
 </li>
 </ul>
 </td>
@@ -81,6 +80,9 @@ file_io.read_pdb()</p>
 </tbody>
 </table>
 <p class="rubric">Examples</p>
+<p>Since subsequent classes in this file inherit from Atom and the
+common use case involves molecules, examples will use the Molecule()
+class instead of Atom.</p>
 <p>Define instance of class and read in PDB file at same time</p>
 <div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">sasmol.system</span> <span class="k">as</span> <span class="nn">system</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">molecule</span> <span class="o">=</span> <span class="n">system</span><span class="o">.</span><span class="n">Molecule</span><span class="p">(</span><span class="n">filename</span><span class="o">=</span><span class="s1">&#39;hiv1_gag.pdb&#39;</span><span class="p">)</span>
@@ -872,13 +874,12 @@ a single protein, a single nucleic acid strand.</p>
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
 <li><strong>args</strong> &#8211; optional integer : self._id</li>
-<li><strong>kwargs</strong> &#8211; <p>optional keyword arguments
-{</p>
-<blockquote>
-<div>string filename (filename = &#8216;hiv1_gag.pdb&#8217;) : default = None
+<li><strong>kwargs</strong> &#8211; <dl class="docutils">
+<dt>optional keyword arguments</dt>
+<dd>string filename (filename = &#8216;hiv1_gag.pdb&#8217;) : default = None
 integet id (id=3) : default = 0
-boolean debug (debug = True) : default = None</div></blockquote>
-<p>}</p>
+boolean debug (debug = True) : default = None</dd>
+</dl>
 </li>
 </ul>
 </td>
@@ -896,9 +897,7 @@ file_io.read_pdb()</p>
 <p class="rubric">Examples</p>
 <div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">sasmol.system</span> <span class="k">as</span> <span class="nn">system</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">molecule</span> <span class="o">=</span> <span class="n">system</span><span class="o">.</span><span class="n">Molecule</span><span class="p">(</span><span class="n">filename</span><span class="o">=</span><span class="s1">&#39;hiv1_gag.pdb&#39;</span><span class="p">)</span>
-</pre></div>
-</div>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">molecule</span> <span class="o">=</span> <span class="n">system</span><span class="o">.</span><span class="n">Molecule</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">molecule</span> <span class="o">=</span> <span class="n">system</span><span class="o">.</span><span class="n">Molecule</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">molecule</span> <span class="o">=</span> <span class="n">system</span><span class="o">.</span><span class="n">Molecule</span><span class="p">(</span><span class="nb">id</span><span class="o">=</span><span class="mi">7</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">molecule</span> <span class="o">=</span> <span class="n">system</span><span class="o">.</span><span class="n">Molecule</span><span class="p">(</span><span class="n">debug</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">molecule</span> <span class="o">=</span> <span class="n">system</span><span class="o">.</span><span class="n">Molecule</span><span class="p">(</span><span class="s1">&#39;hiv1_gag.pdb&#39;</span><span class="p">)</span>
@@ -973,13 +972,12 @@ all of attributes from Atom.</p>
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
 <li><strong>args</strong> &#8211; optional integer : self._id</li>
-<li><strong>kwargs</strong> &#8211; <p>optional keyword arguments
-{</p>
-<blockquote>
-<div>string filename (filename = &#8216;hiv1_gag.pdb&#8217;) : default = None
+<li><strong>kwargs</strong> &#8211; <dl class="docutils">
+<dt>optional keyword arguments</dt>
+<dd>string filename (filename = &#8216;hiv1_gag.pdb&#8217;) : default = None
 integet id (id=3) : default = 0
-boolean debug (debug = True) : default = None</div></blockquote>
-<p>}</p>
+boolean debug (debug = True) : default = None</dd>
+</dl>
 </li>
 </ul>
 </td>
@@ -1028,7 +1026,7 @@ file_io.read_pdb()</p>
 <h3>Related Topics</h3>
 <ul>
   <li><a href="index.html">Documentation overview</a><ul>
-      <li>Previous: <a href="index_properties.html" title="previous chapter">Properties</a></li>
+      <li>Previous: <a href="index_subset.html" title="previous chapter">Subset</a></li>
       <li>Next: <a href="index_topology.html" title="next chapter">Topology</a></li>
   </ul></li>
 </ul>

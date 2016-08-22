@@ -116,12 +116,9 @@
 
 <span class="sd">        kwargs </span>
 <span class="sd">            optional keyword arguments</span>
-<span class="sd">            {</span>
 <span class="sd">                string filename (filename = &#39;hiv1_gag.pdb&#39;) : default = None</span>
 <span class="sd">                integet id (id=3) : default = 0</span>
 <span class="sd">                boolean debug (debug = True) : default = None</span>
-<span class="sd">                </span>
-<span class="sd">            }</span>
 <span class="sd">                                                                                       </span>
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
@@ -132,6 +129,10 @@
 
 <span class="sd">        Examples</span>
 <span class="sd">        -------</span>
+
+<span class="sd">        Since subsequent classes in this file inherit from Atom and the</span>
+<span class="sd">        common use case involves molecules, examples will use the Molecule()</span>
+<span class="sd">        class instead of Atom.  </span>
 
 <span class="sd">        Define instance of class and read in PDB file at same time</span>
 
@@ -676,8 +677,7 @@
 
 <div class="viewcode-block" id="Molecule"><a class="viewcode-back" href="../index_system.html#system.Molecule">[docs]</a><span class="k">class</span> <span class="nc">Molecule</span><span class="p">(</span><span class="n">Atom</span><span class="p">):</span>
 
-    <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Molecule is a class that is used to describe molecules. It inherits</span>
+    <span class="sd">&quot;&quot;&quot; Molecule is a class that is used to describe molecules. It inherits</span>
 <span class="sd">        all of attributes from Atom.  An example of a molecule is</span>
 <span class="sd">        a single protein, a single nucleic acid strand.</span>
 
@@ -690,12 +690,9 @@
 
 <span class="sd">        kwargs </span>
 <span class="sd">            optional keyword arguments</span>
-<span class="sd">            {</span>
 <span class="sd">                string filename (filename = &#39;hiv1_gag.pdb&#39;) : default = None</span>
 <span class="sd">                integet id (id=3) : default = 0</span>
 <span class="sd">                boolean debug (debug = True) : default = None</span>
-<span class="sd">                </span>
-<span class="sd">            }</span>
 <span class="sd">                                                                                       </span>
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
@@ -705,12 +702,10 @@
 <span class="sd">            file_io.read_pdb()</span>
 
 <span class="sd">        Examples</span>
-<span class="sd">        -------</span>
+<span class="sd">        --------</span>
 
 <span class="sd">        &gt;&gt;&gt; import sasmol.system as system</span>
 <span class="sd">        &gt;&gt;&gt; molecule = system.Molecule(filename=&#39;hiv1_gag.pdb&#39;)</span>
-<span class="sd">      </span>
-<span class="sd">        </span>
 <span class="sd">        &gt;&gt;&gt; molecule = system.Molecule()</span>
 <span class="sd">        &gt;&gt;&gt; molecule = system.Molecule(id=7)</span>
 <span class="sd">        &gt;&gt;&gt; molecule = system.Molecule(debug=True)</span>
@@ -720,17 +715,15 @@
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        
         <span class="n">Atom</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="System"><a class="viewcode-back" href="../index_system.html#system.System">[docs]</a><span class="k">class</span> <span class="nc">System</span><span class="p">(</span><span class="n">Atom</span><span class="p">):</span>
 
-    <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        System is a class that is used to aggregate all components. It inherits</span>
+    <span class="sd">&quot;&quot;&quot; System is a class that is used to aggregate all components. It inherits</span>
 <span class="sd">        all of attributes from Atom.  </span>
-
+<span class="sd">    </span>
 <span class="sd">        Class has several initialization options</span>
-
+<span class="sd">    </span>
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        args </span>
@@ -738,13 +731,10 @@
 
 <span class="sd">        kwargs </span>
 <span class="sd">            optional keyword arguments</span>
-<span class="sd">            {</span>
 <span class="sd">                string filename (filename = &#39;hiv1_gag.pdb&#39;) : default = None</span>
 <span class="sd">                integet id (id=3) : default = 0</span>
 <span class="sd">                boolean debug (debug = True) : default = None</span>
-<span class="sd">                </span>
-<span class="sd">            }</span>
-<span class="sd">                                                                                       </span>
+<span class="sd">    </span>
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">        system object</span>
@@ -768,44 +758,6 @@
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Class has several initialization options</span>
-
-<span class="sd">        Parameters</span>
-<span class="sd">        ----------</span>
-<span class="sd">        args </span>
-<span class="sd">            optional integer : self._id</span>
-
-<span class="sd">        kwargs </span>
-<span class="sd">            optional keyword arguments</span>
-<span class="sd">            {</span>
-<span class="sd">                string filename (filename = &#39;hiv1_gag.pdb&#39;) : default = None</span>
-<span class="sd">                integet id (id=3) : default = 0</span>
-<span class="sd">                boolean debug (debug = True) : default = None</span>
-<span class="sd">                </span>
-<span class="sd">            }</span>
-<span class="sd">                                                                                       </span>
-<span class="sd">        Returns</span>
-<span class="sd">        -------</span>
-<span class="sd">        system object</span>
-<span class="sd">            if called with string (or with filename kwarg) returns</span>
-<span class="sd">            an initialized system object with data read in using</span>
-<span class="sd">            file_io.read_pdb()</span>
-
-<span class="sd">        Examples</span>
-<span class="sd">        -------</span>
-
-<span class="sd">        &gt;&gt;&gt; import sasmol.system as system</span>
-<span class="sd">        &gt;&gt;&gt; molecule = system.Molecule(filename=&#39;hiv1_gag.pdb&#39;)</span>
-<span class="sd">      </span>
-<span class="sd">        </span>
-<span class="sd">        &gt;&gt;&gt; molecule = system.Molecule()</span>
-<span class="sd">        &gt;&gt;&gt; molecule = system.Molecule(id=7)</span>
-<span class="sd">        &gt;&gt;&gt; molecule = system.Molecule(debug=True)</span>
-<span class="sd">        &gt;&gt;&gt; molecule = system.Molecule(&#39;hiv1_gag.pdb&#39;)</span>
-<span class="sd">        &gt;&gt;&gt; molecule = system.Molecule(filename=&#39;hiv1_gag.pdb&#39;, id=0, debug=False)</span>
-<span class="sd">        </span>
-<span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">Atom</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
 
 

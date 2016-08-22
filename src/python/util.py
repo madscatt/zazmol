@@ -34,6 +34,11 @@ from __future__ import print_function
 '''
 
 import string
+import copy
+
+def duplicate_molecule(molecule, number_of_duplicates):
+    return [copy.deepcopy(molecule) for x in xrange(number_of_duplicates)]
+
 
 NAME, NUM, LPAREN, RPAREN, EOS = range(5)
 import re

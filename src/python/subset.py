@@ -35,6 +35,7 @@ import struct
 import numpy
 import time
 import sasmol.mask
+import sasmol.util as utilities
 import random
 
 '''
@@ -739,206 +740,86 @@ class Mask(object):
 
         return error
 
-    def duplicate_molecule(self, other, number_of_duplicates, frame, com_coor):
+    def duplicate_molecule(self, number_of_duplicates, **kwargs):
         '''
-        This method assigns all fields from one molecule to another
-        for a user-supplied number_of_duplicates
+        This method copies all attributes from one molecule to a new
+        set of a user-supplied number of duplicate molecules
 
-        usage:
+        Parameters
+        ----------
+        number_of_duplicates 
+            integer : number of copies to make
 
-                Here is a way to create a mask to be used somewhere else:
+        kwargs 
+            optional future arguments
+                           
+        Returns
+        -------
+        molecules
+            list of system objects
 
-                m1=system.Molecule(0)	### create a molecule m1
-                m1.read_pdb(filename)	### read in variables, coor, etc.
+        Examples
+        --------
 
-                # you need an array of x,y,z coords that set the com position
-                # of each duplicate : com_coor
-
-                . . . do stuff . . . 
-
-                m2=system.Molecule(1)  	### create a second molecule m2
-
-                error = m1.duplicate_molecule(m2,number_of_duplicates,frame,com_coor) 
-
+        >>> import sasmol.system as system
+        >>> molecule = system.Molecule('hiv1_gag.pdb')
+        >>> molecule.coor()[0][0]
+        array([-21.52499962, -67.56199646,  86.75900269])
+        >>> molecule.name()[:10]
+        ['N', 'HT1', 'HT2', 'HT3', 'CA', 'HA1', 'HA2', 'C', 'O', 'N']  
+       
+        >>> import sasmol.util as utilities
+        >>> number_of_duplicates = 108
+        >>> molecules = utilities.duplicate_molecule(molecule, number_of_duplicates)
+        >>> molecules[-1].coor()[0][0]
+        array([-21.52499962, -67.56199646,  86.75900269]) 
+        >>> molecules[-1].name()[:10]
+        ['N', 'HT1', 'HT2', 'HT3', 'CA', 'HA1', 'HA2', 'C', 'O', 'N']  
+      
+       
+        Note
+        ____
+        Using deepcopy directly in subset.py leads to inheritance conflict.  
+        Therefore subset calls a method held in utilities to make duplicates. 
+        
         '''
-        frame = 0
-        number_of_frames = 1
-        error = []
-        atom = []
-        index = []
-        name = []
-        loc = []
-        resname = []
-        chain = []
-        resid = []
-        rescode = []
-        occupancy = []
-        beta = []
-        segname = []
-        element = []
-        charge = []
-        moltype = []
-        atom_charge = []
-        atom_vdw = []
-        residue_flag = []
-        original_index = []
-        original_resid = []
-        unique_names = []
-        unique_resnames = []
-        unique_resids = []
-        unique_chains = []
-        unique_segnames = []
-        unique_occupancies = []
-        unique_betas = []
-        unique_elements = []
-        natoms = self.natoms()
-        count = 1
-
-        self_com = self.calccom(frame)
-
-        separate_resids = 'no'
-
-        new_coor = numpy.zeros(
-            (number_of_frames, number_of_duplicates * natoms, 3), numpy.float)
-
-        for i in xrange(number_of_duplicates):
-            if(i < 10):
-                this_segment = '000' + str(i)
-            elif(i < 100):
-                this_segment = '00' + str(i)
-            elif(i < 1000):
-                this_segment = '0' + str(i)
-            else:
-                this_segment = '' + str(i)
-
-            if(separate_resids == 'yes'):
-                if(i == 0):
-                    this_resid = 1
-                else:
-                    this_resid += 1
-
-            for j in xrange(natoms):
-                try:
-                    atom.append(self._atom[j])
-                    # index.append(self._index[j])
-                    index.append(str(count))
-                    count += 1
-                    original_index.append(self._original_index[j])
-                    name.append(self._name[j])
-                    loc.append(self._loc[j])
-                    resname.append(self._resname[j])
-                    chain.append(self._chain[j])
-                    if(separate_resids == 'yes'):
-                        resid.append(this_resid)
-                    else:
-                        resid.append(self._resid[j])
-                    original_resid.append(self._original_resid[j])
-                    rescode.append(self._rescode[j])
-                    occupancy.append(self._occupancy[j])
-                    beta.append(self._beta[j])
-                    # segname.append(self._segname[j])
-                    segname.append(this_segment)
-                    element.append(self._element[j])
-                    charge.append(self._charge[j])
-                    moltype.append(self._moltype[j])
-                    residue_flag.append(self._residue_flag[j])
-
-                    try:
-                        atom_charge.append(self._atom_charge[j])
-                    except:
-                        pass
-                    try:
-                        atom_vdw.append(self._atom_vdw[j])
-                    except:
-                        pass
-
-                    if(self._name[j] not in unique_names):
-                        unique_names.append(self._name[j])
-                    if(self._resname[j] not in unique_resnames):
-                        unique_resnames.append(self._resname[j])
-                    if(self._resid[j] not in unique_resids):
-                        unique_resids.append(self._resid[j])
-                    if(self._chain[j] not in unique_chains):
-                        unique_chains.append(self._chain[j])
-                    if(this_segment not in unique_segnames):
-                        unique_segnames.append(this_segment)
-                    if(self._occupancy[j] not in unique_occupancies):
-                        unique_occupancies.append(self._occupancy[j])
-                    if(self._beta[j] not in unique_betas):
-                        unique_betas.append(self._beta[j])
-                    if(self._element[j] not in unique_elements):
-                        unique_elements.append(self._element[j])
-
-                except:
-                    error.append(
-                        'failed in copy_molecule when attempting to assign descriptors to atom ' + str(i))
-                    sys.exit()
-                    return error
-
-            axis_int = random.randint(1, 3)
-            if(axis_int == 1):
-                axis = 'x'
-            elif(axis_int == 2):
-                axis = 'y'
-            else:
-                axis = 'z'
-
-            theta = 360.0 * random.random()
-
-            self.rotate(frame, axis, theta)
-
-            new_coor[0, natoms * i:(natoms * (i + 1)),
-                     :] = self._coor[0, :, :] - self_com + com_coor[i]
-
-            self.rotate(frame, axis, -theta)
-
-        other.setAtom(atom)
-        other.setIndex(numpy.array(index, numpy.int))
-        other.setOriginal_index(original_index)
-        other.setName(name)
-        other.setLoc(loc)
-        other.setResname(resname)
-        other.setChain(chain)
-        other.setResid(numpy.array(resid, numpy.int))
-        other.setOriginal_resid(numpy.array(original_resid, numpy.int))
-        other.setRescode(rescode)
-        other.setOccupancy(occupancy)
-        other.setBeta(beta)
-        other.setSegname(segname)
-        other.setElement(element)
-        other.setCharge(charge)
-        other.setMoltype(moltype)
-        other.setCoor(new_coor)
-        other.setNatoms(len(index))
-        other.setAtom_charge(numpy.array(atom_charge, numpy.float32))
-        other.setAtom_vdw(numpy.array(atom_vdw, numpy.float32))
-        other.setResidue_flag(residue_flag)
-
-        other.setConect(self.conect())
-
-        other._number_of_names = len(unique_names)
-        other._names = unique_names
-        other._number_of_resnames = len(unique_resnames)
-        other._resnames = unique_resnames
-        other._number_of_resids = len(unique_resids)
-        other._resids = unique_resids
-        other._number_of_chains = len(unique_chains)
-        other._chains = unique_chains
-        other._number_of_segnames = len(unique_segnames)
-        other._segnames = unique_segnames
-        other._number_of_occupancies = len(unique_occupancies)
-        other._occupancies = unique_occupancies
-        other._number_of_betas = len(unique_betas)
-        other._betas = unique_betas
-        other._number_of_elements = len(unique_elements)
-        other._elements = unique_elements
-
-        return error
+    
+        molecules = utilities.duplicate_molecule(molecule, number_of_duplicates)
+         
+        return molecules
 
     def get_indices_from_mask(self, mask):
         '''
         This method returns the internal indices for the supplied
         mask.  
+
+        Parameters
+        ----------
+        mask 
+            numpy integer array : mask array of length of the number of atoms
+                                  with 1 or 0 for each atom depending on the selection
+                                  used to create the mask
+
+        kwargs 
+            optional future arguments
+                           
+        Returns
+        -------
+        indices
+            numpy integer array : indices of atoms determined by the input mask
+
+
+        Examples
+        --------
+
+        >>> import sasmol.system as system
+        >>> molecule = system.Molecule('hiv1_gag.pdb')
+        >>> basis_filter = "name[i] == 'CA'"
+        >>> error, mask = molecule.get_subset_mask(basis_filter)
+        >>> indices = molecule.get_indices_from_mask(mask) 
+        >>> indices[:10]
+        array([  4,  11,  21,  45,  55,  66,  82, 101, 112, 119])
+
         '''
 
         natoms = self.natoms()
@@ -948,23 +829,44 @@ class Mask(object):
 
     def get_coor_using_mask(self, frame, mask):
         '''
-        This method extracts coordinates from frame=frame of self
+        This method extracts coordinates from frame=frame of system object (self)
         using a supplied mask which has been created before this method is called.
+
         Coorindates are chosen for the elements that are equal to 1 in the supplied mask array.
 
-        usage:
+        Parameters
+        ----------
+        frame 
+            integer : trajectory frame number to use
+        
+        mask 
+            numpy integer array : mask array of length of the number of atoms
+                                  with 1 or 0 for each atom depending on the selection
+                                  used to create the mask
 
-                m1=system.Molecule(0)	### create a molecule m1
-                m1.read_pdb(filename)	### read in variables, coor, etc.
+        kwargs 
+            optional future arguments
+                           
+        Returns
+        -------
+        error
+            string : error statement
 
-                . . . do stuff . . . 
+        coor
+            coordinates corresponding to those determined by the input mask
 
-                basis_filter = XXXX     ### your filter information in a string
-                error,mask = m1.get_subset_mask(basis_filter)  ### get a mask
+        Examples
+        --------
 
-                # now the commands that refer to the current method . . . 
+        >>> import sasmol.system as system
+        >>> molecule = system.Molecule('hiv1_gag.pdb')
+        >>> basis_filter = "name[i] == 'CA'"
+        >>> error, mask = molecule.get_subset_mask(basis_filter)
+        >>> frame = 0
+        >>> error, coor = molecule.get_coor_using_mask(frame, mask)
+        >>> coor[0][0]
+        array([-21.72500038, -66.91000366,  85.45700073], dtype=float32)
 
-                error,new_coor=m1.get_coor_using_mask(frame,mask)		
         '''
         error = []
         new_coor = []
@@ -987,34 +889,46 @@ class Mask(object):
 
     def set_coor_using_mask(self, other, frame, mask):
         '''
-        This method replaces coordinates from frame=frame of self
+        This method replaces coordinates from frame=frame of system object (self)
         using a supplied mask which has been created before this method is called.
+
         Coordinates are chosen for the elements that are equal to 1 in the supplied mask array.
 
-        usage:
+        Parameters
+        ----------
+        frame 
+            integer : trajectory frame number to use
+        
+        mask 
+            numpy integer array : mask array of length of the number of atoms
+                                  with 1 or 0 for each atom depending on the selection
+                                  used to create the mask
 
-                m1=system.Molecule(0)	### create a molecule m1
-                m1.read_pdb(filename)	### read in variables, coor, etc.
+        kwargs 
+            optional future arguments
+                           
+        Returns
+        -------
+        error
+            string : error statement
 
-                m2=system.Molecule(1)	### create a molecule m2
+            updated self._coor
 
-                . . . do stuff . . . 
+        Examples
+        --------
 
-                ### m2 gets coordinates in some way (copy, read a pdb, etc.)
+        >>> import sasmol.system as system
+        >>> molecule_1 = system.Molecule('hiv1_gag.pdb')
+        >>> molecule_2 = system.Molecule('other_hiv1_gag.pdb')
+        >>> basis_filter = "name[i] == 'CA'"
+        >>> error, mask = molecule_1.get_subset_mask(basis_filter)
+        >>> frame = 0
+        >>> error = molecule_1.set_coor_using_mask(molecule_2, frame, mask)
 
-                basis_filter = XXXX     ### your filter information in a string
-                error,mask = m1.get_subset_mask(basis_filter)  ### get a mask
-
-                # now the commands that refer to the current method . . . 
-
-                error = m1.set_coor_using_mask(m2,frame,mask)		
-
-                NOTE that m2 must be smaller or equal to m1 and that the coordinates in m2
-                are in the same order in m1 
-
-        ### OPEN NEEDS DESIGN REVIEW AND TESTING
-        ### OPEN NEEDS DESIGN REVIEW AND TESTING
-        ### OPEN NEEDS DESIGN REVIEW AND TESTING
+        Note
+        ____
+        molecule_2 must be smaller or equal to molecule_1 and that the coordinates 
+        in molecule_2 are in the same order in molecule_1 
 
         '''
         error = []
@@ -1032,14 +946,6 @@ class Mask(object):
         coor = self.coor()[:, :, :]
 
         try:
-            # TAKE COORDS FROM OTHER
-
-            #			c = numpy.take(other._coor[frame,:,:],three_indicies_other)
-            #			c.shape = (-1,3)
-
-            # PUT OTHER INTO SELF
-
-            #			numpy.put(coor[frame],three_indicies_other,c)
             numpy.put(coor[frame], three_indicies_self,
                       other._coor[frame, :, :])
 
