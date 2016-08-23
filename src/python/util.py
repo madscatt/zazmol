@@ -37,6 +37,9 @@ import string
 import copy
 import numpy
 
+def find_unique(this_list):
+    return list(numpy.unique(this_list))
+
 class Copy_Using_Mask():
 
     @classmethod

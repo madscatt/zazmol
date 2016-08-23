@@ -384,16 +384,6 @@ class Mask(object):
         original_resid = []
         residue_flag = []
 
-        unique_names = []
-        unique_resnames = []
-        unique_resids = []
-        unique_chains = []
-        unique_segnames = []
-        unique_occupancies = []
-        unique_betas = []
-        unique_elements = []
-        unique_moltypes = []
-
         natoms1 = mol1.natoms()
         natoms2 = mol2.natoms()
 
@@ -425,25 +415,6 @@ class Mask(object):
                 original_index.append(mol1._original_index[i])
                 original_resid.append(mol1._original_resid[i])
                 residue_flag.append(mol1._residue_flag[i])
-
-                if(mol1._name[i] not in unique_names):
-                    unique_names.append(mol1._name[i])
-                if(mol1._resname[i] not in unique_resnames):
-                    unique_resnames.append(mol1._resname[i])
-                if(mol1._resid[i] not in unique_resids):
-                    unique_resids.append(mol1._resid[i])
-                if(mol1._chain[i] not in unique_chains):
-                    unique_chains.append(mol1._chain[i])
-                if(mol1._segname[i] not in unique_segnames):
-                    unique_segnames.append(mol1._segname[i])
-                if(mol1._occupancy[i] not in unique_occupancies):
-                    unique_occupancies.append(mol1._occupancy[i])
-                if(mol1._beta[i] not in unique_betas):
-                    unique_betas.append(mol1._beta[i])
-                if(mol1._element[i] not in unique_elements):
-                    unique_elements.append(mol1._element[i])
-                if(mol1._moltype[i] not in unique_moltypes):
-                    unique_moltypes.append(mol1._moltype[i])
 
             except:
                 error.append(
@@ -478,30 +449,11 @@ class Mask(object):
                 residue_flag.append(mol2._residue_flag[i])
                 this_index = this_index + 1
 
-                if(mol2._name[i] not in unique_names):
-                    unique_names.append(mol2._name[i])
-                if(mol2._resname[i] not in unique_resnames):
-                    unique_resnames.append(mol2._resname[i])
-                if(mol2._resid[i] not in unique_resids):
-                    unique_resids.append(mol2._resid[i])
-                if(mol2._chain[i] not in unique_chains):
-                    unique_chains.append(mol2._chain[i])
-                if(mol2._segname[i] not in unique_segnames):
-                    unique_segnames.append(mol2._segname[i])
-                if(mol2._occupancy[i] not in unique_occupancies):
-                    unique_occupancies.append(mol2._occupancy[i])
-                if(mol2._beta[i] not in unique_betas):
-                    unique_betas.append(mol2._beta[i])
-                if(mol2._element[i] not in unique_elements):
-                    unique_elements.append(mol2._element[i])
-                if(mol2._moltype[i] not in unique_moltypes):
-                    unique_moltypes.append(mol2._moltype[i])
-
             except:
                 error.append(
                     'failed in copy_molecule when attempting to assign descriptors to atom ' + str(i) + ' from mol2')
                 return error
-
+        
         x = numpy.array(x, numpy.float)
         y = numpy.array(y, numpy.float)
         z = numpy.array(z, numpy.float)
@@ -536,24 +488,25 @@ class Mask(object):
         self._original_resid = original_resid
         self._residue_flag = residue_flag
 
-        self._number_of_names = len(unique_names)
-        self._names = unique_names
-        self._number_of_resnames = len(unique_resnames)
-        self._resnames = unique_resnames
-        self._number_of_resids = len(unique_resids)
-        self._resids = unique_resids
-        self._number_of_chains = len(unique_chains)
-        self._chains = unique_chains
-        self._number_of_segnames = len(unique_segnames)
-        self._segnames = unique_segnames
-        self._number_of_occupancies = len(unique_occupancies)
-        self._occupancies = unique_occupancies
-        self._number_of_betas = len(unique_betas)
-        self._betas = unique_betas
-        self._number_of_elements = len(unique_elements)
-        self._elements = unique_elements
-        self._number_of_moltypes = len(unique_moltypes)
-        self._moltypes = unique_moltypes
+        self._unique_names = list(numpy.unique(self._name))
+        self._unique_resnames = list(numpy.unique(self._resname))
+        self._unique_resids = list(numpy.unique(self._resid))
+        self._unique_chains = list(numpy.unique(self._chain))
+        self._unique_segnames = list(numpy.unique(self._segname))
+        self._unique_occupancies = list(numpy.unique(self._occupancy))
+        self._unique_betas = list(numpy.unique(self._beta))
+        self._unique_elements = list(numpy.unique(self._element))
+        self._unique_moltypes = list(numpy.unique(self._moltype))
+
+        self._number_of_names = len(self._unique_names)
+        self._number_of_resnames = len(self._unique_resnames)
+        self._number_of_resids = len(self._unique_resids)
+        self._number_of_chains = len(self._unique_chains)
+        self._number_of_segnames = len(self._unique_segnames)
+        self._number_of_occupancies = len(self._unique_occupancies)
+        self._number_of_betas = len(self._unique_betas)
+        self._number_of_elements = len(self._unique_elements)
+        self._number_of_moltypes = len(self._unique_moltypes)
 
         self._conect = mol1._conect
 

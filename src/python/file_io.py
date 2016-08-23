@@ -1,3 +1,8 @@
+from __future__ import absolute_import
+from __future__ import division
+from __future__ import print_function
+#from __future__ import unicode_literals
+#
 '''
     SASMOL: Copyright (C) 2011 Joseph E. Curtis, Ph.D. 
 
@@ -23,7 +28,8 @@ import locale
 import struct
 import numpy
 import time
-import dcdio
+import sasmol.dcdio as dcdio
+import sasmol.util as utilities
 
 #	FILE_IO
 #
@@ -78,8 +84,8 @@ class Files(object):
 
         readheaderresult,nnatoms,nset,istart,nsavc,delta,namnf,reverseEndian,charmm=dcdio.read_dcdheader(filepointer)
         if(readheaderresult!=0):
-            print 'failed to read header'
-            print 'readheaderresult = ',readheaderresult	
+            print('failed to read header')
+            print('readheaderresult = ',readheaderresult)	
 	
         dcdfile = [filepointer,nnatoms,nset,reverseEndian,charmm]
 	
@@ -141,7 +147,7 @@ class Files(object):
 
         i = 0
         for frame in xrange(start,end):
-            print ".",
+            print(".",)
             sys.stdout.flush()
 
             tx=self._coor[frame,:,0].astype(numpy.float32)	
@@ -160,7 +166,7 @@ class Files(object):
         This method closes a dcd file.
         '''
         result = dcdio.close_dcd_write(filepointer)
-        print 'result = ',result
+        print('result = ',result)
 	
         return
 	
@@ -169,7 +175,7 @@ class Files(object):
         This method closes a dcd file.
         '''
         result = dcdio.close_dcd_read(filepointer)
-        print 'result = ',result
+        print('result = ',result)
 	
         return
 
@@ -188,7 +194,7 @@ class Files(object):
         headerresult=dcdio.write_dcdheader(outfile,filename,natoms,nset,istart,nsavc,delta)
 
         for frame in xrange(nset):
-            print ".",
+            print(".",)
             sys.stdout.flush()
 
             tx=self._coor[frame,:,0].astype(numpy.float32)	
@@ -214,13 +220,13 @@ class Files(object):
         num_fixed=0
         result = 1
 
-        print 'calling read dcd header'
+        print('calling read dcd header')
         readheaderresult,nnatoms,nset,istart,nsavc,delta,namnf,reverseEndian,charmm=dcdio.read_dcdheader(infile)
         if(readheaderresult!=0):
-            print 'failed to read header'
-            print 'readheaderresult = ',readheaderresult	
+            print('failed to read header')
+            print('readheaderresult = ',readheaderresult)	
 
-        print 'done with read dcd header'
+        print('done with read dcd header')
 
         coor=numpy.zeros((1,nnatoms,3),numpy.float)	
 	
@@ -230,12 +236,10 @@ class Files(object):
 
         first = 1  # since num_fixed = 0 ; the "first" variable is inconsequential
 		
-        print 'calling read_dcdstep'
         for i in xrange(frame):	
             result=dcdio.read_dcdstep(infile,tx,ty,tz,num_fixed,first,reverseEndian,charmm)
 
-        print 'back from read_dcdstep'
-        print 'result = ',result
+        print('result = ',result)
 
         coor[0,:,0]=tx.astype(numpy.float) ; coor[0,:,1]=ty.astype(numpy.float) ; coor[0,:,2]=tz.astype(numpy.float)
 		
@@ -243,8 +247,8 @@ class Files(object):
         self._coor=numpy.array(coor)
 	
         if(result!=0):
-            print 'failed to read coordinates'	
-            print 'result = ',result
+            print('failed to read coordinates')	
+            print('result = ',result)
 
         return
 	
@@ -296,7 +300,7 @@ class Files(object):
 
         sum=0.0
         for i in xrange(nset):
-            print '.',
+            print('.',)
             sys.stdout.flush()
             read_start_time=time.time()
             tx=numpy.zeros(nnatoms,dtype=numpy.float32)
@@ -313,7 +317,7 @@ class Files(object):
         result = dcdio.close_dcd_read(infile)
         self._coor=numpy.array(coor)
 
-        print
+        print()
 
         return
 
@@ -331,7 +335,7 @@ class Files(object):
     def check_error(self,error):
 
         if(len(error)>0):
-            print error
+            print(error)
             sys.exit()
 
         return
@@ -469,24 +473,24 @@ class Files(object):
 
                 infile.write("%-6s%5s %-4s%1s%-4s%1s%4s%1s   %8s%8s%8s%6s%6s      %-4s%2s%2s\n" % (self._atom[i],this_index,self._name[i],self._loc[i],self._resname[i],self._chain[i],this_resid,self._rescode[i],sx,sy,sz,self._occupancy[i],self._beta[i],self._segname[i],self._element[i],self._charge[i]))
             except:
-                print '\n>>>> ERROR IN WRITE_PDB <<<<\n'
-                print '>> i = ',i
-                print 'atom = ',self._atom[i],' : type = ',type(self._atom[i])
-                print 'index = ',this_index,' : type = ',type(this_index)
-                print 'name = ',self._name[i],' : type = ',type(self._name[i])
-                print 'loc = ',self._loc[i],' : type = ',type(self._loc[i])
-                print 'resname = ',self._resname[i],' : type = ',type(self._resname[i])
-                print 'chain = ',self._chain[i],' : type = ',type(self._chain[i])
-                print 'resid = ',self._resid[i],' : type = ',type(self._resid[i])
-                print 'rescode = ',self._rescode[i],' : type = ',type(self._rescode[i])
-                print 'coor_x = ',self._coor[frame,i,0],' : type = ',type(self._coor[frame,i,0])
-                print 'coor_y = ',self._coor[frame,i,1],' : type = ',type(self._coor[frame,i,1])
-                print 'coor_z = ',self._coor[frame,i,2],' : type = ',type(self._coor[frame,i,2])
-                print 'occupancy = ',self._occupancy[i],' : type = ',type(self._occupancy[i])
-                print 'beta = ',self._beta[i],' : type = ',type(self._beta[i])
-                print 'segname = ',self._segname[i],' : type = ',type(self._segname[i])
-                print 'element = ',self._element[i],' : type = ',type(self._element[i])
-                print 'charge = ',self._charge[i],' : type = ',type(self._charge[i])
+                print('\n>>>> ERROR IN WRITE_PDB <<<<\n')
+                print('>> i = ',i)
+                print('atom = ',self._atom[i],' : type = ',type(self._atom[i]))
+                print('index = ',this_index,' : type = ',type(this_index))
+                print('name = ',self._name[i],' : type = ',type(self._name[i]))
+                print('loc = ',self._loc[i],' : type = ',type(self._loc[i]))
+                print('resname = ',self._resname[i],' : type = ',type(self._resname[i]))
+                print('chain = ',self._chain[i],' : type = ',type(self._chain[i]))
+                print('resid = ',self._resid[i],' : type = ',type(self._resid[i]))
+                print('rescode = ',self._rescode[i],' : type = ',type(self._rescode[i]))
+                print('coor_x = ',self._coor[frame,i,0],' : type = ',type(self._coor[frame,i,0]))
+                print('coor_y = ',self._coor[frame,i,1],' : type = ',type(self._coor[frame,i,1]))
+                print('coor_z = ',self._coor[frame,i,2],' : type = ',type(self._coor[frame,i,2]))
+                print('occupancy = ',self._occupancy[i],' : type = ',type(self._occupancy[i]))
+                print('beta = ',self._beta[i],' : type = ',type(self._beta[i]))
+                print('segname = ',self._segname[i],' : type = ',type(self._segname[i]))
+                print('element = ',self._element[i],' : type = ',type(self._element[i]))
+                print('charge = ',self._charge[i],' : type = ',type(self._charge[i]))
 
         # TODO: Check with Joseph to see if logic acceptable -
         # i.e. is 'final' always accompanied by 'model'?
@@ -660,7 +664,7 @@ class Files(object):
 	
         infile=open(filename,'r').readlines()
 
-        if(printme): print 'reading filename: ',filename
+        if(printme): print('reading filename: ',filename)
 		
         atom=[] ; index=[] ; original_index=[] ; name=[] ; loc=[] ; resname=[] ; chain=[] ; resid=[] ; rescode=[]
         x=[] ; y=[] ; z=[] 
@@ -726,7 +730,7 @@ class Files(object):
         if ( (len(num_counts_per_end)==0) and (len(num_counts_per_model)!=0) ):
             raise Exception, 'According to Protein Data Bank Contents Guide, END line must appear in each coor entry'
         if (len(num_counts_per_model)!=0 and (len(num_counts_per_end)>1 or sum(num_counts_per_model)!=sum(num_counts_per_end))):
-            if(printme): print num_counts_per_model,num_counts_per_end
+            if(printme): print(num_counts_per_model,num_counts_per_end)
             raise Exception, 'Only one terminating END line is allowed for pdb entries with multiple MODEL'
 		#
         if (len(num_counts_per_model)>0):
@@ -745,9 +749,9 @@ class Files(object):
         else:
             raise Exception, 'unexpected error!'
 
-        if(printme): print 'num_atoms = ',num_atoms
+        if(printme): print('num_atoms = ',num_atoms)
 
-        if(printme): print '>>> found ',num_frames,' model(s) or frame(s)'			
+        if(printme): print('>>> found ',num_frames,' model(s) or frame(s)')			
         this_frame = 1		
 
         true_index = 0
@@ -867,7 +871,7 @@ class Files(object):
                 if(this_moltype not in unique_moltypes): unique_moltypes.append(this_moltype)
 					
                 if(true_index == num_atoms):				
-                    if(printme): print 'finished reading frame = ',this_frame
+                    if(printme): print('finished reading frame = ',this_frame)
                     index=numpy.array(index,numpy.int)
                     original_index=numpy.array(original_index,numpy.int)
                     resid=numpy.array(resid,numpy.int)
@@ -908,7 +912,7 @@ class Files(object):
                 z.append(lin[46:54])				#	47-54		Real(8.3) Z: angstroms	
 		
                 if(true_index == num_atoms):
-                    if(printme): print 'finished reading frame = ',this_frame
+                    if(printme): print('finished reading frame = ',this_frame)
                     x=numpy.array(x,numpy.float32)
                     y=numpy.array(y,numpy.float32)
                     z=numpy.array(z,numpy.float32)
@@ -927,9 +931,7 @@ class Files(object):
                 conect[ndxs[0]] = ndxs[1:]
 
         if(((this_frame - 1) != num_frames) and not fastread):
-            if(printme): print '>>> WARNING: pdb file had ',num_frames,' file_io read ',this_frame-1,' frames'
-            if(printme): print '>>> WARNING: pdb file had ',num_frames,' file_io read ',this_frame-1,' frames'
-            if(printme): print '>>> WARNING: pdb file had ',num_frames,' file_io read ',this_frame-1,' frames'
+            if(printme): print('>>> WARNING: pdb file had ',num_frames,' file_io read ',this_frame-1,' frames')
 
         self._coor=numpy.array(coor)
 
