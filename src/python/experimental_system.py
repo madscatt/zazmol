@@ -34,7 +34,7 @@ class Atom():
             else:
                 self.__atom = None
         except:
-            self.__atom = 'ATOM'
+            self.__atom = None
         try:
             self.__index = numpy.array(index, numpy.int)
         except:
