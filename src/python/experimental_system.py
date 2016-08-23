@@ -8,6 +8,9 @@ class Atom():
 
     TODO: slicing & length checks for essential attributes
 
+
+    http://stackoverflow.com/questions/19128523/accessing-non-consecutive-elements-of-a-list-or-string-in-python
+
     Examples
     ________
 
