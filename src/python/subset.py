@@ -1087,3 +1087,8 @@ class Mask(object):
         err = other.apply_biomt(0, selection, U, M)
 
         return
+
+
+if __name__ == "__main__":
+    import doctest
+    doctest.testmod(verbose=True)

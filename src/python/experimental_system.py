@@ -14,63 +14,29 @@ class Atom():
     Examples
     ________
 
-    >>> import a
-    >>> coor0 = numpy.zeros([3,4,3],numpy.float)
-    >>> coor1 = numpy.ones([3,4,3],numpy.float)
-    >>> b = a.Atom(name=['ARG'],atom=['ATOM'],resid=numpy.array([1,2,3]),coor=coor0)
-    >>> c = a.Atom(name=['ARG'],atom=['ATOM'],resid=numpy.array([4,5,6]),coor=coor1)
+    >>> import experimental_system as experimental_system
+    >>> coor0 = numpy.zeros([3, 4, 3], numpy.float)
+    >>> coor1 = numpy.ones([3, 4, 3], numpy.float)
+    >>> b = experimental_system.Atom(name=['ARG','GLU','TRP'], resid=numpy.array([1,2,3]), coor=coor0)
+    >>> c = experimental_system.Atom(name=['ARG','PHE','ALA'], resid=numpy.array([4,5,6]), coor=coor1)
     >>> b + c
     >>> b.resid()
     array([1, 2, 3, 4, 5, 6])
     >>> b.coor()[-1]
     array([[ 1.,  1.,  1.],
-        [ 1.,  1.,  1.],
-        [ 1.,  1.,  1.],
-        [ 1.,  1.,  1.]])
+           [ 1.,  1.,  1.],
+           [ 1.,  1.,  1.],
+           [ 1.,  1.,  1.]])
 
     '''
 
-    def __init__(self, atom='ATOM', index=None, name=None, resname=None, resid=None, coor=None):
-        try:
-            if type(atom) is list:
-                self.__atom = atom
-            else:
-                self.__atom = None
-        except:
-            self.__atom = None
-        try:
-            self.__index = numpy.array(index, numpy.int)
-        except:
-            self.__index = None
-        try:
-            if type(name) is list:
-                self.__name = name
-            else:
-                self.__name = None
-        except:
-            self.__name = None
-        try:
-            if type(resname) is list:
-                self.__resname = resname
-            else: 
-                self.__resname = None
-        except:
-            self.__resname = None
-        try: 
-            if type(resid) is numpy.ndarray:
-                self.__resid = numpy.array(resid, numpy.int)
-            else:
-                self.__resid = None
-        except: 
-            self.__resid = None
-        try:
-
-            if type(coor) is numpy.ndarray:
-                self.__coor = numpy.array(coor, numpy.float)
-            else:
-                self.__coor = None
-        except: 
-            self.__coor = None
+    def __init__(self, atom=None, index=None, name=None, resname=None, resid=None, coor=None):
+        self.__atom = atom
+        self.__index = index
+        self.__name = name
+        self.__resname = resname
+        self.__resid = resid
+        self.__coor = coor
 
     def __add__(self, other):
         #print self.__dict__
@@ -101,7 +67,7 @@ class Atom():
         self.__resname = resname  
    
     def resname(self):
-        return self.__resname 
+        return self.__resname  
 
     def setName(self, name):
         self.__name = name  
@@ -109,7 +75,6 @@ class Atom():
     def name(self):
         return self.__name 
     
-
     def setResid(self, resid):
         self.__resid = resid  
    
@@ -133,3 +98,8 @@ class Atom():
 
 
      
+
+
+if __name__ == "__main__":
+    import doctest
+    doctest.testmod(verbose=True)
