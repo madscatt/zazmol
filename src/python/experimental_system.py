@@ -30,13 +30,18 @@ class Atom():
 
     '''
 
-    def __init__(self, atom=None, index=None, name=None, resname=None, resid=None, coor=None):
+    def __init__(self, atom=None, index=None, name=None, resname=None, resid=None, coor=None, **kwargs):
         self.__atom = atom
         self.__index = index
         self.__name = name
         self.__resname = resname
         self.__resid = resid
         self.__coor = coor
+
+
+        try:
+            if kwargs['mask']:
+
 
     def __add__(self, other):
         #print self.__dict__
