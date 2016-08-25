@@ -178,36 +178,44 @@ class Atom(file_io.Files, calculate.Calculate, operate.Move, subset.Mask, proper
             self._debug = True
 
         self._defined_with_input_file = False
-        argument_flag = True
+        self._argument_flag = False
+        self._id_flag = False
+
         try:
-            for argument in args:
-                if(os.path.isfile(str(argument))):
-                    try:
-                        self.read_pdb(argument)
-                        argument_flag = False
-                        self._defined_with_input_file = True
-                    except:
-                        pass
-                else:
-                    self._id = argument
+            if self._filename is not None:
+                if(os.path.isfile(self._filename)):
+                    self.read_pdb(self._filename)
+                    self._defined_with_input_file = True
+            else:
+                 
+                for argument in args:
+                    self._argument_flag = True
+                    if(os.path.isfile(str(argument))):
+                        try:    
+                            self.read_pdb(argument)
+                            self._defined_with_input_file = True
+                            self._filename = argument
+                            break
+                        except:
+                            pass
+                    else:
+                        try:
+                            self._id = int(argument)
+                            self._id_flag = True
+                            break
+                        except:
+                            pass     
+                        
         except:
-            argument_flag = False
-
-        if self._filename and argument_flag:
-            try:
-                self.read_pdb(self._filename)
-                self._defined_with_input_file = True
-            except:
-                pass
-
-        self.setId(self._id) 
-
+            pass
 
                                                     
     def __repr__(self):
 
-        if self._filename and self._defined_with_input_file:
+        if self._defined_with_input_file:
             return "sasmol object initialied with filename = " + self._filename
+        elif self._argument_flag and not self._id_flag: 
+            return "sasmol object (no file found)"
         else:
             return "sasmol object"
 
@@ -359,6 +367,12 @@ class Atom(file_io.Files, calculate.Calculate, operate.Move, subset.Mask, proper
     def setNatoms(self, newValue):
         self._natoms = newValue
 
+    def number_of_atoms(self):
+        return self._number_of_atoms
+
+    def setNumber_of_atoms(self, newValue):
+        self._number_of_atoms = newValue
+
     def moltype(self):
         return self._moltype
 
@@ -467,6 +481,12 @@ class Molecule(Atom):
 
     def setCom(self, newValue):
         self._com = newValue
+
+    def center_of_mass(self):
+        return self._center_of_mass
+
+    def setCenter_of_mass(self, newValue):
+        self._center_of_mass = newValue
 
     def names(self):
         return self._names

@@ -1,1 +1,6 @@
 doc_files/sphinx_docs/_build
+build
+dist
+src/python/test_sasmol/*sasmol_log
+docs/.buildinfo
+sasmol.egg-info/
