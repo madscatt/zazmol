@@ -99,7 +99,7 @@
 
 <span class="kn">import</span> <span class="nn">sasmol.config</span> <span class="kn">as</span> <span class="nn">config</span>
 
-<div class="viewcode-block" id="Atom"><a class="viewcode-back" href="../index_system.html#system.Atom">[docs]</a><span class="k">class</span> <span class="nc">Atom</span><span class="p">(</span><span class="n">file_io</span><span class="o">.</span><span class="n">Files</span><span class="p">,</span> <span class="n">calculate</span><span class="o">.</span><span class="n">Calculate</span><span class="p">,</span> <span class="n">operate</span><span class="o">.</span><span class="n">Move</span><span class="p">,</span> <span class="n">subset</span><span class="o">.</span><span class="n">Mask</span><span class="p">,</span> <span class="n">properties</span><span class="o">.</span><span class="n">Atomic</span><span class="p">,</span> <span class="n">topology</span><span class="o">.</span><span class="n">CharmmTopology</span><span class="p">,</span> <span class="n">view</span><span class="o">.</span><span class="n">View</span><span class="p">):</span>
+<div class="viewcode-block" id="Atom"><a class="viewcode-back" href="../index_system.html#system.Atom">[docs]</a><span class="k">class</span> <span class="nc">Atom</span><span class="p">(</span><span class="n">file_io</span><span class="o">.</span><span class="n">Files</span><span class="p">,</span> <span class="n">calculate</span><span class="o">.</span><span class="n">Calculate</span><span class="p">,</span> <span class="n">operate</span><span class="o">.</span><span class="n">Move</span><span class="p">,</span> <span class="n">subset</span><span class="o">.</span><span class="n">Mask</span><span class="p">,</span> <span class="n">properties</span><span class="o">.</span><span class="n">Atomic</span><span class="p">,</span> <span class="n">topology</span><span class="o">.</span><span class="n">Topology</span><span class="p">,</span> <span class="n">view</span><span class="o">.</span><span class="n">View</span><span class="p">):</span>
 
     <span class="sd">&quot;&quot;&quot; Base class containing methods to define system objects.</span>
 
@@ -221,36 +221,44 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">_debug</span> <span class="o">=</span> <span class="bp">True</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">_defined_with_input_file</span> <span class="o">=</span> <span class="bp">False</span>
-        <span class="n">argument_flag</span> <span class="o">=</span> <span class="bp">True</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_argument_flag</span> <span class="o">=</span> <span class="bp">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_id_flag</span> <span class="o">=</span> <span class="bp">False</span>
+
         <span class="k">try</span><span class="p">:</span>
-            <span class="k">for</span> <span class="n">argument</span> <span class="ow">in</span> <span class="n">args</span><span class="p">:</span>
-                <span class="k">if</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">argument</span><span class="p">))):</span>
-                    <span class="k">try</span><span class="p">:</span>
-                        <span class="bp">self</span><span class="o">.</span><span class="n">read_pdb</span><span class="p">(</span><span class="n">argument</span><span class="p">)</span>
-                        <span class="n">argument_flag</span> <span class="o">=</span> <span class="bp">False</span>
-                        <span class="bp">self</span><span class="o">.</span><span class="n">_defined_with_input_file</span> <span class="o">=</span> <span class="bp">True</span>
-                    <span class="k">except</span><span class="p">:</span>
-                        <span class="k">pass</span>
-                <span class="k">else</span><span class="p">:</span>
-                    <span class="bp">self</span><span class="o">.</span><span class="n">_id</span> <span class="o">=</span> <span class="n">argument</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_filename</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+                <span class="k">if</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_filename</span><span class="p">)):</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">read_pdb</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_filename</span><span class="p">)</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_defined_with_input_file</span> <span class="o">=</span> <span class="bp">True</span>
+            <span class="k">else</span><span class="p">:</span>
+                 
+                <span class="k">for</span> <span class="n">argument</span> <span class="ow">in</span> <span class="n">args</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_argument_flag</span> <span class="o">=</span> <span class="bp">True</span>
+                    <span class="k">if</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">argument</span><span class="p">))):</span>
+                        <span class="k">try</span><span class="p">:</span>    
+                            <span class="bp">self</span><span class="o">.</span><span class="n">read_pdb</span><span class="p">(</span><span class="n">argument</span><span class="p">)</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">_defined_with_input_file</span> <span class="o">=</span> <span class="bp">True</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">_filename</span> <span class="o">=</span> <span class="n">argument</span>
+                            <span class="k">break</span>
+                        <span class="k">except</span><span class="p">:</span>
+                            <span class="k">pass</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="k">try</span><span class="p">:</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">_id</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">argument</span><span class="p">)</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">_id_flag</span> <span class="o">=</span> <span class="bp">True</span>
+                            <span class="k">break</span>
+                        <span class="k">except</span><span class="p">:</span>
+                            <span class="k">pass</span>     
+                        
         <span class="k">except</span><span class="p">:</span>
-            <span class="n">argument_flag</span> <span class="o">=</span> <span class="bp">False</span>
-
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_filename</span> <span class="ow">and</span> <span class="n">argument_flag</span><span class="p">:</span>
-            <span class="k">try</span><span class="p">:</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">read_pdb</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_filename</span><span class="p">)</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">_defined_with_input_file</span> <span class="o">=</span> <span class="bp">True</span>
-            <span class="k">except</span><span class="p">:</span>
-                <span class="k">pass</span>
-
-        <span class="bp">self</span><span class="o">.</span><span class="n">setId</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_id</span><span class="p">)</span> 
-
+            <span class="k">pass</span>
 
                                                     
     <span class="k">def</span> <span class="nf">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_filename</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">_defined_with_input_file</span><span class="p">:</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_defined_with_input_file</span><span class="p">:</span>
             <span class="k">return</span> <span class="s2">&quot;sasmol object initialied with filename = &quot;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">_filename</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">_argument_flag</span> <span class="ow">and</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_id_flag</span><span class="p">:</span> 
+            <span class="k">return</span> <span class="s2">&quot;sasmol object (no file found)&quot;</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">return</span> <span class="s2">&quot;sasmol object&quot;</span>
 
@@ -402,6 +410,12 @@
 <div class="viewcode-block" id="Atom.setNatoms"><a class="viewcode-back" href="../index_system.html#system.Atom.setNatoms">[docs]</a>    <span class="k">def</span> <span class="nf">setNatoms</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">newValue</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_natoms</span> <span class="o">=</span> <span class="n">newValue</span></div>
 
+<div class="viewcode-block" id="Atom.number_of_atoms"><a class="viewcode-back" href="../index_system.html#system.Atom.number_of_atoms">[docs]</a>    <span class="k">def</span> <span class="nf">number_of_atoms</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_number_of_atoms</span></div>
+
+<div class="viewcode-block" id="Atom.setNumber_of_atoms"><a class="viewcode-back" href="../index_system.html#system.Atom.setNumber_of_atoms">[docs]</a>    <span class="k">def</span> <span class="nf">setNumber_of_atoms</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">newValue</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_number_of_atoms</span> <span class="o">=</span> <span class="n">newValue</span></div>
+
 <div class="viewcode-block" id="Atom.moltype"><a class="viewcode-back" href="../index_system.html#system.Atom.moltype">[docs]</a>    <span class="k">def</span> <span class="nf">moltype</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_moltype</span></div>
 
@@ -510,6 +524,12 @@
 
 <div class="viewcode-block" id="Molecule.setCom"><a class="viewcode-back" href="../index_system.html#system.Molecule.setCom">[docs]</a>    <span class="k">def</span> <span class="nf">setCom</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">newValue</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_com</span> <span class="o">=</span> <span class="n">newValue</span></div>
+
+<div class="viewcode-block" id="Molecule.center_of_mass"><a class="viewcode-back" href="../index_system.html#system.Molecule.center_of_mass">[docs]</a>    <span class="k">def</span> <span class="nf">center_of_mass</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_center_of_mass</span></div>
+
+<div class="viewcode-block" id="Molecule.setCenter_of_mass"><a class="viewcode-back" href="../index_system.html#system.Molecule.setCenter_of_mass">[docs]</a>    <span class="k">def</span> <span class="nf">setCenter_of_mass</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">newValue</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_center_of_mass</span> <span class="o">=</span> <span class="n">newValue</span></div>
 
 <div class="viewcode-block" id="Molecule.names"><a class="viewcode-back" href="../index_system.html#system.Molecule.names">[docs]</a>    <span class="k">def</span> <span class="nf">names</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_names</span></div>

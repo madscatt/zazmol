@@ -56,7 +56,7 @@ import sasmol.view as view
 
 import sasmol.config as config
 
-class Atom(file_io.Files, calculate.Calculate, operate.Move, subset.Mask, properties.Atomic, topology.CharmmTopology, view.View):
+class Atom(file_io.Files, calculate.Calculate, operate.Move, subset.Mask, properties.Atomic, topology.Topology, view.View):
 
     """ Base class containing methods to define system objects.
 
@@ -218,6 +218,81 @@ class Atom(file_io.Files, calculate.Calculate, operate.Move, subset.Mask, proper
             return "sasmol object (no file found)"
         else:
             return "sasmol object"
+
+    def __add__(self, other, **kwargs):
+       
+        '''
+
+        Override the python __add__ method to combine other molecule into instance molecule
+
+        Parameters
+        ----------
+        other 
+            system object
+
+        kwargs 
+            optional keyword arguments
+                                                                                       
+        Returns
+        -------
+        None
+            modified system object
+
+        Examples
+        -------
+
+        >>> import sasmol.system as system
+        >>> molecule_1 = system.Molecule(filename='hiv1_gag.pdb')
+        >>> molecule_2 = system.Molecule(filename='lysozyme.pdb')
+        >>> molecule_1.natoms() 
+        6730
+        >>> molecule_2.natoms() 
+        1960
+         
+        >>> molecule_1 + molecule_2 
+        >>> molecule_1.natoms()
+        8690
+        >>> molecule_1.index()[-1]
+        8690
+         
+        
+        Note
+        ____
+        
+        If an item is missing in the other molecule then the original item is not altered
+
+        self._natoms is updated based on the len(self._names)
+
+        self._index is reset to start at 1 and end at self._natoms
+
+        Currently no check is made on the number of frames in each molecule that are being
+        added together.
+
+
+        '''
+        
+        #print(self.__dict__)
+        for key,value in self.__dict__.iteritems():
+            #print(key)
+            try:
+                if type(value) is list:
+                    self.__dict__[key].extend(other.__dict__[key])
+                elif type(value) is numpy.ndarray:
+               #     print 'sdk = ',self.__dict__[key], 'odk =', other.__dict__[key]
+                    if key == '_coor':
+                        self.__dict__[key] = numpy.concatenate((self.__dict__[key], other.__dict__[key]), axis=1)
+                    elif len(value.shape) == 1:
+                        #print(key)
+                        self.__dict__[key] = numpy.concatenate((self.__dict__[key], other.__dict__[key]))
+                    else:
+                        print('numpy array not added for self.__dict__[key]: ' + str(key))
+
+            except:
+                pass
+                             
+            self._natoms = len(self._name)
+            self._index = numpy.array([x + 1 for x in xrange(self._natoms)], numpy.int)
+
 
     def setId(self, newValue):
         self._id = newValue

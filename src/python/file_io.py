@@ -19,48 +19,28 @@ from __future__ import print_function
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 '''
-#### NOTE: INDENTATION FIXED : 12/11/2015 JEC
-
 import os
 import sys
 import string
 import locale
-import struct
-import numpy
 import time
-import sasmol.dcdio as dcdio
 import sasmol.pdb_io as pdb_io
 import sasmol.dcd_io as dcd_io
 
 #	FILE_IO
 #
-#	12/5/2009	--	initial coding			:	jc
-#	12/10/2009	--	doc strings 			:	jc
-#	01/01/2011	--	added dcdio wrappers		:	jc
+#	12/5/2009	--	initial coding			                    :	jc
+#	12/10/2009	--	doc strings 			                    :	jc
+#	01/01/2011	--	added dcdio wrappers		                :	jc
+#	08/26/2016	--	split dependent classes to new files        :   jc
 #
 #LC	 1         2         3         4         5         6         7
 #LC4567890123456789012345678901234567890123456789012345678901234567890123456789
 #								       *      **
 '''
-	FILE_IO is the main module that contains the base classes that 
+	FILE_IO is the module that contains or inherits base classes that 
 	read and write atomic information from and to the hard disk,
-	and (eventually) deal with logging of input parameters and
-	project runs.
-
-	The methods in class Files are used to read and write data to
-	the Charmm/Xplor binary data format (DCD) and textual protein
-	data bank (PDB) format.  
-
-	See the following sites for the DCD format:
-
-	http://www.ks.uiuc.edu/Research/vmd/plugins/molfile/dcdplugin.html
-	http://www.lrz-muenchen.de/~heller/ego/manual/node93.html
-
-	The methods (read_pdb, write_pdb) are used to read and write data
-	using the PDB file format as described at the following
-	web-site:
-
-	http://deposit.rcsb.org/adit/docs/pdb_atom_format.html
+	and (eventually) deal with logging and general file I/O operations. 
 
 	These classes are accessed by the SasAtm class found in
 	the sasmol module.
@@ -72,4 +52,7 @@ class Files(pdb_io.PDB, dcd_io.DCD):
     def __init__(self,filename,flag):
         pass
 
+
+    def open_file(filename):
+        pass
 

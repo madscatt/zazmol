@@ -1,6 +1,16 @@
 import numpy
+import os, sys
+import sasmol.file_io as file_io
+import sasmol.calculate as calculate
+import sasmol.operate as operate
+import sasmol.subset as subset
+import sasmol.properties as properties
+import sasmol.topology as topology
+import sasmol.view as view
 
-class Atom():
+import sasmol.config as config
+
+class Atom(file_io.Files, calculate.Calculate, operate.Move, subset.Mask, properties.Atomic, topology.Topology, view.View):
 
     '''
 
@@ -30,17 +40,76 @@ class Atom():
 
     '''
 
-    def __init__(self, atom=None, index=None, name=None, resname=None, resid=None, coor=None, **kwargs):
-        self.__atom = atom
-        self.__index = index
-        self.__name = name
-        self.__resname = resname
-        self.__resid = resid
-        self.__coor = coor
-
+    def __init__(self, *args, **kwargs):
 
         try:
             if kwargs['mask']:
+                pass
+        except:
+            pass
+
+        self._filename = kwargs.pop('filename', None)
+        self._id = kwargs.pop('id', 0)
+        self._debug = kwargs.pop('debug', None)
+
+        self.__atom = None
+        self.__index = None
+        self.__name = None
+        self.__resname = None
+        self.__resid = None
+        self.__coor = None
+        
+        self._total_mass = 0.0
+        self._natoms = 0
+        self._mass = None
+        self._com = None
+        self._conect = []
+
+        if config.__logging_level__ == 'DEBUG':
+            self._debug = True
+
+        self._defined_with_input_file = False
+        self._argument_flag = False
+        self._id_flag = False
+
+        try:
+            if self._filename is not None:
+                if(os.path.isfile(self._filename)):
+                    self.read_pdb(self._filename)
+                    self._defined_with_input_file = True
+            else:
+
+                for argument in args:
+                    self._argument_flag = True
+                    if(os.path.isfile(str(argument))):
+                        try:
+                            self.read_pdb(argument)
+                            self._defined_with_input_file = True
+                            self._filename = argument
+                            break
+                        except:
+                            pass
+                    else:
+                        try:
+                            self._id = int(argument)
+                            self._id_flag = True
+                            break
+                        except:
+                            pass
+
+        except:
+            pass
+
+
+    def __repr__(self):
+
+        if self._defined_with_input_file:
+            return "sasmol object initialied with filename = " + self._filename
+        elif self._argument_flag and not self._id_flag:
+            return "sasmol object (no file found)"
+        else:
+            return "sasmol object"
+
 
 
     def __add__(self, other):

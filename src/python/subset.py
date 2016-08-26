@@ -35,7 +35,7 @@ import struct
 import numpy
 import time
 import sasmol.mask
-import sasmol.util as utilities
+import sasmol.utilities as utilities
 import random
 
 '''
