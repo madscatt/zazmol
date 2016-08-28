@@ -61,6 +61,38 @@ class Atomic(object):
 
     """ 
 
+    one_to_three_letter_protein_residue_dictionary = {
+            'A' : 'ALA',
+            'R' : 'ARG',
+            'D' : 'ASP',
+            'N' : 'ASN',
+            'C' : 'CYS',
+            'E' : 'GLU',
+            'Q' : 'GLN',
+            'G' : 'GLY',
+            'H' : 'HSE',
+            'I' : 'ILE',
+            'L' : 'LEU',
+            'K' : 'LYS',
+            'M' : 'MET',
+            'F' : 'PHE',
+            'P' : 'PRO',
+            'S' : 'SER',
+            'T' : 'THR',
+            'W' : 'TRP',
+            'Y' : 'TYR',
+            'V' : 'VAL',
+
+    }
+
+    one_to_three_letter_nucleic_residue_dictionary = {
+            'G' : 'GUA',
+            'C' : 'CYT',
+            'A' : 'ADE',
+            'T' : 'THY',
+            'U' : 'URA'
+    }
+
     def amu(self, **kwargs):
         """
 

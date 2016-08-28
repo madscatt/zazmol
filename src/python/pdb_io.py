@@ -379,6 +379,7 @@ class PDB(object):
         fastread = False
         pdbscan = False
         printme = True
+        printme = False
 
         if 'verbose' in kwargs:
             printme = kwargs['verbose']
