@@ -6,7 +6,7 @@
 '''
 import os,sys
 from distutils      import sysconfig
-import setuptools
+#import setuptools
 from numpy.distutils.core import Extension, setup
 #       SETUP
 #

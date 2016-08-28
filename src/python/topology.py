@@ -68,36 +68,34 @@ class Topology(charmm_topology.CharmmTopology):
         1
         >>> molecule.resid()[0]
         1
-        >>> molecule.resid()[0]
-        1 
        
         default renumber() with no arguments renumbers
         both index and resid starting at 1 
         
         >>> molecule.renumber()
         >>> molecule.index()[0]
-        1 
+        1
         >>> molecule.resid()[0]
-        1 
+        1
 
         passing a kwarg with a value will renumber appropriate
         attribute with value passed
 
         >>> molecule.renumber(index=3)
         >>> molecule.index()[0]
-        3 
+        3
         >>> molecule.resid()[0]
         1
 
         >>> molecule.renumber(resid=8)
         >>> molecule.index()[0]
-        3 
+        3
         >>> molecule.resid()[0]
         8
 
         >>> molecule.renumber(index=223, resid=18)
         >>> molecule.index()[0]
-        223 
+        223
         >>> molecule.resid()[0]
         18
 
@@ -389,14 +387,15 @@ class Topology(charmm_topology.CharmmTopology):
         >>> import sasmol.system as system
         >>> molecule = system.Molecule("hiv1_gag.pdb")
         >>> molecule.create_fasta()
-        >>> molecule.fasta()[:5]
-        ['G', 'A', 'R', 'A', 'S']
+        >>> print(molecule.fasta()[:5]) # doctest: +NORMALIZE_WHITESPACE
+        ['G', 'A', 'R', 'A', 'S'] 
+
         >>> molecule.create_fasta(fasta_format=True)
         >>> print(molecule.fasta()[:5])
         >
         GAR
         >>> molecule.create_fasta(fasta_format=True,width='60')
-        >>> print(molecule.fasta())
+        >>> print(molecule.fasta()[:-1])
         >
         GARASVLSGGELDKWEKIRLRPGGKKQYKLKHIVWASRELERFAVNPGLLETSEGCRQIL
         GQLQPSLQTGSEELRSLYNTIAVLYCVHQRIDVKDTKEALDKIEEEQNKSKKKAQQAAAD
