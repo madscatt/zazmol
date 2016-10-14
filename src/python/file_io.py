@@ -65,6 +65,7 @@ class Files(object):
     def __init__(self,filename,flag):
         pass
 
+
     def open_dcd_read(self,filename):
         '''
         This method opens a file to read in the Charmm/Xplor data format.
@@ -85,6 +86,7 @@ class Files(object):
 
         return dcdfile
 
+
     def open_dcd_write(self,filename):
         '''
         This method opens a file and writes the headerfile in the Charmm/Xplor data format.
@@ -99,6 +101,7 @@ class Files(object):
 
         return filepointer
 
+
     def write_dcd_header(self,filepointer,nset):
         '''
         This method writes the headerfile in the Charmm/Xplor data format.
@@ -110,6 +113,7 @@ class Files(object):
         headerresult=dcdio.write_dcdheader(filepointer,filename,natoms,nset,istart,nsavc,delta)
 
         return
+
 
     def write_dcd_step(self,filepointer,frame,step):
         '''
@@ -124,6 +128,7 @@ class Files(object):
         stepresult=dcdio.write_dcdstep(filepointer,tx,ty,tz,step)
 
         return
+
 
     def write_dcd_frames(self, filename, start, end):
         '''
@@ -155,6 +160,7 @@ class Files(object):
 
         return
 
+
     def close_dcd_write(self,filepointer):
         '''
         This method closes a dcd file.
@@ -164,6 +170,7 @@ class Files(object):
 
         return
 
+
     def close_dcd_read(self,filepointer):
         '''
         This method closes a dcd file.
@@ -172,6 +179,7 @@ class Files(object):
         print 'result = ',result
 
         return
+
 
     def write_dcd(self,filename):
         '''
@@ -200,6 +208,7 @@ class Files(object):
         result = dcdio.close_dcd_write(outfile)
 
         return
+
 
     def read_single_dcd_step(self,filename,frame):
         '''
@@ -248,6 +257,7 @@ class Files(object):
 
         return
 
+
     def read_dcd_step(self,dcdfile,frame,**kwargs):
         '''
         This method reads a single dcd step in the Charmm/Xplor data format.
@@ -276,6 +286,7 @@ class Files(object):
                 pass
 
         return
+
 
     def read_dcd(self,filename):
 
@@ -317,6 +328,7 @@ class Files(object):
 
         return
 
+
     def print_error(self,name,my_message):
 
         error = []
@@ -328,6 +340,7 @@ class Files(object):
 
         return error
 
+
     def check_error(self,error):
 
         if(len(error)>0):
@@ -335,6 +348,7 @@ class Files(object):
             sys.exit()
 
         return
+
 
     def element_filter(self):
         '''
@@ -361,6 +375,7 @@ class Files(object):
                 unique_elements.append(self._element[i])
 
         return unique_elements
+
 
     def get_element(self,name,resname):
         '''
@@ -417,6 +432,7 @@ class Files(object):
             error = self.print_error(name,my_message)
 
         return error,element_name
+
 
     def write_pdb(self,filename,frame,flag,**kwargs):
 
@@ -520,6 +536,7 @@ class Files(object):
 
         return result
 
+
     def get_resnames(self):
         '''
         This method holds names of residues to use to set moltype.  Based on Charmm 27 naming.
@@ -536,6 +553,7 @@ class Files(object):
         water_resnames=['TIP3','SPCE','TIP','SPC','TIP4','TP3M']
 
         return protein_resnames,dna_resnames,rna_resnames,nucleic_resnames,water_resnames
+
 
     def initialize_children(self):
 
@@ -630,6 +648,7 @@ class Files(object):
 
         return
 
+
     def read_pdb(self,filename,**kwargs):
         '''
         This method reads a PDB file.
@@ -715,20 +734,18 @@ class Files(object):
                     num_counts_this_end = 0
             except:
                 pass
-			#
+
             if((record_name == 'ATOM' or record_name == 'HETATM')):
                 count_index += 1
                 num_counts_this_model += 1
                 num_counts_this_end += 1
-		#
-		#
 
         if ( (len(num_counts_per_end)==0) and (len(num_counts_per_model)!=0) ):
             raise Exception, 'According to Protein Data Bank Contents Guide, END line must appear in each coor entry'
         if (len(num_counts_per_model)!=0 and (len(num_counts_per_end)>1 or sum(num_counts_per_model)!=sum(num_counts_per_end))):
             if(printme): print num_counts_per_model,num_counts_per_end
             raise Exception, 'Only one terminating END line is allowed for pdb entries with multiple MODEL'
-		#
+
         if (len(num_counts_per_model)>0):
             num_frames = len(num_counts_per_model)
             num_atoms = num_counts_per_model[0]
@@ -954,6 +971,7 @@ class Files(object):
         self._conect = conect
 
         return
+
 
     def create_conect_pdb_lines(self):
         """
