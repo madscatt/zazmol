@@ -1,5 +1,5 @@
 '''
-    SASMOL: Copyright (C) 2011 Joseph E. Curtis, Ph.D. 
+    SASMOL: Copyright (C) 2011 Joseph E. Curtis, Ph.D.
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -35,14 +35,14 @@ import dcdio
 #LC4567890123456789012345678901234567890123456789012345678901234567890123456789
 #								       *      **
 '''
-	FILE_IO is the main module that contains the base classes that 
+	FILE_IO is the main module that contains the base classes that
 	read and write atomic information from and to the hard disk,
 	and (eventually) deal with logging of input parameters and
 	project runs.
 
 	The methods in class Files are used to read and write data to
 	the Charmm/Xplor binary data format (DCD) and textual protein
-	data bank (PDB) format.  
+	data bank (PDB) format.
 
 	See the following sites for the DCD format:
 
@@ -79,10 +79,10 @@ class Files(object):
         readheaderresult,nnatoms,nset,istart,nsavc,delta,namnf,reverseEndian,charmm=dcdio.read_dcdheader(filepointer)
         if(readheaderresult!=0):
             print 'failed to read header'
-            print 'readheaderresult = ',readheaderresult	
-	
+            print 'readheaderresult = ',readheaderresult
+
         dcdfile = [filepointer,nnatoms,nset,reverseEndian,charmm]
-	
+
         return dcdfile
 
     def open_dcd_write(self,filename):
@@ -109,7 +109,7 @@ class Files(object):
         istart = 0 ; nsavc = 1 ; delta = 1.0
         headerresult=dcdio.write_dcdheader(filepointer,filename,natoms,nset,istart,nsavc,delta)
 
-        return 
+        return
 
     def write_dcd_step(self,filepointer,frame,step):
         '''
@@ -117,9 +117,9 @@ class Files(object):
         by calling a pre-compiled C module (dcdio).
         '''
 
-        tx=self._coor[frame,:,0].astype(numpy.float32)	
-        ty=self._coor[frame,:,1].astype(numpy.float32)	
-        tz=self._coor[frame,:,2].astype(numpy.float32)	
+        tx=self._coor[frame,:,0].astype(numpy.float32)
+        ty=self._coor[frame,:,1].astype(numpy.float32)
+        tz=self._coor[frame,:,2].astype(numpy.float32)
 
         stepresult=dcdio.write_dcdstep(filepointer,tx,ty,tz,step)
 
@@ -144,9 +144,9 @@ class Files(object):
             print ".",
             sys.stdout.flush()
 
-            tx=self._coor[frame,:,0].astype(numpy.float32)	
-            ty=self._coor[frame,:,1].astype(numpy.float32)	
-            tz=self._coor[frame,:,2].astype(numpy.float32)	
+            tx=self._coor[frame,:,0].astype(numpy.float32)
+            ty=self._coor[frame,:,1].astype(numpy.float32)
+            tz=self._coor[frame,:,2].astype(numpy.float32)
 
             stepresult=dcdio.write_dcdstep(outfile,tx,ty,tz,i+1)
             i += 1
@@ -161,16 +161,16 @@ class Files(object):
         '''
         result = dcdio.close_dcd_write(filepointer)
         print 'result = ',result
-	
+
         return
-	
+
     def close_dcd_read(self,filepointer):
         '''
         This method closes a dcd file.
         '''
         result = dcdio.close_dcd_read(filepointer)
         print 'result = ',result
-	
+
         return
 
     def write_dcd(self,filename):
@@ -178,22 +178,22 @@ class Files(object):
         This method writes data in the Charmm/Xplor data format.
         by calling a pre-compiled C module (dcdio).
         '''
-		
+
         outfile=dcdio.open_dcd_write(filename)
 
         nset = self._coor[:,0,0].shape[0]
         natoms = self._coor[0,:,0].shape[0]
         istart = 0 ; nsavc = 1 ; delta = 1.0
-		
+
         headerresult=dcdio.write_dcdheader(outfile,filename,natoms,nset,istart,nsavc,delta)
 
         for frame in xrange(nset):
             print ".",
             sys.stdout.flush()
 
-            tx=self._coor[frame,:,0].astype(numpy.float32)	
-            ty=self._coor[frame,:,1].astype(numpy.float32)	
-            tz=self._coor[frame,:,2].astype(numpy.float32)	
+            tx=self._coor[frame,:,0].astype(numpy.float32)
+            ty=self._coor[frame,:,1].astype(numpy.float32)
+            tz=self._coor[frame,:,2].astype(numpy.float32)
 
             stepresult=dcdio.write_dcdstep(outfile,tx,ty,tz,frame+1)
 
@@ -204,7 +204,7 @@ class Files(object):
     def read_single_dcd_step(self,filename,frame):
         '''
         This method reads a single dcd step in the Charmm/Xplor data format.
-	
+
         The method simply reads all frames up until frame and then assigns
         coordinates to the last frame (no seek option is utilizied)
 
@@ -218,36 +218,36 @@ class Files(object):
         readheaderresult,nnatoms,nset,istart,nsavc,delta,namnf,reverseEndian,charmm=dcdio.read_dcdheader(infile)
         if(readheaderresult!=0):
             print 'failed to read header'
-            print 'readheaderresult = ',readheaderresult	
+            print 'readheaderresult = ',readheaderresult
 
         print 'done with read dcd header'
 
-        coor=numpy.zeros((1,nnatoms,3),numpy.float)	
-	
+        coor=numpy.zeros((1,nnatoms,3),numpy.float)
+
         tx=numpy.zeros(nnatoms,dtype=numpy.float32)
         ty=numpy.zeros(nnatoms,dtype=numpy.float32)
         tz=numpy.zeros(nnatoms,dtype=numpy.float32)
 
         first = 1  # since num_fixed = 0 ; the "first" variable is inconsequential
-		
+
         print 'calling read_dcdstep'
-        for i in xrange(frame):	
+        for i in xrange(frame):
             result=dcdio.read_dcdstep(infile,tx,ty,tz,num_fixed,first,reverseEndian,charmm)
 
         print 'back from read_dcdstep'
         print 'result = ',result
 
         coor[0,:,0]=tx.astype(numpy.float) ; coor[0,:,1]=ty.astype(numpy.float) ; coor[0,:,2]=tz.astype(numpy.float)
-		
+
         result = dcdio.close_dcd_read(infile)
         self._coor=numpy.array(coor)
-	
+
         if(result!=0):
-            print 'failed to read coordinates'	
+            print 'failed to read coordinates'
             print 'result = ',result
 
         return
-	
+
     def read_dcd_step(self,dcdfile,frame,**kwargs):
         '''
         This method reads a single dcd step in the Charmm/Xplor data format.
@@ -266,10 +266,10 @@ class Files(object):
         result=dcdio.read_dcdstep(filepointer,tx,ty,tz,num_fixed,frame,reverseEndian,charmm)
 
         self._coor[0,:,0]=tx.astype(numpy.float) ; self._coor[0,:,1]=ty.astype(numpy.float) ; self._coor[0,:,2]=tz.astype(numpy.float)
-	
+
         if len(kwargs) < 1:
             sys.stdout.write('.',)
-        elif not kwargs['no_print']: 
+        elif not kwargs['no_print']:
             try:
                 sys.stdout.write('.',)
             except:
@@ -289,9 +289,9 @@ class Files(object):
         namnf=0 ; freeindexes=[] ; reverseEndian=0 ; charmm=0
 
         readheaderresult,nnatoms,nset,istart,nsavc,delta,namnf,reverseEndian,charmm=dcdio.read_dcdheader(infile)
-        coor=numpy.zeros((nset,nnatoms,3),numpy.float)	
-	
-        num_fixed=0 
+        coor=numpy.zeros((nset,nnatoms,3),numpy.float)
+
+        num_fixed=0
         result=1
 
         sum=0.0
@@ -302,14 +302,14 @@ class Files(object):
             tx=numpy.zeros(nnatoms,dtype=numpy.float32)
             ty=numpy.zeros(nnatoms,dtype=numpy.float32)
             tz=numpy.zeros(nnatoms,dtype=numpy.float32)
-		
+
             result=dcdio.read_dcdstep(infile,tx,ty,tz,num_fixed,i,reverseEndian,charmm)
             read_end_time=time.time()
-	
+
             sum+=read_end_time-read_start_time
 
             coor[i,:,0]=tx.astype(numpy.float) ; coor[i,:,1]=ty.astype(numpy.float) ; coor[i,:,2]=tz.astype(numpy.float)
-	
+
         result = dcdio.close_dcd_read(infile)
         self._coor=numpy.array(coor)
 
@@ -337,11 +337,11 @@ class Files(object):
         return
 
     def element_filter(self):
-        '''	
+        '''
         This function filters the PDB file to sraighten
         out various things (add to this as you go along).
-        
-        Filter element list... 
+
+        Filter element list...
         '''
         unique_elements = []
         error = []
@@ -357,7 +357,7 @@ class Files(object):
 #
 ###	OPEN	Error exception handling stub
 #
-            if(self._element[i] not in unique_elements): 
+            if(self._element[i] not in unique_elements):
                 unique_elements.append(self._element[i])
 
         return unique_elements
@@ -365,13 +365,13 @@ class Files(object):
     def get_element(self,name,resname):
         '''
         Get elment from charmm27 atom name list plus extras from periodic table
-        and resolve name conflicts	
+        and resolve name conflicts
         '''
 
         error = []
         element_name = ''
-	
-        #hydrogen,carbon,nitrogen,oxygen,sulfur,phosphorus,other = self.charmm_names()	
+
+        #hydrogen,carbon,nitrogen,oxygen,sulfur,phosphorus,other = self.charmm_names()
         charmm_names = self.charmm_names()
         hydrogen = charmm_names['hydrogen']
         carbon = charmm_names['carbon']
@@ -382,9 +382,9 @@ class Files(object):
         other = charmm_names['other']
 
         conflict_atoms = ['CD','CE','HE','HG','NE','ND','NB','PB','PA']
-	
+
         if(name in conflict_atoms and (name == resname)):
-            element_name = name	
+            element_name = name
         elif(name in hydrogen): element_name = 'H'
         elif(name in carbon): element_name = 'C'
         elif(name in nitrogen): element_name = 'N'
@@ -415,7 +415,7 @@ class Files(object):
         else:
             my_message = '\nNO CHARACTERS FOUND FOR ATOM NAME\n'
             error = self.print_error(name,my_message)
-	
+
         return error,element_name
 
     def write_pdb(self,filename,frame,flag,**kwargs):
@@ -427,15 +427,15 @@ class Files(object):
         debug=0
         result=1
         conect = False
-	
+
         if(flag=='w' or flag=='W'):
             infile=open(filename,'w')
-        elif(flag=='a' or flag=='A'):				
+        elif(flag=='a' or flag=='A'):
             infile=open(filename,'a')
-	
+
         if 'conect' in kwargs:
             conect = kwargs['conect']
-		
+
         if 'model' in kwargs:
             this_frame = kwargs['model']
             infile.write("MODEL "+str(this_frame)+"\n")
@@ -445,9 +445,9 @@ class Files(object):
             infile.write("01234567890123456789012345678901234567890123456789012345678901234567890123456789\n")
 
         for i in range(len(self._atom)):
-			
+
             this_index = self._index[i]
-	
+
             this_resid = self._resid[i]
 
             if(this_index > 99999):
@@ -517,7 +517,7 @@ class Files(object):
         #     infile.write("END\n")
 
         infile.close()
-    
+
         return result
 
     def get_resnames(self):
@@ -526,15 +526,15 @@ class Files(object):
         '''
 
         protein_resnames=['ALA','ARG','ASN','ASP','CYS','GLN','GLU','GLY','HIS','HSD','HSE','HSP','ILE','LEU','LYS','MET','PHE','PRO','SER','THR','TRP','TYR','VAL']
-	
+
         dna_resnames=['NUSA','NUSG','NUSC','NUSU','DA','DG','DC','DT','ADE','GUA','CYT','THY']
 
         rna_resnames=['RNUS','RNUA','RUUG','RNUC','A', 'C', 'G', 'U','ADE','CYT','GUA','URA']
 
         nucleic_resnames = ['GUA','ADE','CYT','THY','URA','G', 'A', 'C', 'T', 'U','DA','DG','DC','DT']
 
-        water_resnames=['TIP3','SPCE','TIP','SPC','TIP4','TP3M'] 
-			
+        water_resnames=['TIP3','SPCE','TIP','SPC','TIP4','TP3M']
+
         return protein_resnames,dna_resnames,rna_resnames,nucleic_resnames,water_resnames
 
     def initialize_children(self):
@@ -551,7 +551,7 @@ class Files(object):
             occupancies()	: occupancies_mask()
             betas()		: betas_mask()
             elements()		: elements_mask()
-			
+
             The objects on the left contain the unique values and
             the objects on the right contain the masks that have
             the indices to extract the information for each unique
@@ -571,7 +571,7 @@ class Files(object):
         name = self.name() ; resname = self.resname() ; resid = self.resid() ; chain = self.chain()
         occupancy = self.occupancy() ; beta = self.beta() ; element = self.element() ; segname = self.segname()
 
-        names = [] ; resnames = [] ; resids = [] ; chains = [] 
+        names = [] ; resnames = [] ; resids = [] ; chains = []
         occupancies = [] ; betas = [] ; elements = [] ; segments = []
 
         names_mask = numpy.zeros((number_of_names,natoms),numpy.int)
@@ -611,7 +611,7 @@ class Files(object):
     def check_for_all_zero_columns(self, coor, frame=0):
         '''
             Make sure there are no two all zero columns in coordinates
-            This is needed for the alignment module 
+            This is needed for the alignment module
         '''
         SMALL = 1.0E-10
         x0,y0,z0=False,False,False
@@ -632,7 +632,7 @@ class Files(object):
 
     def read_pdb(self,filename,**kwargs):
         '''
-        This method reads a PDB file.  
+        This method reads a PDB file.
         '''
         debug=0
         result=1
@@ -640,7 +640,7 @@ class Files(object):
         protein_resnames,dna_resnames,rna_resnames,nucleic_resnames,water_resnames = self.get_resnames()
 
         ### LONG	Need to properly import header information
-	
+
         # see: http://deposit.rcsb.org/adit/docs/pdb_atom_format.html
 
         fastread = False
@@ -649,7 +649,7 @@ class Files(object):
 
         if 'verbose' in kwargs:
             printme = kwargs['verbose']
-			
+
         if 'fastread' in kwargs:
             fastread = kwargs['fastread']
             if(fastread):
@@ -657,24 +657,24 @@ class Files(object):
 
         if 'pdbscan' in kwargs:
             pdbscan = kwargs['pdbscan']
-	
+
         infile=open(filename,'r').readlines()
 
         if(printme): print 'reading filename: ',filename
-		
+
         atom=[] ; index=[] ; original_index=[] ; name=[] ; loc=[] ; resname=[] ; chain=[] ; resid=[] ; rescode=[]
-        x=[] ; y=[] ; z=[] 
+        x=[] ; y=[] ; z=[]
         occupancy=[] ; beta=[] ; segname=[] ; element=[] ; charge=[] ; moltype=[] ; conect = {}
         residue_flag = [] ; original_resid=[] ; header = []
-	
+
         # first check to see how many frames are in the file
 
         num_model = 0
         num_endmdl = 0
         num_end = 0
-        
+
         num_frames = 1
-        
+
         count_index = 0
 
         num_counts_this_model = 0 # number of atoms encompassed by "MODEL" and "ENDMDL" lines
@@ -700,7 +700,7 @@ class Files(object):
             try:
                 if(lins[0]=='MODEL'):
                     if modelON:
-                        raise Exception, 'Encountered two consecutive MODEL lines' 
+                        raise Exception, 'Encountered two consecutive MODEL lines'
                     if (num_counts_this_model != 0):
                         raise Exception, 'There should not be atoms after ENDMDL and before MODEL lines'
                     modelON = True
@@ -747,14 +747,14 @@ class Files(object):
 
         if(printme): print 'num_atoms = ',num_atoms
 
-        if(printme): print '>>> found ',num_frames,' model(s) or frame(s)'			
-        this_frame = 1		
+        if(printme): print '>>> found ',num_frames,' model(s) or frame(s)'
+        this_frame = 1
 
         true_index = 0
-	
-        coor=numpy.zeros((num_frames,num_atoms,3),numpy.float)	
 
-        unique_names = [] ; unique_resnames = [] ; unique_resids = [] ; unique_chains = [] 
+        coor=numpy.zeros((num_frames,num_atoms,3),numpy.float)
+
+        unique_names = [] ; unique_resnames = [] ; unique_resids = [] ; unique_chains = []
         unique_occupancies = [] ; unique_betas = [] ; unique_segnames = [] ; unique_moltypes = []
 
         for i in range(len(infile)):
@@ -765,7 +765,7 @@ class Files(object):
 
             if((record_name == 'ATOM' or record_name == 'HETATM') and this_frame == 1):
                 true_index += 1
-                atom.append(string.strip(lin[0:6]))		#	1-6		record name	
+                atom.append(string.strip(lin[0:6]))		#	1-6		record name
                 original_index.append(lin[6:11])				#	7-11		atom serial number
                 index.append(str(true_index))   	        #   set index so that > 99,999 atoms can be read and counted
                 this_name = string.strip(lin[12:16])		#	13-16		atom name
@@ -782,15 +782,15 @@ class Files(object):
                 original_resid.append(lin[22:26])			#	23-26		residue sequence number
                 resid.append(lin[22:26])			#	23-26		residue sequence number
                 rescode.append(lin[26])				#	27		code for insertion of residues
-                x.append(lin[30:38])				#	31-38		Real(8.3) X: angstroms	
-                y.append(lin[38:46])				#	39-46		Real(8.3) Y: angstroms	
-                z.append(lin[46:54])				#	47-54		Real(8.3) Z: angstroms	
-				
+                x.append(lin[30:38])				#	31-38		Real(8.3) X: angstroms
+                y.append(lin[38:46])				#	39-46		Real(8.3) Y: angstroms
+                z.append(lin[46:54])				#	47-54		Real(8.3) Z: angstroms
+
                 residue_flag.append(False)
 
                 if not pdbscan:
 
-                    try:	
+                    try:
                         occupancy.append(string.strip(lin[54:60]))      #	55-60		occupancy
                         this_occupancy =string.strip(lin[54:60])      #	55-60		occupancy
                         if(occupancy[-1] == ''):
@@ -846,27 +846,27 @@ class Files(object):
                 if(this_segname not in unique_segnames): unique_segnames.append(this_segname)
                 if(this_occupancy not in unique_occupancies): unique_occupancies.append(this_occupancy)
                 if(this_beta not in unique_betas): unique_betas.append(this_beta)
-	
+
                 this_resname=(string.strip(lin[17:21]))
                 if this_resname in protein_resnames:
                     moltype.append('protein')
                     this_moltype = 'protein'
-                elif this_resname in rna_resnames:	
+                elif this_resname in rna_resnames:
                     moltype.append('rna')
                     this_moltype = 'rna'
-                elif this_resname in dna_resnames:	
+                elif this_resname in dna_resnames:
                     moltype.append('dna')
                     this_moltype = 'dna'
-                elif this_resname in water_resnames:	
+                elif this_resname in water_resnames:
                     moltype.append('water')
                     this_moltype = 'water'
                 else:
                     moltype.append('other')
                     this_moltype = 'other'
-				
+
                 if(this_moltype not in unique_moltypes): unique_moltypes.append(this_moltype)
-					
-                if(true_index == num_atoms):				
+
+                if(true_index == num_atoms):
                     if(printme): print 'finished reading frame = ',this_frame
                     index=numpy.array(index,numpy.int)
                     original_index=numpy.array(original_index,numpy.int)
@@ -884,7 +884,7 @@ class Files(object):
                         self._chain=chain ; self._resid=resid ; self._rescode=rescode ; self._original_resid=original_resid
                         self._occupancy=occupancy ; self._beta=beta ; self._segname=segname ; self._element=element
                         self._charge=charge ; self._moltype=moltype
-                        
+
                         self._number_of_names = len(unique_names) ; self._names = unique_names
                         self._number_of_resnames = len(unique_resnames) ; self._resnames = unique_resnames
                         self._number_of_resids = len(unique_resids) ; self._resids = unique_resids
@@ -900,13 +900,13 @@ class Files(object):
                     this_frame += 1
             elif((record_name != 'ATOM' or record_name != 'HETATM' and record_name != 'CONECT') and this_frame == 1):
                 header.append(lin)
-	
+
             elif((record_name == 'ATOM' or record_name == 'HETATM') and this_frame > 1):
                 true_index += 1
-                x.append(lin[30:38])				#	31-38		Real(8.3) X: angstroms	
-                y.append(lin[38:46])				#	39-46		Real(8.3) Y: angstroms	
-                z.append(lin[46:54])				#	47-54		Real(8.3) Z: angstroms	
-		
+                x.append(lin[30:38])				#	31-38		Real(8.3) X: angstroms
+                y.append(lin[38:46])				#	39-46		Real(8.3) Y: angstroms
+                z.append(lin[46:54])				#	47-54		Real(8.3) Z: angstroms
+
                 if(true_index == num_atoms):
                     if(printme): print 'finished reading frame = ',this_frame
                     x=numpy.array(x,numpy.float32)
@@ -914,14 +914,14 @@ class Files(object):
                     z=numpy.array(z,numpy.float32)
                     coor[this_frame-1,:,0]=x ; coor[this_frame-1,:,1]=y ; coor[this_frame-1,:,2]=z
                     true_index = 0
-                    this_frame += 1		
+                    this_frame += 1
                     x=[] ; y=[] ; z=[]
 
             elif ((record_name == 'CONECT') and pdbscan):
                 # Format of CONECT line:
-                # Record name CONECT followed by list of atom indexes in 6 
-                # character columns. First is the base atom, following atoms 
-                # are those connected to it. 
+                # Record name CONECT followed by list of atom indexes in 6
+                # character columns. First is the base atom, following atoms
+                # are those connected to it.
                 # Input line is filtered to ignore blank columns.
                 ndxs = [int(lin[i:i+5]) for i in range(6, len(lin), 5) if lin[i:i+5].strip()]
                 conect[ndxs[0]] = ndxs[1:]
@@ -935,7 +935,7 @@ class Files(object):
 
         if 'check_zero_coor' in kwargs:
             self.check_for_all_zero_columns(self._coor)
-			
+
         unique_elements = self.element_filter()
 
         self._number_of_elements = len(unique_elements) ; self._elements = unique_elements
@@ -946,30 +946,30 @@ class Files(object):
         error = []
 
         if 'saspdbrx_topology' in kwargs:
-            if kwargs['saspdbrx_topology']:	
+            if kwargs['saspdbrx_topology']:
                 error = self.check_charmm_atomic_order_reorganize()
                 return error
 
         self._header = header
         self._conect = conect
 
-        return 
+        return
 
     def create_conect_pdb_lines(self):
         """
             Output stored conect information in PDB record format.
-            Indices are converted from those read in - original_index - to 
+            Indices are converted from those read in - original_index - to
             those used in output.
             Format of CONECT line:
-            Record name CONECT followed by list of atom indexes in 6 character 
-            columns. First is the base atom, following atoms are those 
+            Record name CONECT followed by list of atom indexes in 6 character
+            columns. First is the base atom, following atoms are those
             connected to it.
         """
 
         original_conect = self.conect()
         original_indexs = self.original_index()
         indexs = self.index()
-            
+
         # Convert from original to current indexing
         convert_index = dict(zip(original_indexs, indexs))
 
