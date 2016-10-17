@@ -278,7 +278,10 @@ class Files(object):
         self._coor[0,:,0]=tx.astype(numpy.float) ; self._coor[0,:,1]=ty.astype(numpy.float) ; self._coor[0,:,2]=tz.astype(numpy.float)
 
         if len(kwargs) < 1:
-            sys.stdout.write('.',)
+            sys.stdout.write('\r')
+            eq = int(numpy.ceil(numpy.true_divide(frame*100, dcdfile[2]*5)))
+            sys.stdout.write("[{:20s}] {}/{} frames ".format('='*eq, frame+1,
+                                                             dcdfile[2]))
         elif not kwargs['no_print']:
             try:
                 sys.stdout.write('.',)
