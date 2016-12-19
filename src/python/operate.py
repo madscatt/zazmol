@@ -517,3 +517,151 @@ class Move():
         self.coor()[frame, :] = coor
 
         return
+
+
+    def align_principal_axes_to_xyz(self, frame, **kwargs):
+        '''
+        Transform system object so that the principle axes align with
+        cardinal axes 
+
+        Parameters
+        ----------
+        frame 
+            integer : trajectory frame number to use
+
+        kwargs 
+            optional future arguments        
+       
+        Returns
+        -------
+        None
+            updated self._coor 
+
+        Examples
+        -------
+
+        >>> import sasmol.system as system 
+        >>> molecule = system.Molecule('hiv1_gag.pdb')
+        >>> frame = 0
+        >>> molecule.align_principal_axes_to_xyz(frame)
+ 
+        Note 
+        ----------
+        Eigen vectors of principal mometns used to determine and use 
+        transformation matrix to align system object on
+        x, y and z-axes respectively 
+
+        '''
+        
+        import sasmol.linear_algebra as linear_algebra
+
+        self.center(frame)
+        
+        uk, ak, I = self.calculate_principal_moments_of_inertia(frame)
+
+        print('initial: ak = ', ak)
+
+        #ak = numpy.transpose(ak)
+        ak = ak/numpy.linalg.norm(ak)
+
+
+        comx = numpy.sum(ak[:][0])/3
+        comy = numpy.sum(ak[:][1])/3
+        comz = numpy.sum(ak[:][2])/3
+       
+        print('ak: comx = ',comx) 
+        print('ak: comy = ',comy) 
+        print('ak: comz = ',comz) 
+        
+        ak[:][0] -= comx 
+        ak[:][1] -= comy 
+        ak[:][2] -= comz 
+        
+        ak = ak/numpy.linalg.norm(ak)
+        
+        comx = numpy.sum(ak[:][0])/3
+        comy = numpy.sum(ak[:][1])/3
+        comz = numpy.sum(ak[:][2])/3
+       
+        print('ak: comx = ',comx) 
+        print('ak: comy = ',comy) 
+        print('ak: comz = ',comz) 
+        
+        ak_x = ak[0] ; ak_y = ak[1] ; ak_z = ak[2]
+
+        u_x = numpy.array([1.0, 0.0, 0.0])
+        u_y = numpy.array([0.0, 1.0, 0.0])
+        u_z = numpy.array([0.0, 0.0, 1.0])
+
+        unit_axes = numpy.array([u_x, u_y, u_z], numpy.float)
+
+        comx = numpy.sum(unit_axes[:][0])/3
+        comy = numpy.sum(unit_axes[:][1])/3
+        comz = numpy.sum(unit_axes[:][2])/3
+       
+        print('ua: comx = ',comx) 
+        print('ua: comy = ',comy) 
+        print('ua: comz = ',comz) 
+        
+        unit_axes[:][0] -= comx 
+        unit_axes[:][1] -= comy 
+        unit_axes[:][2] -= comz 
+        
+        comx = numpy.sum(unit_axes[:][0])/3
+        comy = numpy.sum(unit_axes[:][1])/3
+        comz = numpy.sum(unit_axes[:][2])/3
+       
+        print('ua: comx = ',comx) 
+        print('ua: comy = ',comy) 
+        print('ua: comz = ',comz) 
+        
+        print('ak.shape = ', ak.shape)
+        print('unit_axes.shape = ', unit_axes.shape)
+
+        u = linear_algebra.find_u(ak, unit_axes)
+        #u = linear_algebra.find_u(unit_axes, ak)
+       
+    #    print(u)
+        
+        
+        tao = numpy.transpose(self.coor()[frame])
+        #tao = numpy.transpose(self.coor()[frame] - com_subset_other)
+
+        error, nat2 = linear_algebra.matrix_multiply(u, tao)
+
+        ncoor = numpy.transpose(nat2) 
+        #ncoor = numpy.transpose(nat2) + com_subset_other
+
+        self._coor[frame, :] = ncoor 
+
+        uk, ak, I = self.calculate_principal_moments_of_inertia(frame)
+
+        print('final: ak = ', ak)
+
+
+        ak = ak/numpy.linalg.norm(ak)
+
+
+        comx = numpy.sum(ak[:][0])/3
+        comy = numpy.sum(ak[:][1])/3
+        comz = numpy.sum(ak[:][2])/3
+       
+        print('ak: comx = ',comx) 
+        print('ak: comy = ',comy) 
+        print('ak: comz = ',comz) 
+        
+        ak[:][0] -= comx 
+        ak[:][1] -= comy 
+        ak[:][2] -= comz 
+        
+        ak = ak/numpy.linalg.norm(ak)
+        
+        comx = numpy.sum(ak[:][0])/3
+        comy = numpy.sum(ak[:][1])/3
+        comz = numpy.sum(ak[:][2])/3
+       
+        print('ak: comx = ',comx) 
+        print('ak: comy = ',comy) 
+        print('ak: comz = ',comz) 
+        
+        print('final: ak = ', ak)
