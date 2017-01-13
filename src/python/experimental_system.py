@@ -171,8 +171,6 @@ class Atom(file_io.Files, calculate.Calculate, operate.Move, subset.Mask, proper
         # although you could assign by class_instance._Atom__name = value
 
 
-     
-
 
 if __name__ == "__main__":
     import doctest

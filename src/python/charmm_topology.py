@@ -486,15 +486,13 @@ class CharmmTopology(object):
 
             
         '''
-        
         # OPEN: ONLY ATOMS ARE PATCHED (NO BOND, ETC)
         error = []
         #
         # Make sure residue and patch are the right type
         #
         if residue not in self.topology_info:
-            error.append('Residue ' + residue +
-                         ' not found in the topology information list during patching!')
+            error.append('Residue ' + residue + ' not found in the topology information list during patching!')
             return error
         elif patch not in self.topology_info:
             error.append(
@@ -504,14 +502,13 @@ class CharmmTopology(object):
         # Delete atoms from 'DELE' in patch list
         #
         tmp_dict = copy.deepcopy(self.topology_info[residue])
-        # print 'ZHL ',patch,self.topology_info[patch]
-        if 'DELE' in self.topology_info[patch]['DELE']:
-            for atom_delete in self.topology_info[patch]['DELE']['ATOM']:
-                for atom_residue in tmp_dict['ATOM']:
-                    if atom_delete == atom_residue[0]:
-                        tmp_dict['ATOM'].remove(atom_residue)
+        if 'DELE' in self.topology_info[patch]:
+                for atom_delete in self.topology_info[patch]['DELE']['ATOM']:
+                    for atom_residue in tmp_dict['ATOM']:
+                        if atom_delete == atom_residue[0]:
+                            tmp_dict['ATOM'].remove(atom_residue)
         #
-        # Delete atoms
+        # Add atoms
         #
         num_added = 0
         for atom_patch in self.topology_info[patch]['ATOM']:
@@ -529,6 +526,7 @@ class CharmmTopology(object):
         self.topology_info[residue + '_' + patch] = tmp_dict
         self.charmm_residue_atoms[
             residue + '_' + patch] = numpy.array(tmp_dict['ATOM'])[:, 0].tolist()
+        
 
     def setup_cys_patch_atoms_simple(self, **kwargs):
         '''
