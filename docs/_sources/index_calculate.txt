@@ -7,7 +7,7 @@ Calculate
 ==========
 
 :mod:`Calculate`
----------------
+----------------
 
 .. automodule:: calculate
     :members:

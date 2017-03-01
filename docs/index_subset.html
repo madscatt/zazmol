@@ -1,0 +1,595 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Subset &mdash; sasmol 1.0 documentation</title>
+    
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '1.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="sasmol 1.0 documentation" href="index.html" />
+    <link rel="next" title="System" href="index_system.html" />
+    <link rel="prev" title="Properties" href="index_properties.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="subset">
+<h1>Subset<a class="headerlink" href="#subset" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="id1">
+<h2><code class="xref py py-mod docutils literal"><span class="pre">Subset</span></code><a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h2>
+<span class="target" id="module-subset"></span><dl class="class">
+<dt id="subset.Mask">
+<em class="property">class </em><code class="descclassname">subset.</code><code class="descname">Mask</code><a class="reference internal" href="_modules/subset.html#Mask"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#subset.Mask" title="Permalink to this definition">¶</a></dt>
+<dd><p>Base class containing methods to extract or combine system objects
+using numpy masks</p>
+<p class="rubric">Examples</p>
+<p>First example shows how to use class methods from system object:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">sasmol.system</span> <span class="k">as</span> <span class="nn">system</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">molecule</span> <span class="o">=</span> <span class="n">system</span><span class="o">.</span><span class="n">Molecule</span><span class="p">(</span><span class="s1">&#39;hiv1_gag.pdb&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">basis_filter</span> <span class="o">=</span> <span class="s1">&#39;name[i] == &quot;CA&quot; and resid[i] &lt; 10&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">error</span><span class="p">,</span> <span class="n">mask</span> <span class="o">=</span> <span class="n">molecule</span><span class="o">.</span><span class="n">get_subset_mask</span><span class="p">(</span><span class="n">basis_filter</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">numpy</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">numpy</span><span class="o">.</span><span class="n">nonzero</span><span class="p">(</span><span class="n">mask</span><span class="p">)</span>
+<span class="go">(array([  4,  11,  21,  45,  55,  66,  82, 101, 112]),)</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last"><cite>self</cite> parameter is not shown in the <code class="docutils literal"><span class="pre">Parameters</span></code> section in the documentation</p>
+</div>
+<dl class="method">
+<dt id="subset.Mask.apply_biomt">
+<code class="descname">apply_biomt</code><span class="sig-paren">(</span><em>frame</em>, <em>selection</em>, <em>U</em>, <em>M</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/subset.html#Mask.apply_biomt"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#subset.Mask.apply_biomt" title="Permalink to this definition">¶</a></dt>
+<dd><p>Apply biological unit transforms (BIOMT) to the coordinates of the
+chosen selection and frame.</p>
+<p>Information on BIOMT available at:
+<a class="reference external" href="http://pdb101.rcsb.org/learn/guide-to-understanding-pdb-data/biological-assemblies">http://pdb101.rcsb.org/learn/guide-to-understanding-pdb-data/biological-assemblies</a></p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>frame</strong> &#8211; integer : frame number with coordinates to transform</li>
+<li><strong>selection</strong> &#8211; <dl class="docutils">
+<dt>string</dt>
+ <span class="classifier-delimiter">:</span> <span class="classifier">selection string in standard SASMOL format</span><dd>specifying the coordinates to be transformed</dd>
+</dl>
+</li>
+<li><strong>U</strong> &#8211; numpy array : 3 x 3 rotation matrix</li>
+<li><strong>M</strong> &#8211; numpy array : 3 x 1 translation vector</li>
+<li><strong>kwargs</strong> &#8211; optional future arguments</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">updated self._coor</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://docs.python.org/library/constants.html#None" title="(in Python v2.7)">None</a></p>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Examples</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">TODO: add example</p>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="subset.Mask.copy_apply_biomt">
+<code class="descname">copy_apply_biomt</code><span class="sig-paren">(</span><em>other</em>, <em>frame</em>, <em>selection</em>, <em>U</em>, <em>M</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/subset.html#Mask.copy_apply_biomt"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#subset.Mask.copy_apply_biomt" title="Permalink to this definition">¶</a></dt>
+<dd><p>Copy selected atoms (with initial coordinates from the given frame)
+to new Molecule object (other) and apply transforms taken from biological
+unit (BIOMT) to the coordinates.</p>
+<p>Information on BIOMT available at:
+<a class="reference external" href="http://pdb101.rcsb.org/learn/guide-to-understanding-pdb-data/biological-assemblies">http://pdb101.rcsb.org/learn/guide-to-understanding-pdb-data/biological-assemblies</a></p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>other</strong> &#8211; system object : object to copy transformed information into</li>
+<li><strong>frame</strong> &#8211; integer : frame number with coordinates to transform</li>
+<li><strong>selection</strong> &#8211; <dl class="docutils">
+<dt>string</dt>
+ <span class="classifier-delimiter">:</span> <span class="classifier">selection string in standard SASMOL format</span><dd>specifying the coordinates to be transformed</dd>
+</dl>
+</li>
+<li><strong>U</strong> &#8211; numpy array : 3 x 3 rotation matrix</li>
+<li><strong>M</strong> &#8211; numpy array : 3 x 1 translation vector</li>
+<li><strong>kwargs</strong> &#8211; optional future arguments</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">updated self._coor</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://docs.python.org/library/constants.html#None" title="(in Python v2.7)">None</a></p>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Examples</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">TODO: add example</p>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="subset.Mask.copy_molecule_using_mask">
+<code class="descname">copy_molecule_using_mask</code><span class="sig-paren">(</span><em>other</em>, <em>mask</em>, <em>frame</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/subset.html#Mask.copy_molecule_using_mask"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#subset.Mask.copy_molecule_using_mask" title="Permalink to this definition">¶</a></dt>
+<dd><p>This method initializes the standard descriptors and
+coordinates for a subset molecule defined by the
+supplied mask array.</p>
+<p>usage:</p>
+<blockquote>
+<div><p>Here is a way to create a mask to be used somewhere else:</p>
+<p>m1=system.Molecule(0)   ### create a molecule m1
+m1.read_pdb(filename)   ### read in variables, coor, etc.</p>
+<p>. . . do stuff . . .</p>
+<p>basis_filter = XXXX     ### your (see examples below)</p>
+<p>error,mask = m1.get_subset_mask(basis_filter)  ### get a mask</p>
+<p>sub_m1=system.Molecule(1)               ### create a new molecule sub_m1</p>
+<p>error = m1.copy_molecule_using_mask(sub_m1,mask,frame) ### initializes sub_m1</p>
+</div></blockquote>
+</dd></dl>
+
+<dl class="method">
+<dt id="subset.Mask.duplicate_molecule">
+<code class="descname">duplicate_molecule</code><span class="sig-paren">(</span><em>number_of_duplicates</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/subset.html#Mask.duplicate_molecule"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#subset.Mask.duplicate_molecule" title="Permalink to this definition">¶</a></dt>
+<dd><p>This method copies all attributes from one molecule to a new
+set of a user-supplied number of duplicate molecules</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>number_of_duplicates</strong> &#8211; integer : number of copies to make</li>
+<li><strong>kwargs</strong> &#8211; optional future arguments</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">list of system objects</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">molecules</p>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Examples</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">sasmol.system</span> <span class="k">as</span> <span class="nn">system</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">molecule</span> <span class="o">=</span> <span class="n">system</span><span class="o">.</span><span class="n">Molecule</span><span class="p">(</span><span class="s1">&#39;hiv1_gag.pdb&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">molecule</span><span class="o">.</span><span class="n">coor</span><span class="p">()[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+<span class="go">array([-21.52499962, -67.56199646,  86.75900269])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">molecule</span><span class="o">.</span><span class="n">name</span><span class="p">()[:</span><span class="mi">10</span><span class="p">]</span>
+<span class="go">[&#39;N&#39;, &#39;HT1&#39;, &#39;HT2&#39;, &#39;HT3&#39;, &#39;CA&#39;, &#39;HA1&#39;, &#39;HA2&#39;, &#39;C&#39;, &#39;O&#39;, &#39;N&#39;]</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">sasmol.util</span> <span class="k">as</span> <span class="nn">utilities</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">number_of_duplicates</span> <span class="o">=</span> <span class="mi">108</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">molecules</span> <span class="o">=</span> <span class="n">utilities</span><span class="o">.</span><span class="n">duplicate_molecule</span><span class="p">(</span><span class="n">molecule</span><span class="p">,</span> <span class="n">number_of_duplicates</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">molecules</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">coor</span><span class="p">()[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+<span class="go">array([-21.52499962, -67.56199646,  86.75900269])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">molecules</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">name</span><span class="p">()[:</span><span class="mi">10</span><span class="p">]</span>
+<span class="go">[&#39;N&#39;, &#39;HT1&#39;, &#39;HT2&#39;, &#39;HT3&#39;, &#39;CA&#39;, &#39;HA1&#39;, &#39;HA2&#39;, &#39;C&#39;, &#39;O&#39;, &#39;N&#39;]</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Using deepcopy directly in subset.py leads to inheritance conflict.
+Therefore subset calls a method held in utilities to make duplicates.</p>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="subset.Mask.get_coor_using_mask">
+<code class="descname">get_coor_using_mask</code><span class="sig-paren">(</span><em>frame</em>, <em>mask</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/subset.html#Mask.get_coor_using_mask"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#subset.Mask.get_coor_using_mask" title="Permalink to this definition">¶</a></dt>
+<dd><p>This method extracts coordinates from frame=frame of system object (self)
+using a supplied mask which has been created before this method is called.</p>
+<p>Coorindates are chosen for the elements that are equal to 1 in the supplied mask array.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>frame</strong> &#8211; integer : trajectory frame number to use</li>
+<li><strong>mask</strong> &#8211; <dl class="docutils">
+<dt>numpy integer array</dt>
+ <span class="classifier-delimiter">:</span> <span class="classifier">mask array of length of the number of atoms</span><dd>with 1 or 0 for each atom depending on the selection
+used to create the mask</dd>
+</dl>
+</li>
+<li><strong>kwargs</strong> &#8211; optional future arguments</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"><ul class="simple">
+<li><em>error</em> &#8211; string : error statement</li>
+<li><em>coor</em> &#8211; coordinates corresponding to those determined by the input mask</li>
+</ul>
+</p>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Examples</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">sasmol.system</span> <span class="k">as</span> <span class="nn">system</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">molecule</span> <span class="o">=</span> <span class="n">system</span><span class="o">.</span><span class="n">Molecule</span><span class="p">(</span><span class="s1">&#39;hiv1_gag.pdb&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">basis_filter</span> <span class="o">=</span> <span class="s2">&quot;name[i] == &#39;CA&#39;&quot;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">error</span><span class="p">,</span> <span class="n">mask</span> <span class="o">=</span> <span class="n">molecule</span><span class="o">.</span><span class="n">get_subset_mask</span><span class="p">(</span><span class="n">basis_filter</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">frame</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">error</span><span class="p">,</span> <span class="n">coor</span> <span class="o">=</span> <span class="n">molecule</span><span class="o">.</span><span class="n">get_coor_using_mask</span><span class="p">(</span><span class="n">frame</span><span class="p">,</span> <span class="n">mask</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">coor</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+<span class="go">array([-21.72500038, -66.91000366,  85.45700073], dtype=float32)</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="subset.Mask.get_dihedral_subset_mask">
+<code class="descname">get_dihedral_subset_mask</code><span class="sig-paren">(</span><em>flexible_residues</em>, <em>mtype</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/subset.html#Mask.get_dihedral_subset_mask"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#subset.Mask.get_dihedral_subset_mask" title="Permalink to this definition">¶</a></dt>
+<dd><p>This method creates an array of ones and/or zeros
+of the length of the number of atoms in &#8220;self&#8221;. It
+uses the user-supplied flexible_residue array to
+determine which atoms to include in the mask.
+This version is hard-wired for proteins or rna to choose
+the C(n-1), N(n), CA(n), C(n), and N(n+1) atoms
+or the O3&#8217;(n-1), P(n), O5&#8217;(n), C5&#8217;(n), C4&#8217;(n),
+C3&#8217;(n), O3&#8217;(n) and P(n+1) atoms that form the basis set
+for the rotation phi &amp; psi or alpha, beta, delta, epsilon, and eta
+angles respectively.  This method calles a c-method called
+mask to speed up the calculation (24.5 X faster).</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="subset.Mask.get_indices_from_mask">
+<code class="descname">get_indices_from_mask</code><span class="sig-paren">(</span><em>mask</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/subset.html#Mask.get_indices_from_mask"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#subset.Mask.get_indices_from_mask" title="Permalink to this definition">¶</a></dt>
+<dd><p>This method returns the internal indices for the supplied
+mask.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>mask</strong> &#8211; <dl class="docutils">
+<dt>numpy integer array</dt>
+ <span class="classifier-delimiter">:</span> <span class="classifier">mask array of length of the number of atoms</span><dd>with 1 or 0 for each atom depending on the selection
+used to create the mask</dd>
+</dl>
+</li>
+<li><strong>kwargs</strong> &#8211; optional future arguments</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">numpy integer array : indices of atoms determined by the input mask</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">indices</p>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Examples</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">sasmol.system</span> <span class="k">as</span> <span class="nn">system</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">molecule</span> <span class="o">=</span> <span class="n">system</span><span class="o">.</span><span class="n">Molecule</span><span class="p">(</span><span class="s1">&#39;hiv1_gag.pdb&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">basis_filter</span> <span class="o">=</span> <span class="s2">&quot;name[i] == &#39;CA&#39;&quot;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">error</span><span class="p">,</span> <span class="n">mask</span> <span class="o">=</span> <span class="n">molecule</span><span class="o">.</span><span class="n">get_subset_mask</span><span class="p">(</span><span class="n">basis_filter</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">indices</span> <span class="o">=</span> <span class="n">molecule</span><span class="o">.</span><span class="n">get_indices_from_mask</span><span class="p">(</span><span class="n">mask</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">indices</span><span class="p">[:</span><span class="mi">10</span><span class="p">]</span>
+<span class="go">array([  4,  11,  21,  45,  55,  66,  82, 101, 112, 119])</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="subset.Mask.get_subset_mask">
+<code class="descname">get_subset_mask</code><span class="sig-paren">(</span><em>basis_filter</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/subset.html#Mask.get_subset_mask"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#subset.Mask.get_subset_mask" title="Permalink to this definition">¶</a></dt>
+<dd><p>This method creates an array of ones and/or zeros
+of the length of the number of atoms in &#8220;self&#8221; and
+uses the user-supplied filter string to filter the
+parameter descriptors to obtain a subset array
+that can be used to filter entities in other methods
+either in this class or elsewhere.</p>
+<p>usage:</p>
+<blockquote>
+<div><p>Here is a way to create a mask to be used somewhere else:</p>
+<p>m1=system.Molecule(0)   ### create a molecule m1
+m1.read_pdb(filename)   ### read in variables, coor, etc.</p>
+<p>. . . do stuff . . .</p>
+<p>basis_filter = XXXX     ### your (see examples below)</p>
+<p>error,mask = m1.get_subset_mask(basis_filter)  ### get a mask</p>
+<p>. . . do something with the mask using other functions in this class . . .</p>
+<p>Here are some example basis_filter strings:</p>
+<p>basis_filter = &#8216;name[i] == &#8220;CA&#8221; and resid[i] &lt; 10&#8217;
+basis_filter = &#8216;name[i][0] == &#8220;H&#8221; and resid[i] &lt; 10&#8217;
+basis_filter = &#8216;name[i] == &#8220;CA&#8221; and resid[i] &gt;= 1 and resid[i] &lt; 10&#8217;</p>
+<p>The syntax for basis selection can be quite eloborate.  For example,</p>
+<p>basis_filter = &#8216;name[i] == &#8220;CA&#8221; and resid[i] &gt;= 1 and resid[i] &lt; 10 and moltype==&#8221;protein&#8221; and chain==&#8221;F&#8221; and occupancy==1 and beta&gt;10.0 and element==&#8221;C&#8221; ...&#8217;</p>
+<p>could be used for advanced selection needs.  See API for full details.</p>
+</div></blockquote>
+</dd></dl>
+
+<dl class="method">
+<dt id="subset.Mask.init_child">
+<code class="descname">init_child</code><span class="sig-paren">(</span><em>descriptor</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/subset.html#Mask.init_child"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#subset.Mask.init_child" title="Permalink to this definition">¶</a></dt>
+<dd><p>This method allows one to create a list of Molecule objects
+that are defined by the input descriptor.</p>
+<p>usage:</p>
+<blockquote>
+<div><p>This is a way to create a mask to be used somewhere else:</p>
+<p>m1=system.Molecule(0)   ### create a molecule m1
+m1.read_pdb(filename)   ### read in variables, coor, etc.
+m1.initialize_children()   ### set up the masks etc.</p>
+<p>. . . do stuff . . .</p>
+<p>This initializes the following &#8220;children&#8221; with their
+masks already defined to the &#8220;parent&#8221; molecule</p>
+<p>names()                 : names_mask()
+resnames()              : resnames_mask()
+resids()                : resids_mask()
+chains()                : chains_mask()
+segnames()              : segnames_mask()
+occupancies()           : occupancies_mask()
+betas()                 : betas_mask()
+elements()              : elements_mask()</p>
+<p>The objects on the left contain the unique values and
+the objects on the right contain the masks that have
+the indices to extract the information for each unique
+value from the parent molecule.</p>
+<p>NOTE: the pluarity of the words is chosen for a reason
+to distinguish the singular words used to keep track
+of the parent variables (name &#8211;&gt; name[i] for each
+atom, while names &#8211;&gt; corresponds to the unique names
+in the parent: len(names) &lt;= len(name))</p>
+<p>For &#8220;min3.pdb&#8221; if one wants to know the unique elements
+you would type:</p>
+<p>m1.elements()</p>
+<p>which yields:</p>
+<p>[&#8216;N&#8217;, &#8216;H&#8217;, &#8216;C&#8217;, &#8216;O&#8217;, &#8216;S&#8217;, &#8216;ZN&#8217;]</p>
+<p>So, given a pre-defined object that has atomic information
+initialized by reading in the PDB file and intializing all
+children as shown above, one can get a list of subset
+objects for each type of element by typing:</p>
+<p>element_molecules = m1.init_child(&#8216;elements&#8217;)</p>
+<p>then you could parse the full-subset molecule as its own
+entity</p>
+<p>com = element_molecules[0].calccom(0)</p>
+<p>which would give the center of mass for all the &#8220;N&#8221; atoms
+in the parent molecule.</p>
+<p>Another example would be to get the COM of each amino acid
+in a protein.</p>
+<p>residue_molecules = m1.init_child(&#8216;resids&#8217;)</p>
+<dl class="docutils">
+<dt>for i in xrange(m1.number_of_resids()):</dt>
+<dd>print(residue_molecules[i].calccom(0))</dd>
+<dt>NOTE: coordinates will have to be updated separately using</dt>
+<dd>get_coor_using_mask ... using the mask(s) generated
+by file_io.initialize_children()</dd>
+</dl>
+</div></blockquote>
+</dd></dl>
+
+<dl class="method">
+<dt id="subset.Mask.merge_two_molecules">
+<code class="descname">merge_two_molecules</code><span class="sig-paren">(</span><em>mol1</em>, <em>mol2</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/subset.html#Mask.merge_two_molecules"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#subset.Mask.merge_two_molecules" title="Permalink to this definition">¶</a></dt>
+<dd><p>This method combines two molecules into a single, new molecule.
+It will assign coordinates from the first frame of a molecule.</p>
+<p>usage:</p>
+<blockquote>
+<div><p>m1=system.Molecule(0)   ### create a molecule m1
+m1.read_pdb(filename1)  ### read in variables, coor, etc.</p>
+<p>m2=system.Molecule(1)   ### create a molecule m2
+m2.read_pdb(filename2)  ### read in variables, coor, etc.</p>
+<p>m3=system.Molecule(2)   ### create a molecule m3</p>
+<p>. . . do stuff . . .</p>
+<p>error = m3.merge_two_molecules(m1,m2)   ### sets the values that define mol3</p>
+</div></blockquote>
+</dd></dl>
+
+<dl class="method">
+<dt id="subset.Mask.set_coor_using_mask">
+<code class="descname">set_coor_using_mask</code><span class="sig-paren">(</span><em>other</em>, <em>frame</em>, <em>mask</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/subset.html#Mask.set_coor_using_mask"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#subset.Mask.set_coor_using_mask" title="Permalink to this definition">¶</a></dt>
+<dd><p>This method replaces coordinates from frame=frame of system object (self)
+using a supplied mask which has been created before this method is called.</p>
+<p>Coordinates are chosen for the elements that are equal to 1 in the supplied mask array.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>frame</strong> &#8211; integer : trajectory frame number to use</li>
+<li><strong>mask</strong> &#8211; <dl class="docutils">
+<dt>numpy integer array</dt>
+ <span class="classifier-delimiter">:</span> <span class="classifier">mask array of length of the number of atoms</span><dd>with 1 or 0 for each atom depending on the selection
+used to create the mask</dd>
+</dl>
+</li>
+<li><strong>kwargs</strong> &#8211; optional future arguments</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><p>string : error statement</p>
+<p>updated self._coor</p>
+</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">error</p>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Examples</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">sasmol.system</span> <span class="k">as</span> <span class="nn">system</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">molecule_1</span> <span class="o">=</span> <span class="n">system</span><span class="o">.</span><span class="n">Molecule</span><span class="p">(</span><span class="s1">&#39;hiv1_gag.pdb&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">molecule_2</span> <span class="o">=</span> <span class="n">system</span><span class="o">.</span><span class="n">Molecule</span><span class="p">(</span><span class="s1">&#39;other_hiv1_gag.pdb&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">basis_filter</span> <span class="o">=</span> <span class="s2">&quot;name[i] == &#39;CA&#39;&quot;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">error</span><span class="p">,</span> <span class="n">mask</span> <span class="o">=</span> <span class="n">molecule_1</span><span class="o">.</span><span class="n">get_subset_mask</span><span class="p">(</span><span class="n">basis_filter</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">frame</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">error</span> <span class="o">=</span> <span class="n">molecule_1</span><span class="o">.</span><span class="n">set_coor_using_mask</span><span class="p">(</span><span class="n">molecule_2</span><span class="p">,</span> <span class="n">frame</span><span class="p">,</span> <span class="n">mask</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">molecule_2 must be smaller or equal to molecule_1 and that the coordinates
+in molecule_2 are in the same order in molecule_1</p>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="subset.Mask.set_descriptor_using_mask">
+<code class="descname">set_descriptor_using_mask</code><span class="sig-paren">(</span><em>mask</em>, <em>descriptor</em>, <em>value</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/subset.html#Mask.set_descriptor_using_mask"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#subset.Mask.set_descriptor_using_mask" title="Permalink to this definition">¶</a></dt>
+<dd><p>This method writes the &#8220;value&#8221; to the given descriptor to
+the elements that are equal to 1 in the supplied mask array.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>mask</strong> &#8211; <dl class="docutils">
+<dt>numpy integer array</dt>
+ <span class="classifier-delimiter">:</span> <span class="classifier">mask array of length of the number of atoms</span><dd>with 1 or 0 for each atom depending on the selection
+used to create the mask</dd>
+</dl>
+</li>
+<li><strong>descriptor</strong> &#8211; system property : a property defined in an instance of a system object</li>
+<li><strong>value</strong> &#8211; string : new value to apply to selection defined by mask</li>
+<li><strong>kwargs</strong> &#8211; <dl class="docutils">
+<dt>point = True</dt>
+ <span class="classifier-delimiter">:</span> <span class="classifier">will translate to a fixed point</span><dd>given by value variable</dd>
+</dl>
+</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">updated self._descriptor</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://docs.python.org/library/constants.html#None" title="(in Python v2.7)">None</a></p>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Examples</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">sasmol.system</span> <span class="k">as</span> <span class="nn">system</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">molecule</span> <span class="o">=</span> <span class="n">system</span><span class="o">.</span><span class="n">Molecule</span><span class="p">(</span><span class="s1">&#39;hiv1_gag.pdb&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">molecule</span><span class="o">.</span><span class="n">beta</span><span class="p">()[:</span><span class="mi">10</span><span class="p">]</span>
+<span class="go">[&#39;0.00&#39;, &#39;0.00&#39;, &#39;0.00&#39;, &#39;0.00&#39;, &#39;0.00&#39;, &#39;0.00&#39;, &#39;0.00&#39;, &#39;0.00&#39;, &#39;0.00&#39;, &#39;0.00&#39;]</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">basis_filter</span> <span class="o">=</span> <span class="s2">&quot;name[i] == &#39;CA&#39;&quot;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">error</span><span class="p">,</span> <span class="n">mask</span> <span class="o">=</span> <span class="n">molecule</span><span class="o">.</span><span class="n">get_subset_mask</span><span class="p">(</span><span class="n">basis_filter</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">descriptor</span> <span class="o">=</span> <span class="n">molecule</span><span class="o">.</span><span class="n">beta</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">value</span> <span class="o">=</span> <span class="s1">&#39;1.00&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">error</span> <span class="o">=</span> <span class="n">molecule</span><span class="o">.</span><span class="n">set_descriptor_using_mask</span><span class="p">(</span><span class="n">mask</span><span class="p">,</span> <span class="n">descriptor</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">descriptor</span><span class="p">[:</span><span class="mi">10</span><span class="p">]</span>
+<span class="go">[&#39;0.00&#39;, &#39;0.00&#39;, &#39;0.00&#39;, &#39;0.00&#39;, &#39;1.00&#39;, &#39;0.00&#39;, &#39;0.00&#39;, &#39;0.00&#39;, &#39;0.00&#39;, &#39;0.00&#39;]</span>
+</pre></div>
+</div>
+<p>which can then be used to set the new values into the molecule</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">molecule</span><span class="o">.</span><span class="n">setBeta</span><span class="p">(</span><span class="n">descriptor</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">molecule</span><span class="o">.</span><span class="n">beta</span><span class="p">()[:</span><span class="mi">10</span><span class="p">]</span>
+<span class="go">[&#39;0.00&#39;, &#39;0.00&#39;, &#39;0.00&#39;, &#39;0.00&#39;, &#39;1.00&#39;, &#39;0.00&#39;, &#39;0.00&#39;, &#39;0.00&#39;, &#39;0.00&#39;, &#39;0.00&#39;]</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p>Coordinate arrays can not be manipulated by this method.</p>
+<p class="last">TODO: If possible, get rid of loop</p>
+</div>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Subset</a><ul>
+<li><a class="reference internal" href="#id1"><code class="docutils literal"><span class="pre">Subset</span></code></a></li>
+</ul>
+</li>
+</ul>
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+      <li>Previous: <a href="index_properties.html" title="previous chapter">Properties</a></li>
+      <li>Next: <a href="index_system.html" title="next chapter">System</a></li>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/index_subset.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2016, Joseph E. Curtis, Ph.D..
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.4.1</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.8</a>
+      
+      |
+      <a href="_sources/index_subset.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

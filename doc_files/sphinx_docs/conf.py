@@ -61,7 +61,7 @@ master_doc = 'index'
 
 # General information about the project.
 project = u'sasmol'
-copyright = u'2016, Joseph E. Curtis, Ph.D.'
+copyright = u'2016, Joseph E. Curtis, Ph.D'
 author = u'Joseph E. Curtis, Ph.D.'
 
 # The version info for the project you're documenting, acts as replacement for

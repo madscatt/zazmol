@@ -1,4 +1,4 @@
-from __future__ import absolute_import
+#from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 #from __future__ import unicode_literals
@@ -32,8 +32,126 @@ from __future__ import print_function
 	Util holds general methods for file naming, os differences,
         chemical formula parsing, etc.
 '''
-
+#import system as system
 import string
+import copy
+import numpy
+
+def find_unique(this_list):
+    return list(numpy.unique(this_list))
+
+class Copy_Using_Mask():
+
+    @classmethod
+    def from_sasmol(class_instance,  mask, **kwargs):
+        ''' 
+
+        Parameters
+        __________
+        class_instance
+            system object
+
+        mask
+            integer list
+
+        kwargs
+            optional future keyword arguments
+
+        Returns
+        _______
+            molecule
+                new system object
+
+        Examples
+        --------
+            >>> import sasmol.system as system 
+            >>> import sasmol.util as utilties 
+            >>> molecule = system.Molecule('hiv1_gag.pdb')
+            >>> molecule.name()[0] 
+            'N'
+            >>> molecule.name()[4] 
+            'CA'
+            >>> molecule.name()[14] 
+            'HB1'
+            >>> mask = [0, 4, 14]
+            >>> new_molecule = utilities.Copy_Using_Mask.from_sasmol(molecule, mask) 
+            >>> new_molecule.name()
+            ['N', 'CA', 'HB1']
+            >>> new_molecule.mass()
+            array([ 14.00672 ,  12.01078 ,   1.007947])
+
+        Note
+        ____
+
+            if more attributes are added in system.Atom() then the key lists below need
+                to be updated
+
+            currently only list_keys and numpy_keys are returned
+
+            int_keys would have to be recalculated based on mask
+
+            short_keys would have to be re-initialized (init_children)
+
+            may want to consider passing a list of specific attributes to extract if memory is an issue
+
+            copies all frames (untested)
+
+            why can't this method be in subset?
+
+        ''' 
+       
+        list_keys = ['_residue_flag', '_occupancy', '_charge', '_atom', '_chain', '_segname', '_beta', '_loc', '_element', '_name', '_rescode', '_moltype', '_resname']
+
+        numpy_keys = ['_original_index', '_original_resid', '_index', '_resid', '_mass', '_coor'] 
+     
+        short_keys = ['_resnames', '_resids', '_elements', '_segnames', '_betas', '_names', '_moltypes', '_occupancies' ]      
+        
+        int_keys = ['_number_of_chains', '_number_of_betas', '_number_of_resids', '_number_of_names', '_number_of_moltypes', '_number_of_resnames', '_number_of_segnames', '_number_of_elements', '_id', '_number_of_occupancies' ]  
+       
+        other_keys = ['_header', '_conect', '_debug']  
+            
+        new_dict = {}
+
+        number_of_frames = len(class_instance.coor())
+        mask_length = len(mask) 
+        
+        natoms = class_instance._natoms
+        all_data = [[] for x in xrange(natoms)]
+        for i in xrange(natoms):
+            if i in mask:
+                count = 0
+                for key, value in class_instance.__dict__.iteritems():
+                    if key in list_keys:
+                        all_data[count].append(value[i])
+                        count += 1
+        count = 0
+
+        for key, value in class_instance.__dict__.iteritems():
+            if key in list_keys:
+                new_dict[key] = all_data[count]
+                count += 1
+
+        molecule = system.Molecule()
+        molecule.__dict__ = new_dict  
+      
+        molecule.setId(0)
+
+        molecule.setNatoms(mask_length) 
+        
+        molecule.setOriginal_index(numpy.take(class_instance.original_index(),mask))        
+        molecule.setOriginal_resid(numpy.take(class_instance.original_resid(),mask))        
+        molecule.setIndex(numpy.take(class_instance.index(),mask))        
+        molecule.setResid(numpy.take(class_instance.resid(),mask))
+                
+        molecule.setMass(numpy.take(class_instance.mass(),mask))        
+       
+        molecule.setCoor(numpy.take(class_instance.coor(),mask,axis=1))
+            
+        return molecule
+
+def duplicate_molecule(molecule, number_of_duplicates):
+    return [copy.deepcopy(molecule) for x in xrange(number_of_duplicates)]
+
 
 NAME, NUM, LPAREN, RPAREN, EOS = range(5)
 import re
@@ -338,3 +456,81 @@ if __name__ == "__main__":
         else:
             print("unknown action:", action)
     '''
+def parse_fasta(fasta_sequence, **kwargs):
+    """
+    method to convert fasta_sequence object to list of strings
+    for each valid sequence in the initial object
+
+    format is based on the NCBI fasta format convention
+    https://blast.ncbi.nlm.nih.gov/Blast.cgi?CMD=Web&PAGE_TYPE=BlastDocs&DOC_TYPE=BlastHelp
+
+    notes:
+
+    Parameters
+    ----------
+    fasta_sequence
+        list with formatted fasta input
+
+    kwargs
+        optional future arguments
+
+    Returns
+    -------
+    all_sequences
+
+        a list containing sequences without comments, spaces, carriage returns, numbers,
+        or termination flags.
+
+        or
+
+        an error indicating an empty line in the file
+
+    Examples
+    -------
+
+    >>> import sasmol.sasutil as sasutil
+    >>> fasta_sequence = open('test_fasta.txt', 'r').readlines()
+    >>> all_sequences = sasutil.parse_fasta(fasta_sequence)
+    >>> print(all_sequences)
+
+    Note
+    ----
+        1) lines beginning with > or ; are treated as comments and passed
+        2) spaces are ignored
+        3) * are ignored (should be a termination)
+        4) numbers are ignored so you can have numbering at the beginning of a line
+        5) \n are processed
+        6) comment lines are NOT required in the input
+        7) comment lines cause a new sequence to be started
+
+    """
+
+    all_sequences = []
+    for line in fasta_sequence:
+        # check if line is empty
+        if line.strip() == '':
+            error = 'ERROR: empty lines in fasta sequence are not allowed'
+            print(error)
+            return error
+        # check if first character is the comment identifier
+        elif line[0] == '>' or line[0] == ';':
+            # try to add completed sequence to full list (if it exists)
+            try:
+                if new_sequence != '':
+                    all_sequences.append(new_sequence)
+            except:
+                pass
+            new_sequence = ''
+        else:
+            for char in line:
+                if not char.isspace() and char != '*' and not char.isdigit():
+                    try:
+                        new_sequence += char
+                    except:
+                        new_sequence = char
+
+    if new_sequence != '':
+        all_sequences.append(new_sequence)
+
+    return all_sequences
+

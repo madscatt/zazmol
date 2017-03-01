@@ -59,13 +59,12 @@ atom properties, topology, and viewing from other samsol classes.</p>
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
 <li><strong>args</strong> &#8211; optional integer : self._id</li>
-<li><strong>kwargs</strong> &#8211; <p>optional keyword arguments
-{</p>
-<blockquote>
-<div>string filename (filename = &#8216;hiv1_gag.pdb&#8217;) : default = None
+<li><strong>kwargs</strong> &#8211; <dl class="docutils">
+<dt>optional keyword arguments</dt>
+<dd>string filename (filename = &#8216;hiv1_gag.pdb&#8217;) : default = None
 integet id (id=3) : default = 0
-boolean debug (debug = True) : default = None</div></blockquote>
-<p>}</p>
+boolean debug (debug = True) : default = None</dd>
+</dl>
 </li>
 </ul>
 </td>
@@ -81,6 +80,9 @@ file_io.read_pdb()</p>
 </tbody>
 </table>
 <p class="rubric">Examples</p>
+<p>Since subsequent classes in this file inherit from Atom and the
+common use case involves molecules, examples will use the Molecule()
+class instead of Atom.</p>
 <p>Define instance of class and read in PDB file at same time</p>
 <div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">sasmol.system</span> <span class="k">as</span> <span class="nn">system</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">molecule</span> <span class="o">=</span> <span class="n">system</span><span class="o">.</span><span class="n">Molecule</span><span class="p">(</span><span class="n">filename</span><span class="o">=</span><span class="s1">&#39;hiv1_gag.pdb&#39;</span><span class="p">)</span>
@@ -112,6 +114,30 @@ the new list to the molecule</p>
 </div>
 <p>Many &#8220;setters&#8221; and &#8220;getters&#8221; methods are defined in this class.  See source
 code for details.</p>
+<p>### attributes of len(natoms):</p>
+<blockquote>
+<div><p># python lists:</p>
+<blockquote>
+<div>list_keys = [&#8216;_residue_flag&#8217;, &#8216;_occupancy&#8217;, &#8216;_charge&#8217;, &#8216;_atom&#8217;, &#8216;_chain&#8217;, &#8216;_segname&#8217;, &#8216;_beta&#8217;, &#8216;_loc&#8217;, &#8216;_element&#8217;, &#8216;_name&#8217;, &#8216;_rescode&#8217;, &#8216;_moltype&#8217;, &#8216;_resname&#8217;, &#8216;_charmm_type&#8217;, &#8216;_atom_charge&#8217;, &#8216;_atom_vdw&#8217;, &#8216;_residue_charge&#8217;, &#8216;_one_letter_resname&#8217; ]</div></blockquote>
+<p># numpy arrays: (note that _coor has array dimensions (number of frames, natoms, 3)</p>
+<p>numpy_keys = [&#8216;_original_index&#8217;, &#8216;_original_resid&#8217;, &#8216;_index&#8217;, &#8216;_resid&#8217;, &#8216;_mass&#8217;, &#8216;_coor&#8217;, &#8216;_minimum&#8217;, &#8216;_maximum&#8217;, &#8216;_pmi&#8217;]</p>
+</div></blockquote>
+<p>### attributes with variable list lenghts:</p>
+<blockquote>
+<div><p>#python lists:</p>
+<p>short_keys = [&#8216;_resnames&#8217;, &#8216;_chains&#8217;, &#8216;_resids&#8217;, &#8216;_elements&#8217;, &#8216;_segnames&#8217;, &#8216;_betas&#8217;, &#8216;_names&#8217;, &#8216;_moltypes&#8217;, &#8216;_occupancies&#8217; ]
+# numpy arrays</p>
+<p>numpy_short_keys = [&#8216;_names_mask&#8217;, &#8216;_resnames_mask&#8217;, &#8216;_resids_mask&#8217;, &#8216;_chains_mask&#8217;, &#8216;_occupancies_mask&#8217;, &#8216;_betas_mask&#8217;, &#8216;_elements_mask&#8217;, &#8216;_segnames_mask&#8217;]</p>
+</div></blockquote>
+<p>### integer attributes</p>
+<blockquote>
+<div>int_keys = [&#8216;_number_of_chains&#8217;, &#8216;_number_of_betas&#8217;, &#8216;_number_of_resids&#8217;, &#8216;_number_of_names&#8217;, &#8216;_number_of_moltypes&#8217;, &#8216;_number_of_resnames&#8217;, &#8216;_number_of_segnames&#8217;, &#8216;_number_of_elements&#8217;, &#8216;_id&#8217;, &#8216;_number_of_occupancies&#8217;, &#8216;_number_of_frames&#8217;, &#8216;_natoms&#8217; ]</div></blockquote>
+<p>### float attributes</p>
+<blockquote>
+<div>float_keys = [&#8216;_total_mass&#8217;, &#8216;_com&#8217;, &#8216;_rg&#8217;]</div></blockquote>
+<p>### strings, dictionaries, and flags</p>
+<blockquote>
+<div>other_keys = [&#8216;_fasta&#8217;, &#8216;_header&#8217;, &#8216;_conect&#8217;, &#8216;_debug&#8217;, &#8216;_formula&#8217;, &#8216;_unitcell&#8217;]</div></blockquote>
 <dl class="method">
 <dt id="system.Atom.atom">
 <code class="descname">atom</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/system.html#Atom.atom"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#system.Atom.atom" title="Permalink to this definition">¶</a></dt>
@@ -133,28 +159,8 @@ code for details.</p>
 <dd></dd></dl>
 
 <dl class="method">
-<dt id="system.Atom.betas">
-<code class="descname">betas</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/system.html#Atom.betas"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#system.Atom.betas" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="system.Atom.betas_mask">
-<code class="descname">betas_mask</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/system.html#Atom.betas_mask"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#system.Atom.betas_mask" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
 <dt id="system.Atom.chain">
 <code class="descname">chain</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/system.html#Atom.chain"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#system.Atom.chain" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="system.Atom.chains">
-<code class="descname">chains</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/system.html#Atom.chains"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#system.Atom.chains" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="system.Atom.chains_mask">
-<code class="descname">chains_mask</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/system.html#Atom.chains_mask"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#system.Atom.chains_mask" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
@@ -163,43 +169,8 @@ code for details.</p>
 <dd></dd></dl>
 
 <dl class="method">
-<dt id="system.Atom.charmm_type">
-<code class="descname">charmm_type</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/system.html#Atom.charmm_type"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#system.Atom.charmm_type" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="system.Atom.com">
-<code class="descname">com</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/system.html#Atom.com"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#system.Atom.com" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="system.Atom.conect">
-<code class="descname">conect</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/system.html#Atom.conect"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#system.Atom.conect" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
 <dt id="system.Atom.coor">
 <code class="descname">coor</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/system.html#Atom.coor"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#system.Atom.coor" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="system.Atom.delete">
-<code class="descname">delete</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/system.html#Atom.delete"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#system.Atom.delete" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="system.Atom.delframes">
-<code class="descname">delframes</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/system.html#Atom.delframes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#system.Atom.delframes" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="system.Atom.effective_charge">
-<code class="descname">effective_charge</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/system.html#Atom.effective_charge"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#system.Atom.effective_charge" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="system.Atom.effective_van_der_waals">
-<code class="descname">effective_van_der_waals</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/system.html#Atom.effective_van_der_waals"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#system.Atom.effective_van_der_waals" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
@@ -208,38 +179,8 @@ code for details.</p>
 <dd></dd></dl>
 
 <dl class="method">
-<dt id="system.Atom.elements">
-<code class="descname">elements</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/system.html#Atom.elements"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#system.Atom.elements" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="system.Atom.elements_mask">
-<code class="descname">elements_mask</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/system.html#Atom.elements_mask"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#system.Atom.elements_mask" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="system.Atom.energy">
-<code class="descname">energy</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/system.html#Atom.energy"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#system.Atom.energy" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="system.Atom.fasta">
-<code class="descname">fasta</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/system.html#Atom.fasta"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#system.Atom.fasta" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="system.Atom.filename">
-<code class="descname">filename</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/system.html#Atom.filename"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#system.Atom.filename" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
 <dt id="system.Atom.formula">
 <code class="descname">formula</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/system.html#Atom.formula"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#system.Atom.formula" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="system.Atom.header">
-<code class="descname">header</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/system.html#Atom.header"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#system.Atom.header" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
@@ -253,23 +194,8 @@ code for details.</p>
 <dd></dd></dl>
 
 <dl class="method">
-<dt id="system.Atom.load">
-<code class="descname">load</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/system.html#Atom.load"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#system.Atom.load" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
 <dt id="system.Atom.loc">
 <code class="descname">loc</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/system.html#Atom.loc"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#system.Atom.loc" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="system.Atom.long_range_potential">
-<code class="descname">long_range_potential</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/system.html#Atom.long_range_potential"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#system.Atom.long_range_potential" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="system.Atom.maketop">
-<code class="descname">maketop</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/system.html#Atom.maketop"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#system.Atom.maketop" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
@@ -278,23 +204,8 @@ code for details.</p>
 <dd></dd></dl>
 
 <dl class="method">
-<dt id="system.Atom.maximum">
-<code class="descname">maximum</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/system.html#Atom.maximum"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#system.Atom.maximum" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="system.Atom.minimum">
-<code class="descname">minimum</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/system.html#Atom.minimum"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#system.Atom.minimum" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
 <dt id="system.Atom.moltype">
 <code class="descname">moltype</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/system.html#Atom.moltype"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#system.Atom.moltype" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="system.Atom.moltypes">
-<code class="descname">moltypes</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/system.html#Atom.moltypes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#system.Atom.moltypes" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
@@ -303,33 +214,13 @@ code for details.</p>
 <dd></dd></dl>
 
 <dl class="method">
-<dt id="system.Atom.names">
-<code class="descname">names</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/system.html#Atom.names"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#system.Atom.names" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="system.Atom.names_mask">
-<code class="descname">names_mask</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/system.html#Atom.names_mask"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#system.Atom.names_mask" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
 <dt id="system.Atom.natoms">
 <code class="descname">natoms</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/system.html#Atom.natoms"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#system.Atom.natoms" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
-<dt id="system.Atom.number_of_betas">
-<code class="descname">number_of_betas</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/system.html#Atom.number_of_betas"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#system.Atom.number_of_betas" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="system.Atom.number_of_chains">
-<code class="descname">number_of_chains</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/system.html#Atom.number_of_chains"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#system.Atom.number_of_chains" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="system.Atom.number_of_elements">
-<code class="descname">number_of_elements</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/system.html#Atom.number_of_elements"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#system.Atom.number_of_elements" title="Permalink to this definition">¶</a></dt>
+<dt id="system.Atom.number_of_atoms">
+<code class="descname">number_of_atoms</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/system.html#Atom.number_of_atoms"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#system.Atom.number_of_atoms" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
@@ -338,53 +229,8 @@ code for details.</p>
 <dd></dd></dl>
 
 <dl class="method">
-<dt id="system.Atom.number_of_moltypes">
-<code class="descname">number_of_moltypes</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/system.html#Atom.number_of_moltypes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#system.Atom.number_of_moltypes" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="system.Atom.number_of_names">
-<code class="descname">number_of_names</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/system.html#Atom.number_of_names"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#system.Atom.number_of_names" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="system.Atom.number_of_occupancies">
-<code class="descname">number_of_occupancies</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/system.html#Atom.number_of_occupancies"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#system.Atom.number_of_occupancies" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="system.Atom.number_of_resids">
-<code class="descname">number_of_resids</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/system.html#Atom.number_of_resids"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#system.Atom.number_of_resids" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="system.Atom.number_of_resnames">
-<code class="descname">number_of_resnames</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/system.html#Atom.number_of_resnames"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#system.Atom.number_of_resnames" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="system.Atom.number_of_segnames">
-<code class="descname">number_of_segnames</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/system.html#Atom.number_of_segnames"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#system.Atom.number_of_segnames" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="system.Atom.occupancies">
-<code class="descname">occupancies</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/system.html#Atom.occupancies"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#system.Atom.occupancies" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="system.Atom.occupancies_mask">
-<code class="descname">occupancies_mask</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/system.html#Atom.occupancies_mask"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#system.Atom.occupancies_mask" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
 <dt id="system.Atom.occupancy">
 <code class="descname">occupancy</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/system.html#Atom.occupancy"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#system.Atom.occupancy" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="system.Atom.one_letter_resname">
-<code class="descname">one_letter_resname</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/system.html#Atom.one_letter_resname"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#system.Atom.one_letter_resname" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
@@ -398,11 +244,6 @@ code for details.</p>
 <dd></dd></dl>
 
 <dl class="method">
-<dt id="system.Atom.pmi">
-<code class="descname">pmi</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/system.html#Atom.pmi"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#system.Atom.pmi" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
 <dt id="system.Atom.rescode">
 <code class="descname">rescode</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/system.html#Atom.rescode"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#system.Atom.rescode" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
@@ -413,63 +254,13 @@ code for details.</p>
 <dd></dd></dl>
 
 <dl class="method">
-<dt id="system.Atom.resids">
-<code class="descname">resids</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/system.html#Atom.resids"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#system.Atom.resids" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="system.Atom.resids_mask">
-<code class="descname">resids_mask</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/system.html#Atom.resids_mask"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#system.Atom.resids_mask" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="system.Atom.residue_charge">
-<code class="descname">residue_charge</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/system.html#Atom.residue_charge"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#system.Atom.residue_charge" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="system.Atom.residue_flag">
-<code class="descname">residue_flag</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/system.html#Atom.residue_flag"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#system.Atom.residue_flag" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
 <dt id="system.Atom.resname">
 <code class="descname">resname</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/system.html#Atom.resname"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#system.Atom.resname" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
-<dt id="system.Atom.resnames">
-<code class="descname">resnames</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/system.html#Atom.resnames"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#system.Atom.resnames" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="system.Atom.resnames_mask">
-<code class="descname">resnames_mask</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/system.html#Atom.resnames_mask"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#system.Atom.resnames_mask" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="system.Atom.rg">
-<code class="descname">rg</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/system.html#Atom.rg"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#system.Atom.rg" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="system.Atom.save">
-<code class="descname">save</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/system.html#Atom.save"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#system.Atom.save" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
 <dt id="system.Atom.segname">
 <code class="descname">segname</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/system.html#Atom.segname"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#system.Atom.segname" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="system.Atom.segnames">
-<code class="descname">segnames</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/system.html#Atom.segnames"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#system.Atom.segnames" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="system.Atom.segnames_mask">
-<code class="descname">segnames_mask</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/system.html#Atom.segnames_mask"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#system.Atom.segnames_mask" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
@@ -493,28 +284,8 @@ code for details.</p>
 <dd></dd></dl>
 
 <dl class="method">
-<dt id="system.Atom.setBetas">
-<code class="descname">setBetas</code><span class="sig-paren">(</span><em>newValue</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/system.html#Atom.setBetas"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#system.Atom.setBetas" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="system.Atom.setBetas_mask">
-<code class="descname">setBetas_mask</code><span class="sig-paren">(</span><em>newValue</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/system.html#Atom.setBetas_mask"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#system.Atom.setBetas_mask" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
 <dt id="system.Atom.setChain">
 <code class="descname">setChain</code><span class="sig-paren">(</span><em>newValue</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/system.html#Atom.setChain"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#system.Atom.setChain" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="system.Atom.setChains">
-<code class="descname">setChains</code><span class="sig-paren">(</span><em>newValue</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/system.html#Atom.setChains"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#system.Atom.setChains" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="system.Atom.setChains_mask">
-<code class="descname">setChains_mask</code><span class="sig-paren">(</span><em>newValue</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/system.html#Atom.setChains_mask"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#system.Atom.setChains_mask" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
@@ -523,33 +294,8 @@ code for details.</p>
 <dd></dd></dl>
 
 <dl class="method">
-<dt id="system.Atom.setCharmm_type">
-<code class="descname">setCharmm_type</code><span class="sig-paren">(</span><em>newValue</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/system.html#Atom.setCharmm_type"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#system.Atom.setCharmm_type" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="system.Atom.setCom">
-<code class="descname">setCom</code><span class="sig-paren">(</span><em>newValue</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/system.html#Atom.setCom"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#system.Atom.setCom" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="system.Atom.setConect">
-<code class="descname">setConect</code><span class="sig-paren">(</span><em>newValue</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/system.html#Atom.setConect"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#system.Atom.setConect" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
 <dt id="system.Atom.setCoor">
 <code class="descname">setCoor</code><span class="sig-paren">(</span><em>newValue</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/system.html#Atom.setCoor"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#system.Atom.setCoor" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="system.Atom.setEffective_charge">
-<code class="descname">setEffective_charge</code><span class="sig-paren">(</span><em>newValue</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/system.html#Atom.setEffective_charge"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#system.Atom.setEffective_charge" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="system.Atom.setEffective_van_der_waals">
-<code class="descname">setEffective_van_der_waals</code><span class="sig-paren">(</span><em>newValue</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/system.html#Atom.setEffective_van_der_waals"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#system.Atom.setEffective_van_der_waals" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
@@ -558,38 +304,8 @@ code for details.</p>
 <dd></dd></dl>
 
 <dl class="method">
-<dt id="system.Atom.setElements">
-<code class="descname">setElements</code><span class="sig-paren">(</span><em>newValue</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/system.html#Atom.setElements"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#system.Atom.setElements" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="system.Atom.setElements_mask">
-<code class="descname">setElements_mask</code><span class="sig-paren">(</span><em>newValue</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/system.html#Atom.setElements_mask"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#system.Atom.setElements_mask" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="system.Atom.setEnergy">
-<code class="descname">setEnergy</code><span class="sig-paren">(</span><em>newValue</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/system.html#Atom.setEnergy"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#system.Atom.setEnergy" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="system.Atom.setFasta">
-<code class="descname">setFasta</code><span class="sig-paren">(</span><em>newValue</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/system.html#Atom.setFasta"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#system.Atom.setFasta" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="system.Atom.setFilename">
-<code class="descname">setFilename</code><span class="sig-paren">(</span><em>newValue</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/system.html#Atom.setFilename"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#system.Atom.setFilename" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
 <dt id="system.Atom.setFormula">
 <code class="descname">setFormula</code><span class="sig-paren">(</span><em>newValue</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/system.html#Atom.setFormula"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#system.Atom.setFormula" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="system.Atom.setHeader">
-<code class="descname">setHeader</code><span class="sig-paren">(</span><em>newValue</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/system.html#Atom.setHeader"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#system.Atom.setHeader" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
@@ -608,23 +324,8 @@ code for details.</p>
 <dd></dd></dl>
 
 <dl class="method">
-<dt id="system.Atom.setLong_range_potential">
-<code class="descname">setLong_range_potential</code><span class="sig-paren">(</span><em>newValue</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/system.html#Atom.setLong_range_potential"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#system.Atom.setLong_range_potential" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
 <dt id="system.Atom.setMass">
 <code class="descname">setMass</code><span class="sig-paren">(</span><em>newValue</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/system.html#Atom.setMass"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#system.Atom.setMass" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="system.Atom.setMaximum">
-<code class="descname">setMaximum</code><span class="sig-paren">(</span><em>newValue</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/system.html#Atom.setMaximum"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#system.Atom.setMaximum" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="system.Atom.setMinimum">
-<code class="descname">setMinimum</code><span class="sig-paren">(</span><em>newValue</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/system.html#Atom.setMinimum"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#system.Atom.setMinimum" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
@@ -633,23 +334,8 @@ code for details.</p>
 <dd></dd></dl>
 
 <dl class="method">
-<dt id="system.Atom.setMoltypes">
-<code class="descname">setMoltypes</code><span class="sig-paren">(</span><em>newValue</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/system.html#Atom.setMoltypes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#system.Atom.setMoltypes" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
 <dt id="system.Atom.setName">
 <code class="descname">setName</code><span class="sig-paren">(</span><em>newValue</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/system.html#Atom.setName"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#system.Atom.setName" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="system.Atom.setNames">
-<code class="descname">setNames</code><span class="sig-paren">(</span><em>newValue</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/system.html#Atom.setNames"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#system.Atom.setNames" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="system.Atom.setNames_mask">
-<code class="descname">setNames_mask</code><span class="sig-paren">(</span><em>newValue</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/system.html#Atom.setNames_mask"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#system.Atom.setNames_mask" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
@@ -658,18 +344,8 @@ code for details.</p>
 <dd></dd></dl>
 
 <dl class="method">
-<dt id="system.Atom.setNumber_of_betas">
-<code class="descname">setNumber_of_betas</code><span class="sig-paren">(</span><em>newValue</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/system.html#Atom.setNumber_of_betas"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#system.Atom.setNumber_of_betas" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="system.Atom.setNumber_of_chains">
-<code class="descname">setNumber_of_chains</code><span class="sig-paren">(</span><em>newValue</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/system.html#Atom.setNumber_of_chains"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#system.Atom.setNumber_of_chains" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="system.Atom.setNumber_of_elements">
-<code class="descname">setNumber_of_elements</code><span class="sig-paren">(</span><em>newValue</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/system.html#Atom.setNumber_of_elements"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#system.Atom.setNumber_of_elements" title="Permalink to this definition">¶</a></dt>
+<dt id="system.Atom.setNumber_of_atoms">
+<code class="descname">setNumber_of_atoms</code><span class="sig-paren">(</span><em>newValue</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/system.html#Atom.setNumber_of_atoms"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#system.Atom.setNumber_of_atoms" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
@@ -678,53 +354,8 @@ code for details.</p>
 <dd></dd></dl>
 
 <dl class="method">
-<dt id="system.Atom.setNumber_of_moltypes">
-<code class="descname">setNumber_of_moltypes</code><span class="sig-paren">(</span><em>newValue</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/system.html#Atom.setNumber_of_moltypes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#system.Atom.setNumber_of_moltypes" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="system.Atom.setNumber_of_names">
-<code class="descname">setNumber_of_names</code><span class="sig-paren">(</span><em>newValue</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/system.html#Atom.setNumber_of_names"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#system.Atom.setNumber_of_names" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="system.Atom.setNumber_of_occupancies">
-<code class="descname">setNumber_of_occupancies</code><span class="sig-paren">(</span><em>newValue</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/system.html#Atom.setNumber_of_occupancies"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#system.Atom.setNumber_of_occupancies" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="system.Atom.setNumber_of_resids">
-<code class="descname">setNumber_of_resids</code><span class="sig-paren">(</span><em>newValue</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/system.html#Atom.setNumber_of_resids"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#system.Atom.setNumber_of_resids" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="system.Atom.setNumber_of_resnames">
-<code class="descname">setNumber_of_resnames</code><span class="sig-paren">(</span><em>newValue</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/system.html#Atom.setNumber_of_resnames"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#system.Atom.setNumber_of_resnames" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="system.Atom.setNumber_of_segnames">
-<code class="descname">setNumber_of_segnames</code><span class="sig-paren">(</span><em>newValue</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/system.html#Atom.setNumber_of_segnames"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#system.Atom.setNumber_of_segnames" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="system.Atom.setOccupancies">
-<code class="descname">setOccupancies</code><span class="sig-paren">(</span><em>newValue</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/system.html#Atom.setOccupancies"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#system.Atom.setOccupancies" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="system.Atom.setOccupancies_mask">
-<code class="descname">setOccupancies_mask</code><span class="sig-paren">(</span><em>newValue</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/system.html#Atom.setOccupancies_mask"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#system.Atom.setOccupancies_mask" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
 <dt id="system.Atom.setOccupancy">
 <code class="descname">setOccupancy</code><span class="sig-paren">(</span><em>newValue</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/system.html#Atom.setOccupancy"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#system.Atom.setOccupancy" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="system.Atom.setOne_letter_resname">
-<code class="descname">setOne_letter_resname</code><span class="sig-paren">(</span><em>newValue</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/system.html#Atom.setOne_letter_resname"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#system.Atom.setOne_letter_resname" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
@@ -738,11 +369,6 @@ code for details.</p>
 <dd></dd></dl>
 
 <dl class="method">
-<dt id="system.Atom.setPmi">
-<code class="descname">setPmi</code><span class="sig-paren">(</span><em>newValue</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/system.html#Atom.setPmi"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#system.Atom.setPmi" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
 <dt id="system.Atom.setRescode">
 <code class="descname">setRescode</code><span class="sig-paren">(</span><em>newValue</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/system.html#Atom.setRescode"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#system.Atom.setRescode" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
@@ -753,43 +379,8 @@ code for details.</p>
 <dd></dd></dl>
 
 <dl class="method">
-<dt id="system.Atom.setResids">
-<code class="descname">setResids</code><span class="sig-paren">(</span><em>newValue</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/system.html#Atom.setResids"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#system.Atom.setResids" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="system.Atom.setResids_mask">
-<code class="descname">setResids_mask</code><span class="sig-paren">(</span><em>newValue</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/system.html#Atom.setResids_mask"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#system.Atom.setResids_mask" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="system.Atom.setResidue_charge">
-<code class="descname">setResidue_charge</code><span class="sig-paren">(</span><em>newValue</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/system.html#Atom.setResidue_charge"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#system.Atom.setResidue_charge" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="system.Atom.setResidue_flag">
-<code class="descname">setResidue_flag</code><span class="sig-paren">(</span><em>newValue</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/system.html#Atom.setResidue_flag"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#system.Atom.setResidue_flag" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
 <dt id="system.Atom.setResname">
 <code class="descname">setResname</code><span class="sig-paren">(</span><em>newValue</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/system.html#Atom.setResname"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#system.Atom.setResname" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="system.Atom.setResnames">
-<code class="descname">setResnames</code><span class="sig-paren">(</span><em>newValue</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/system.html#Atom.setResnames"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#system.Atom.setResnames" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="system.Atom.setResnames_mask">
-<code class="descname">setResnames_mask</code><span class="sig-paren">(</span><em>newValue</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/system.html#Atom.setResnames_mask"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#system.Atom.setResnames_mask" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="system.Atom.setRg">
-<code class="descname">setRg</code><span class="sig-paren">(</span><em>newValue</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/system.html#Atom.setRg"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#system.Atom.setRg" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
@@ -798,63 +389,13 @@ code for details.</p>
 <dd></dd></dl>
 
 <dl class="method">
-<dt id="system.Atom.setSegnames">
-<code class="descname">setSegnames</code><span class="sig-paren">(</span><em>newValue</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/system.html#Atom.setSegnames"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#system.Atom.setSegnames" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="system.Atom.setSegnames_mask">
-<code class="descname">setSegnames_mask</code><span class="sig-paren">(</span><em>newValue</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/system.html#Atom.setSegnames_mask"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#system.Atom.setSegnames_mask" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="system.Atom.setShape">
-<code class="descname">setShape</code><span class="sig-paren">(</span><em>newValue</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/system.html#Atom.setShape"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#system.Atom.setShape" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="system.Atom.setShort_range_potential">
-<code class="descname">setShort_range_potential</code><span class="sig-paren">(</span><em>newValue</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/system.html#Atom.setShort_range_potential"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#system.Atom.setShort_range_potential" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
 <dt id="system.Atom.setTotal_mass">
 <code class="descname">setTotal_mass</code><span class="sig-paren">(</span><em>newValue</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/system.html#Atom.setTotal_mass"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#system.Atom.setTotal_mass" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
-<dt id="system.Atom.setType">
-<code class="descname">setType</code><span class="sig-paren">(</span><em>newValue</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/system.html#Atom.setType"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#system.Atom.setType" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="system.Atom.setUnitcell">
-<code class="descname">setUnitcell</code><span class="sig-paren">(</span><em>newValue</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/system.html#Atom.setUnitcell"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#system.Atom.setUnitcell" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="system.Atom.shape">
-<code class="descname">shape</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/system.html#Atom.shape"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#system.Atom.shape" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="system.Atom.short_range_potential">
-<code class="descname">short_range_potential</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/system.html#Atom.short_range_potential"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#system.Atom.short_range_potential" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
 <dt id="system.Atom.total_mass">
 <code class="descname">total_mass</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/system.html#Atom.total_mass"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#system.Atom.total_mass" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="system.Atom.type">
-<code class="descname">type</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/system.html#Atom.type"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#system.Atom.type" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="system.Atom.unitcell">
-<code class="descname">unitcell</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/system.html#Atom.unitcell"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#system.Atom.unitcell" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
@@ -872,13 +413,12 @@ a single protein, a single nucleic acid strand.</p>
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
 <li><strong>args</strong> &#8211; optional integer : self._id</li>
-<li><strong>kwargs</strong> &#8211; <p>optional keyword arguments
-{</p>
-<blockquote>
-<div>string filename (filename = &#8216;hiv1_gag.pdb&#8217;) : default = None
+<li><strong>kwargs</strong> &#8211; <dl class="docutils">
+<dt>optional keyword arguments</dt>
+<dd>string filename (filename = &#8216;hiv1_gag.pdb&#8217;) : default = None
 integet id (id=3) : default = 0
-boolean debug (debug = True) : default = None</div></blockquote>
-<p>}</p>
+boolean debug (debug = True) : default = None</dd>
+</dl>
 </li>
 </ul>
 </td>
@@ -896,15 +436,413 @@ file_io.read_pdb()</p>
 <p class="rubric">Examples</p>
 <div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">sasmol.system</span> <span class="k">as</span> <span class="nn">system</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">molecule</span> <span class="o">=</span> <span class="n">system</span><span class="o">.</span><span class="n">Molecule</span><span class="p">(</span><span class="n">filename</span><span class="o">=</span><span class="s1">&#39;hiv1_gag.pdb&#39;</span><span class="p">)</span>
-</pre></div>
-</div>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">molecule</span> <span class="o">=</span> <span class="n">system</span><span class="o">.</span><span class="n">Molecule</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">molecule</span> <span class="o">=</span> <span class="n">system</span><span class="o">.</span><span class="n">Molecule</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">molecule</span> <span class="o">=</span> <span class="n">system</span><span class="o">.</span><span class="n">Molecule</span><span class="p">(</span><span class="nb">id</span><span class="o">=</span><span class="mi">7</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">molecule</span> <span class="o">=</span> <span class="n">system</span><span class="o">.</span><span class="n">Molecule</span><span class="p">(</span><span class="n">debug</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">molecule</span> <span class="o">=</span> <span class="n">system</span><span class="o">.</span><span class="n">Molecule</span><span class="p">(</span><span class="s1">&#39;hiv1_gag.pdb&#39;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">molecule</span> <span class="o">=</span> <span class="n">system</span><span class="o">.</span><span class="n">Molecule</span><span class="p">(</span><span class="n">filename</span><span class="o">=</span><span class="s1">&#39;hiv1_gag.pdb&#39;</span><span class="p">,</span> <span class="nb">id</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">debug</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 </pre></div>
 </div>
+<dl class="method">
+<dt id="system.Molecule.betas">
+<code class="descname">betas</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/system.html#Molecule.betas"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#system.Molecule.betas" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="system.Molecule.betas_mask">
+<code class="descname">betas_mask</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/system.html#Molecule.betas_mask"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#system.Molecule.betas_mask" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="system.Molecule.center_of_mass">
+<code class="descname">center_of_mass</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/system.html#Molecule.center_of_mass"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#system.Molecule.center_of_mass" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="system.Molecule.chains">
+<code class="descname">chains</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/system.html#Molecule.chains"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#system.Molecule.chains" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="system.Molecule.chains_mask">
+<code class="descname">chains_mask</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/system.html#Molecule.chains_mask"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#system.Molecule.chains_mask" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="system.Molecule.charmm_type">
+<code class="descname">charmm_type</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/system.html#Molecule.charmm_type"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#system.Molecule.charmm_type" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="system.Molecule.com">
+<code class="descname">com</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/system.html#Molecule.com"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#system.Molecule.com" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="system.Molecule.conect">
+<code class="descname">conect</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/system.html#Molecule.conect"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#system.Molecule.conect" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="system.Molecule.elements">
+<code class="descname">elements</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/system.html#Molecule.elements"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#system.Molecule.elements" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="system.Molecule.elements_mask">
+<code class="descname">elements_mask</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/system.html#Molecule.elements_mask"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#system.Molecule.elements_mask" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="system.Molecule.fasta">
+<code class="descname">fasta</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/system.html#Molecule.fasta"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#system.Molecule.fasta" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="system.Molecule.header">
+<code class="descname">header</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/system.html#Molecule.header"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#system.Molecule.header" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="system.Molecule.maximum">
+<code class="descname">maximum</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/system.html#Molecule.maximum"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#system.Molecule.maximum" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="system.Molecule.minimum">
+<code class="descname">minimum</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/system.html#Molecule.minimum"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#system.Molecule.minimum" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="system.Molecule.moltypes">
+<code class="descname">moltypes</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/system.html#Molecule.moltypes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#system.Molecule.moltypes" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="system.Molecule.names">
+<code class="descname">names</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/system.html#Molecule.names"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#system.Molecule.names" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="system.Molecule.names_mask">
+<code class="descname">names_mask</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/system.html#Molecule.names_mask"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#system.Molecule.names_mask" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="system.Molecule.number_of_betas">
+<code class="descname">number_of_betas</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/system.html#Molecule.number_of_betas"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#system.Molecule.number_of_betas" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="system.Molecule.number_of_chains">
+<code class="descname">number_of_chains</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/system.html#Molecule.number_of_chains"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#system.Molecule.number_of_chains" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="system.Molecule.number_of_elements">
+<code class="descname">number_of_elements</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/system.html#Molecule.number_of_elements"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#system.Molecule.number_of_elements" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="system.Molecule.number_of_moltypes">
+<code class="descname">number_of_moltypes</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/system.html#Molecule.number_of_moltypes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#system.Molecule.number_of_moltypes" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="system.Molecule.number_of_names">
+<code class="descname">number_of_names</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/system.html#Molecule.number_of_names"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#system.Molecule.number_of_names" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="system.Molecule.number_of_occupancies">
+<code class="descname">number_of_occupancies</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/system.html#Molecule.number_of_occupancies"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#system.Molecule.number_of_occupancies" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="system.Molecule.number_of_resids">
+<code class="descname">number_of_resids</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/system.html#Molecule.number_of_resids"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#system.Molecule.number_of_resids" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="system.Molecule.number_of_resnames">
+<code class="descname">number_of_resnames</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/system.html#Molecule.number_of_resnames"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#system.Molecule.number_of_resnames" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="system.Molecule.number_of_segnames">
+<code class="descname">number_of_segnames</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/system.html#Molecule.number_of_segnames"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#system.Molecule.number_of_segnames" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="system.Molecule.occupancies">
+<code class="descname">occupancies</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/system.html#Molecule.occupancies"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#system.Molecule.occupancies" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="system.Molecule.occupancies_mask">
+<code class="descname">occupancies_mask</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/system.html#Molecule.occupancies_mask"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#system.Molecule.occupancies_mask" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="system.Molecule.one_letter_resname">
+<code class="descname">one_letter_resname</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/system.html#Molecule.one_letter_resname"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#system.Molecule.one_letter_resname" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="system.Molecule.pmi">
+<code class="descname">pmi</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/system.html#Molecule.pmi"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#system.Molecule.pmi" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="system.Molecule.resids">
+<code class="descname">resids</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/system.html#Molecule.resids"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#system.Molecule.resids" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="system.Molecule.resids_mask">
+<code class="descname">resids_mask</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/system.html#Molecule.resids_mask"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#system.Molecule.resids_mask" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="system.Molecule.residue_charge">
+<code class="descname">residue_charge</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/system.html#Molecule.residue_charge"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#system.Molecule.residue_charge" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="system.Molecule.residue_flag">
+<code class="descname">residue_flag</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/system.html#Molecule.residue_flag"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#system.Molecule.residue_flag" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="system.Molecule.resnames">
+<code class="descname">resnames</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/system.html#Molecule.resnames"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#system.Molecule.resnames" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="system.Molecule.resnames_mask">
+<code class="descname">resnames_mask</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/system.html#Molecule.resnames_mask"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#system.Molecule.resnames_mask" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="system.Molecule.rg">
+<code class="descname">rg</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/system.html#Molecule.rg"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#system.Molecule.rg" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="system.Molecule.segnames">
+<code class="descname">segnames</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/system.html#Molecule.segnames"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#system.Molecule.segnames" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="system.Molecule.segnames_mask">
+<code class="descname">segnames_mask</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/system.html#Molecule.segnames_mask"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#system.Molecule.segnames_mask" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="system.Molecule.setBetas">
+<code class="descname">setBetas</code><span class="sig-paren">(</span><em>newValue</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/system.html#Molecule.setBetas"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#system.Molecule.setBetas" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="system.Molecule.setBetas_mask">
+<code class="descname">setBetas_mask</code><span class="sig-paren">(</span><em>newValue</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/system.html#Molecule.setBetas_mask"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#system.Molecule.setBetas_mask" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="system.Molecule.setCenter_of_mass">
+<code class="descname">setCenter_of_mass</code><span class="sig-paren">(</span><em>newValue</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/system.html#Molecule.setCenter_of_mass"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#system.Molecule.setCenter_of_mass" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="system.Molecule.setChains">
+<code class="descname">setChains</code><span class="sig-paren">(</span><em>newValue</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/system.html#Molecule.setChains"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#system.Molecule.setChains" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="system.Molecule.setChains_mask">
+<code class="descname">setChains_mask</code><span class="sig-paren">(</span><em>newValue</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/system.html#Molecule.setChains_mask"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#system.Molecule.setChains_mask" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="system.Molecule.setCharmm_type">
+<code class="descname">setCharmm_type</code><span class="sig-paren">(</span><em>newValue</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/system.html#Molecule.setCharmm_type"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#system.Molecule.setCharmm_type" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="system.Molecule.setCom">
+<code class="descname">setCom</code><span class="sig-paren">(</span><em>newValue</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/system.html#Molecule.setCom"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#system.Molecule.setCom" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="system.Molecule.setConect">
+<code class="descname">setConect</code><span class="sig-paren">(</span><em>newValue</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/system.html#Molecule.setConect"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#system.Molecule.setConect" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="system.Molecule.setElements">
+<code class="descname">setElements</code><span class="sig-paren">(</span><em>newValue</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/system.html#Molecule.setElements"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#system.Molecule.setElements" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="system.Molecule.setElements_mask">
+<code class="descname">setElements_mask</code><span class="sig-paren">(</span><em>newValue</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/system.html#Molecule.setElements_mask"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#system.Molecule.setElements_mask" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="system.Molecule.setFasta">
+<code class="descname">setFasta</code><span class="sig-paren">(</span><em>newValue</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/system.html#Molecule.setFasta"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#system.Molecule.setFasta" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="system.Molecule.setHeader">
+<code class="descname">setHeader</code><span class="sig-paren">(</span><em>newValue</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/system.html#Molecule.setHeader"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#system.Molecule.setHeader" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="system.Molecule.setMaximum">
+<code class="descname">setMaximum</code><span class="sig-paren">(</span><em>newValue</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/system.html#Molecule.setMaximum"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#system.Molecule.setMaximum" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="system.Molecule.setMinimum">
+<code class="descname">setMinimum</code><span class="sig-paren">(</span><em>newValue</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/system.html#Molecule.setMinimum"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#system.Molecule.setMinimum" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="system.Molecule.setMoltypes">
+<code class="descname">setMoltypes</code><span class="sig-paren">(</span><em>newValue</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/system.html#Molecule.setMoltypes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#system.Molecule.setMoltypes" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="system.Molecule.setNames">
+<code class="descname">setNames</code><span class="sig-paren">(</span><em>newValue</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/system.html#Molecule.setNames"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#system.Molecule.setNames" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="system.Molecule.setNames_mask">
+<code class="descname">setNames_mask</code><span class="sig-paren">(</span><em>newValue</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/system.html#Molecule.setNames_mask"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#system.Molecule.setNames_mask" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="system.Molecule.setNumber_of_betas">
+<code class="descname">setNumber_of_betas</code><span class="sig-paren">(</span><em>newValue</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/system.html#Molecule.setNumber_of_betas"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#system.Molecule.setNumber_of_betas" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="system.Molecule.setNumber_of_chains">
+<code class="descname">setNumber_of_chains</code><span class="sig-paren">(</span><em>newValue</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/system.html#Molecule.setNumber_of_chains"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#system.Molecule.setNumber_of_chains" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="system.Molecule.setNumber_of_elements">
+<code class="descname">setNumber_of_elements</code><span class="sig-paren">(</span><em>newValue</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/system.html#Molecule.setNumber_of_elements"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#system.Molecule.setNumber_of_elements" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="system.Molecule.setNumber_of_moltypes">
+<code class="descname">setNumber_of_moltypes</code><span class="sig-paren">(</span><em>newValue</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/system.html#Molecule.setNumber_of_moltypes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#system.Molecule.setNumber_of_moltypes" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="system.Molecule.setNumber_of_names">
+<code class="descname">setNumber_of_names</code><span class="sig-paren">(</span><em>newValue</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/system.html#Molecule.setNumber_of_names"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#system.Molecule.setNumber_of_names" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="system.Molecule.setNumber_of_occupancies">
+<code class="descname">setNumber_of_occupancies</code><span class="sig-paren">(</span><em>newValue</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/system.html#Molecule.setNumber_of_occupancies"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#system.Molecule.setNumber_of_occupancies" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="system.Molecule.setNumber_of_resids">
+<code class="descname">setNumber_of_resids</code><span class="sig-paren">(</span><em>newValue</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/system.html#Molecule.setNumber_of_resids"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#system.Molecule.setNumber_of_resids" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="system.Molecule.setNumber_of_resnames">
+<code class="descname">setNumber_of_resnames</code><span class="sig-paren">(</span><em>newValue</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/system.html#Molecule.setNumber_of_resnames"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#system.Molecule.setNumber_of_resnames" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="system.Molecule.setNumber_of_segnames">
+<code class="descname">setNumber_of_segnames</code><span class="sig-paren">(</span><em>newValue</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/system.html#Molecule.setNumber_of_segnames"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#system.Molecule.setNumber_of_segnames" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="system.Molecule.setOccupancies">
+<code class="descname">setOccupancies</code><span class="sig-paren">(</span><em>newValue</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/system.html#Molecule.setOccupancies"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#system.Molecule.setOccupancies" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="system.Molecule.setOccupancies_mask">
+<code class="descname">setOccupancies_mask</code><span class="sig-paren">(</span><em>newValue</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/system.html#Molecule.setOccupancies_mask"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#system.Molecule.setOccupancies_mask" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="system.Molecule.setOne_letter_resname">
+<code class="descname">setOne_letter_resname</code><span class="sig-paren">(</span><em>newValue</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/system.html#Molecule.setOne_letter_resname"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#system.Molecule.setOne_letter_resname" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="system.Molecule.setPmi">
+<code class="descname">setPmi</code><span class="sig-paren">(</span><em>newValue</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/system.html#Molecule.setPmi"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#system.Molecule.setPmi" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="system.Molecule.setResids">
+<code class="descname">setResids</code><span class="sig-paren">(</span><em>newValue</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/system.html#Molecule.setResids"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#system.Molecule.setResids" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="system.Molecule.setResids_mask">
+<code class="descname">setResids_mask</code><span class="sig-paren">(</span><em>newValue</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/system.html#Molecule.setResids_mask"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#system.Molecule.setResids_mask" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="system.Molecule.setResidue_charge">
+<code class="descname">setResidue_charge</code><span class="sig-paren">(</span><em>newValue</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/system.html#Molecule.setResidue_charge"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#system.Molecule.setResidue_charge" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="system.Molecule.setResidue_flag">
+<code class="descname">setResidue_flag</code><span class="sig-paren">(</span><em>newValue</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/system.html#Molecule.setResidue_flag"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#system.Molecule.setResidue_flag" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="system.Molecule.setResnames">
+<code class="descname">setResnames</code><span class="sig-paren">(</span><em>newValue</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/system.html#Molecule.setResnames"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#system.Molecule.setResnames" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="system.Molecule.setResnames_mask">
+<code class="descname">setResnames_mask</code><span class="sig-paren">(</span><em>newValue</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/system.html#Molecule.setResnames_mask"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#system.Molecule.setResnames_mask" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="system.Molecule.setRg">
+<code class="descname">setRg</code><span class="sig-paren">(</span><em>newValue</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/system.html#Molecule.setRg"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#system.Molecule.setRg" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="system.Molecule.setSegnames">
+<code class="descname">setSegnames</code><span class="sig-paren">(</span><em>newValue</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/system.html#Molecule.setSegnames"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#system.Molecule.setSegnames" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="system.Molecule.setSegnames_mask">
+<code class="descname">setSegnames_mask</code><span class="sig-paren">(</span><em>newValue</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/system.html#Molecule.setSegnames_mask"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#system.Molecule.setSegnames_mask" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="system.Molecule.setUnitcell">
+<code class="descname">setUnitcell</code><span class="sig-paren">(</span><em>newValue</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/system.html#Molecule.setUnitcell"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#system.Molecule.setUnitcell" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="system.Molecule.unitcell">
+<code class="descname">unitcell</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/system.html#Molecule.unitcell"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#system.Molecule.unitcell" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
 </dd></dl>
 
 <dl class="class">
@@ -973,13 +911,12 @@ all of attributes from Atom.</p>
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
 <li><strong>args</strong> &#8211; optional integer : self._id</li>
-<li><strong>kwargs</strong> &#8211; <p>optional keyword arguments
-{</p>
-<blockquote>
-<div>string filename (filename = &#8216;hiv1_gag.pdb&#8217;) : default = None
+<li><strong>kwargs</strong> &#8211; <dl class="docutils">
+<dt>optional keyword arguments</dt>
+<dd>string filename (filename = &#8216;hiv1_gag.pdb&#8217;) : default = None
 integet id (id=3) : default = 0
-boolean debug (debug = True) : default = None</div></blockquote>
-<p>}</p>
+boolean debug (debug = True) : default = None</dd>
+</dl>
 </li>
 </ul>
 </td>
@@ -1055,7 +992,7 @@ file_io.read_pdb()</p>
       <div class="clearer"></div>
     </div>
     <div class="footer">
-      &copy;2016, Joseph E. Curtis, Ph.D..
+      &copy;2016, Joseph E. Curtis, Ph.D.
       
       |
       Powered by <a href="http://sphinx-doc.org/">Sphinx 1.4.1</a>

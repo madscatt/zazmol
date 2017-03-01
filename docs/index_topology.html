@@ -46,77 +46,13 @@
 <div class="section" id="id1">
 <h2><code class="xref py py-mod docutils literal"><span class="pre">Topology</span></code><a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h2>
 <span class="target" id="module-topology"></span><dl class="class">
-<dt id="topology.CharmmTopology">
-<em class="property">class </em><code class="descclassname">topology.</code><code class="descname">CharmmTopology</code><a class="reference internal" href="_modules/topology.html#CharmmTopology"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#topology.CharmmTopology" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference external" href="https://docs.python.org/library/functions.html#object" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">object</span></code></a></p>
-<p>This class contains charmm topology information used other modules.</p>
-<p>The output topology dictionary looks like the following examples:</p>
-<p class="rubric">Examples</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">pprint</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">sasmol.topology</span> <span class="k">as</span> <span class="nn">topology</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">test</span> <span class="o">=</span> <span class="n">topology</span><span class="o">.</span><span class="n">CharmmTopology</span><span class="p">()</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">test</span><span class="o">.</span><span class="n">read_charmm_topology</span><span class="p">()</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">pprint</span><span class="o">.</span><span class="n">pprint</span><span class="p">(</span><span class="n">test</span><span class="o">.</span><span class="n">topology_info</span><span class="p">[</span><span class="s1">&#39;NTER&#39;</span><span class="p">],</span><span class="n">width</span><span class="o">=</span><span class="mi">100</span><span class="p">)</span>
-<span class="go">{&#39;ATOM&#39;: [[&#39;N&#39;, &#39;NH3&#39;, &#39;-0.30&#39;],</span>
-<span class="go">      [&#39;HT1&#39;, &#39;HC&#39;, &#39;0.33&#39;],</span>
-<span class="go">      [&#39;HT2&#39;, &#39;HC&#39;, &#39;0.33&#39;],</span>
-<span class="go">      [&#39;HT3&#39;, &#39;HC&#39;, &#39;0.33&#39;],</span>
-<span class="go">      [&#39;CA&#39;, &#39;CT1&#39;, &#39;0.21&#39;],</span>
-<span class="go">      [&#39;HA&#39;, &#39;HB&#39;, &#39;0.10&#39;]],</span>
-<span class="go">&#39;BOND&#39;: [[&#39;HT1&#39;, &#39;N&#39;], [&#39;HT2&#39;, &#39;N&#39;], [&#39;HT3&#39;, &#39;N&#39;]],</span>
-<span class="go">&#39;DELE&#39;: [[&#39;ATOM&#39;, &#39;HN&#39;]],</span>
-<span class="go">&#39;DONO&#39;: [&#39;HT1&#39;, &#39;N&#39;, &#39;HT2&#39;, &#39;N&#39;, &#39;HT3&#39;, &#39;N&#39;],</span>
-<span class="go">&#39;IC&#39;: [[&#39;HT1&#39;, &#39;N&#39;, &#39;CA&#39;, &#39;C&#39;, &#39;0.0000&#39;, &#39;0.0000&#39;, &#39;180.0000&#39;, &#39;0.0000&#39;, &#39;0.0000&#39;],</span>
-<span class="go">        [&#39;HT2&#39;, &#39;CA&#39;, &#39;*N&#39;, &#39;HT1&#39;, &#39;0.0000&#39;, &#39;0.0000&#39;, &#39;120.0000&#39;, &#39;0.0000&#39;, &#39;0.0000&#39;],</span>
-<span class="go">        [&#39;HT3&#39;, &#39;CA&#39;, &#39;*N&#39;, &#39;HT2&#39;, &#39;0.0000&#39;, &#39;0.0000&#39;, &#39;120.0000&#39;, &#39;0.0000&#39;, &#39;0.0000&#39;]],</span>
-<span class="go">&#39;TOTAL_CHARGE&#39;: &#39;1.00&#39;}</span>
-</pre></div>
-</div>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">pprint</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">sasmol.topology</span> <span class="k">as</span> <span class="nn">topology</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">test</span> <span class="o">=</span> <span class="n">topology</span><span class="o">.</span><span class="n">CharmmTopology</span><span class="p">()</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">test</span><span class="o">.</span><span class="n">read_charmm_topology</span><span class="p">()</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">pprint</span><span class="o">.</span><span class="n">pprint</span><span class="p">(</span><span class="n">test</span><span class="o">.</span><span class="n">topology_info</span><span class="p">[</span><span class="s1">&#39;ALA&#39;</span><span class="p">],</span><span class="n">width</span><span class="o">=</span><span class="mi">100</span><span class="p">)</span>
-<span class="go">{&#39;ACCE&#39;: [&#39;O&#39;, &#39;C&#39;],</span>
-<span class="go">&#39;ATOM&#39;: [[&#39;N&#39;, &#39;NH1&#39;, &#39;-0.47&#39;],</span>
-<span class="go">        [&#39;HN&#39;, &#39;H&#39;, &#39;0.31&#39;],</span>
-<span class="go">        [&#39;CA&#39;, &#39;CT1&#39;, &#39;0.07&#39;],</span>
-<span class="go">        [&#39;HA&#39;, &#39;HB&#39;, &#39;0.09&#39;],</span>
-<span class="go">        [&#39;CB&#39;, &#39;CT3&#39;, &#39;-0.27&#39;],</span>
-<span class="go">        [&#39;HB1&#39;, &#39;HA&#39;, &#39;0.09&#39;],</span>
-<span class="go">        [&#39;HB2&#39;, &#39;HA&#39;, &#39;0.09&#39;],</span>
-<span class="go">        [&#39;HB3&#39;, &#39;HA&#39;, &#39;0.09&#39;],</span>
-<span class="go">        [&#39;C&#39;, &#39;C&#39;, &#39;0.51&#39;],</span>
-<span class="go">        [&#39;O&#39;, &#39;O&#39;, &#39;-0.51&#39;]],</span>
-<span class="go">&#39;BOND&#39;: [[&#39;CB&#39;, &#39;CA&#39;],</span>
-<span class="go">        [&#39;N&#39;, &#39;HN&#39;],</span>
-<span class="go">        [&#39;N&#39;, &#39;CA&#39;],</span>
-<span class="go">        [&#39;C&#39;, &#39;CA&#39;],</span>
-<span class="go">        [&#39;C&#39;, &#39;+N&#39;],</span>
-<span class="go">        [&#39;CA&#39;, &#39;HA&#39;],</span>
-<span class="go">        [&#39;CB&#39;, &#39;HB1&#39;],</span>
-<span class="go">        [&#39;CB&#39;, &#39;HB2&#39;],</span>
-<span class="go">        [&#39;CB&#39;, &#39;HB3&#39;]],</span>
-<span class="go">&#39;DONO&#39;: [&#39;HN&#39;, &#39;N&#39;],</span>
-<span class="go">&#39;DOUB&#39;: [[&#39;O&#39;, &#39;C&#39;]],</span>
-<span class="go">&#39;IC&#39;: [[&#39;-C&#39;, &#39;CA&#39;, &#39;*N&#39;, &#39;HN&#39;, &#39;1.3551&#39;, &#39;126.4900&#39;, &#39;180.0000&#39;, &#39;115.4200&#39;, &#39;0.9996&#39;],</span>
-<span class="go">        [&#39;-C&#39;, &#39;N&#39;, &#39;CA&#39;, &#39;C&#39;, &#39;1.3551&#39;, &#39;126.4900&#39;, &#39;180.0000&#39;, &#39;114.4400&#39;, &#39;1.5390&#39;],</span>
-<span class="go">        [&#39;N&#39;, &#39;CA&#39;, &#39;C&#39;, &#39;+N&#39;, &#39;1.4592&#39;, &#39;114.4400&#39;, &#39;180.0000&#39;, &#39;116.8400&#39;, &#39;1.3558&#39;],</span>
-<span class="go">        [&#39;+N&#39;, &#39;CA&#39;, &#39;*C&#39;, &#39;O&#39;, &#39;1.3558&#39;, &#39;116.8400&#39;, &#39;180.0000&#39;, &#39;122.5200&#39;, &#39;1.2297&#39;],</span>
-<span class="go">        [&#39;CA&#39;, &#39;C&#39;, &#39;+N&#39;, &#39;+CA&#39;, &#39;1.5390&#39;, &#39;116.8400&#39;, &#39;180.0000&#39;, &#39;126.7700&#39;, &#39;1.4613&#39;],</span>
-<span class="go">        [&#39;N&#39;, &#39;C&#39;, &#39;*CA&#39;, &#39;CB&#39;, &#39;1.4592&#39;, &#39;114.4400&#39;, &#39;123.2300&#39;, &#39;111.0900&#39;, &#39;1.5461&#39;],</span>
-<span class="go">        [&#39;N&#39;, &#39;C&#39;, &#39;*CA&#39;, &#39;HA&#39;, &#39;1.4592&#39;, &#39;114.4400&#39;, &#39;-120.4500&#39;, &#39;106.3900&#39;, &#39;1.0840&#39;],</span>
-<span class="go">        [&#39;C&#39;, &#39;CA&#39;, &#39;CB&#39;, &#39;HB1&#39;, &#39;1.5390&#39;, &#39;111.0900&#39;, &#39;177.2500&#39;, &#39;109.6000&#39;, &#39;1.1109&#39;],</span>
-<span class="go">        [&#39;HB1&#39;, &#39;CA&#39;, &#39;*CB&#39;, &#39;HB2&#39;, &#39;1.1109&#39;, &#39;109.6000&#39;, &#39;119.1300&#39;, &#39;111.0500&#39;, &#39;1.1119&#39;],</span>
-<span class="go">        [&#39;HB1&#39;, &#39;CA&#39;, &#39;*CB&#39;, &#39;HB3&#39;, &#39;1.1109&#39;, &#39;109.6000&#39;, &#39;-119.5800&#39;, &#39;111.6100&#39;, &#39;1.1114&#39;]],</span>
-<span class="go">&#39;IMPR&#39;: [[&#39;N&#39;, &#39;-C&#39;, &#39;CA&#39;, &#39;HN&#39;], [&#39;C&#39;, &#39;CA&#39;, &#39;+N&#39;, &#39;O&#39;]],</span>
-</pre></div>
-</div>
-<blockquote>
-<div><cite>self</cite> parameter is not shown in the <code class="docutils literal"><span class="pre">Parameters</span></code> section in the documentation</div></blockquote>
+<dt id="topology.Topology">
+<em class="property">class </em><code class="descclassname">topology.</code><code class="descname">Topology</code><a class="reference internal" href="_modules/topology.html#Topology"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#topology.Topology" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">sasmol.charmm_topology.CharmmTopology</span></code></p>
+<p>This class contains topology information used other modules.</p>
 <dl class="method">
-<dt id="topology.CharmmTopology.add">
-<code class="descname">add</code><span class="sig-paren">(</span><em>dictionary</em>, <em>key</em>, <em>value</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/topology.html#CharmmTopology.add"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#topology.CharmmTopology.add" title="Permalink to this definition">¶</a></dt>
+<dt id="topology.Topology.add">
+<code class="descname">add</code><span class="sig-paren">(</span><em>dictionary</em>, <em>key</em>, <em>value</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#topology.Topology.add" title="Permalink to this definition">¶</a></dt>
 <dd><p>This method is used by the self.read_topology method.</p>
 <p>It will check whether the key is in the dictionary:
 if yes, append value to dictionary[key]
@@ -157,8 +93,33 @@ if no, initialize dictionary[key] as [value]</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="topology.CharmmTopology.check_charmm_atomic_order_reorganize">
-<code class="descname">check_charmm_atomic_order_reorganize</code><span class="sig-paren">(</span><em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/topology.html#CharmmTopology.check_charmm_atomic_order_reorganize"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#topology.CharmmTopology.check_charmm_atomic_order_reorganize" title="Permalink to this definition">¶</a></dt>
+<dt id="topology.Topology.charmm_names">
+<code class="descname">charmm_names</code><span class="sig-paren">(</span><em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#topology.Topology.charmm_names" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>kwargs</strong> &#8211; optional future arguments</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">dictionary : atom_name and list of atom names for
+hydrogen, carbon, nitrogen, oxygen, sulfur, phosphorus, other</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference internal" href="#topology.Topology.charmm_names" title="topology.Topology.charmm_names">charmm_names</a></td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Examples</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">sasmol.properties</span> <span class="k">as</span> <span class="nn">properties</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">properties</span> <span class="o">=</span> <span class="n">properties</span><span class="o">.</span><span class="n">Atomic</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">properties</span><span class="o">.</span><span class="n">charmm_names</span><span class="p">()[</span><span class="s1">&#39;sulfur&#39;</span><span class="p">]</span>
+<span class="go">[&#39;SG&#39;, &#39;SD&#39;, &#39;1SG&#39;, &#39;2SG&#39;]</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="topology.Topology.check_charmm_atomic_order_reorganize">
+<code class="descname">check_charmm_atomic_order_reorganize</code><span class="sig-paren">(</span><em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#topology.Topology.check_charmm_atomic_order_reorganize" title="Permalink to this definition">¶</a></dt>
 <dd><p>re-organize the atomic list according to the charmm topology contract
 do nothing if the atomic order alreay match that in the charmm topology file
 meanwhile make sure there are no missing or extra atoms
@@ -195,8 +156,8 @@ Patch N-ter for the first residue and C-ter for the last residue in each segment
 </dd></dl>
 
 <dl class="method">
-<dt id="topology.CharmmTopology.compare_list_ignore_order">
-<code class="descname">compare_list_ignore_order</code><span class="sig-paren">(</span><em>l1</em>, <em>l2</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/topology.html#CharmmTopology.compare_list_ignore_order"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#topology.CharmmTopology.compare_list_ignore_order" title="Permalink to this definition">¶</a></dt>
+<dt id="topology.Topology.compare_list_ignore_order">
+<code class="descname">compare_list_ignore_order</code><span class="sig-paren">(</span><em>l1</em>, <em>l2</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#topology.Topology.compare_list_ignore_order" title="Permalink to this definition">¶</a></dt>
 <dd><p>Compare two lists while ignoring order</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -233,8 +194,8 @@ Patch N-ter for the first residue and C-ter for the last residue in each segment
 </dd></dl>
 
 <dl class="method">
-<dt id="topology.CharmmTopology.patch_charmm_residue_atoms">
-<code class="descname">patch_charmm_residue_atoms</code><span class="sig-paren">(</span><em>residue</em>, <em>patch</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/topology.html#CharmmTopology.patch_charmm_residue_atoms"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#topology.CharmmTopology.patch_charmm_residue_atoms" title="Permalink to this definition">¶</a></dt>
+<dt id="topology.Topology.patch_charmm_residue_atoms">
+<code class="descname">patch_charmm_residue_atoms</code><span class="sig-paren">(</span><em>residue</em>, <em>patch</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#topology.Topology.patch_charmm_residue_atoms" title="Permalink to this definition">¶</a></dt>
 <dd><p>Applies &#8216;patch&#8217; to &#8216;residue&#8217; based on the charmm topology
 definition to add / remove atoms as needed.  Only ATOM and DELE
 records are accommodated</p>
@@ -275,8 +236,8 @@ records are accommodated</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="topology.CharmmTopology.read_charmm_topology">
-<code class="descname">read_charmm_topology</code><span class="sig-paren">(</span><em>topology_file_path=''</em>, <em>topology_file_name='top_all27_prot_na.inp'</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/topology.html#CharmmTopology.read_charmm_topology"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#topology.CharmmTopology.read_charmm_topology" title="Permalink to this definition">¶</a></dt>
+<dt id="topology.Topology.read_charmm_topology">
+<code class="descname">read_charmm_topology</code><span class="sig-paren">(</span><em>topology_file_path=''</em>, <em>topology_file_name='top_all27_prot_na.inp'</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#topology.Topology.read_charmm_topology" title="Permalink to this definition">¶</a></dt>
 <dd><p>Read and parse the charmm topology file
 A comprehensive dictionary (topology_info) will be built to store all the topology information
 The strategy for parsing topology file is to split words in each line</p>
@@ -331,8 +292,8 @@ The strategy for parsing topology file is to split words in each line</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="topology.CharmmTopology.setup_charmm_residue_atoms">
-<code class="descname">setup_charmm_residue_atoms</code><span class="sig-paren">(</span><em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/topology.html#CharmmTopology.setup_charmm_residue_atoms"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#topology.CharmmTopology.setup_charmm_residue_atoms" title="Permalink to this definition">¶</a></dt>
+<dt id="topology.Topology.setup_charmm_residue_atoms">
+<code class="descname">setup_charmm_residue_atoms</code><span class="sig-paren">(</span><em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#topology.Topology.setup_charmm_residue_atoms" title="Permalink to this definition">¶</a></dt>
 <dd><p>Build the atom list of all the residues in the charmm topology file</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -362,8 +323,8 @@ The strategy for parsing topology file is to split words in each line</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="topology.CharmmTopology.setup_cys_patch_atoms_simple">
-<code class="descname">setup_cys_patch_atoms_simple</code><span class="sig-paren">(</span><em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/topology.html#CharmmTopology.setup_cys_patch_atoms_simple"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#topology.CharmmTopology.setup_cys_patch_atoms_simple" title="Permalink to this definition">¶</a></dt>
+<dt id="topology.Topology.setup_cys_patch_atoms_simple">
+<code class="descname">setup_cys_patch_atoms_simple</code><span class="sig-paren">(</span><em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#topology.Topology.setup_cys_patch_atoms_simple" title="Permalink to this definition">¶</a></dt>
 <dd><p>A way to set up cys patch atoms
 simply remove HG1 atom from the atom list</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -465,7 +426,7 @@ simply remove HG1 atom from the atom list</p>
       <div class="clearer"></div>
     </div>
     <div class="footer">
-      &copy;2016, Joseph E. Curtis, Ph.D..
+      &copy;2016, Joseph E. Curtis, Ph.D.
       
       |
       Powered by <a href="http://sphinx-doc.org/">Sphinx 1.4.1</a>

@@ -32,16 +32,10 @@ floattype=os.environ['SASMOL_FLOATTYPE']
 
 DataPath = os.path.join(os.path.dirname(os.path.realpath(__file__)),'..','data','pdb_common')+os.path.sep
 
-class Test_intg_system_Atom_Type(MockerTestCase):
+class Test_intg_system_Molecule_Type(MockerTestCase):
 
    def setUp(self):
-      self.o=system.Atom(3,'1CRN-3frames.pdb')
-
-   def test_energy(self):
-      expected = 10.0
-      self.o.setEnergy(expected)
-      result = self.o.energy()
-      self.assertEqual(expected, result)
+      self.o=system.Molecule(3,'1CRN-3frames.pdb')
 
    def test_formula(self):
       expected = 'fom'
@@ -60,12 +54,6 @@ class Test_intg_system_Atom_Type(MockerTestCase):
       self.o.read_pdb(DataPath+'1ATM.pdb')
       self.o.setTotal_mass(expected)
       result = self.o.total_mass()
-      self.assertEqual(expected, result)
-
-   def test_unitcell(self):
-      expected = 'P1'
-      self.o.setUnitcell(expected)
-      result = self.o.unitcell()
       self.assertEqual(expected, result)
 
    def test_com(self):
@@ -102,12 +90,6 @@ class Test_intg_system_Atom_Type(MockerTestCase):
       expected = 10000.0
       self.o.setMaximum(expected)
       result = self.o.maximum()
-      self.assertEqual(expected, result)
-
-   def test_shape(self):
-      expected = 'sphere'
-      self.o.setShape(expected)
-      result = self.o.shape()
       self.assertEqual(expected, result)
 
    def test_moltype(self):

@@ -61,6 +61,38 @@ class Atomic(object):
 
     """ 
 
+    one_to_three_letter_protein_residue_dictionary = {
+            'A' : 'ALA',
+            'R' : 'ARG',
+            'D' : 'ASP',
+            'N' : 'ASN',
+            'C' : 'CYS',
+            'E' : 'GLU',
+            'Q' : 'GLN',
+            'G' : 'GLY',
+            'H' : 'HSE',
+            'I' : 'ILE',
+            'L' : 'LEU',
+            'K' : 'LYS',
+            'M' : 'MET',
+            'F' : 'PHE',
+            'P' : 'PRO',
+            'S' : 'SER',
+            'T' : 'THR',
+            'W' : 'TRP',
+            'Y' : 'TYR',
+            'V' : 'VAL',
+
+    }
+
+    one_to_three_letter_nucleic_residue_dictionary = {
+            'G' : 'GUA',
+            'C' : 'CYT',
+            'A' : 'ADE',
+            'T' : 'THY',
+            'U' : 'URA'
+    }
+
     def amu(self, **kwargs):
         """
 
@@ -120,56 +152,7 @@ class Atomic(object):
 
         return standard_atomic_weight
 
-    def charmm_names(self, **kwargs):
-        """
 
-        Parameters
-        ----------
-        kwargs 
-            optional future arguments
-                                                                                     
-        Returns
-        -------
-        charmm_names
-            dictionary : atom_name and list of atom names for
-            hydrogen, carbon, nitrogen, oxygen, sulfur, phosphorus, other
-
-        Examples
-        -------
-
-        >>> import sasmol.properties as properties
-        >>> properties = properties.Atomic()
-        >>> properties.charmm_names()['sulfur']
-        ['SG', 'SD', '1SG', '2SG']
-
-        """
-
-        charmm_names = {}
-
-        charmm_names['hydrogen'] = ['HN', 'HA', 'HB1', 'HB2', 'HB3', 'HG1', 'HG2', 'HD1', 'HD2', 'HE', 'HH11', 'HH12', 'HH21', 'HH22', 'HD21', 'HD22', 'HE21', 'HE22', 'HA1', 'HA2', 'HE1', 'HE2', 'HB', 'HG21', 'HG22', 'HG23', 'HG11', 'HG12', 'HD3', 'HG', 'HD11', 'HD12', 'HD13', 'HD23', 'HZ1', 'HZ2', 'HZ3', 'HE3', 'HZ', 'HH2', 'HH', 'HG13', 'H1', 'H2', 'HC', 'HD', 'HMA1', 'HMA2', 'HMA3', 'HAA1', 'HAA2', 'HBA1', 'HBA2', 'HMB1', 'HMB2', 'HMB3', 'HAB', 'HBB1', 'HBB2', 'HMC1', 'HMC2', 'HMC3', 'HAC', 'HBC1', 'HBC2', 'HMD1', 'HMD2', 'HMD3', 'HAD1', 'HAD2', 'HBD1', 'HBD2', 'HT1', 'HT2', 'HT3', 'HN1', 'HN2', 'HY1', 'HY2',
-                    'HY3', 'HNT', "H5'", "H5''", "H4'", "H1'", 'H21', 'H22', 'H8', "H2''", "H2'", "H3'", 'H61', 'H62', 'H6', 'H5', 'H41', 'H42', 'H3', 'H51', 'H52', 'H53', 'H11', 'H12', 'H13', 'H23', 'H9', 'H5T', "H53'", 'H5T1', 'H5T2', 'H5T3', 'H3T', 'H3T1', 'H3T2', 'H3T3', 'H91', 'H92', 'H93', 'H9B1', 'H9B2', 'H9B3', 'H5M1', 'H5M2', 'H5M3', 'H4', 'H15', 'H16', 'H17', "H11'", "H12'", "H21'", "H22'", "H31'", "H32'", "H41'", "H42'", "H51'", "H52'", "H1''", "H4''", "H3''", "1H3'", "1H3''", "1H2''", "2H5'", "2H5''", "AH4'", "AH1'", 'AH8', 'AH2', "AH2'", 'AH61', 'AH62', 'AH2T', "AH3'", 'AH3T', "AH5'", 'AH5S']
-
-        charmm_names['carbon'] = ["CA", "CB", "C", "CG", "CD", "CZ", "CE1", "CD2", "CG2", "CG1", "CD1", "CE", "CE2", "CE3", "CZ3", "CZ2", "CH2", "C1A", "C2A", "C3A", "C4A", "C1B", 'C2B', 'C3B', 'C4B', 'C1C', 'C2C', 'C3C', 'C4C', 'C1D', 'C2D', 'C3D', 'C4D', 'CHA', 'CHB', 'CHC', 'CHD', 'CMA', 'CAA', 'CBA', 'CGA', 'CMB', 'CAB', 'CBB', 'CMC',
-                  'CAC', 'CBC', 'CMD', 'CAD', 'CBD', 'CGD', 'CAY', 'CY', 'CT', 'CAT', "C5'", "C4'", "C1'", 'C4', 'C2', 'C6', 'C5', 'C8', "C2'", "C3'", 'C5M', 'C1', 'C5T', 'C3T', 'C9', 'C9B', 'C3', 'C7', 'C10', 'C12', '1CB', '2CB', "1C3'", "1C2'", "2C5'", "AC4'", "AC1'", 'AC5', 'AC8', 'AC2', 'AC4', 'AC6', "AC2'", "AC3'", "AC5'"]
-
-        charmm_names['nitrogen'] = ['N', 'NH1', 'NH2', 'ND2', 'NE2', 'ND1', 'NZ', 'NE1', 'NA', 'NB', 'NC', 'ND', 'NT', 'N9', 'N2', 'N3', 'N1', 'N7', 'N6', 'N4', 'N14', 'NP', 'NO1', 'NO2', "NO5'", "NC5'", 'NH5S', "NH5'", "NC2'", "NH2'", "NO2'",
-                    'NH2T', "NC3'", "NH3'", "NO3'", 'NH3T', "NC1'", "NH1'", "NC4'", "NH4'", "NO4'", 'NN1', 'NC6', 'NH6', 'NC5', 'NH5', 'NC4', 'NH4', 'NC3', 'NC2', 'NC7', 'NO7', 'NN7', 'NH71', 'NH72', 'NH42', 'AN7', 'AN9', 'AN1', 'AN3', 'AN6']
-
-        charmm_names['oxygen'] = ['O', 'OD1', 'OD2', 'OE1', 'OE2', 'OG', 'OG1', 'OH', 'OH2', 'O1A', 'O2A', 'O1D', 'O2D', 'OY', 'OT1', 'OT2', 'O1', 'O2', 'O3', 'O4', 'O1P', 'O2P', "O5'", "O4'", 'O6', "O2'", "O3'", 'O5T', 'O1P3', 'O2P3', 'O3T', 'O3P3', 'O13',
-                  'O11', 'O12', 'O14', 'O22', 'O23', 'O24', 'O3A', 'O1B', 'O2B', 'O3B', 'O1G', 'O2G', 'O3G', 'O21', 'O3P', 'O31P', 'O32P', 'O33P', "1O2'", '2O1P', '2O2P', "2O5'", "AO4'", "AO2'", "AO3'", 'AO1', 'AO2', "AO5'", 'AO1P', 'AO2P', 'AO2T', 'OM']
-
-        charmm_names['sulfur'] = ['SG', 'SD', '1SG', '2SG']
-
-        charmm_names['phosphorus'] = ['P1', 'P', 'P3', 'P2',
-                      'PA', 'PB', 'PG', '2P', 'AP', 'AP2']
-
-        charmm_names['other'] = ['AS', 'AG', 'AL', 'AR', 'AC', 'AT', 'AU', 'BI', 'BE', 'B', 'BR', 'BA', 'CR', 'CS', 'CU', 'CO', 'D', 'DY', 'EU', 'ER', 'F', 'FE', 'FR', 'GA', 'GE', 'GD', 'HO', 'HF', 'IN', 'I', 'IR', 'K', 'KR', 'LI', 'LA', 'LU', 'MG', 'MN', 'MO', 'NE',
-                 'NI', 'OS', 'PD', 'PR', 'PM', 'PT', 'PO', 'RB', 'RU', 'RH', 'RE', 'RN', 'RA', 'SI', 'SC', 'SE', 'SR', 'SN', 'SB', 'SM', 'TI', 'TC', 'TE', 'TB', 'TA', 'TL', 'TH', 'U', 'V', 'W', 'XE', 'Y', 'YB', 'ZN', 'ZR', 'SS', 'CAL', 'DUM', 'POT', 'CES', 'CLA']
-
-# note that SM is C-S-S-C not Sm (the element)
-# note that SM is C-S-S-C not Sm (the element)
-
-        return charmm_names
 
     def amino_acid_sld(self, **kwargs):
         """
@@ -228,271 +211,7 @@ class Atomic(object):
 
         return residue_scattering
 
-    def create_fasta(self, **kwargs):
-        """
-        Method to make a fasta file compatible lists of residue names
 
-        http://en.wikipedia.org/wiki/FASTA_format
-
-        Parameters
-        ----------
-        kwargs 
-            optional future arguments
-                                                                                     
-        Returns
-        -------
-        self._fasta
-            sets the fasta attribute in a system object 
-
-        Examples
-        -------
-
-        >>> import sasmol.system as system
-        >>> molecule = system.Molecule("hiv1_gag.pdb")
-        >>> molecule.create_fasta()
-        >>> molecule.fasta()[:5]
-        ['G', 'A', 'R', 'A', 'S']
-        >>> m.create_fasta(fasta_format=True)
-        >>> print molecule.fasta()[:5]
-        >
-        GAR
-        >>> m.create_fasta(fasta_format=True,width='60')
-        >>> print molecule.fasta()
-        >
-        GARASVLSGGELDKWEKIRLRPGGKKQYKLKHIVWASRELERFAVNPGLLETSEGCRQIL
-        GQLQPSLQTGSEELRSLYNTIAVLYCVHQRIDVKDTKEALDKIEEEQNKSKKKAQQAAAD
-        TGNNSQVSQNYPIVQNLQGQMVHQAISPRTLNAWVKVVEEKAFSPEVIPMFSALSEGATP
-        QDLNTMLNTVGGHQAAMQMLKETINEEAAEWDRVHPVHAGPIAPGQMREPRGSDIAGTTS
-        TLQEQIGWMTNNPPIPVGEIYKRWIILGLNKIVRMYSPTSILDIRQGPKEPFRDYVDRFY
-        KTLRAEQASQEVKNAATETLLVQNANPDCKTILKALGPAATLEEMMTACQGVGGPGHKAR
-        VIAEAMSQVTNSATIMMQKGNFRNQRKTVKCFNCGKEGHIAKNCRAPRKKGCWKCGKEGH
-        QMKDCTERQAN
-
-        >>> molecule.create_fasta(fasta_format=True,width='60',name='aar')
-        >>> print molecule.fasta()[:90]
-        >aar
-        GARASVLSGGELDKWEKIRLRPGGKKQYKLKHIVWASRELERFAVNPGLLETSEGCRQIL
-        GQLQPSLQTGSEELRSLYNTIAVL
-
-        
-        Note
-        ----
-        Other use types below
-
-        molecule.create_fasta(fasta_format=True,exclude_hetatm=True,by_chain=True)
-        print molecule.fasta()
-
-        print '>>> testing by_chain with HETATM (t.py): '
-
-        molecule.create_fasta(fasta_format=True,by_chain=True)
-        print molecule.fasta()
-
-        print '>>> testing by_segname (t.py): '
-
-        molecule.create_fasta(fasta_format=True,exclude_hetatm=True,by_segname=True)
-        print molecule.fasta()
-
-        Note that this creates a simple string that is associated with the molecule (self)
-        and it will return without assigning a string if a non-standard three letter code
-        is supplied.
-
-        """
-
-        fasta_format = False
-        by_chain = False
-        by_segname = False
-        single_chain = False
-        single_segname = False
-        exclude_hetatm = False
-
-        if 'fasta_format' in kwargs:
-            fasta_format = True
-
-        if 'name' in kwargs:
-            name = kwargs['name']
-            header = '>' + name
-        else:
-            header = '>'
-
-        if 'width' in kwargs:
-            width = kwargs['width']
-        else:
-            width = '80'
-
-        if 'exclude_hetatm' in kwargs:
-            exclude_hetatm = True
-
-        if 'by_chain' in kwargs:
-            by_chain = True
-
-        elif 'by_segname' in kwargs:
-            by_segname = True
-
-        one_resname = []
-
-        resname = self.resname()
-        atom = self.atom()
-        chain = self.chain()
-        segname = self.segname()
-
-        residue_dictionary = {
-            'ALA': 'A',
-            'ARG': 'R',
-            'ASP': 'D',
-            'ASN': 'N',
-            'CYS': 'C',
-            'GLU': 'E',
-            'GLN': 'Q',
-            'GLY': 'G',
-            'HSD': 'H',
-            'HIS': 'H',
-            'HSE': 'H',
-            'HSP': 'H',
-            'ILE': 'I',
-            'LEU': 'L',
-            'LYS': 'K',
-            'MET': 'M',
-            'PHE': 'F',
-            'PRO': 'P',
-            'SER': 'S',
-            'THR': 'T',
-            'TRP': 'W',
-            'TYR': 'Y',
-            'VAL': 'V',
-            'GUA': 'G',
-            'CYT': 'C',
-            'ADE': 'A',
-            'THY': 'T',
-            'URA': 'U'
-        }
-
-        for i in xrange(len(resname)):
-            this_resname = resname[i]
-            if this_resname in residue_dictionary:
-                one_resname.append(residue_dictionary[this_resname])
-            elif (atom[i] == 'HETATM'):
-                # print 'skipping non-standard resname in HETATM record:
-                # ',this_resname
-                one_resname.append("X")
-            else:
-                print('non standard resname: ', this_resname)
-                print('unable to make Fasta conversion')
-                return
-
-        self.setOne_letter_resname(one_resname)
-
-        resid = self.resid()
-
-        last_resid = None
-        last_chain = None
-        last_segname = None
-        fasta = []
-        local_fasta = []
-        number_of_chains = 0
-        number_of_segnames = 0
-        chain_name = []
-        segname_name = []
-        first = True
-        for i in xrange(len(resid)):
-            this_resid = resid[i]
-
-            if by_chain:
-                this_chain = chain[i]
-                if this_chain != last_chain:
-                    number_of_chains += 1
-                    chain_name.append(this_chain)
-                    if first:
-                        first = False
-                    else:
-                        fasta.append(local_fasta)
-
-                    last_chain = this_chain
-                    local_fasta = []
-
-            if by_segname:
-                this_segname = segname[i]
-                if this_segname != last_segname:
-                    number_of_segnames += 1
-                    segname_name.append(this_segname)
-                    if first:
-                        first = False
-                    else:
-                        fasta.append(local_fasta)
-
-                    last_segname = this_segname
-                    local_fasta = []
-
-            this_resname = self.one_letter_resname()[i]
-            if this_resid != last_resid:
-                local_fasta.append(this_resname)
-                last_resid = this_resid
-
-        if by_chain or by_segname:
-            fasta.append(local_fasta)
-
-        elif not by_chain and not by_segname:
-            fasta = local_fasta
-            number_of_chains = 1
-            chain_name = chain[0]
-
-        final_fasta = ''
-
-        if by_segname:
-            number_of_chains = number_of_segnames
-
-        for i in xrange(number_of_chains):
-            saveme = False
-            if fasta_format:
-                from textwrap import TextWrapper
-                wrapper = TextWrapper(width=int(width))
-                if by_chain or by_segname:
-                    if exclude_hetatm:
-                        while "X" in fasta[i]:
-                            fasta[i].remove("X")
-
-                    joined_fasta = ''.join(fasta[i])
-                else:
-                    if exclude_hetatm:
-                        while "X" in fasta:
-                            fasta.remove("X")
-                    joined_fasta = ''.join(fasta)
-
-                formatted_fasta = "\n".join(wrapper.wrap(joined_fasta))
-
-                if(len(formatted_fasta.strip()) > 0):
-                    saveme = True
-
-                if(len(header) > 1):
-                    if by_chain:
-                        formatted_fasta = header + ' chain:' + \
-                            chain_name[i] + '\n' + formatted_fasta
-                    elif by_segname:
-                        formatted_fasta = header + ' segname:' + \
-                            segname_name[i] + '\n' + formatted_fasta
-                    else:
-                        formatted_fasta = header + '\n' + formatted_fasta
-
-                else:
-                    if by_chain:
-                        formatted_fasta = header + 'chain:' + \
-                            chain_name[i] + '\n' + formatted_fasta
-                    elif by_segname:
-                        formatted_fasta = header + 'segname:' + \
-                            segname_name[i] + '\n' + formatted_fasta
-                    else:
-                        formatted_fasta = header + '\n' + formatted_fasta
-
-                if saveme:
-                    final_fasta += formatted_fasta + '\n'
-                else:
-                    final_fasta += '\n'
-
-        if fasta_format:
-            self.setFasta(final_fasta)
-        else:
-            self.setFasta(fasta)
-
-        return
 
     def set_average_vdw(self, **kwargs):
 
