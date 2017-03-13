@@ -14,6 +14,7 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 '''
+from __future__ import print_function
 
 from sasmol.test_sasmol.utilities import env,util
 
@@ -65,11 +66,11 @@ class Test_unit_operate_Move_translate(MockerTestCase):
         frame = 0
         #
         expected_coor = numpy.array([[[1.0, -1.0, 1.0]]],floattype)[frame]
-	print 'expected_coor:\n', expected_coor
+	print('expected_coor:\n', expected_coor)
         #
         self.o.rotate(frame,axis,theta)
         result_coor = self.o.coor()[frame]
-        print 'result_coor:\n',result_coor
+        print('result_coor:\n',result_coor)
         #
         self.assert_list_almost_equal(expected_coor, result_coor,3)
 
@@ -84,11 +85,11 @@ class Test_unit_operate_Move_translate(MockerTestCase):
         frame = 0
         #
         expected_coor = numpy.array([[[1.0, 1.0, -1.0]]],floattype)[frame]
-	print 'expected_coor:\n', expected_coor
+	print('expected_coor:\n', expected_coor)
         #
         self.o.rotate(frame,axis,theta)
         result_coor = self.o.coor()[frame]
-        print 'result_coor:\n',result_coor
+        print('result_coor:\n',result_coor)
         #
         self.assert_list_almost_equal(expected_coor, result_coor,3)
 
@@ -103,11 +104,11 @@ class Test_unit_operate_Move_translate(MockerTestCase):
         frame = 0
         #
         expected_coor = numpy.array([[[-1.0, 1.0, 1.0]]],floattype)[frame]
-	print 'expected_coor:\n', expected_coor
+	print('expected_coor:\n', expected_coor)
         #
         self.o.rotate(frame,axis,theta)
         result_coor = self.o.coor()[frame]
-        print 'result_coor:\n',result_coor
+        print('result_coor:\n',result_coor)
         #
         self.assert_list_almost_equal(expected_coor, result_coor,3)
 
@@ -122,11 +123,11 @@ class Test_unit_operate_Move_translate(MockerTestCase):
         frame = 0
         #
 	expected_coor = numpy.array([[[-1.0, -3.87, 2.0],[-5.0, -6.0, 3.2]]],floattype)[frame]
-	print 'expected_coor:\n', expected_coor
+	print('expected_coor:\n', expected_coor)
         #
         self.o.rotate(frame,axis,theta)
         result_coor = self.o.coor()[frame]
-        print 'result_coor:\n',result_coor
+        print('result_coor:\n',result_coor)
         #
         self.assert_list_almost_equal(expected_coor, result_coor,3)
 
@@ -139,11 +140,11 @@ class Test_unit_operate_Move_translate(MockerTestCase):
         frame = 0
         #
         expected_coor = numpy.array([[[3.87, 2.0, 1.0],[6.0, 3.2, 5.0]]],floattype)[frame]
-	print 'expected_coor:\n', expected_coor
+	print('expected_coor:\n', expected_coor)
         #
         self.o.rotate(frame,axis,theta)
         result_coor = self.o.coor()[frame]
-        print 'result_coor:\n',result_coor
+        print('result_coor:\n',result_coor)
         #
         self.assert_list_almost_equal(expected_coor, result_coor,3)
 
@@ -161,11 +162,11 @@ class Test_unit_operate_Move_translate(MockerTestCase):
 	cs=numpy.cos(theta)
 	si=numpy.sin(theta)
 	expected_coor = numpy.array([[[-1.0*cs-2.0*si, -1.0*si+2.0*cs, 3.87],[-5.0*cs-3.2*si, -5.0*si+3.2*cs, 6.0]]],floattype)[frame]
-	print 'expected_coor:\n', expected_coor
+	print('expected_coor:\n', expected_coor)
         #
         self.o.rotate(frame,axis,theta)
         result_coor = self.o.coor()[frame]
-        print 'result_coor:\n',result_coor
+        print('result_coor:\n',result_coor)
         #
         self.assert_list_almost_equal(expected_coor, result_coor,3)
 
@@ -179,11 +180,11 @@ class Test_unit_operate_Move_translate(MockerTestCase):
 	cs=numpy.cos(theta)
 	si=numpy.sin(theta)
         expected_coor = numpy.array([[[1.2, 2.0*cs-3.0*si, 2.0*si+3.0*cs],[-2.0, 5.0*cs-6.0*si, 5.0*si+6.0*cs],[7.0, 8.0*cs-9.0*si, 8.0*si+9.0*cs],[1.0, 3.0*cs-5.0*si, 3.0*si+5.0*cs],[2.0, 4.0*cs-6.0*si, 4.0*si+6.0*cs],[0.0, 2.0*cs-3.0*si, 2.0*si+3.0*cs]]],floattype)[frame]
-	print 'expected_coor:\n', expected_coor
+	print('expected_coor:\n', expected_coor)
         #
         self.o.rotate(frame,axis,theta)
         result_coor = self.o.coor()[frame]
-        print 'result_coor:\n',result_coor
+        print('result_coor:\n',result_coor)
         #
         self.assert_list_almost_equal(expected_coor, result_coor,3)
 
@@ -197,11 +198,11 @@ class Test_unit_operate_Move_translate(MockerTestCase):
 	cs=numpy.cos(theta)
 	si=numpy.sin(theta)
         expected_coor = numpy.array([[[1.2, 2.0*cs-3.0*si, 2.0*si+3.0*cs],[-2.0, 5.0*cs-6.0*si, 5.0*si+6.0*cs],[7.0, 8.0*cs-9.0*si, 8.0*si+9.0*cs],[1.0, 3.0*cs-5.0*si, 3.0*si+5.0*cs],[2.0, 4.0*cs-6.0*si, 4.0*si+6.0*cs],[0.0, 2.0*cs-3.0*si, 2.0*si+3.0*cs]]],floattype)[frame]
-	print 'expected_coor:\n', expected_coor
+	print('expected_coor:\n', expected_coor)
         #
         self.o.rotate(frame,axis,theta)
         result_coor = self.o.coor()[frame]
-        print 'result_coor:\n',result_coor
+        print('result_coor:\n',result_coor)
         #
         self.assert_list_almost_equal(expected_coor, result_coor,3)
 
@@ -216,11 +217,11 @@ class Test_unit_operate_Move_translate(MockerTestCase):
         cs=numpy.cos(theta)
         si=numpy.sin(theta)
         expected_coor = numpy.array([[[1.2, 2.0*cs-3.0*si, 2.0*si+3.0*cs],[-2.0, 5.0*cs-6.0*si, 5.0*si+6.0*cs],[7.0, 8.0*cs-9.0*si, 8.0*si+9.0*cs],[1.0, 3.0*cs-5.0*si, 3.0*si+5.0*cs],[2.0, 4.0*cs-6.0*si, 4.0*si+6.0*cs],[0.0, 2.0*cs-3.0*si, 2.0*si+3.0*cs]]],floattype)[frame]
-	print 'expected_coor:\n', expected_coor
+	print('expected_coor:\n', expected_coor)
         #
         self.o.rotate(frame,axis,theta)
         result_coor = self.o.coor()[frame]
-        print 'result_coor:\n',result_coor
+        print('result_coor:\n',result_coor)
         #
         self.assert_list_almost_equal(expected_coor, result_coor,3)
 
@@ -235,11 +236,11 @@ class Test_unit_operate_Move_translate(MockerTestCase):
         cs=numpy.cos(theta)
         si=numpy.sin(theta)
         expected_coor = numpy.array([[[1.2, util.NAN*cs-3.0*si, util.NAN*si+3.0*cs],[-2.0, 5.0*cs-6.0*si, 5.0*si+6.0*cs],[7.0, 8.0*cs-9.0*si, 8.0*si+9.0*cs],[1.0, 3.0*cs-5.0*si, 3.0*si+5.0*cs],[2.0, 4.0*cs-6.0*si, 4.0*si+6.0*cs],[0.0, 2.0*cs-3.0*si, 2.0*si+3.0*cs]]],floattype)[frame]
-	print 'expected_coor:\n', expected_coor
+	print('expected_coor:\n', expected_coor)
         #
         self.o.rotate(frame,axis,theta)
         result_coor = self.o.coor()[frame]
-        print 'result_coor:\n',result_coor
+        print('result_coor:\n',result_coor)
         #
         self.assert_list_almost_equal(expected_coor, result_coor,3)
 
@@ -253,11 +254,11 @@ class Test_unit_operate_Move_translate(MockerTestCase):
         cs=numpy.cos(theta)
         si=numpy.sin(theta)
         expected_coor = numpy.array([[[1.2, util.TINY*cs-3.0*si, util.TINY*si+3.0*cs],[-2.0, 5.0*cs-6.0*si, 5.0*si+6.0*cs],[7.0, 8.0*cs-9.0*si, 8.0*si+9.0*cs],[1.0, 3.0*cs-5.0*si, 3.0*si+5.0*cs],[2.0, 4.0*cs-6.0*si, 4.0*si+6.0*cs],[0.0, 2.0*cs-3.0*si, 2.0*si+3.0*cs]]],floattype)[frame]
-	print 'expected_coor:\n', expected_coor
+	print('expected_coor:\n', expected_coor)
         #
         self.o.rotate(frame,axis,theta)
         result_coor = self.o.coor()[frame]
-        print 'result_coor:\n',result_coor
+        print('result_coor:\n',result_coor)
         #
         self.assert_list_almost_equal(expected_coor, result_coor,3)
 
@@ -271,11 +272,11 @@ class Test_unit_operate_Move_translate(MockerTestCase):
         cs=numpy.cos(theta)
         si=numpy.sin(theta)
         expected_coor = numpy.array([[[1.2, util.ZERO*cs-3.0*si, util.ZERO*si+3.0*cs],[-2.0, 5.0*cs-6.0*si, 5.0*si+6.0*cs],[7.0, 8.0*cs-9.0*si, 8.0*si+9.0*cs],[1.0, 3.0*cs-5.0*si, 3.0*si+5.0*cs],[2.0, 4.0*cs-6.0*si, 4.0*si+6.0*cs],[0.0, 2.0*cs-3.0*si, 2.0*si+3.0*cs]]],floattype)[frame]
-	print 'expected_coor:\n', expected_coor
+	print('expected_coor:\n', expected_coor)
         #
         self.o.rotate(frame,axis,theta)
         result_coor = self.o.coor()[frame]
-        print 'result_coor:\n',result_coor
+        print('result_coor:\n',result_coor)
         #
         self.assert_list_almost_equal(expected_coor, result_coor,3)
 

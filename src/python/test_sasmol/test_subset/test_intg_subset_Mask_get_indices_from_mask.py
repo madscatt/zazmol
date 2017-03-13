@@ -14,6 +14,7 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 '''
+from __future__ import print_function
 
 from sasmol.test_sasmol.utilities import env
 
@@ -100,7 +101,7 @@ class Test_subset_Mask_set_descriptor_using_mask(MockerTestCase):
       #
       result_indices = self.o.get_indices_from_mask(mask)
       #
-      print 'expected_indices:\n', expected_indices, '\nresult_indices:\n',result_indices
+      print('expected_indices:\n', expected_indices, '\nresult_indices:\n',result_indices)
       self.assert_list_almost_equal(expected_indices, result_indices)
 
 
@@ -142,7 +143,7 @@ class Test_subset_Mask_set_descriptor_using_mask(MockerTestCase):
       #
       result_indices = self.o.get_indices_from_mask(mask)
       #
-      print 'expected_indices:\n', expected_indices, '\nresult_indices:\n',result_indices
+      print('expected_indices:\n', expected_indices, '\nresult_indices:\n',result_indices)
       self.assert_list_almost_equal(expected_indices, result_indices)
 
 
@@ -158,7 +159,7 @@ class Test_subset_Mask_set_descriptor_using_mask(MockerTestCase):
       #
       result_indices = self.o.get_indices_from_mask(mask)
       #
-      print 'expected_indices:\n', expected_indices, '\nresult_indices:\n',result_indices
+      print('expected_indices:\n', expected_indices, '\nresult_indices:\n',result_indices)
       self.assert_list_almost_equal(expected_indices, result_indices)
 
 
@@ -174,7 +175,7 @@ class Test_subset_Mask_set_descriptor_using_mask(MockerTestCase):
       #
       result_indices = self.o.get_indices_from_mask(mask)
       #
-      print 'expected_indices:\n', expected_indices, '\nresult_indices:\n',result_indices
+      print('expected_indices:\n', expected_indices, '\nresult_indices:\n',result_indices)
       self.assert_list_almost_equal(expected_indices, result_indices)
 
 
@@ -190,7 +191,7 @@ class Test_subset_Mask_set_descriptor_using_mask(MockerTestCase):
       #
       result_indices = self.o.get_indices_from_mask(mask)
       #
-      print 'expected_indices:\n', expected_indices, '\nresult_indices:\n',result_indices
+      print('expected_indices:\n', expected_indices, '\nresult_indices:\n',result_indices)
       self.assert_list_almost_equal(expected_indices, result_indices)
 
 
@@ -206,7 +207,7 @@ class Test_subset_Mask_set_descriptor_using_mask(MockerTestCase):
       #
       result_indices = self.o.get_indices_from_mask(mask)
       #
-      print 'expected_indices:\n', expected_indices, '\nresult_indices:\n',result_indices
+      print('expected_indices:\n', expected_indices, '\nresult_indices:\n',result_indices)
       self.assert_list_almost_equal(expected_indices, result_indices)
 
 
@@ -222,7 +223,7 @@ class Test_subset_Mask_set_descriptor_using_mask(MockerTestCase):
       #
       result_indices = self.o.get_indices_from_mask(mask)
       #
-      print 'expected_indices:\n', expected_indices, '\nresult_indices:\n',result_indices
+      print('expected_indices:\n', expected_indices, '\nresult_indices:\n',result_indices)
       self.assert_list_almost_equal(expected_indices, result_indices)
 
 
@@ -238,7 +239,7 @@ class Test_subset_Mask_set_descriptor_using_mask(MockerTestCase):
       #
       result_indices = self.o.get_indices_from_mask(mask)
       #
-      print 'expected_indices:\n', expected_indices, '\nresult_indices:\n',result_indices
+      print('expected_indices:\n', expected_indices, '\nresult_indices:\n',result_indices)
       self.assert_list_almost_equal(expected_indices, result_indices)
 
 
@@ -254,7 +255,7 @@ class Test_subset_Mask_set_descriptor_using_mask(MockerTestCase):
       #
       result_indices = self.o.get_indices_from_mask(mask)
       #
-      print 'expected_indices:\n', expected_indices, '\nresult_indices:\n',result_indices
+      print('expected_indices:\n', expected_indices, '\nresult_indices:\n',result_indices)
       self.assert_list_almost_equal(expected_indices, result_indices)
 
 
@@ -270,7 +271,7 @@ class Test_subset_Mask_set_descriptor_using_mask(MockerTestCase):
       #
       result_indices = self.o.get_indices_from_mask(mask)
       #
-      print 'expected_indices:\n', expected_indices, '\nresult_indices:\n',result_indices
+      print('expected_indices:\n', expected_indices, '\nresult_indices:\n',result_indices)
       self.assert_list_almost_equal(expected_indices, result_indices)
 
 
@@ -286,7 +287,7 @@ class Test_subset_Mask_set_descriptor_using_mask(MockerTestCase):
       #
       result_indices = self.o.get_indices_from_mask(mask)
       #
-      print 'expected_indices:\n', expected_indices, '\nresult_indices:\n',result_indices
+      print('expected_indices:\n', expected_indices, '\nresult_indices:\n',result_indices)
       self.assert_list_almost_equal(expected_indices, result_indices)
       
 
@@ -302,7 +303,7 @@ class Test_subset_Mask_set_descriptor_using_mask(MockerTestCase):
       #
       result_indices = self.o.get_indices_from_mask(mask)
       #
-      print 'expected_indices:\n', expected_indices, '\nresult_indices:\n',result_indices
+      print('expected_indices:\n', expected_indices, '\nresult_indices:\n',result_indices)
       self.assert_list_almost_equal(expected_indices, result_indices)
 
 
@@ -319,7 +320,7 @@ class Test_subset_Mask_set_descriptor_using_mask(MockerTestCase):
       #
       result_indices = self.o.get_indices_from_mask(mask)
       #
-      print 'expected_indices:\n', expected_indices, '\nresult_indices:\n',result_indices
+      print('expected_indices:\n', expected_indices, '\nresult_indices:\n',result_indices)
       self.assert_list_almost_equal(expected_indices, result_indices)
 
 
@@ -337,7 +338,7 @@ class Test_subset_Mask_set_descriptor_using_mask(MockerTestCase):
       #
       result_indices = self.o.get_indices_from_mask(mask)
       #
-      print 'expected_indices:\n', expected_indices, '\nresult_indices:\n',result_indices
+      print('expected_indices:\n', expected_indices, '\nresult_indices:\n',result_indices)
       self.assert_list_almost_equal(expected_indices, result_indices)
 
 
@@ -354,7 +355,7 @@ class Test_subset_Mask_set_descriptor_using_mask(MockerTestCase):
       #
       result_indices = self.o.get_indices_from_mask(mask)
       #
-      print 'expected_indices:\n', expected_indices, '\nresult_indices:\n',result_indices
+      print('expected_indices:\n', expected_indices, '\nresult_indices:\n',result_indices)
       self.assert_list_almost_equal(expected_indices, result_indices)
 
 
@@ -372,7 +373,7 @@ class Test_subset_Mask_set_descriptor_using_mask(MockerTestCase):
       #
       result_indices = self.o.get_indices_from_mask(mask)
       #
-      print 'expected_indices:\n', expected_indices, '\nresult_indices:\n',result_indices
+      print('expected_indices:\n', expected_indices, '\nresult_indices:\n',result_indices)
       self.assert_list_almost_equal(expected_indices, result_indices)
 
 
@@ -392,7 +393,7 @@ class Test_subset_Mask_set_descriptor_using_mask(MockerTestCase):
       #
       result_indices = self.o.get_indices_from_mask(mask)
       #
-      print 'expected_indices:\n', expected_indices, '\nresult_indices:\n',result_indices
+      print('expected_indices:\n', expected_indices, '\nresult_indices:\n',result_indices)
       self.assert_list_almost_equal(expected_indices, result_indices)
 
 

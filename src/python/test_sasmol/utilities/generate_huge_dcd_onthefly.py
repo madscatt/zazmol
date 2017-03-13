@@ -1,3 +1,4 @@
+from __future__ import print_function
 import os
 
 import numpy as np
@@ -8,7 +9,7 @@ def generate(fin='rna.pdb', fout='rna.dcd', frames=1000):
   path = os.path.dirname(os.path.realpath(__file__))
   fin = os.path.join(path,'../','data','pdb_common',fin)
   if not os.path.exists(fin):
-    raise Exception,fin+' does not exist while generating huge rna dcd files'
+    raise Exception(fin+' does not exist while generating huge rna dcd files')
     return
   #fout = os.path.join(path,'../','data','dcd_common',fout)
   fout = os.path.join('/tmp/',fout)
@@ -39,4 +40,4 @@ if __name__=='__main__':
   start = datetime.datetime.now()
   generate_huge_dcd()
   end = datetime.datetime.now()
-  print 'time used (seconds): ',(end-start).seconds
+  print('time used (seconds): ',(end-start).seconds)

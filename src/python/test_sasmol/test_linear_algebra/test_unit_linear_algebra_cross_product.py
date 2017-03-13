@@ -1,5 +1,5 @@
 '''
-    SASMOL: Copyright (C) 2011 Joseph E. Curtis, Ph.D. 
+    SASMOL: Copyright (C) 2011 Joseph E. Curtis, Ph.D.
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -14,10 +14,11 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 '''
+from __future__ import print_function
 
 from sasmol.test_sasmol.utilities import env, util
 
-from unittest import main 
+from unittest import main
 from mocker import Mocker, MockerTestCase, ANY, ARGS, KWARGS
 import sasmol.linear_algebra as linear_algebra
 import numpy
@@ -25,7 +26,7 @@ import numpy
 import os
 floattype=os.environ['SASMOL_FLOATTYPE']
 
-class Test_linear_algebra_cross_product(MockerTestCase): 
+class Test_linear_algebra_cross_product(MockerTestCase):
 
     def setUp(self):
         self.m = Mocker()
@@ -42,12 +43,10 @@ class Test_linear_algebra_cross_product(MockerTestCase):
         #self.o=linear_algebra.Math()
 
     def assert_list_almost_equal(self,a,b,places=5):
-        if (len(a)!=len(b)):
-           raise "LengthError"
-        else:
-           for i in range(len(a)):
-              if (numpy.isnan(a[i]) and numpy.isnan(b[i])): continue
-              self.assertAlmostEqual(a[i],b[i],places)
+        assert len(a)==len(b), "Length Error"
+        for i in range(len(a)):
+            if (numpy.isnan(a[i]) and numpy.isnan(b[i])): continue
+            self.assertAlmostEqual(a[i],b[i],places)
 
     def test_two_zero_arrays(self):
 
@@ -98,7 +97,7 @@ class Test_linear_algebra_cross_product(MockerTestCase):
         x=numpy.array([util.HUGE, 3.0, -100.2],floattype)
         y=numpy.array([2.0, 0.9, -2.2],floattype)
         result=linear_algebra.cross_product(x,y)
-        print result
+        print(result)
         resultnp = numpy.cross(x,y)
         self.assert_list_almost_equal(result,resultnp)
 
@@ -134,6 +133,5 @@ class Test_linear_algebra_cross_product(MockerTestCase):
     def tearDown(self):
         self.m.verify()
 
-if __name__ == '__main__': 
-   main() 
-
+if __name__ == '__main__':
+   main()

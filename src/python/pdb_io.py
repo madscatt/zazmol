@@ -423,7 +423,7 @@ class PDB(object):
                 if ((i+1)==len(infile)):
                     lins=['']
                     if modelON:
-                        raise Exception, 'There should be an ENDMDL pairing with MODEL'
+                        raise Exception('There should be an ENDMDL pairing with MODEL')
                     else:
                         continue
 
@@ -434,13 +434,13 @@ class PDB(object):
             try:
                 if(lins[0]=='MODEL'):
                     if modelON:
-                        raise Exception, 'Encountered two consecutive MODEL lines' 
+                        raise Exception('Encountered two consecutive MODEL lines') 
                     if (num_counts_this_model != 0):
-                        raise Exception, 'There should not be atoms after ENDMDL and before MODEL lines'
+                        raise Exception('There should not be atoms after ENDMDL and before MODEL lines')
                     modelON = True
                 elif(lins[0]=='ENDMDL'):
                     if not modelON:
-                        raise Exception, 'Encountered two consecutive ENDMDL lines'
+                        raise Exception('Encountered two consecutive ENDMDL lines')
                     modelON = False
                     num_counts_per_model.append(num_counts_this_model)
                     num_counts_this_model = 0
@@ -458,26 +458,26 @@ class PDB(object):
 		#
 
         if ( (len(num_counts_per_end)==0) and (len(num_counts_per_model)!=0) ):
-            raise Exception, 'According to Protein Data Bank Contents Guide, END line must appear in each coor entry'
+            raise Exception('According to Protein Data Bank Contents Guide, END line must appear in each coor entry')
         if (len(num_counts_per_model)!=0 and (len(num_counts_per_end)>1 or sum(num_counts_per_model)!=sum(num_counts_per_end))):
             if(printme): print(num_counts_per_model,num_counts_per_end)
-            raise Exception, 'Only one terminating END line is allowed for pdb entries with multiple MODEL'
+            raise Exception('Only one terminating END line is allowed for pdb entries with multiple MODEL')
 		#
         if (len(num_counts_per_model)>0):
             num_frames = len(num_counts_per_model)
             num_atoms = num_counts_per_model[0]
             if not all(x == num_atoms for x in num_counts_per_model):
-                raise Exception, 'number of atoms per frame is not equal'
+                raise Exception('number of atoms per frame is not equal')
         elif (len(num_counts_per_end)>0):
             num_frames = len(num_counts_per_end)
             num_atoms = num_counts_per_end[0]
             if not all(x == num_atoms for x in num_counts_per_end):
-                raise Exception, 'number of atoms per frame is not equal'
+                raise Exception('number of atoms per frame is not equal')
         elif ( (len(num_counts_per_model)==0) and (len(num_counts_per_end)==0) ):
             num_frames = 1
             num_atoms = num_counts_this_model
         else:
-            raise Exception, 'unexpected error!'
+            raise Exception('unexpected error!')
 
         if(printme): print('num_atoms = ',num_atoms)
 

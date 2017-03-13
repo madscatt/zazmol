@@ -1,3 +1,4 @@
+from __future__ import print_function
 import copy
 
 class sasmol_keys():
@@ -58,23 +59,23 @@ data = [x for x in xrange(10)]
 data2 = [x*2 for x in xrange(10)]
 foo = Foo()
 
-print 'foo.__dict__ = ', foo.__dict__
+print('foo.__dict__ = ', foo.__dict__)
 foo.setVar_a(data)
 foo.setVar_b(data2)
 
-print 'foo.__dict__ = ', foo.__dict__
+print('foo.__dict__ = ', foo.__dict__)
 
-print 'foo.var_a() = ', foo.var_a()
-print 'foo.var_b() = ', foo.var_b()
+print('foo.var_a() = ', foo.var_a())
+print('foo.var_b() = ', foo.var_b())
 
 mask = [0,8]
 #new_foo = Foo()
 new_foo = Foo.from_foo(foo,mask)
-print 'new_foo.__dict__ = ', new_foo.__dict__
+print('new_foo.__dict__ = ', new_foo.__dict__)
 
 
-print 'new_foo._var_a = ', new_foo._var_a
-print 'new_foo._var_b = ', new_foo._var_b
+print('new_foo._var_a = ', new_foo._var_a)
+print('new_foo._var_b = ', new_foo._var_b)
 
 '''
 new_foo.var_a()[0] = 3

@@ -14,6 +14,7 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 '''
+from __future__ import print_function
 
 from sasmol.test_sasmol.utilities import env, util
 
@@ -117,7 +118,7 @@ class Test_sascalc_Prop_calcpmi(MockerTestCase):
         result_eigenvectors = result[1].T
         result_I = result[2]
         result_eigenvalues, result_eigenvectors = self.reorder_eigens(result_eigenvalues, result_eigenvectors)
-        print result_I, '\n', result_eigenvalues, '\n',result_eigenvectors
+        print(result_I, '\n', result_eigenvalues, '\n',result_eigenvectors)
         expected_eigenvalues = numpy.array([400.277, 394.737, 5.54], floattype)
         expected_eigenvectors = numpy.array([[-6.274e-15, -8.321e-01, 5.547e-01], [9.246e-01, -2.114e-01, -3.170e-01], [3.810e-01, 5.129e-01, 7.693e-01]], floattype)
         self.assert_list_almost_equal_flip_sign_allowed(expected_eigenvalues, result_eigenvalues,3)
@@ -132,7 +133,7 @@ class Test_sascalc_Prop_calcpmi(MockerTestCase):
         result_eigenvectors = result[1].T
         result_I = result[2]
         result_eigenvalues, result_eigenvectors = self.reorder_eigens(result_eigenvalues, result_eigenvectors)
-        print result_I, '\n',result_eigenvalues, '\n',  result_eigenvectors
+        print(result_I, '\n',result_eigenvalues, '\n',  result_eigenvectors)
         expected_eigenvalues = numpy.array([5761.418, 5625.53, 139.66], floattype)
         expected_eigenvectors = numpy.array([[0.351, -0.821, 0.451], [-0.837, -0.059, 0.544],[0.42, 0.568, 0.708]],floattype);
         self.assert_list_almost_equal_flip_sign_allowed(expected_eigenvalues, result_eigenvalues,2)
@@ -172,7 +173,7 @@ class Test_sascalc_Prop_calcpmi(MockerTestCase):
         result_eigenvectors = result[1].T
         result_I = result[2]
         result_eigenvalues, result_eigenvectors = self.reorder_eigens(result_eigenvalues, result_eigenvectors)
-        print list(result_I), '\n', list(result_eigenvalues), '\n', list(result_eigenvectors)
+        print(list(result_I), '\n', list(result_eigenvalues), '\n', list(result_eigenvectors))
         expected_I = numpy.array([[4675.176, -1324.189, -1572.26 ], [-1324.189,  3932.916, -2256.545], [-1572.26 , -2256.545,  2894.494]], floattype)
         expected_eigenvalues = numpy.array([5748.699, 5591.441, 162.447], floattype)
         expected_eigenvectors = numpy.array([[0.321, -0.821, 0.472], [-0.852, -0.032, 0.523], [0.414, 0.57, 0.709]], floattype)
@@ -190,7 +191,7 @@ class Test_sascalc_Prop_calcpmi(MockerTestCase):
         result_eigenvectors = result[1].T
         result_I = result[2]
         result_eigenvalues, result_eigenvectors = self.reorder_eigens(result_eigenvalues, result_eigenvectors)
-        print list(result_I), '\n',list(result_eigenvalues), '\n', list(result_eigenvectors)
+        print(list(result_I), '\n',list(result_eigenvalues), '\n', list(result_eigenvectors))
         expected_I = numpy.array([[4675.176, -1324.189, -1572.26 ], [-1324.189,  3932.916, -2256.545], [-1572.26 , -2256.545,  2894.494]], floattype)
         expected_eigenvalues = numpy.array([5748.699, 5591.441, 162.447], floattype)
         expected_eigenvectors = numpy.array([[ 0.321, -0.821,  0.472], [-0.852, -0.032,  0.523], [ 0.414,  0.57 ,  0.709]], floattype)

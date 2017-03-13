@@ -14,6 +14,7 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 '''
+from __future__ import print_function
 
 from sasmol.test_sasmol.utilities import env
 
@@ -384,7 +385,7 @@ class Test_subset_Mask_get_subset_mask(MockerTestCase):
       basis_filter = 'moltype[i]=="rna"'
       #
       error, mask = self.o.get_subset_mask(basis_filter)
-      print error, mask
+      print(error, mask)
       #
       expecting_error = False
       expectd_mask = [0]*10632

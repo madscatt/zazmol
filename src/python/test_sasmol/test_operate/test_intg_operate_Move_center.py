@@ -14,6 +14,7 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 '''
+from __future__ import print_function
 
 from sasmol.test_sasmol.utilities import env
 
@@ -55,7 +56,7 @@ class Test_intg_operate_Move_center(MockerTestCase):
         self.o.read_pdb(DataPath+'1ATM.pdb')
         self.o.center(0)
         result_coor = self.o.coor()[0]
-        print result_coor
+        print(result_coor)
         expected_coor = numpy.array([[0.0, 0.0, 0.0]], floattype)
         self.assert_list_almost_equal(expected_coor, result_coor,3)
 
@@ -63,27 +64,27 @@ class Test_intg_operate_Move_center(MockerTestCase):
         self.o.read_pdb(DataPath+'2AAD.pdb')
         self.o.center(0)
         result_coor = self.o.coor()[0]
-        print result_coor
+        print(result_coor)
         expected_coor = self.o.coor()[0]-self.o.com()
-        print expected_coor
+        print(expected_coor)
         self.assert_list_almost_equal(expected_coor, result_coor,3)
 
     def test_rna_pdb(self):
         self.o.read_pdb(DataPath+'rna.pdb')
         self.o.center(0)
         result_coor = self.o.coor()[0]
-        print result_coor
+        print(result_coor)
         expected_coor = self.o.coor()[0]-self.o.com()
-        print expected_coor
+        print(expected_coor)
         self.assert_list_almost_equal(expected_coor, result_coor,3)
 
     def test_1CRN_pdb(self):
         self.o.read_pdb(DataPath+'1CRN.pdb')
         self.o.center(0)
         result_coor = self.o.coor()[0]
-        print result_coor
+        print(result_coor)
         expected_coor = self.o.coor()[0]-self.o.com()
-        print expected_coor
+        print(expected_coor)
         self.assert_list_almost_equal(expected_coor, result_coor,3)
 
     @skipIf(os.environ['SASMOL_LARGETEST']=='n',"I am not testing large files")
@@ -91,9 +92,9 @@ class Test_intg_operate_Move_center(MockerTestCase):
         self.o.read_pdb(DataPath+'1KP8.pdb')
         self.o.center(0)
         result_coor = self.o.coor()[0]
-        print result_coor
+        print(result_coor)
         expected_coor = self.o.coor()[0]-self.o.com()
-        print expected_coor
+        print(expected_coor)
         self.assert_list_almost_equal(expected_coor, result_coor,3)
 
     def tearDown(self):

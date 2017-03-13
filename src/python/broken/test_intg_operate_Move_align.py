@@ -14,6 +14,7 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 '''
+from __future__ import print_function
 
 from sasmol.test_sasmol.utilities import env
 
@@ -77,8 +78,8 @@ class Test_intg_operate_Move_align(MockerTestCase):
         self.o1.align(frame, coorO2Sub, comO2Sub, coorO1Sub, comO1Sub)
 
         result_coor = self.o1.coor()[frame]
-        print 'expected:\n', expected_coor
-        print 'result:\n', result_coor
+        print('expected:\n', expected_coor)
+        print('result:\n', result_coor)
         self.assert_list_almost_equal(expected_coor, result_coor,3)
 
 
@@ -100,8 +101,8 @@ class Test_intg_operate_Move_align(MockerTestCase):
         self.o1.align(frame, coorO2Sub, comO2Sub, coorO1Sub, comO1Sub)
 
         result_coor = self.o1.coor()[frame]
-        print 'expected:\n', expected_coor
-        print 'result:\n', result_coor
+        print('expected:\n', expected_coor)
+        print('result:\n', result_coor)
         self.assert_list_almost_equal(expected_coor, result_coor,3)
 
 
@@ -123,8 +124,8 @@ class Test_intg_operate_Move_align(MockerTestCase):
         self.o1.align(frame, coorO2Sub, comO2Sub, coorO1Sub, comO1Sub)
 
         result_coor = self.o1.coor()[frame]
-        print 'expected:\n', expected_coor
-        print 'result:\n', result_coor
+        print('expected:\n', expected_coor)
+        print('result:\n', result_coor)
         self.assert_list_almost_equal(expected_coor, result_coor,3)
 
 
@@ -146,8 +147,8 @@ class Test_intg_operate_Move_align(MockerTestCase):
         self.o1.align(frame, coorO2Sub, comO2Sub, coorO1Sub, comO1Sub)
 
         result_coor = self.o1.coor()[frame]
-        print 'expected:\n', expected_coor
-        print 'result:\n', result_coor
+        print('expected:\n', expected_coor)
+        print('result:\n', result_coor)
         self.assert_list_almost_equal(expected_coor, result_coor,3)
 
 
@@ -169,8 +170,8 @@ class Test_intg_operate_Move_align(MockerTestCase):
         self.o1.align(frame, coorO2Sub, comO2Sub, coorO1Sub, comO1Sub)
 
         result_coor = self.o1.coor()[frame]
-        print 'expected:\n', expected_coor
-        print 'result:\n', result_coor
+        print('expected:\n', expected_coor)
+        print('result:\n', result_coor)
         self.assert_list_almost_equal(expected_coor, result_coor,3)
 
 

@@ -14,6 +14,7 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 '''
+from __future__ import print_function
 
 from sasmol.test_sasmol.utilities import env,util
 
@@ -69,7 +70,7 @@ class Test_unit_operate_Move_translate_to_point(MockerTestCase):
         value = numpy.array([1.0, 3.0, 6.0],floattype)
         self.o.translate(0,value,point=True)
         result_coor = self.o.coor()
-        print result_coor
+        print(result_coor)
         expected_coor = numpy.array([[[1.0, 3.0, 6.0]]], floattype)
         self.assert_list_almost_equal(expected_coor, result_coor,3)
 
@@ -79,7 +80,7 @@ class Test_unit_operate_Move_translate_to_point(MockerTestCase):
         value = numpy.array([1.0, 3.0, 6.0],floattype)
         self.o.translate(0,value,point=True)
         result_coor = self.o.coor()[0]
-        print result_coor
+        print(result_coor)
         expected_coor = numpy.array([[3.0, 2.4, 4.935],[-1.0, 3.6, 7.065]], floattype)
         self.assert_list_almost_equal(expected_coor, result_coor,3)
 
@@ -91,9 +92,9 @@ class Test_unit_operate_Move_translate_to_point(MockerTestCase):
         value = numpy.array([1.0, 3.0, 6.0],floattype)
         self.o.translate(0,value,point=True)
         result_coor = self.o.coor()[0]
-        print result_coor,'\n\n'
+        print(result_coor,'\n\n')
         expected_coor = coorback[0]-self.o.com()+value
-        print expected_coor
+        print(expected_coor)
         self.assert_list_almost_equal(expected_coor, result_coor,3)
 
     def test_six_atoms_inf1(self):
@@ -104,9 +105,9 @@ class Test_unit_operate_Move_translate_to_point(MockerTestCase):
         value = numpy.array([1.0, 3.0, 6.0],floattype)
         self.o.translate(0,value,point=True)
         result_coor = self.o.coor()[0]
-        print result_coor,'\n\n'
+        print(result_coor,'\n\n')
         expected_coor = coorback[0]-self.o.com()+value
-        print expected_coor
+        print(expected_coor)
         self.assert_list_almost_equal(expected_coor, result_coor,3)
 
     def test_six_atoms_inf2(self):
@@ -117,9 +118,9 @@ class Test_unit_operate_Move_translate_to_point(MockerTestCase):
         value = numpy.array([1.0, 3.0, 6.0],floattype)
         self.o.translate(0,value,point=True)
         result_coor = self.o.coor()[0]
-        print result_coor,'\n\n'
+        print(result_coor,'\n\n')
         expected_coor = coorback[0]-self.o.com()+value
-        print expected_coor
+        print(expected_coor)
         self.assert_list_almost_equal(expected_coor, result_coor,3)
 
     def test_six_atoms_nan(self):
@@ -130,9 +131,9 @@ class Test_unit_operate_Move_translate_to_point(MockerTestCase):
         value = numpy.array([1.0, 3.0, 6.0],floattype)
         self.o.translate(0,value,point=True)
         result_coor = self.o.coor()[0]
-        print result_coor,'\n\n'
+        print(result_coor,'\n\n')
         expected_coor = coorback[0]-self.o.com()+value
-        print expected_coor
+        print(expected_coor)
         self.assert_list_almost_equal(expected_coor, result_coor,3)
 
     def test_six_atoms_tiny(self):
@@ -143,9 +144,9 @@ class Test_unit_operate_Move_translate_to_point(MockerTestCase):
         value = numpy.array([1.0, 3.0, 6.0],floattype)
         self.o.translate(0,value,point=True)
         result_coor = self.o.coor()[0]
-        print result_coor,'\n\n'
+        print(result_coor,'\n\n')
         expected_coor = coorback[0]-self.o.com()+value
-        print expected_coor
+        print(expected_coor)
         self.assert_list_almost_equal(expected_coor, result_coor,3)
 
     def test_six_atoms_zero(self):
@@ -156,9 +157,9 @@ class Test_unit_operate_Move_translate_to_point(MockerTestCase):
         value = numpy.array([1.0, 3.0, 6.0],floattype)
         self.o.translate(0,value,point=True)
         result_coor = self.o.coor()[0]
-        print result_coor,'\n\n'
+        print(result_coor,'\n\n')
         expected_coor = coorback[0]-self.o.com()+value
-        print expected_coor
+        print(expected_coor)
         self.assert_list_almost_equal(expected_coor, result_coor,3)
 
 
