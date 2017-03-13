@@ -39,7 +39,7 @@ class Test_intg_system_Atom_setElement(MockerTestCase):
       self.o.setElement(expected)
       #
       result = self.o.element()
-      print result
+      print(result)
       #
       self.assertEqual(expected, result)
 

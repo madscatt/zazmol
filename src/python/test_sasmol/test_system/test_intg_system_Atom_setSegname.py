@@ -39,7 +39,7 @@ class Test_intg_system_Atom_setSegname(MockerTestCase):
       self.o.setSegname(expected)
       #
       result = self.o.segname()
-      print result
+      print(result)
       #
       self.assertEqual(expected, result)
 

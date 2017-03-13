@@ -36,13 +36,13 @@ class Test_intg_system_Atom_setResid(MockerTestCase):
 	   test a regular pdb file with 3 frame
 	   '''
       #
-      expected = range(1,328)
+      expected = list(range(1,328))
       expected = numpy.array(expected, numpy.int)
       #
       self.o.setResid(expected)
       #
       result = self.o.resid()
-      print result
+      print(result)
       #
       self.assertEqual(list(expected), list(result))
 

@@ -39,7 +39,7 @@ class Test_intg_system_Atom_setLoc(MockerTestCase):
       self.o.setLoc(expected)
       #
       result = self.o.loc()
-      print result
+      print(result)
       #
       self.assertEqual(expected, result)
 

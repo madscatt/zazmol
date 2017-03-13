@@ -39,7 +39,7 @@ class Test_intg_system_Atom_setChain(MockerTestCase):
       self.o.setChain(expected)
       #
       result = self.o.chain()
-      print result
+      print(result)
       #
       self.assertEqual(expected, result)
 

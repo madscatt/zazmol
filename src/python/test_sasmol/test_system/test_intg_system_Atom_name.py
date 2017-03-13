@@ -37,7 +37,7 @@ class Test_intg_system_Atom_name(MockerTestCase):
       self.o.read_pdb(DataPath+'1CRN-3frames.pdb')
       #
       result = self.o.name()
-      print result
+      print(result)
       #
       self.assertEqual(expected, result)
 
