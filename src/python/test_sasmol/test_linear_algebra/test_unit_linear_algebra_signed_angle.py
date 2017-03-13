@@ -14,7 +14,6 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 '''
-from __future__ import print_function
 
 from sasmol.test_sasmol.utilities import env, util
 
@@ -84,9 +83,9 @@ class Test_linear_algebra_signed_angle(MockerTestCase):
         result = linear_algebra.signed_angle(a,b,c)
         expected = self.calc_expected(a,b,c)
         self.assertAlmostEqual(result,expected)
-        print('numpy.dot(a,a) ',numpy.dot(a,a))
-        print('numpy.dot(b,b) ',numpy.dot(b,b))
-        print('numpy.dot(a,b) ',numpy.dot(a,b))
+        print 'numpy.dot(a,a) ',numpy.dot(a,a)
+        print 'numpy.dot(b,b) ',numpy.dot(b,b)
+        print 'numpy.dot(a,b) ',numpy.dot(a,b)
 
 
     def test_inf_1(self):
@@ -101,7 +100,7 @@ class Test_linear_algebra_signed_angle(MockerTestCase):
         b=numpy.array([util.INF, 1.2, 2.3],floattype)
         c=numpy.array([0.3, util.INF, 29.02],floattype)
         result = linear_algebra.signed_angle(a,b,c)
-        print(result)
+        print result
         self.assertTrue(numpy.isnan(result) or numpy.isinf(result))
 
     def test_nan(self):

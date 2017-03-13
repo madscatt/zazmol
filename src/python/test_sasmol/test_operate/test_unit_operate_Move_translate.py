@@ -14,7 +14,6 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 '''
-from __future__ import print_function
 
 from sasmol.test_sasmol.utilities import env,util
 
@@ -69,7 +68,7 @@ class Test_unit_operate_Move_translate(MockerTestCase):
         value = numpy.array([1.0, 3.0, 6.0],floattype)
         self.o.translate(0,value)
         result_coor = self.o.coor()
-        print(result_coor)
+        print result_coor
         expected_coor = numpy.array([[[0.0, 5.0, 9.0]]], floattype)
         self.assert_list_almost_equal(expected_coor, result_coor,3)
 
@@ -78,7 +77,7 @@ class Test_unit_operate_Move_translate(MockerTestCase):
         value = numpy.array([-3.0, 0.0, 6.1],floattype)
         self.o.translate(0,value)
         result_coor = self.o.coor()
-        print(result_coor)
+        print result_coor
         expected_coor = numpy.array([[[-4.0, 2.0, 9.97],[-8.0, 3.2, 12.1]]], floattype)
         self.assert_list_almost_equal(expected_coor, result_coor,3)
 
@@ -87,7 +86,7 @@ class Test_unit_operate_Move_translate(MockerTestCase):
         value = numpy.array([-3.0, 0.0, 6.1],floattype)
         self.o.translate(0,value)
         result_coor = self.o.coor()
-        print(result_coor)
+        print result_coor
         expected_coor = numpy.array([[[-1.8, 2.0, 9.1],[-5.0, 5.0, 12.1],[4.0, 8.0, 15.1],[-2.0, 3.0, 11.1],[-1.0, 4.0, 12.1],[-3.0, 2.0, 9.1]]],floattype)
         self.assert_list_almost_equal(expected_coor, result_coor,3)
 
@@ -96,7 +95,7 @@ class Test_unit_operate_Move_translate(MockerTestCase):
         value = numpy.array([-3.0, 0.0, 6.1],floattype)
         self.o.translate(0,value)
         result_coor = self.o.coor()
-        print(result_coor)
+        print result_coor
         expected_coor = numpy.array([[[-1.8, 2.0, util.HUGE],[-5.0, 5.0, 12.1],[4.0, 8.0, 15.1],[-2.0, 3.0, 11.1],[-1.0, 4.0, 12.1],[-3.0, 2.0, 9.1]]],floattype)
         self.assert_list_almost_equal(expected_coor, result_coor,3)
 
@@ -105,7 +104,7 @@ class Test_unit_operate_Move_translate(MockerTestCase):
         value = numpy.array([-3.0, 0.0, 6.1],floattype)
         self.o.translate(0,value)
         result_coor = self.o.coor()
-        print(result_coor)
+        print result_coor
         expected_coor = numpy.array([[[-1.8, 2.0, util.INF],[-5.0, 5.0, 12.1],[4.0, 8.0, 15.1],[-2.0, 3.0, 11.1],[-1.0, 4.0, 12.1],[-3.0, 2.0, 9.1]]],floattype)
         self.assert_list_almost_equal(expected_coor, result_coor,3)
 
@@ -114,7 +113,7 @@ class Test_unit_operate_Move_translate(MockerTestCase):
         value = numpy.array([-3.0, 0.0, 6.1],floattype)
         self.o.translate(0,value)
         result_coor = self.o.coor()
-        print(result_coor)
+        print result_coor
         expected_coor = numpy.array([[[-1.8, 2.0, util.NAN],[-5.0, 5.0, 12.1],[4.0, 8.0, 15.1],[-2.0, 3.0, 11.1],[-1.0, 4.0, 12.1],[-3.0, 2.0, 9.1]]],floattype)
         self.assert_list_almost_equal(expected_coor, result_coor,3)
 
@@ -123,7 +122,7 @@ class Test_unit_operate_Move_translate(MockerTestCase):
         value = numpy.array([-3.0, 0.0, 6.1],floattype)
         self.o.translate(0,value)
         result_coor = self.o.coor()
-        print(result_coor)
+        print result_coor
         expected_coor = numpy.array([[[-1.8, 2.0, util.TINY+6.1],[-5.0, 5.0, 12.1],[4.0, 8.0, 15.1],[-2.0, 3.0, 11.1],[-1.0, 4.0, 12.1],[-3.0, 2.0, 9.1]]],floattype)
         self.assert_list_almost_equal(expected_coor, result_coor,3)
 
@@ -132,7 +131,7 @@ class Test_unit_operate_Move_translate(MockerTestCase):
         value = numpy.array([-3.0, 0.0, 6.1],floattype)
         self.o.translate(0,value)
         result_coor = self.o.coor()
-        print(result_coor)
+        print result_coor
         expected_coor = numpy.array([[[-1.8, 2.0, 6.1],[-5.0, 5.0, 12.1],[4.0, 8.0, 15.1],[-2.0, 3.0, 11.1],[-1.0, 4.0, 12.1],[-3.0, 2.0, 9.1]]],floattype)
         self.assert_list_almost_equal(expected_coor, result_coor,3)
 

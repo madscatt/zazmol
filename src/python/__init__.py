@@ -1,5 +1,4 @@
-from __future__ import absolute_import
-from . import config as config
+import config as config
 
 #global __sasmol_id__ 
 #__sasmol_id__ = 0

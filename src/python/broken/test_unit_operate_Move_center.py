@@ -14,7 +14,6 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 '''
-from __future__ import print_function
 
 from sasmol.test_sasmol.utilities import env,util
 
@@ -68,7 +67,7 @@ class Test_unit_operate_Move_center(MockerTestCase):
         self.o.setCom(numpy.array([-1.0, 2.0, 3.0],floattype))
         self.o.center(0)
         result_coor = self.o.coor()
-        print(result_coor)
+        print result_coor
         expected_coor = numpy.array([[[0.0, 0.0, 0.0]]], floattype)
         self.assert_list_almost_equal(expected_coor, result_coor,3)
 
@@ -77,68 +76,68 @@ class Test_unit_operate_Move_center(MockerTestCase):
         self.o.setCom(numpy.array([-3.0, 2.6, 4.935],floattype))
         self.o.center(0)
         result_coor = self.o.coor()
-        print(result_coor)
+        print result_coor
         expected_coor = numpy.array([[[2.0, -0.6, -1.065],[-2.0, 0.6, 1.065]]], floattype)
         self.assert_list_almost_equal(expected_coor, result_coor,3)
 
     def test_six_atoms(self):
         self.o.setCoor(numpy.array([[[1.2, 2.0, 3.0],[-2.0, 5.0, 6.0],[7.0, 8.0, 9.0],[1.0, 3.0, 5.0],[2.0, 4.0, 6.0],[0.0, 2.0, 3.0]]],floattype))
-        print(numpy.average(self.o.coor()[0],axis=0))
+        print numpy.average(self.o.coor()[0],axis=0)
         self.o.setCom(numpy.array([1.533, 4.0, 5.333],floattype))
         expected_coor = self.o.coor()[0]-self.o.com()
         self.o.center(0)
         result_coor = self.o.coor()[0]
-        print(result_coor)
+        print result_coor
         self.assert_list_almost_equal(expected_coor, result_coor,3)
 
     def test_six_atoms_inf1(self):
         self.o.setCoor(numpy.array([[[1.2, 2.0, util.HUGE],[-2.0, 5.0, 6.0],[7.0, 8.0, 9.0],[1.0, 3.0, 5.0],[2.0, 4.0, 6.0],[0.0, 2.0, 3.0]]],floattype))
-        print(numpy.average(self.o.coor()[0],axis=0))
+        print numpy.average(self.o.coor()[0],axis=0)
         self.o.setCom(numpy.array([1.533, 4.0, util.HUGE], floattype))
         expected_coor = self.o.coor()[0]-self.o.com()
         self.o.center(0)
         result_coor = self.o.coor()[0]
-        print(result_coor)
+        print result_coor
         self.assert_list_almost_equal(expected_coor, result_coor,3)
 
     def test_six_atoms_inf2(self):
         self.o.setCoor(numpy.array([[[1.2, 2.0, util.INF],[-2.0, 5.0, 6.0],[7.0, 8.0, 9.0],[1.0, 3.0, 5.0],[2.0, 4.0, 6.0],[0.0, 2.0, 3.0]]],floattype))
-        print(numpy.average(self.o.coor()[0],axis=0))
+        print numpy.average(self.o.coor()[0],axis=0)
         self.o.setCom(numpy.array([1.533, 4.0, util.INF],floattype))
         expected_coor = self.o.coor()[0]-self.o.com()
         self.o.center(0)
         result_coor = self.o.coor()[0]
-        print(result_coor)
+        print result_coor
         self.assert_list_almost_equal(expected_coor, result_coor,3)
 
     def test_six_atoms_nan(self):
         self.o.setCoor(numpy.array([[[1.2, 2.0, util.NAN],[-2.0, 5.0, 6.0],[7.0, 8.0, 9.0],[1.0, 3.0, 5.0],[2.0, 4.0, 6.0],[0.0, 2.0, 3.0]]],floattype))
-        print(numpy.average(self.o.coor()[0],axis=0))
+        print numpy.average(self.o.coor()[0],axis=0)
         self.o.setCom(numpy.array([1.533, 4.0, util.NAN],floattype))
         expected_coor = self.o.coor()[0]-self.o.com()
         self.o.center(0)
         result_coor = self.o.coor()[0]
-        print(result_coor)
+        print result_coor
         self.assert_list_almost_equal(expected_coor, result_coor,3)
 
     def test_six_atoms_tiny(self):
         self.o.setCoor(numpy.array([[[1.2, 2.0, util.TINY],[-2.0, 5.0, 6.0],[7.0, 8.0, 9.0],[1.0, 3.0, 5.0],[2.0, 4.0, 6.0],[0.0, 2.0, 3.0]]],floattype))
-        print(numpy.average(self.o.coor()[0],axis=0))
+        print numpy.average(self.o.coor()[0],axis=0)
         self.o.setCom(numpy.array([1.533, 4.0, 4.833],floattype))
         expected_coor = self.o.coor()[0]-self.o.com()
         self.o.center(0)
         result_coor = self.o.coor()[0]
-        print(result_coor)
+        print result_coor
         self.assert_list_almost_equal(expected_coor, result_coor,3)
 
     def test_six_atoms_zero(self):
         self.o.setCoor(numpy.array([[[1.2, 2.0, util.ZERO],[-2.0, 5.0, 6.0],[7.0, 8.0, 9.0],[1.0, 3.0, 5.0],[2.0, 4.0, 6.0],[0.0, 2.0, 3.0]]],floattype))
-        print(numpy.average(self.o.coor()[0],axis=0))
+        print numpy.average(self.o.coor()[0],axis=0)
         self.o.setCom(numpy.array([1.533, 4.0, 4.833],floattype))
         expected_coor = self.o.coor()[0]-self.o.com()
         self.o.center(0)
         result_coor = self.o.coor()[0]
-        print(result_coor)
+        print result_coor
         self.assert_list_almost_equal(expected_coor, result_coor,3)
 
     def tearDown(self):

@@ -14,7 +14,6 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 '''
-from __future__ import print_function
 
 from sasmol.test_sasmol.utilities import env
 
@@ -59,7 +58,7 @@ class Test_intg_file_io_Files_write_dcd_header(MockerTestCase):
       self.o.write_dcd_header(fp, nset)
       dcdio.close_dcd_write(fp)
       fsize = os.path.getsize(dcdFileName)
-      print(fsize)
+      print fsize
       self.assertTrue(fsize>0)
       os.remove(dcdFileName)
 
@@ -78,7 +77,7 @@ class Test_intg_file_io_Files_write_dcd_header(MockerTestCase):
       self.o.write_dcd_header(fp, nset)
       dcdio.close_dcd_write(fp)
       fsize = os.path.getsize(dcdFileName)
-      print(fsize)
+      print fsize
       self.assertTrue(fsize>0)
       os.remove(dcdFileName)
 
@@ -97,7 +96,7 @@ class Test_intg_file_io_Files_write_dcd_header(MockerTestCase):
       self.o.write_dcd_header(fp, nset)
       dcdio.close_dcd_write(fp)
       fsize = os.path.getsize(dcdFileName)
-      print(fsize)
+      print fsize
       self.assertTrue(fsize>0)
       os.remove(dcdFileName)
 
@@ -117,7 +116,7 @@ class Test_intg_file_io_Files_write_dcd_header(MockerTestCase):
       self.o.write_dcd_header(fp, nset)
       dcdio.close_dcd_write(fp)
       fsize = os.path.getsize(dcdFileName)
-      print(fsize)
+      print fsize
       self.assertTrue(fsize>0)
       os.remove(dcdFileName)
 
@@ -136,7 +135,7 @@ class Test_intg_file_io_Files_write_dcd_header(MockerTestCase):
       self.o.write_dcd_header(fp, nset)
       dcdio.close_dcd_write(fp)
       fsize = os.path.getsize(dcdFileName)
-      print(fsize)
+      print fsize
       self.assertTrue(fsize>0)
       os.remove(dcdFileName)
 

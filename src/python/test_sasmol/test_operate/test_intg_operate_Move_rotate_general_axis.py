@@ -14,7 +14,6 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 '''
-from __future__ import print_function
 
 from sasmol.test_sasmol.utilities import env, util
 
@@ -57,7 +56,7 @@ class Test_intg_operate_rotate_general_axis(MockerTestCase):
         self.o.rotate_general_axis(frame,theta,[0.2,1.3,-3.5])
         result_coor = self.o.coor()
         result_com  = self.o.calculate_center_of_mass(0)
-        print('\nresult_coor:\n'); util.printfl([result_coor]); print('\nresult_com:\n',util.printfl([result_com]))
+        print '\nresult_coor:\n'; util.printfl([result_coor]); print '\nresult_com:\n',util.printfl([result_com])
         #
         expected_coor = numpy.array([[[73.944, 41.799, 41.652]]], floattype)
         expected_com = numpy.array([73.944, 41.799, 41.652], floattype)
@@ -74,7 +73,7 @@ class Test_intg_operate_rotate_general_axis(MockerTestCase):
         self.o.rotate_general_axis(frame,theta,[0.2,1.3,-3.5])
         result_coor = self.o.coor()
         result_com  = self.o.calculate_center_of_mass(0)
-        print('\nresult_coor:\n'); util.printfl([result_coor]); print('\nresult_com:\n',util.printfl([result_com]))
+        print '\nresult_coor:\n'; util.printfl([result_coor]); print '\nresult_com:\n',util.printfl([result_com])
         #
         expected_coor = numpy.array([[[-215.775, 167.484, 356.058]]], floattype)
         expected_com = numpy.array([-215.775, 167.484, 356.058], floattype)
@@ -89,7 +88,7 @@ class Test_intg_operate_rotate_general_axis(MockerTestCase):
         #
         self.o.rotate_general_axis(frame,theta,[0.2,1.3,-3.5])
         result_com  = self.o.calculate_center_of_mass(0)
-        print('\nresult_com:\n',util.printfl([result_com]))
+        print '\nresult_com:\n',util.printfl([result_com])
         #
         expected_com = numpy.array([-221.139, 178.873, 343.429], floattype)
         self.assert_list_almost_equal(expected_com, result_com,2)
@@ -102,7 +101,7 @@ class Test_intg_operate_rotate_general_axis(MockerTestCase):
         #
         self.o.rotate_general_axis(frame,theta,[0.2,1.3,-3.5])
         result_com  = self.o.calculate_center_of_mass(0)
-        print('\nresult_com:\n',util.printfl([result_com]))
+        print '\nresult_com:\n',util.printfl([result_com])
         #
         expected_com = numpy.array([-30.425, -38.942, 44.267], floattype)
         self.assert_list_almost_equal(expected_com, result_com,2)
@@ -115,7 +114,7 @@ class Test_intg_operate_rotate_general_axis(MockerTestCase):
         #
         self.o.rotate_general_axis(frame,theta,[0,1,0])
         result_com  = self.o.calculate_center_of_mass(0)
-        print('\nresult_com:\n',util.printfl([result_com]))
+        print '\nresult_com:\n',util.printfl([result_com])
         #
         expected_com = numpy.array([-6.978, 9.775, 9.300], floattype)
         self.assert_list_almost_equal(expected_com, result_com,2)
@@ -129,7 +128,7 @@ class Test_intg_operate_rotate_general_axis(MockerTestCase):
         #
         self.o.rotate_general_axis(frame,theta,[0,1,0])
         result_com  = self.o.calculate_center_of_mass(0)
-        print('\nresult_com:\n',util.printfl([result_com]))
+        print '\nresult_com:\n',util.printfl([result_com])
         #
         expected_com = numpy.array([84.358, 0.251, -22.552], floattype)
         self.assert_list_almost_equal(expected_com, result_com,2)

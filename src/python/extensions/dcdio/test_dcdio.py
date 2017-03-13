@@ -4,11 +4,9 @@
     This is free software, and you are welcome to redistribute it under certain
     conditions; see http://www.gnu.org/licenses/gpl-3.0.html for details.
 '''
-from __future__ import print_function
-from __future__ import absolute_import
 import sys,numpy,time
 sys.path.append('./')
-from . import dcdio
+import dcdio
 import sasmol
 
 A=sasmol.SasMol(0)
@@ -34,11 +32,11 @@ nset=200; istart=1 ; nsavc=1 ; delta=1.0
 
 headerresult=dcdio.write_dcdheader(fp,filename,natoms,nset,istart,nsavc,delta)
 
-print('writing '+str(nset)+' to disk')
+print 'writing '+str(nset)+' to disk'
 start_time=time.time()
 
 for blah in range(nset):
-     print(".", end=' ')
+     print ".",
      sys.stdout.flush()
 
      x=x+5.0
@@ -50,7 +48,7 @@ end_time=time.time()
 
 dt=end_time-start_time
 
-print('\ntotal time = ',dt,' time per structure = ',dt/nset)
+print '\ntotal time = ',dt,' time per structure = ',dt/nset
 
 dcdio.close_dcd_write(fp)
 
@@ -63,22 +61,22 @@ ifp=dcdio.open_dcd_read(filename)
 nnatoms=0 ; nset=0 ; istart=0 ; nsavc=0 ; delta=0.0
 namnf=0 ; freeindexes=[] ; reverseEndian=0 ; charmm=0
 
-print('nnatoms = ',nnatoms)
-print('nset = ',nset)
-print('freeindexes = ',freeindexes)
+print 'nnatoms = ',nnatoms
+print 'nset = ',nset
+print 'freeindexes = ',freeindexes
 
 readheaderresult,nnatoms,nset,istart,nsavc,delta,namnf,reverseEndian,charmm=dcdio.read_dcdheader(ifp)
 
-print('read header result = ',readheaderresult)
+print 'read header result = ',readheaderresult
 
-print('nnatoms = ',nnatoms)
-print('nset = ',nset)
-print('istart = ',istart)
-print('nsavc = ',nsavc)
-print('delta = ',delta)
-print('namnf = ',namnf)
-print('reverseEndian = ',reverseEndian)
-print('charmm = ',charmm)
+print 'nnatoms = ',nnatoms
+print 'nset = ',nset
+print 'istart = ',istart
+print 'nsavc = ',nsavc
+print 'delta = ',delta
+print 'namnf = ',namnf
+print 'reverseEndian = ',reverseEndian
+print 'charmm = ',charmm
 
 x=numpy.zeros((nset,nnatoms),dtype=numpy.float32)
 y=numpy.zeros((nset,nnatoms),dtype=numpy.float32)
@@ -90,11 +88,11 @@ result=1
 i=0
 
 #try:
-print('reading dcd file')
+print 'reading dcd file'
 start_time=time.time()
 sum=0.0
 for i in xrange(nset):
-	print('.', end=' ')
+	print '.',
  	sys.stdout.flush()
  	read_start_time=time.time()
 	tx=numpy.zeros(nnatoms,dtype=numpy.float32)
@@ -111,10 +109,10 @@ for i in xrange(nset):
 end_time=time.time()
 dt=end_time-start_time
 
-print('\nread total_time = ',sum,' time per structure = ',sum/nset)
-print('total_time = ',dt,' time per structure = ',dt/nset)
-print('ratio(total time) = ',dt/sum)
-print('ratio(per structure) = ',(dt/nset)/(sum/nset))
+print '\nread total_time = ',sum,' time per structure = ',sum/nset
+print 'total_time = ',dt,' time per structure = ',dt/nset
+print 'ratio(total time) = ',dt/sum
+print 'ratio(per structure) = ',(dt/nset)/(sum/nset)
 
 
 #except:

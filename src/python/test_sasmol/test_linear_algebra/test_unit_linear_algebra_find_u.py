@@ -1,5 +1,5 @@
 '''
-    SASMOL: Copyright (C) 2011 Joseph E. Curtis, Ph.D.
+    SASMOL: Copyright (C) 2011 Joseph E. Curtis, Ph.D. 
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -14,11 +14,10 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 '''
-from __future__ import print_function
 
 from sasmol.test_sasmol.utilities import env
 
-from unittest import main
+from unittest import main 
 from mocker import Mocker, MockerTestCase, ANY, ARGS, KWARGS
 import sasmol.system as system
 import sasmol.linear_algebra as linear_algebra
@@ -32,7 +31,7 @@ floattype=os.environ['SASMOL_FLOATTYPE']
 PdbPath = os.path.join(os.path.dirname(os.path.realpath(__file__)),'..','data','pdb_common')+os.path.sep
 modulePdbPath = os.path.join(os.path.dirname(os.path.realpath(__file__)),'..','data','sasmol','linear_algebra')+os.path.sep
 
-class Test_linear_algebra(MockerTestCase):
+class Test_linear_algebra(MockerTestCase): 
 
     def setUp(self):
         self.m = Mocker()
@@ -49,10 +48,12 @@ class Test_linear_algebra(MockerTestCase):
         #self.o=linear_algebra.Math()
 
     def assert_list_almost_equal(self,a,b):
-        assert len(a)==len(b), "LengthError"
-        for i in range(len(a)):
-            if (numpy.isnan(a[i]) and numpy.isnan(b[i])): continue
-            self.assertAlmostEqual(a[i],b[i],places=2)
+        if (len(a)!=len(b)):
+           raise "LengthError"
+        else:
+           for i in range(len(a)):
+              if (numpy.isnan(a[i]) and numpy.isnan(b[i])): continue
+              self.assertAlmostEqual(a[i],b[i],places=2)
 
     def test_against_mathematica_two_unit_atoms_one_origin(self):
         x=numpy.array([[0.0, 0.0, 0.0],[1.0, 0.0, 0.0]], floattype)
@@ -65,7 +66,7 @@ class Test_linear_algebra(MockerTestCase):
     def test_against_mathematica_two_unit_atoms(self):
         x=numpy.array([[1.0, 1.0, 1.0], [2.0, 1.0, 1.0]], floattype)
         y=numpy.array([[1.0, 1.0, 1.0], [1.0, 2.0, 1.0]], floattype)
-        result_u = linear_algebra.find_u(x,y); print(result_u)
+        result_u = linear_algebra.find_u(x,y); print result_u
         expected_u = [[0.0, 1.0, 0.0], [0.0, 0.0, 1.0], [1.0, 0.0, 0.0]];
         for i in range(len(result_u)):
           self.assert_list_almost_equal(list(result_u[i]),expected_u[i])
@@ -73,8 +74,8 @@ class Test_linear_algebra(MockerTestCase):
     def test_against_mathematica_two_overlap_unit_atoms(self):
         x=numpy.array([[1.0, 1.0, 1.0], [1.0, 2.0, 1.0]], floattype)
         y=numpy.array([[1.0, 1.0, 1.0], [1.0, 2.0, 1.0]], floattype)
-        result_u = linear_algebra.find_u(x,y); print(result_u)
-        print(result_u)
+        result_u = linear_algebra.find_u(x,y); print result_u
+        print result_u
         expected_u = [[1.0, 0.0, 0.0], [0.0, 1.0, 0.0], [0.0, 0.0, 1.0]];
         for i in range(len(result_u)):
           self.assert_list_almost_equal(list(result_u[i]),expected_u[i])
@@ -159,5 +160,6 @@ class Test_linear_algebra(MockerTestCase):
     def tearDown(self):
         self.m.verify()
 
-if __name__ == '__main__':
-   main()
+if __name__ == '__main__': 
+   main() 
+

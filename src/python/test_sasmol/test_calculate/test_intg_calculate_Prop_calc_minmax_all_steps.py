@@ -14,7 +14,6 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 '''
-from __future__ import print_function
 from sasmol.test_sasmol.utilities import env
 
 from unittest import main, skipIf
@@ -58,7 +57,7 @@ class Test_sascalc_Prop_calc_minmax_all_steps(MockerTestCase):
         self.o.read_pdb(DataPath+'2AAD.pdb')
         self.o.read_dcd(dcdDataPath+'2AAD.dcd')
         result_minmax  = self.o.calculate_minimum_and_maximum()
-	print(result_minmax)
+	print result_minmax
         expected_minmax = [[-79.712, -46.273,  39.354], [79.712,  46.273,  43.910]]
         self.assert_list_almost_equal(expected_minmax[0], result_minmax[0])
         self.assert_list_almost_equal(expected_minmax[1], result_minmax[1])
@@ -70,7 +69,7 @@ class Test_sascalc_Prop_calc_minmax_all_steps(MockerTestCase):
         self.o.read_dcd(dcdDataPath+'rna-1to10.dcd')
         result_minmax  = self.o.calculate_minimum_and_maximum()
 	numpy.set_printoptions(precision=3)
-	print(result_minmax)
+	print result_minmax
         expected_minmax = [[-43.801, -44.888, -42.605], [ 41.234,  39.706,  41.903]]
         self.assert_list_almost_equal(expected_minmax[0], result_minmax[0])
         self.assert_list_almost_equal(expected_minmax[1], result_minmax[1])
@@ -82,7 +81,7 @@ class Test_sascalc_Prop_calc_minmax_all_steps(MockerTestCase):
         self.o.read_dcd(dcdDataPath+'rna-0.8g.dcd')
         result_minmax  = self.o.calculate_minimum_and_maximum()
 	numpy.set_printoptions(precision=3)
-	print(result_minmax)
+	print result_minmax
         expected_minmax = [[-45.714, -45.643, -42.868], [ 41.65 ,  41.087,  45.362]]
         self.assert_list_almost_equal(expected_minmax[0], result_minmax[0],3)
         self.assert_list_almost_equal(expected_minmax[1], result_minmax[1],3)
@@ -94,7 +93,7 @@ class Test_sascalc_Prop_calc_minmax_all_steps(MockerTestCase):
         self.o.read_dcd(dcdDataPath+'rna-1.0g.dcd')
         result_minmax  = self.o.calculate_minimum_and_maximum()
 	numpy.set_printoptions(precision=3)
-	print(result_minmax)
+	print result_minmax
         expected_minmax = [[-46.369, -45.643, -42.868], [ 41.65 ,  41.087,  45.362]]
         self.assert_list_almost_equal(expected_minmax[0], result_minmax[0],3)
         self.assert_list_almost_equal(expected_minmax[1], result_minmax[1],3)
@@ -106,7 +105,7 @@ class Test_sascalc_Prop_calc_minmax_all_steps(MockerTestCase):
         self.o.read_dcd(dcdDataPath+'rna-2.0g.dcd')
         result_minmax  = self.o.calculate_minimum_and_maximum()
 	numpy.set_printoptions(precision=3)
-	print(result_minmax)
+	print result_minmax
         expected_minmax = [[-48.253, -45.643, -42.868], [ 41.65 ,  41.087,  45.362]]
         self.assert_list_almost_equal(expected_minmax[0], result_minmax[0],3)
         self.assert_list_almost_equal(expected_minmax[1], result_minmax[1],3)
@@ -118,7 +117,7 @@ class Test_sascalc_Prop_calc_minmax_all_steps(MockerTestCase):
         self.o.read_dcd(dcdDataPath+'rna-3.2g.dcd')
         result_minmax  = self.o.calculate_minimum_and_maximum()
 	numpy.set_printoptions(precision=3)
-	print(result_minmax)
+	print result_minmax
         expected_minmax = [[-48.253, -45.643, -42.868], [ 41.65 ,  41.087,  45.362]]
         self.assert_list_almost_equal(expected_minmax[0], result_minmax[0],3)
         self.assert_list_almost_equal(expected_minmax[1], result_minmax[1],3)
@@ -130,7 +129,7 @@ class Test_sascalc_Prop_calc_minmax_all_steps(MockerTestCase):
         self.o.read_dcd(dcdDataPath+'rna-6.4g.dcd')
         result_minmax  = self.o.calculate_minimum_and_maximum()
 	numpy.set_printoptions(precision=3)
-	print(result_minmax)
+	print result_minmax
         expected_minmax = [[-48.253, -45.643, -42.868], [ 41.65 ,  41.332,  45.362]]
         self.assert_list_almost_equal(expected_minmax[0], result_minmax[0],3)
         self.assert_list_almost_equal(expected_minmax[1], result_minmax[1],3)

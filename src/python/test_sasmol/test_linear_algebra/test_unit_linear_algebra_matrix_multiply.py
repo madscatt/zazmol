@@ -14,7 +14,6 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 '''
-from __future__ import print_function
 
 from sasmol.test_sasmol.utilities import env, util
 
@@ -108,7 +107,7 @@ class Test_linear_algebra_matrix_multiply(MockerTestCase):
         b=numpy.array([[1.23, 0.03, 20.0],[10.0, 1.0, 3.0]],floattype).T
         result = linear_algebra.matrix_multiply(a,b)[1]
         expected = numpy.array([[-1585.84, -140.0],[-24.5454, -880.8]],floattype)
-	print(result)
+	print result
         self.assert_list_almost_equal(result,expected)
 	result_error = linear_algebra.matrix_multiply(a,b)[0]
 	expected_error = []
@@ -119,7 +118,7 @@ class Test_linear_algebra_matrix_multiply(MockerTestCase):
         b=numpy.array([-20.69958848, 16.66901076, 20.49978462],floattype)
         result = linear_algebra.matrix_multiply(a,b)[1]
         expected = numpy.array([[-71.396],[52.547]],floattype)
-	print(result)
+	print result
         self.assert_list_almost_equal(result,expected,3)
 	result_error = linear_algebra.matrix_multiply(a,b)[0]
 	expected_error = []
@@ -130,7 +129,7 @@ class Test_linear_algebra_matrix_multiply(MockerTestCase):
         b=numpy.array([[1.23, 2.0, 20.0],[10.0, 21.0, util.HUGE]],floattype).T
         result = linear_algebra.matrix_multiply(a,b)[1]
         expected = numpy.array([[util.INF, util.INF],[util.INF, util.INF]],floattype)
-	print(result)
+	print result
         self.assert_list_almost_equal(result,expected)
 	result_error = linear_algebra.matrix_multiply(a,b)[0]
 	expected_error = []
@@ -141,7 +140,7 @@ class Test_linear_algebra_matrix_multiply(MockerTestCase):
         b=numpy.array([[1.23, 2.0, 20.0],[10.0, 21.0, util.INF]],floattype).T
         result = linear_algebra.matrix_multiply(a,b)[1]
         expected = numpy.array([[util.INF, util.INF],[util.INF, util.INF]],floattype)
-	print(result)
+	print result
         self.assert_list_almost_equal(result,expected)
 	result_error = linear_algebra.matrix_multiply(a,b)[0]
 	expected_error = []
@@ -152,7 +151,7 @@ class Test_linear_algebra_matrix_multiply(MockerTestCase):
         b=numpy.array([[1.23, 2.0, 20.0],[10.0, 21.0, util.NAN]],floattype).T
         result = linear_algebra.matrix_multiply(a,b)[1]
         expected = numpy.array([[util.NAN, util.NAN],[util.NAN, util.NAN]],floattype)
-	print(result)
+	print result
         self.assert_list_almost_equal(result,expected)
 	result_error = linear_algebra.matrix_multiply(a,b)[0]
 	expected_error = []
@@ -163,7 +162,7 @@ class Test_linear_algebra_matrix_multiply(MockerTestCase):
         b=numpy.array([[1.23, 2.0, 20.0],[10.0, 21.0, util.NAN]],floattype).T
         result = linear_algebra.matrix_multiply(a,b)[1]
         expected = numpy.array([[util.INF, util.NAN],[util.NAN, util.NAN]],floattype)
-	print(result)
+	print result
         self.assert_list_almost_equal(result,expected)
 	result_error = linear_algebra.matrix_multiply(a,b)[0]
 	expected_error = []
@@ -174,7 +173,7 @@ class Test_linear_algebra_matrix_multiply(MockerTestCase):
         b=numpy.array([[1.23, 2.0, 20.0],[10.0, 21.0, util.TINY]],floattype).T
         result = linear_algebra.matrix_multiply(a,b)[1]
         expected = numpy.array([[1560.0, -420.0],[402.4846, 20.2]],floattype)
-	print(result)
+	print result
         self.assert_list_almost_equal(result,expected)
 	result_error = linear_algebra.matrix_multiply(a,b)[0]
 	expected_error = []
@@ -185,7 +184,7 @@ class Test_linear_algebra_matrix_multiply(MockerTestCase):
         b=numpy.array([[1.23, 2.0, 20.0],[10.0, 21.0, util.ZERO]],floattype).T
         result = linear_algebra.matrix_multiply(a,b)[1]
         expected = numpy.array([[1560.0, -420.0],[402.4846, 20.2]],floattype)
-	print(result)
+	print result
         self.assert_list_almost_equal(result,expected)
 	result_error = linear_algebra.matrix_multiply(a,b)[0]
 	expected_error = []

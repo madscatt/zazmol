@@ -1,4 +1,3 @@
-from __future__ import print_function
 import os
 import sasmol.system as system
 import sasmol.calculate as calculate
@@ -14,15 +13,15 @@ except:
 
 frame = 0
 
-print('com = ',m.calculate_center_of_mass(frame))
+print 'com = ',m.calculate_center_of_mass(frame)
 
 m.setCom = m.calculate_center_of_mass(frame)
 
-print('ugly = ',calculate.Calculate.calculate_center_of_mass(m, frame))
+print 'ugly = ',calculate.Calculate.calculate_center_of_mass(m, frame)
 
 calc_com = calculate.Calculate.calculate_center_of_mass
 
-print('prettier  = ',calc_com(m, frame))
+print 'prettier  = ',calc_com(m, frame)
 
 
 

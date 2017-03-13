@@ -14,7 +14,6 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 '''
-from __future__ import print_function
 
 from sasmol.test_sasmol.utilities import env
 
@@ -93,10 +92,10 @@ class Test_intg_sasio_Files_initialize_children(MockerTestCase):
       result = []
       for item in result_child:
           result.append(item.name())
-      print('result \n',result)
+      print 'result \n',result
       #
       expected = [['N', 'N'] , ['CA', 'CA'] , ['C', 'C'] , ['O', 'O'] , ['CB', 'CB'] , ['CG1'] , ['CG2', 'CG2'] , ['CD1'] , ['OG1']]
-      print('expected \n',expected)
+      print 'expected \n',expected
       #
       self.assertEqual(expected, result)
  
@@ -111,10 +110,10 @@ class Test_intg_sasio_Files_initialize_children(MockerTestCase):
       result = []
       for item in result_child:
           result.append(item.resname())
-      print('result \n',result)
+      print 'result \n',result
       #
       expected = [['ILE', 'ILE', 'ILE', 'ILE', 'ILE', 'ILE', 'ILE', 'ILE'], ['THR', 'THR', 'THR', 'THR', 'THR', 'THR', 'THR']]
-      print('expected \n',expected)
+      print 'expected \n',expected
       #
       self.assertEqual(expected, result)
 
@@ -129,10 +128,10 @@ class Test_intg_sasio_Files_initialize_children(MockerTestCase):
       result = []
       for item in result_child:
           result.append(item.resid().tolist())
-      print('result \n',result)
+      print 'result \n',result
       #
       expected = [[515, 515, 515, 515, 515, 515, 515, 515],[516, 516, 516, 516, 516, 516, 516]]
-      print('expected \n',expected)
+      print 'expected \n',expected
       #
       self.assertEqual(expected, result)
 
@@ -147,10 +146,10 @@ class Test_intg_sasio_Files_initialize_children(MockerTestCase):
       result = []
       for item in result_child:
           result.append(item.chain())
-      print('result \n',result)
+      print 'result \n',result
       #
       expected = [['N', 'N', 'N', 'N', 'N', 'N', 'N', 'N', 'N', 'N', 'N', 'N', 'N', 'N', 'N']]
-      print('expected \n',expected)
+      print 'expected \n',expected
       #
       self.assertEqual(expected, result)
 
@@ -165,10 +164,10 @@ class Test_intg_sasio_Files_initialize_children(MockerTestCase):
       result = []
       for item in result_child:
           result.append(item.occupancy())
-      print('result \n',result)
+      print 'result \n',result
       #
       expected = [['1.00', '1.00', '1.00', '1.00', '1.00', '1.00', '1.00', '1.00', '1.00', '1.00', '1.00', '1.00', '1.00', '1.00', '1.00']]
-      print('expected \n',expected)
+      print 'expected \n',expected
       #
       self.assertEqual(expected, result)
 
@@ -183,10 +182,10 @@ class Test_intg_sasio_Files_initialize_children(MockerTestCase):
       result = []
       for item in result_child:
           result.append(item.beta())
-      print('result \n',result)
+      print 'result \n',result
       #
       expected = [['36.37'], ['36.23'], ['36.32'], ['36.04'], ['36.69'], ['38.12'], ['34.42'], ['39.85'], ['35.01'], ['35.51'], ['38.09'], ['36.94'], ['36.74'], ['37.19'], ['34.44']]
-      print('expected \n',expected)
+      print 'expected \n',expected
       #
       self.assertEqual(expected, result)
 
@@ -201,10 +200,10 @@ class Test_intg_sasio_Files_initialize_children(MockerTestCase):
       result = []
       for item in result_child:
           result.append(item.element())
-      print('result \n',result)
+      print 'result \n',result
       #
       expected = [['N', 'N'], ['C', 'C', 'C', 'C', 'C', 'C', 'C', 'C', 'C', 'C'], ['O', 'O', 'O']]
-      print('expected \n',expected)
+      print 'expected \n',expected
       #
       self.assertEqual(expected, result)
 
@@ -219,11 +218,11 @@ class Test_intg_sasio_Files_initialize_children(MockerTestCase):
       result = []
       for item in result_child:
           result.append(item.segname())
-      print('result \n',result)
+      print 'result \n',result
       #
       #expected = [['DUM0', 'DUM0', 'DUM0', 'DUM0', 'DUM0', 'DUM0', 'DUM0', 'DUM0', 'DUM0', 'DUM0', 'DUM0', 'DUM0', 'DUM0', 'DUM0', 'DUM0']]
       expected = [['N', 'N', 'N', 'N', 'N', 'N', 'N', 'N', 'N', 'N', 'N', 'N', 'N', 'N', 'N']]
-      print('expected \n',expected)
+      print 'expected \n',expected
       #
       self.assertEqual(expected, result)
 
@@ -238,10 +237,10 @@ class Test_intg_sasio_Files_initialize_children(MockerTestCase):
       result = []
       for item in result_child:
           result.append(item.element())
-      print('result \n',result)
+      print 'result \n',result
       #
       expected = [['N', 'C', 'C', 'O', 'C', 'C', 'C', 'C'], ['N', 'C', 'C', 'O', 'C', 'O', 'C']]
-      print('expected \n',expected)
+      print 'expected \n',expected
       #
       self.assertEqual(expected, result)
 

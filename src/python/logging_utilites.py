@@ -1,5 +1,3 @@
-from __future__ import print_function
-from __future__ import absolute_import
 import sys
 import os
 import logging
@@ -9,7 +7,7 @@ import time
 import pkg_resources
 import json
 
-from . import config as config
+import config as config
 
 if config.__logging_level__ == "DEBUG":
     DEBUG = True
@@ -159,7 +157,7 @@ class run_utils():
         self.logger.info(message)
         self.txtOutput.put(message)
         if DEBUG:
-            print(message)
+            print message
 
     def clean_up(self, log):
         '''

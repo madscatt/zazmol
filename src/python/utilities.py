@@ -384,7 +384,7 @@ def parse_sequence(sym2elt):
             t.gettoken()
         else:
             assert ttype == NAME
-            if tvalue in sym2elt:
+            if sym2elt.has_key(tvalue):
                 thisguy = ElementSequence(sym2elt[tvalue])
             else:
                 t.error("'" + tvalue + "' is not an element symbol")
@@ -420,7 +420,7 @@ def get_chemical_formula(formula_string):
         #for sym, count in items:
         #    print sym," :: ",count
 
-    except ValueError as detail:
+    except ValueError, detail:
         print(str(detail))
         error.append(detail)
 

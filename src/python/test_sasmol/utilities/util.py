@@ -1,4 +1,3 @@
-from __future__ import print_function
 import array
 
 '''
@@ -23,7 +22,10 @@ def num_to_floattype(a, ft):
 
 # Recursively convert a list to a floattype type list
 def list_to_floattype(lo, ft):
-    assert l == list(lo), "List Convert Error"
+    try:
+        l = list(lo)
+    except:
+        raise "ListConvertError"
     ltmp = []
     for i in range(len(l)):
         if isinstance(l[i], list):
@@ -57,4 +59,5 @@ if __name__=="__main__":
    a=[[1,2],[3,4,[5]],[[6,[7,8]],6],0]
    na=[]
    list_to_floattype(a,ft)
-   print(a,'\n',na)
+   print a,'\n',na
+

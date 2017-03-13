@@ -14,7 +14,6 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 '''
-from __future__ import print_function
 
 from sasmol.test_sasmol.utilities import env
 
@@ -101,7 +100,7 @@ class Test_unit_subset_Mask_get_dihedral_subset_mask(MockerTestCase):
       self.mock_up_get_dihedral_subset_mask(self.o, self.m, natoms, name, resid)
       farray = self.o.get_dihedral_subset_mask(flexible_residues,mtype)
       #
-      print('result_mask:\n', list(farray), '\nexpected_mask:\n',expected_farray)
+      print 'result_mask:\n', list(farray), '\nexpected_mask:\n',expected_farray
       self.assert_list_almost_equal(farray, expected_farray)
 
 
@@ -123,7 +122,7 @@ class Test_unit_subset_Mask_get_dihedral_subset_mask(MockerTestCase):
       self.mock_up_get_dihedral_subset_mask(self.o, self.m, natoms, name, resid)
       farray = self.o.get_dihedral_subset_mask(flexible_residues,mtype)
       #
-      print('result_mask:\n', list(farray), '\nexpected_mask:\n',expected_farray)
+      print 'result_mask:\n', list(farray), '\nexpected_mask:\n',expected_farray
       self.assert_list_almost_equal(farray, expected_farray)
 
 
@@ -145,7 +144,7 @@ class Test_unit_subset_Mask_get_dihedral_subset_mask(MockerTestCase):
       self.mock_up_get_dihedral_subset_mask(self.o, self.m, natoms, name, resid)
       farray = self.o.get_dihedral_subset_mask(flexible_residues,mtype)
       #
-      print('result_mask:\n', list(farray), '\nexpected_mask:\n',expected_farray)
+      print 'result_mask:\n', list(farray), '\nexpected_mask:\n',expected_farray
       self.assert_list_almost_equal(farray, expected_farray)
 
 
@@ -167,7 +166,7 @@ class Test_unit_subset_Mask_get_dihedral_subset_mask(MockerTestCase):
       self.mock_up_get_dihedral_subset_mask(self.o, self.m, natoms, name, resid)
       farray = self.o.get_dihedral_subset_mask(flexible_residues,mtype)
       #
-      print('result_mask:\n', list(farray), '\nexpected_mask:\n',expected_farray)
+      print 'result_mask:\n', list(farray), '\nexpected_mask:\n',expected_farray
       self.assert_list_almost_equal(farray, expected_farray)
 
 
@@ -189,7 +188,7 @@ class Test_unit_subset_Mask_get_dihedral_subset_mask(MockerTestCase):
       self.mock_up_get_dihedral_subset_mask(self.o, self.m, natoms, name, resid)
       farray = self.o.get_dihedral_subset_mask(flexible_residues,mtype)
       #
-      print('result_mask:\n', list(farray), '\nexpected_mask:\n',expected_farray)
+      print 'result_mask:\n', list(farray), '\nexpected_mask:\n',expected_farray
       self.assert_list_almost_equal(farray, expected_farray)
 
 
@@ -211,7 +210,7 @@ class Test_unit_subset_Mask_get_dihedral_subset_mask(MockerTestCase):
       self.mock_up_get_dihedral_subset_mask(self.o, self.m, natoms, name, resid)
       farray = self.o.get_dihedral_subset_mask(flexible_residues,mtype)
       #
-      print('result_mask:\n', list(farray), '\nexpected_mask:\n',expected_farray)
+      print 'result_mask:\n', list(farray), '\nexpected_mask:\n',expected_farray
       self.assert_list_almost_equal(farray, expected_farray)
 
 
@@ -234,7 +233,7 @@ class Test_unit_subset_Mask_get_dihedral_subset_mask(MockerTestCase):
       self.mock_up_get_dihedral_subset_mask(self.o, self.m, natoms, name, resid)
       farray = self.o.get_dihedral_subset_mask(flexible_residues,mtype)
       #
-      print('result_mask:\n', list(farray), '\nexpected_mask:\n',expected_farray)
+      print 'result_mask:\n', list(farray), '\nexpected_mask:\n',expected_farray
       self.assert_list_almost_equal(farray, expected_farray)
 
 
@@ -257,7 +256,7 @@ class Test_unit_subset_Mask_get_dihedral_subset_mask(MockerTestCase):
       self.mock_up_get_dihedral_subset_mask(self.o, self.m, natoms, name, resid)
       farray = self.o.get_dihedral_subset_mask(flexible_residues,mtype)
       #
-      print('result_mask:\n', list(farray), '\nexpected_mask:\n',expected_farray)
+      print 'result_mask:\n', list(farray), '\nexpected_mask:\n',expected_farray
       self.assert_list_almost_equal(farray, expected_farray)
 
 
@@ -280,7 +279,7 @@ class Test_unit_subset_Mask_get_dihedral_subset_mask(MockerTestCase):
       self.mock_up_get_dihedral_subset_mask(self.o, self.m, natoms, name, resid)
       farray = self.o.get_dihedral_subset_mask(flexible_residues,mtype)
       #
-      print('result_mask:\n', list(farray), '\nexpected_mask:\n',expected_farray)
+      print 'result_mask:\n', list(farray), '\nexpected_mask:\n',expected_farray
       self.assert_list_almost_equal(farray, expected_farray)
 
 
@@ -303,7 +302,7 @@ class Test_unit_subset_Mask_get_dihedral_subset_mask(MockerTestCase):
       self.mock_up_get_dihedral_subset_mask(self.o, self.m, natoms, name, resid)
       farray = self.o.get_dihedral_subset_mask(flexible_residues,mtype)
       #
-      print('result_mask:\n', list(farray), '\nexpected_mask:\n',expected_farray)
+      print 'result_mask:\n', list(farray), '\nexpected_mask:\n',expected_farray
       self.assert_list_almost_equal(farray, expected_farray)
 
 
@@ -328,7 +327,7 @@ class Test_unit_subset_Mask_get_dihedral_subset_mask(MockerTestCase):
       self.mock_up_get_dihedral_subset_mask(self.o, self.m, natoms, name, resid)
       farray = self.o.get_dihedral_subset_mask(flexible_residues,mtype)
       #
-      print('result_mask:\n', list(farray), '\nexpected_mask:\n',expected_farray)
+      print 'result_mask:\n', list(farray), '\nexpected_mask:\n',expected_farray
       self.assert_list_almost_equal(farray, expected_farray)
 
 
@@ -355,7 +354,7 @@ class Test_unit_subset_Mask_get_dihedral_subset_mask(MockerTestCase):
       self.mock_up_get_dihedral_subset_mask(self.o, self.m, natoms, name, resid)
       farray = self.o.get_dihedral_subset_mask(flexible_residues,mtype)
       #
-      print('result_mask:\n', list(farray), '\nexpected_mask:\n',expected_farray)
+      print 'result_mask:\n', list(farray), '\nexpected_mask:\n',expected_farray
       self.assert_list_almost_equal(farray, expected_farray)
 
 
@@ -384,7 +383,7 @@ class Test_unit_subset_Mask_get_dihedral_subset_mask(MockerTestCase):
       self.mock_up_get_dihedral_subset_mask(self.o, self.m, natoms, name, resid)
       farray = self.o.get_dihedral_subset_mask(flexible_residues,mtype)
       #
-      print('result_mask:\n', list(farray), '\nexpected_mask:\n',expected_farray)
+      print 'result_mask:\n', list(farray), '\nexpected_mask:\n',expected_farray
       self.assert_list_almost_equal(farray, expected_farray)
 
 
@@ -412,7 +411,7 @@ class Test_unit_subset_Mask_get_dihedral_subset_mask(MockerTestCase):
       self.mock_up_get_dihedral_subset_mask(self.o, self.m, natoms, name, resid)
       farray = self.o.get_dihedral_subset_mask(flexible_residues,mtype)
       #
-      print('result_mask:\n', list(farray), '\nexpected_mask:\n',expected_farray)
+      print 'result_mask:\n', list(farray), '\nexpected_mask:\n',expected_farray
       self.assert_list_almost_equal(farray, expected_farray)
 
 
@@ -441,7 +440,7 @@ class Test_unit_subset_Mask_get_dihedral_subset_mask(MockerTestCase):
       self.mock_up_get_dihedral_subset_mask(self.o, self.m, natoms, name, resid)
       farray = self.o.get_dihedral_subset_mask(flexible_residues,mtype)
       #
-      print('result_mask:\n', list(farray), '\nexpected_mask:\n',expected_farray)
+      print 'result_mask:\n', list(farray), '\nexpected_mask:\n',expected_farray
       self.assert_list_almost_equal(farray, expected_farray)
 
    def test_1_residues_rna_mask_none(self):
@@ -466,7 +465,7 @@ class Test_unit_subset_Mask_get_dihedral_subset_mask(MockerTestCase):
       self.mock_up_get_dihedral_subset_mask(self.o, self.m, natoms, name, resid)
       farray = self.o.get_dihedral_subset_mask(flexible_residues,mtype)
       #
-      print('result_mask:\n', list(farray), '\nexpected_mask:\n',expected_farray)
+      print 'result_mask:\n', list(farray), '\nexpected_mask:\n',expected_farray
       self.assert_list_almost_equal(farray, expected_farray)
 
    def test_1_residues_rna_mask_all(self):
@@ -489,7 +488,7 @@ class Test_unit_subset_Mask_get_dihedral_subset_mask(MockerTestCase):
       self.mock_up_get_dihedral_subset_mask(self.o, self.m, natoms, name, resid)
       farray = self.o.get_dihedral_subset_mask(flexible_residues,mtype)
       #
-      print('result_mask:\n', list(farray), '\nexpected_mask:\n',expected_farray)
+      print 'result_mask:\n', list(farray), '\nexpected_mask:\n',expected_farray
       self.assert_list_almost_equal(farray, expected_farray)
 
    def test_5_residues_rna_mask_all(self):
@@ -514,7 +513,7 @@ class Test_unit_subset_Mask_get_dihedral_subset_mask(MockerTestCase):
       self.mock_up_get_dihedral_subset_mask(self.o, self.m, natoms, name, resid)
       farray = self.o.get_dihedral_subset_mask(flexible_residues,mtype)
       #
-      print('result_mask:\n', list(farray), '\nexpected_mask:\n',expected_farray)
+      print 'result_mask:\n', list(farray), '\nexpected_mask:\n',expected_farray
       self.assert_list_almost_equal(farray, expected_farray)
 
    def test_5_residues_rna_mask_random(self):
@@ -539,8 +538,8 @@ class Test_unit_subset_Mask_get_dihedral_subset_mask(MockerTestCase):
       self.mock_up_get_dihedral_subset_mask(self.o, self.m, natoms, name, resid)
       farray = self.o.get_dihedral_subset_mask(flexible_residues,mtype)
       #
-      print('result_mask:\n', map(int,farray.tolist()[0]), '\nexpected_mask:\n',expected_farray[0])
-      print('result_mask:\n', map(int,farray.tolist()[1]), '\nexpected_mask:\n',expected_farray[1])
+      print 'result_mask:\n', map(int,farray.tolist()[0]), '\nexpected_mask:\n',expected_farray[0]
+      print 'result_mask:\n', map(int,farray.tolist()[1]), '\nexpected_mask:\n',expected_farray[1]
       self.assert_list_almost_equal(farray, expected_farray)
 
    def test_5_residues_rna_mask_all(self):
@@ -565,7 +564,7 @@ class Test_unit_subset_Mask_get_dihedral_subset_mask(MockerTestCase):
       self.mock_up_get_dihedral_subset_mask(self.o, self.m, natoms, name, resid)
       farray = self.o.get_dihedral_subset_mask(flexible_residues,mtype)
       #
-      print('result_mask:\n', list(farray), '\nexpected_mask:\n',expected_farray)
+      print 'result_mask:\n', list(farray), '\nexpected_mask:\n',expected_farray
       self.assert_list_almost_equal(farray, expected_farray)
 
    def test_500_residues_rna_mask_all(self):
@@ -590,7 +589,7 @@ class Test_unit_subset_Mask_get_dihedral_subset_mask(MockerTestCase):
       self.mock_up_get_dihedral_subset_mask(self.o, self.m, natoms, name, resid)
       farray = self.o.get_dihedral_subset_mask(flexible_residues,mtype)
       #
-      print('result_mask:\n', list(farray), '\nexpected_mask:\n',expected_farray)
+      print 'result_mask:\n', list(farray), '\nexpected_mask:\n',expected_farray
       self.assert_list_almost_equal(farray, expected_farray)
 
 

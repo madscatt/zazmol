@@ -14,7 +14,6 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 '''
-from __future__ import print_function
 
 from sasmol.test_sasmol.utilities import env, util
 
@@ -72,8 +71,8 @@ class Test_sascalc_Prop_calccom(MockerTestCase):
         self.o.setTotal_mass(0.0)
         result_com  = self.o.calculate_center_of_mass(0)
         expected_com = [1.41253, 3.24053, 4.60498]
-        print('\nresult_com \n',result_com)
-        print('\nexpected_com \n',expected_com)
+        print '\nresult_com \n',result_com
+        print '\nexpected_com \n',expected_com
         self.assert_list_almost_equal(expected_com, result_com, self.tol)
 
     def test_six_atoms_duplicate_inf_1(self):

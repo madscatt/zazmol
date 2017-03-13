@@ -1,4 +1,3 @@
-from __future__ import print_function
 import os
 import sasmol.system as system
 import sasmol.calculate as calculate
@@ -15,17 +14,17 @@ except:
 
 calc = calculate.Calculate
 
-print('calc.calculate_center_of_mass = ',calc.calculate_center_of_mass(m,0))
+print 'calc.calculate_center_of_mass = ',calc.calculate_center_of_mass(m,0)
 
 calc_com = calc.calculate_center_of_mass
 
 calc_rg = calc.calculate_radius_of_gyration
 
-print('calc_com = ',calc_com(m,0))
+print 'calc_com = ',calc_com(m,0)
      
-print('calc_rg = ',calc_rg(m,0))
+print 'calc_rg = ',calc_rg(m,0)
 
-print('m.calculate_mass() = ', m.calculate_mass())
+print 'm.calculate_mass() = ', m.calculate_mass()
 
 
 '''

@@ -14,7 +14,6 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 '''
-from __future__ import print_function
 
 from sasmol.test_sasmol.utilities import env
 
@@ -71,9 +70,9 @@ import numpy
 import os
 
 PdbDataPath = os.path.join(os.path.dirname(os.path.realpath(__file__)),'..','data','pdb_common')+os.path.sep
-print('PdbDataPath = ', PdbDataPath)
-print('PdbDataPath = ', PdbDataPath)
-print('PdbDataPath = ', PdbDataPath)
+print 'PdbDataPath = ', PdbDataPath
+print 'PdbDataPath = ', PdbDataPath
+print 'PdbDataPath = ', PdbDataPath
 
 class Test_subset_Mask_merge_two_molecules(MockerTestCase): 
  

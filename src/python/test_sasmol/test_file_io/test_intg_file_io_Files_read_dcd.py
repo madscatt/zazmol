@@ -14,7 +14,6 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 '''
-from __future__ import print_function
 
 from sasmol.test_sasmol.utilities import env, generate_huge_dcd_onthefly
 
@@ -59,11 +58,11 @@ class Test_intg_file_io_Files_read_dcd(MockerTestCase):
       self.o.read_dcd(dcdFile)
       result_coor = self.o.coor()
       sum_result_coor = sum(sum(sum(result_coor)))
-      print('\nresult_coor \n',result_coor,'\nsum of result_coor\n',sum_result_coor)
+      print '\nresult_coor \n',result_coor,'\nsum of result_coor\n',sum_result_coor
       #
       expected_coor = numpy.array([[[76.944, 41.799, 41.652]],[[73.944, 38.799, 41.652]]],floattype)
       sum_expected_coor = 314.790
-      print('\nresult_coor \n',result_coor,'\nsum of result_coor\n',sum_result_coor)
+      print '\nresult_coor \n',result_coor,'\nsum of result_coor\n',sum_result_coor
       #
       self.assert_list_almost_equal(expected_coor, result_coor, self.prcsn)
       self.assertAlmostEqual(sum_expected_coor, sum_result_coor, self.prcsn)
@@ -78,13 +77,13 @@ class Test_intg_file_io_Files_read_dcd(MockerTestCase):
       self.o.read_dcd(dcdFile)
       result_coor = self.o.coor()
       sum_result_coor = sum(sum(sum(result_coor)))
-      print('\nresult_coor \n',result_coor,'\nsum of result_coor\n',sum_result_coor)
+      print '\nresult_coor \n',result_coor,'\nsum of result_coor\n',sum_result_coor
       #
       expected_coor = numpy.array([[[  73.944,   41.799,   41.652], [  74.229,   42.563,   40.456], [  75.667,   43.093,   40.463], [  76.264,   43.279,   39.401], [  73.210,   43.734,   40.336], [  71.856,   43.168,   39.926], [  73.677,   44.782,   39.354], [  70.721,   44.177,   39.946], [  76.231,   43.330,   41.647], [  77.592,   43.852,   41.730], [  78.617,   42.820,   42.184], [  79.712,   43.169,   42.656], [  77.671,   45.097,   42.648], [  77.054,   44.816,   43.910], [  76.970,   46.273,   42.000]],\
       [[ -73.944,   41.799,   41.652], [ -74.229,   42.563,   40.456], [ -75.667,   43.093,   40.463], [ -76.264,   43.279,   39.401], [ -73.210,   43.734,   40.336], [ -71.856,   43.168,   39.926], [ -73.677,   44.782,   39.354], [ -70.721,   44.177,   39.946], [ -76.231,   43.330,   41.647], [ -77.592,   43.852,   41.730], [ -78.617,   42.820,   42.184], [ -79.712,   43.169,   42.656], [ -77.671,   45.097,   42.648], [ -77.054,   44.816,   43.910], [ -76.970,   46.273,   42.000]],\
       [[  73.944,  -41.799,   41.652], [  74.229,  -42.563,   40.456], [  75.667,  -43.093,   40.463], [  76.264,  -43.279,   39.401], [  73.210,  -43.734,   40.336], [  71.856,  -43.168,   39.926], [  73.677,  -44.782,   39.354], [  70.721,  -44.177,   39.946], [  76.231,  -43.330,   41.647], [  77.592,  -43.852,   41.730], [  78.617,  -42.820,   42.184], [  79.712,  -43.169,   42.656], [  77.671,  -45.097,   42.648], [  77.054,  -44.816,   43.910], [  76.970,  -46.273,   42.000]]],floattype)
       sum_expected_coor = 3644.294
-      print('\nresult_coor \n',result_coor,'\nsum of result_coor\n',sum_result_coor)
+      print '\nresult_coor \n',result_coor,'\nsum of result_coor\n',sum_result_coor
       #
       self.assert_list_almost_equal(expected_coor, result_coor, self.prcsn)
       self.assertAlmostEqual(sum_expected_coor, sum_result_coor, self.prcsn)
@@ -100,10 +99,10 @@ class Test_intg_file_io_Files_read_dcd(MockerTestCase):
       self.o.read_dcd(dcdFile)
       result_coor = self.o.coor()
       sum_result_coor = sum(sum(sum(result_coor)))
-      print('\nresult_coor \n',result_coor,'\nsum of result_coor\n',sum_result_coor)
+      print '\nresult_coor \n',result_coor,'\nsum of result_coor\n',sum_result_coor
       #
       sum_expected_coor = -430804.378
-      print('\nsum of expected_coor\n',sum_expected_coor)
+      print '\nsum of expected_coor\n',sum_expected_coor
       #
       self.assertAlmostEqual(sum_expected_coor, sum_result_coor, self.prcsn)
 

@@ -14,7 +14,6 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 '''
-from __future__ import print_function
 
 from sasmol.test_sasmol.utilities import env, util
 
@@ -87,7 +86,7 @@ class Test_sascalc_Prop_calcminmax(MockerTestCase):
     def test_6_atoms_nan(self):
         self.o.setCoor(numpy.array([[[1.0, 2.0, 3.0],[util.NAN,5.0, 6.0],[7.0, 8.0, -9.0],[1.0, 3.0, 5.0],[2.0, util.NAN,6.0],[0.0, 2.0, 3.0]]],floattype))
         result_minmax  = self.o.calculate_minimum_and_maximum()
-        print(result_minmax)
+        print result_minmax
         expected_minmax = [[util.NAN,util.NAN,-9.0], [util.NAN,util.NAN,6.0]]
         self.assert_list_almost_equal(expected_minmax[0], result_minmax[0])
         self.assert_list_almost_equal(expected_minmax[1], result_minmax[1])
@@ -95,7 +94,7 @@ class Test_sascalc_Prop_calcminmax(MockerTestCase):
     def test_6_atoms_tiny(self):
         self.o.setCoor(numpy.array([[[1.0, -2.0, 3.0],[-util.TINY,-5.0, 6.0],[7.0, -8.0, -9.0],[1.0, -3.0, 5.0],[2.0, util.TINY,6.0],[0.0, 0.0, 3.0]]],floattype))
         result_minmax  = self.o.calculate_minimum_and_maximum()
-        print(result_minmax)
+        print result_minmax
         expected_minmax = [[-util.TINY,-8.0, -9.0], [7.0, util.TINY,6.0]]
         self.assert_list_almost_equal(expected_minmax[0], result_minmax[0])
         self.assert_list_almost_equal(expected_minmax[1], result_minmax[1])
@@ -103,7 +102,7 @@ class Test_sascalc_Prop_calcminmax(MockerTestCase):
     def test_6_atoms_zero(self):
         self.o.setCoor(numpy.array([[[1.0, -2.0, 3.0],[-util.ZERO,-5.0, 6.0],[7.0, -8.0, -9.0],[1.0, -3.0, 5.0],[2.0, util.ZERO,6.0],[0.0, 0.0, 3.0]]],floattype))
         result_minmax  = self.o.calculate_minimum_and_maximum()
-        print(result_minmax)
+        print result_minmax
         expected_minmax = [[-util.ZERO,-8.0, -9.0], [7.0, util.ZERO,6.0]]
         self.assert_list_almost_equal(expected_minmax[0], result_minmax[0])
         self.assert_list_almost_equal(expected_minmax[1], result_minmax[1])

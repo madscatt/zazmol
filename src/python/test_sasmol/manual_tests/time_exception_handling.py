@@ -1,4 +1,3 @@
-from __future__ import print_function
 import os
 import sasmol.sasmol as sasmol
 import timeit
@@ -31,8 +30,8 @@ except:
 final_time = timeit.default_timer()
 with_time = final_time - start_time
 
-print('without try/except: time = ', without_time)
-print('with try/except: time = ', with_time)
+print 'without try/except: time = ', without_time
+print 'with try/except: time = ', with_time
 
 
 
