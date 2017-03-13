@@ -39,7 +39,7 @@ class Test_intg_system_Atom_segname(MockerTestCase):
       self.o.read_pdb(DataPath+'1CRN-3frames.pdb')
       #
       result = self.o.segname()
-      print(result)
+      print result
       #
       self.assertEqual(expected, result)
 

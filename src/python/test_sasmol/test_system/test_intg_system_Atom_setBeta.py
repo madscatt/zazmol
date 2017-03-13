@@ -39,7 +39,7 @@ class Test_intg_system_Atom_setBeta(MockerTestCase):
       self.o.setBeta(expected)
       #
       result = self.o.beta()
-      print(result)
+      print result
       #
       self.assertEqual(expected, result)
 

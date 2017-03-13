@@ -39,7 +39,7 @@ class Test_intg_sasmol_Atom_setAtom(MockerTestCase):
       self.o.setAtom(expected)
       #
       result = self.o.atom()
-      print(result)
+      print result
       #
       self.assertEqual(expected, result)
 

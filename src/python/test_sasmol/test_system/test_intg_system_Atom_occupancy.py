@@ -38,7 +38,7 @@ class Test_intg_system_Atom_occupancy(MockerTestCase):
       self.o.read_pdb(DataPath+'1CRN-3frames.pdb')
       #
       result = self.o.occupancy()
-      print(result)
+      print result
       #
       self.assertEqual(expected, result)
 

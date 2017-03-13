@@ -39,7 +39,7 @@ class Test_intg_system_Atom_setOccupancy(MockerTestCase):
       self.o.setOccupancy(expected)
       #
       result = self.o.occupancy()
-      print(result)
+      print result
       #
       self.assertEqual(expected, result)
 

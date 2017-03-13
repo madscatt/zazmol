@@ -39,7 +39,7 @@ class Test_intg_system_SasAtm_atom(MockerTestCase):
       self.o.read_pdb(DataPath+'1CRN-3frames.pdb')
       #
       result = self.o.atom()
-      print(result)
+      print result
       #
       self.assertEqual(expected, result)
 

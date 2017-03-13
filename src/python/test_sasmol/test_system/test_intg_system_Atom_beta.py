@@ -39,7 +39,7 @@ class Test_intg_system_SasAtm_beta(MockerTestCase):
       self.o.read_pdb(DataPath+'1CRN-3frames.pdb')
       #
       result = self.o.beta()
-      print(result)
+      print result
       #
       self.assertEqual(expected, result)
 

@@ -40,7 +40,7 @@ class Test_intg_system_Atom_resid(MockerTestCase):
       self.o.read_pdb(DataPath+'1CRN-3frames.pdb')
       #
       result = list(self.o.resid())
-      print(result)
+      print result
       #
       self.assertEqual(expected, list(result))
 

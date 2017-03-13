@@ -47,7 +47,7 @@ class Test_intg_system_Atom_index(MockerTestCase):
 	   test a regular pdb file with 3 frame
 	   '''
       #
-      expected = list(range(1,328))
+      expected = range(1,328)
       #
       self.o.read_pdb(DataPath+'1CRN-3frames.pdb')
       #
