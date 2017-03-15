@@ -480,6 +480,7 @@ class Atom(file_io.Files, calculate.Calculate, operate.Move, subset.Mask,
 
 
 class Molecule(Atom):
+
     """
     Molecule is a class that is used to describe molecules. It inherits
     all of attributes from Atom.  An example of a molecule is
@@ -767,6 +768,7 @@ class Molecule(Atom):
 
 
 class System(Atom):
+
     """
     System is a class that is used to aggregate all components. It inherits
     all of attributes from Atom.
@@ -811,6 +813,7 @@ class System(Atom):
 
 
 class Molecule_Maker(Atom):
+
     """
     This class is used to define the minimum number of fields required to
     use within sasmol to use read_pdb() and write_pdb() methods in file_io.
