@@ -479,7 +479,7 @@ class Molecule(Atom):
 
     """
     Molecule is a class that is used to describe molecules. It inherits
-    all of attributes from Atom.  An example of a molecule is
+    attributes from Atom.  An example of a molecule is
     a single protein, a single nucleic acid strand.
 
     Class has several initialization options
@@ -606,8 +606,8 @@ class Molecule(Atom):
         assert other._coor.shape[2] == 3, 'improperly shaped coordinates'
         coor = []
         for i in range(len(self._coor)):
-            coor.append(np.vstack((self._coor[i], other._coor[i])))
-        coor = np.array(coor)
+            coor.append(numpy.vstack((self._coor[i], other._coor[i])))
+        coor = numpy.array(coor)
         assert len(coor[0]) == natoms
 
         resid = numpy.append(self._resid, other._resid)
