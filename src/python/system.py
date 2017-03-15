@@ -43,7 +43,6 @@ from __future__ import print_function
 
 '''
 
-# import sys
 import os
 import numpy
 import sasmol.file_io as file_io
@@ -615,10 +614,11 @@ class Molecule(Atom):
 
         index = numpy.arange(natoms) + 1
 
-        return Molecule_Maker(natoms, atom=atom, index=index, name=name, resname=resname,
-                              chain=chain, resid=resid, rescode=rescode, coor=coor,
-                              occupancy=occupancy, beta=beta, segname=segname,
-                              element=element, charge=charge)
+        return Molecule_Maker(natoms, atom=atom, index=index, name=name,
+                              resname=resname, chain=chain, resid=resid,
+                              rescode=rescode, coor=coor, occupancy=occupancy,
+                              beta=beta, segname=segname, element=element,
+                              charge=charge)
 
     def __radd__(self, other):
         if other == 0:
