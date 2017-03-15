@@ -27,8 +27,8 @@ from __future__ import print_function
 #	07/23/2016	--	refactored for Python 3 :   jc
 #	08/19/2016	--	added doc strings       :   jc
 #
-#	 1         2         3         4         5         6         7
-# LC4567890123456789012345678901234567890123456789012345678901234567890123456789
+#        1         2         3         4         5         6         7
+# 34567890123456789012345678901234567890123456789012345678901234567890123456789
 #								       *      **
 '''
 	System is the main module that contains the base classes that
@@ -56,109 +56,129 @@ import sasmol.view as view
 
 import sasmol.config as config
 
-class Atom(file_io.Files, calculate.Calculate, operate.Move, subset.Mask, properties.Atomic, topology.Topology, view.View):
 
-    """ Base class containing methods to define system objects.
+class Atom(file_io.Files, calculate.Calculate, operate.Move, subset.Mask,
+           properties.Atomic, topology.Topology, view.View):
 
-        Atom is the base class to build and deal with molecular systems.
-        The class inherits file input/output, calcuation, manipulation, subset,
-        atom properties, topology, and viewing from other samsol classes.
+    """
+    Base class containing methods to define system objects.
 
-        Class has several initialization options
+    Atom is the base class to build and deal with molecular systems.
+    The class inherits file input/output, calcuation, manipulation, subset,
+    atom properties, topology, and viewing from other samsol classes.
 
-        Parameters
-        ----------
-        args
-            optional integer : self._id
+    Class has several initialization options
 
-        kwargs
-            optional keyword arguments
-                string filename (filename = 'hiv1_gag.pdb') : default = None
-                integet id (id=3) : default = 0
-                boolean debug (debug = True) : default = None
+    Parameters
+    ----------
+    args
+        optional integer : self._id
 
-        Returns
-        -------
-        system object
-            if called with string (or with filename kwarg) returns
-            an initialized system object with data read in using
-            file_io.read_pdb()
+    kwargs
+        optional keyword arguments
+            string filename (filename = 'hiv1_gag.pdb') : default = None
+            integet id (id=3) : default = 0
+            boolean debug (debug = True) : default = None
 
-        Examples
-        -------
+    Returns
+    -------
+    system object
+        if called with string (or with filename kwarg) returns
+        an initialized system object with data read in using
+        file_io.read_pdb()
 
-        Since subsequent classes in this file inherit from Atom and the
-        common use case involves molecules, examples will use the Molecule()
-        class instead of Atom.
+    Examples
+    -------
 
-        Define instance of class and read in PDB file at same time
+    Since subsequent classes in this file inherit from Atom and the
+    common use case involves molecules, examples will use the Molecule()
+    class instead of Atom.
 
-        >>> import sasmol.system as system
-        >>> molecule = system.Molecule(filename='hiv1_gag.pdb')
+    Define instance of class and read in PDB file at same time
 
-        Other instance definition examples (not-exhaustive)
+    >>> import sasmol.system as system
+    >>> molecule = system.Molecule(filename='hiv1_gag.pdb')
 
-        >>> molecule = system.Molecule()
-        >>> molecule = system.Molecule(id=7)
-        >>> molecule = system.Molecule(debug=True)
-        >>> molecule = system.Molecule('hiv1_gag.pdb')
-        >>> molecule = system.Molecule(filename='hiv1_gag.pdb', id=0, debug=False)
+    Other instance definition examples (not-exhaustive)
 
-        Example of how setters and getters work.  Below, the original index
-        values are adjusted by a value (-10) and setIndex() is used to assign
-        the new list to the molecule
+    >>> molecule = system.Molecule()
+    >>> molecule = system.Molecule(id=7)
+    >>> molecule = system.Molecule(debug=True)
+    >>> molecule = system.Molecule('hiv1_gag.pdb')
+    >>> molecule = system.Molecule(filename='hiv1_gag.pdb', id=0,
+                                   debug=False)
 
-        >>> molecule.index()[0]
-        1
-        >>> offset = -10
-        >>> index = [x + offset for x in xrange(molecule.natoms())]
-        >>> molecule.setIndex(index)
-        >>> molecule.index()[0]
-        -10
+    Example of how setters and getters work.  Below, the original index
+    values are adjusted by a value (-10) and setIndex() is used to assign
+    the new list to the molecule
 
-        Note
-        ----
+    >>> molecule.index()[0]
+    1
+    >>> offset = -10
+    >>> index = [x + offset for x in xrange(molecule.natoms())]
+    >>> molecule.setIndex(index)
+    >>> molecule.index()[0]
+    -10
 
-        `self` parameter is not shown in the ``Parameters`` section in the documentation
+    Note
+    ----
 
-
-        Many "setters" and "getters" methods are defined in this class.  See source
-        code for details.
-
-
-        ### attributes of len(natoms):
-
-            # python lists:
-
-                list_keys = ['_residue_flag', '_occupancy', '_charge', '_atom', '_chain', '_segname', '_beta', '_loc', '_element', '_name', '_rescode', '_moltype', '_resname', '_charmm_type', '_atom_charge', '_atom_vdw', '_residue_charge', '_one_letter_resname' ]
+    `self` parameter is not shown in the ``Parameters`` section
+    of the documentation
 
 
-            # numpy arrays: (note that _coor has array dimensions (number of frames, natoms, 3)
-
-            numpy_keys = ['_original_index', '_original_resid', '_index', '_resid', '_mass', '_coor', '_minimum', '_maximum', '_pmi']
-
-
-        ### attributes with variable list lenghts:
-
-            #python lists:
-
-            short_keys = ['_resnames', '_chains', '_resids', '_elements', '_segnames', '_betas', '_names', '_moltypes', '_occupancies' ]
-            # numpy arrays
-
-            numpy_short_keys = ['_names_mask', '_resnames_mask', '_resids_mask', '_chains_mask', '_occupancies_mask', '_betas_mask', '_elements_mask', '_segnames_mask']
-
-        ### integer attributes
-
-            int_keys = ['_number_of_chains', '_number_of_betas', '_number_of_resids', '_number_of_names', '_number_of_moltypes', '_number_of_resnames', '_number_of_segnames', '_number_of_elements', '_id', '_number_of_occupancies', '_number_of_frames', '_natoms' ]
+    Many "setters" and "getters" methods are defined in this class.  See source
+    code for details.
 
 
-        ### float attributes
+    ### attributes of len(natoms):
 
-            float_keys = ['_total_mass', '_com', '_rg']
+        # python lists:
 
-        ### strings, dictionaries, and flags
+            list_keys = ['_residue_flag', '_occupancy', '_charge', '_atom',
+                         '_chain', '_segname', '_beta', '_loc', '_element',
+                        '_name', '_rescode', '_moltype', '_resname',
+                        '_charmm_type', '_atom_charge', '_atom_vdw',
+                        '_residue_charge', '_one_letter_resname' ]
 
-            other_keys = ['_fasta', '_header', '_conect', '_debug', '_formula', '_unitcell']
+
+        # numpy arrays: note that _coor has dimensions (number of frames,
+                                                        natoms, 3)
+
+        numpy_keys = ['_original_index', '_original_resid', '_index', '_resid',
+                      '_mass', '_coor', '_minimum', '_maximum', '_pmi']
+
+
+    ### attributes with variable list lenghts:
+
+        #python lists:
+
+        short_keys = ['_resnames', '_chains', '_resids', '_elements',
+                      '_segnames', '_betas', '_names', '_moltypes',
+                    '_occupancies' ]
+        # numpy arrays
+
+        numpy_short_keys = ['_names_mask', '_resnames_mask', '_resids_mask',
+                            '_chains_mask', '_occupancies_mask', '_betas_mask',
+                            '_elements_mask', '_segnames_mask']
+
+    ### integer attributes
+
+        int_keys = ['_number_of_chains', '_number_of_betas',
+                    '_number_of_resids', '_number_of_names',
+                    '_number_of_moltypes', '_number_of_resnames',
+                    '_number_of_segnames', '_number_of_elements', '_id',
+                    '_number_of_occupancies', '_number_of_frames', '_natoms' ]
+
+
+    ### float attributes
+
+        float_keys = ['_total_mass', '_com', '_rg']
+
+    ### strings, dictionaries, and flags
+
+        other_keys = ['_fasta', '_header', '_conect', '_debug', '_formula',
+                      '_unitcell']
 
     """
 
@@ -197,6 +217,7 @@ class Atom(file_io.Files, calculate.Calculate, operate.Move, subset.Mask, proper
                             self._filename = argument
                             break
                         except:
+
                             pass
                     else:
                         try:
@@ -209,7 +230,6 @@ class Atom(file_io.Files, calculate.Calculate, operate.Move, subset.Mask, proper
         except:
             pass
 
-
     def __repr__(self):
 
         if self._defined_with_input_file:
@@ -220,10 +240,9 @@ class Atom(file_io.Files, calculate.Calculate, operate.Move, subset.Mask, proper
             return "sasmol object"
 
     def __add__(self, other, **kwargs):
-
-        '''
-
-        Override the python __add__ method to combine other molecule into instance molecule
+        """
+        Override the python __add__ method to combine other molecule into
+        instance molecule
 
         Parameters
         ----------
@@ -259,40 +278,45 @@ class Atom(file_io.Files, calculate.Calculate, operate.Move, subset.Mask, proper
         Note
         ____
 
-        If an item is missing in the other molecule then the original item is not altered
+        If an item is missing in the other molecule then the original item is
+        not altered
 
         self._natoms is updated based on the len(self._names)
 
         self._index is reset to start at 1 and end at self._natoms
 
-        Currently no check is made on the number of frames in each molecule that are being
-        added together.
+        Currently no check is made on the number of frames in each molecule
+        that are being added together.
 
+        """
 
-        '''
-
-        #print(self.__dict__)
-        for key,value in self.__dict__.iteritems():
-            #print(key)
+        # print(self.__dict__)
+        for key, value in self.__dict__.iteritems():
+            # print(key)
             try:
-                if type(value) is list:
+                if isinstance(value, list):
                     self.__dict__[key].extend(other.__dict__[key])
-                elif type(value) is numpy.ndarray:
-            #     print 'sdk = ',self.__dict__[key], 'odk =', other.__dict__[key]
+                elif isinstance(value, numpy.ndarray):
+                    # print 'sdk = ',self.__dict__[key], 'odk =',
+                    # other.__dict__[key]
                     if key == '_coor':
-                        self.__dict__[key] = numpy.concatenate((self.__dict__[key], other.__dict__[key]), axis=1)
+                        self.__dict__[key] = numpy.concatenate(
+                            (self.__dict__[key], other.__dict__[key]), axis=1)
                     elif len(value.shape) == 1:
-                        #print(key)
-                        self.__dict__[key] = numpy.concatenate((self.__dict__[key], other.__dict__[key]))
+                        # print(key)
+                        self.__dict__[key] = numpy.concatenate(
+                            (self.__dict__[key], other.__dict__[key]))
                     else:
-                        print('numpy array not added for self.__dict__[key]: ' + str(key))
+                        print(
+                            'numpy array not added for self.__dict__[key]: ' +
+                            str(key))
 
             except:
                 pass
 
             self._natoms = len(self._name)
-            self._index = numpy.array([x + 1 for x in xrange(self._natoms)], numpy.int)
-
+            self._index = numpy.array(
+                [x + 1 for x in xrange(self._natoms)], numpy.int)
 
     def setId(self, newValue):
         self._id = newValue
@@ -429,7 +453,7 @@ class Atom(file_io.Files, calculate.Calculate, operate.Move, subset.Mask, proper
         self._mass = newValue
 
     def total_mass(self):
-        if(self._total_mass == None):
+        if(self._total_mass is None):
             self._total_mass = calculate.Calculate.calcmass(self)
         return self._total_mass
 
@@ -456,41 +480,41 @@ class Atom(file_io.Files, calculate.Calculate, operate.Move, subset.Mask, proper
 
 
 class Molecule(Atom):
+    """
+    Molecule is a class that is used to describe molecules. It inherits
+    all of attributes from Atom.  An example of a molecule is
+    a single protein, a single nucleic acid strand.
 
-    """ Molecule is a class that is used to describe molecules. It inherits
-        all of attributes from Atom.  An example of a molecule is
-        a single protein, a single nucleic acid strand.
+    Class has several initialization options
 
-        Class has several initialization options
+    Parameters
+    ----------
+    args
+        optional integer : self._id
 
-        Parameters
-        ----------
-        args
-            optional integer : self._id
+    kwargs
+        optional keyword arguments
+            string filename (filename = 'hiv1_gag.pdb') : default = None
+            integet id (id=3) : default = 0
+            boolean debug (debug = True) : default = None
 
-        kwargs
-            optional keyword arguments
-                string filename (filename = 'hiv1_gag.pdb') : default = None
-                integet id (id=3) : default = 0
-                boolean debug (debug = True) : default = None
+    Returns
+    -------
+    system object
+        if called with string (or with filename kwarg) returns
+        an initialized system object with data read in using
+        file_io.read_pdb()
 
-        Returns
-        -------
-        system object
-            if called with string (or with filename kwarg) returns
-            an initialized system object with data read in using
-            file_io.read_pdb()
+    Examples
+    --------
 
-        Examples
-        --------
-
-        >>> import sasmol.system as system
-        >>> molecule = system.Molecule(filename='hiv1_gag.pdb')
-        >>> molecule = system.Molecule()
-        >>> molecule = system.Molecule(id=7)
-        >>> molecule = system.Molecule(debug=True)
-        >>> molecule = system.Molecule('hiv1_gag.pdb')
-        >>> molecule = system.Molecule(filename='hiv1_gag.pdb', id=0, debug=False)
+    >>> import sasmol.system as system
+    >>> molecule = system.Molecule(filename='hiv1_gag.pdb')
+    >>> molecule = system.Molecule()
+    >>> molecule = system.Molecule(id=7)
+    >>> molecule = system.Molecule(debug=True)
+    >>> molecule = system.Molecule('hiv1_gag.pdb')
+    >>> molecule = system.Molecule(filename='hiv1_gag.pdb', id=0, debug=False)
 
     """
 
@@ -742,45 +766,43 @@ class Molecule(Atom):
         self._residue_flag = newValue
 
 
-
-
 class System(Atom):
+    """
+    System is a class that is used to aggregate all components. It inherits
+    all of attributes from Atom.
 
-    """ System is a class that is used to aggregate all components. It inherits
-        all of attributes from Atom.
+    Class has several initialization options
 
-        Class has several initialization options
+    Parameters
+    ----------
+    args
+        optional integer : self._id
 
-        Parameters
-        ----------
-        args
-            optional integer : self._id
+    kwargs
+        optional keyword arguments
+            string filename (filename = 'hiv1_gag.pdb') : default = None
+            integet id (id=3) : default = 0
+            boolean debug (debug = True) : default = None
 
-        kwargs
-            optional keyword arguments
-                string filename (filename = 'hiv1_gag.pdb') : default = None
-                integet id (id=3) : default = 0
-                boolean debug (debug = True) : default = None
+    Returns
+    -------
+    system object
+        if called with string (or with filename kwarg) returns
+        an initialized system object with data read in using
+        file_io.read_pdb()
 
-        Returns
-        -------
-        system object
-            if called with string (or with filename kwarg) returns
-            an initialized system object with data read in using
-            file_io.read_pdb()
+    Examples
+    -------
 
-        Examples
-        -------
-
-        >>> import sasmol.system as system
-        >>> molecule = system.Molecule(filename='hiv1_gag.pdb')
+    >>> import sasmol.system as system
+    >>> molecule = system.Molecule(filename='hiv1_gag.pdb')
 
 
-        >>> molecule = system.Molecule()
-        >>> molecule = system.Molecule(id=7)
-        >>> molecule = system.Molecule(debug=True)
-        >>> molecule = system.Molecule('hiv1_gag.pdb')
-        >>> molecule = system.Molecule(filename='hiv1_gag.pdb', id=0, debug=False)
+    >>> molecule = system.Molecule()
+    >>> molecule = system.Molecule(id=7)
+    >>> molecule = system.Molecule(debug=True)
+    >>> molecule = system.Molecule('hiv1_gag.pdb')
+    >>> molecule = system.Molecule(filename='hiv1_gag.pdb', id=0, debug=False)
 
     """
 
@@ -790,88 +812,102 @@ class System(Atom):
 
 class Molecule_Maker(Atom):
     """
-        This class is used to define the minimum number of fields required to
-        use within sasmol to use read_pdb() and write_pdb() methods in file_io.
+    This class is used to define the minimum number of fields required to
+    use within sasmol to use read_pdb() and write_pdb() methods in file_io.
 
-        Default inputs are listed in the variables in __init__ and itemized below.
-        The values are assigned to all atoms in the molecule.
+    Default inputs are listed in the variables in __init__ and itemized below.
+    The values are assigned to all atoms in the molecule.
 
-        Once defined, attributes can be set using setters in the Atom class.
+    Once defined, attributes can be set using setters in the Atom class.
 
-        Class has several initialization options
+    Class has several initialization options
 
-        Parameters
-        ----------
-        natoms
-            integer : number of atoms in the molecule
+    Parameters
+    ----------
+    natoms
+        integer : number of atoms in the molecule
 
-        atom
-            string  : name of ATOM keyword, typically either ATOM or HETATM
+    atom
+        string  : name of ATOM keyword, typically either ATOM or HETATM
 
-        index
-            integer list : atom number
+    index
+        integer list : atom number
 
-        name
-            string : atom name
+    name
+        string : atom name
 
-        loc
-            string : alt loc
+    loc
+        string : alt loc
 
-        resname
-            string  : residue name
+    resname
+        string  : residue name
 
-        chain
-            string  : chain name
+    chain
+        string  : chain name
 
-        resid
-            integer list : residue number
+    resid
+        integer list : residue number
 
-        rescode
-            string  : residue code
+    rescode
+        string  : residue code
 
-        coor
-            numpy float array : x, y, z coordinates
+    coor
+        numpy float array : x, y, z coordinates
 
-        occupancy
-            string  : occupancy value
+    occupancy
+        string  : occupancy value
 
-        beta
-            string  : beta value
+    beta
+        string  : beta value
 
-        segname
-            string  : segment name
+    segname
+        string  : segment name
 
-        element
-            string  : element name
+    element
+        string  : element name
 
-        charge
-            string  : element charge
+    charge
+        string  : element charge
 
-        kwargs
-            optional future arguments
+    kwargs
+        optional future arguments
 
-        Returns
-        -------
-        system object
+    Returns
+    -------
+    system object
 
-        Examples
-        -------
+    Examples
+    -------
 
-        >>> import sasmol.system as system
-        >>> molecule = system.Molecule_Maker(2048)
-        >>> molecule = system.Molecule_Maker(2048, name='Ar')
-        >>> molecule = system.Molecule_Maker(2048, name='Ar', segname='ARG0')
-        >>> index = [x for x in xrange(340,1000)]
-        >>> molecule = system.Molecule_Maker(660, name='Ar', index=index)
-        >>> molecule.index()[0]
-        340
+    >>> import sasmol.system as system
+    >>> molecule = system.Molecule_Maker(2048)
+    >>> molecule = system.Molecule_Maker(2048, name='Ar')
+    >>> molecule = system.Molecule_Maker(2048, name='Ar', segname='ARG0')
+    >>> index = [x for x in xrange(340,1000)]
+    >>> molecule = system.Molecule_Maker(660, name='Ar', index=index)
+    >>> molecule.index()[0]
+    340
 
     """
 
-    def __init__(self, natoms, atom='ATOM', index=None, name='C', loc=' ',
-        resname='DUM', chain='A', resid=None, rescode=' ', coor=None,
-        occupancy='0.00', beta='0.00', segname='DUM', element='C', charge=' ',
-        **kwargs):
+    def __init__(
+            self,
+            natoms,
+            atom='ATOM',
+            index=None,
+            name='C',
+            loc=' ',
+            resname='DUM',
+            chain='A',
+            resid=None,
+            rescode=' ',
+            coor=None,
+            occupancy='0.00',
+            beta='0.00',
+            segname='DUM',
+            element='C',
+            charge=' ',
+            **kwargs):
 
         Atom.__init__(self)
 
@@ -880,7 +916,8 @@ class Molecule_Maker(Atom):
         if index is not None:
             self._index = index
         else:
-            self._index = numpy.array([x+1 for x in xrange(natoms)],numpy.int)
+            self._index = numpy.array(
+                [x + 1 for x in xrange(natoms)], numpy.int)
 
         self._name = [name for x in xrange(natoms)]
         self._loc = [loc for x in xrange(natoms)]
@@ -890,18 +927,18 @@ class Molecule_Maker(Atom):
         if resid is not None:
             self._resid = resid
         else:
-            self._resid = numpy.array([x+1 for x in xrange(natoms)],numpy.int)
+            self._resid = numpy.array(
+                [x + 1 for x in xrange(natoms)], numpy.int)
 
         self._rescode = [rescode for x in xrange(natoms)]
 
         if coor is not None:
             self._coor = coor
         else:
-            self._coor = numpy.zeros((1,natoms,3),numpy.float)
+            self._coor = numpy.zeros((1, natoms, 3), numpy.float)
 
         self._occupancy = [occupancy for x in xrange(natoms)]
         self._beta = [beta for x in xrange(natoms)]
         self._charge = [charge for x in xrange(natoms)]
         self._segname = [segname for x in xrange(natoms)]
         self._element = [element for x in xrange(natoms)]
-
