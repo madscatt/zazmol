@@ -290,15 +290,11 @@ class Atom(file_io.Files, calculate.Calculate, operate.Move, subset.Mask,
 
         """
 
-        # print(self.__dict__)
         for key, value in self.__dict__.iteritems():
-            # print(key)
             try:
                 if isinstance(value, list):
                     self.__dict__[key].extend(other.__dict__[key])
                 elif isinstance(value, numpy.ndarray):
-                    # print 'sdk = ',self.__dict__[key], 'odk =',
-                    # other.__dict__[key]
                     if key == '_coor':
                         self.__dict__[key] = numpy.concatenate(
                             (self.__dict__[key], other.__dict__[key]), axis=1)
@@ -315,8 +311,8 @@ class Atom(file_io.Files, calculate.Calculate, operate.Move, subset.Mask,
                 pass
 
             self._natoms = len(self._name)
-            self._index = numpy.array(
-                [x + 1 for x in xrange(self._natoms)], numpy.int)
+            self._index = numpy.array([x + 1 for x in xrange(self._natoms)],
+                                      numpy.int)
 
     def setId(self, newValue):
         self._id = newValue
