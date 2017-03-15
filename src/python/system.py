@@ -916,7 +916,7 @@ class System(Atom):
         Atom.__init__(self, *args, **kwargs)
 
 
-class Molecule_Maker(Atom):
+class Molecule_Maker(Molecule):
 
     """
     This class is used to define the minimum number of fields required to
