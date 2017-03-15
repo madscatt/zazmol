@@ -518,6 +518,114 @@ class Molecule(Atom):
     def __init__(self, *args, **kwargs):
         Atom.__init__(self, *args, **kwargs)
 
+    def __add__(self, other):
+        """
+        Override the python __add__ method to combine molecules
+
+        Parameters
+        ----------
+        other
+            system object
+
+        kwargs
+            optional keyword arguments
+
+        Returns
+        -------
+        None
+            modified system object
+
+        Examples
+        -------
+
+        >>> import sasmol.system as system
+        >>> molecule_1 = system.Molecule(filename='hiv1_gag.pdb')
+        >>> molecule_2 = system.Molecule(filename='lysozyme.pdb')
+        >>> molecule_1.natoms()
+        6730
+        >>> molecule_2.natoms()
+        1960
+
+        >>> molecule_3 = molecule_1 + molecule_2
+        >>> molecule_3.natoms()
+        17380
+        >>> molecule_3.index()[-1]
+        17380
+
+        >>> molecule_4 = sum([molecule_1, molecule_2, molecule_3])
+        >>> molecule_4.natoms()
+        8690
+        >>> molecule_4.index()[-1]
+        8690
+
+        Note
+        ____
+
+        An assertion error will occur if items are missing from either molecule
+
+        self._natoms is updated based on the len(self._names)
+
+        self._index is reset to start at 1 and end at self._natoms
+
+        """
+        natoms = self._natoms + other._natoms
+
+        atom = self._atom + other._atom
+        assert len(atom) == natoms, 'atom definition/s incorrect'
+
+        name = self._name + other._name
+        assert len(name) == natoms, 'name definition/s incorrect'
+
+        resname = self._resname + other._resname
+        assert len(resname) == natoms, 'resname definition/s incorrect'
+
+        chain = self._chain + other._chain
+        assert len(chain) == natoms, 'chain definition/s incorrect'
+
+        rescode = self._rescode + other._rescode
+        assert len(rescode) == natoms, 'rescode definition/s incorrect'
+
+        occupancy = self._occupancy + other._occupancy
+        assert len(occupancy) == natoms, 'occupancy definition/s incorrect'
+
+        beta = self._beta + other._beta
+        assert len(beta) == natoms, 'beta definition/s incorrect'
+
+        segname = self._segname + other._segname
+        assert len(segname) == natoms, 'segname definition/s incorrect'
+
+        element = self._element + other._element
+        assert len(element) == natoms, 'element definition/s incorrect'
+
+        charge = self._charge + other._charge
+        assert len(charge) == natoms, 'charge definition/s incorrect'
+
+        assert self._coor.shape[0] == other._coor.shape[0], (
+            'inconsistent number of frames')
+        assert self._coor.shape[2] == 3, 'improperly shaped coordinates'
+        assert other._coor.shape[2] == 3, 'improperly shaped coordinates'
+        coor = []
+        for i in range(len(self._coor)):
+            coor.append(np.vstack((self._coor[i], other._coor[i])))
+        coor = np.array(coor)
+        assert len(coor[0]) == natoms
+
+        resid = numpy.append(self._resid, other._resid)
+        assert len(resid) == natoms, 'resid definition/s incorrect'
+
+        index = numpy.arange(natoms) + 1
+
+        return Molecule_Maker(natoms, atom=atom, index=index, name=name, resname=resname,
+                              chain=chain, resid=resid, rescode=rescode, coor=coor,
+                              occupancy=occupancy, beta=beta, segname=segname,
+                              element=element, charge=charge)
+
+    def __radd__(self, other):
+        if other == 0:
+            return self
+        else:
+            return self.__add__(other)
+
     def fasta(self):
         return self._fasta
 
@@ -910,6 +1018,7 @@ class Molecule_Maker(Atom):
 
         Atom.__init__(self)
 
+        self._natoms = natoms
         self._atom = [atom for x in xrange(natoms)]
 
         if index is not None:
