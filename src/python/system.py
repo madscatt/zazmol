@@ -1,8 +1,8 @@
 from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
-#from __future__ import unicode_literals
-#
+# from __future__ import unicode_literals
+
 #    SASMOL: Copyright (C) 2011 Joseph E. Curtis, Ph.D.
 #
 #    This program is free software: you can redistribute it and/or modify
@@ -20,30 +20,30 @@ from __future__ import print_function
 #
 #   SYSTEM
 #
-#	12/4/2009	--	initial coding			:	jc
-#	12/10/2009	--	doc strings 			:	jc
-#	01/11/2010	--	new design pattern		:	jc
-#	12/25/2015	--	refactored for release  :   jc
-#	07/23/2016	--	refactored for Python 3 :   jc
-#	08/19/2016	--	added doc strings       :   jc
+#    12/4/2009     --    initial coding          :    jc
+#    12/10/2009    --    doc strings             :    jc
+#    01/11/2010    --    new design pattern      :    jc
+#    12/25/2015    --    refactored for release  :    jc
+#    07/23/2016    --    refactored for Python 3 :    jc
+#    08/19/2016    --    added doc strings       :    jc
 #
 #        1         2         3         4         5         6         7
 # 34567890123456789012345678901234567890123456789012345678901234567890123456789
-#								       *      **
+#
 '''
-	System is the main module that contains the base classes that
-	describe the objects in the system.  An instance of the system
-	can be created of Atom, Molecule, or System classes.
+    System is the main module that contains the base classes that
+    describe the objects in the system.  An instance of the system
+    can be created of Atom, Molecule, or System classes.
 
-	For purely atomic based systems, a set of utilities are provided
-	to hold information, to calculate properties, and to manipulate
-	the structures in space.  In addition, basic file input / output
-	is provided in the Mol class (and inherited up the classes
-	as dictated by the calling code).
+    For purely atomic based systems, a set of utilities are provided
+    to hold information, to calculate properties, and to manipulate
+    the structures in space.  In addition, basic file input / output
+    is provided in the Mol class (and inherited up the classes
+    as dictated by the calling code).
 
 '''
 
-import sys
+# import sys
 import os
 import numpy
 import sasmol.file_io as file_io
