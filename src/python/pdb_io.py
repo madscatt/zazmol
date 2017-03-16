@@ -1,52 +1,53 @@
+'''
+PDB_IO is the main module that contains classes that
+read and write protein data bank files from and to the hard disk,
+
+The methods (read_pdb, write_pdb) are used to read and write data
+using the PDB file format as described at the following
+web-site:
+
+http://deposit.rcsb.org/adit/docs/pdb_atom_format.html
+
+These classes are accessed by the Atom class found in
+the sasmol.system module through the file_io File() class.
+'''
+
 from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 #from __future__ import unicode_literals
+
+
+#    SASMOL: Copyright (C) 2011 Joseph E. Curtis, Ph.D.
 #
-'''
-    SASMOL: Copyright (C) 2011 Joseph E. Curtis, Ph.D. 
+#    This program is free software: you can redistribute it and/or modify
+#    it under the terms of the GNU General Public License as published by
+#    the Free Software Foundation, either version 3 of the License, or
+#    (at your option) any later version.
+#
+#    This program is distributed in the hope that it will be useful,
+#    but WITHOUT ANY WARRANTY; without even the implied warranty of
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#    GNU General Public License for more details.
+#
+#    You should have received a copy of the GNU General Public License
+#    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+#
+#    PDB_IO
+#
+#    12/5/2009     --    initial coding        :    jc
+#    12/10/2009    --    doc strings           :    jc
+#    01/01/2011    --    added dcdio wrappers  :    jc
+#    08/26/2016    --    forked from file_io   :    jc
+#
+#        1         2         3         4         5         6         7
+# 34567890123456789012345678901234567890123456789012345678901234567890123456789
 
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
-'''
 import sys
 import string
 import locale
 import numpy
 
-#	PDB_IO
-#
-#	12/5/2009	--	initial coding			                        :	jc
-#	12/10/2009	--	doc strings 			                        :	jc
-#	01/01/2011	--	added dcdio wrappers		                    :	jc
-#	08/26/2016	--	forked from file_io                             :	jc
-#
-#LC	 1         2         3         4         5         6         7
-#LC4567890123456789012345678901234567890123456789012345678901234567890123456789
-#								       *      **
-'''
-	PDB_IO is the main module that contains classes that 
-	read and write protein data bank files from and to the hard disk,
-
-	The methods (read_pdb, write_pdb) are used to read and write data
-	using the PDB file format as described at the following
-	web-site:
-
-	http://deposit.rcsb.org/adit/docs/pdb_atom_format.html
-
-    These classes are accessed by the Atom class found in
-    the sasmol.system module through the file_io File() class.
-'''
 
 class PDB(object):
 
@@ -70,11 +71,11 @@ class PDB(object):
         return
 
     def element_filter(self):
-        '''	
+        '''
         This function filters the PDB file to sraighten
         out various things (add to this as you go along).
-        
-        Filter element list... 
+
+        Filter element list...
         '''
         unique_elements = []
         error = []
@@ -88,9 +89,9 @@ class PDB(object):
                 error,self._element[i] = self.get_element(name,resname)
                 self.check_error(error)
 #
-###	OPEN	Error exception handling stub
+###    OPEN    Error exception handling stub
 #
-            if(self._element[i] not in unique_elements): 
+            if(self._element[i] not in unique_elements):
                 unique_elements.append(self._element[i])
 
         return unique_elements
@@ -98,13 +99,13 @@ class PDB(object):
     def get_element(self,name,resname):
         '''
         Get elment from charmm27 atom name list plus extras from periodic table
-        and resolve name conflicts	
+        and resolve name conflicts
         '''
 
         error = []
         element_name = ''
-	
-        #hydrogen,carbon,nitrogen,oxygen,sulfur,phosphorus,other = self.charmm_names()	
+
+        #hydrogen,carbon,nitrogen,oxygen,sulfur,phosphorus,other = self.charmm_names()
         charmm_names = self.charmm_names()
         hydrogen = charmm_names['hydrogen']
         carbon = charmm_names['carbon']
@@ -115,9 +116,9 @@ class PDB(object):
         other = charmm_names['other']
 
         conflict_atoms = ['CD','CE','HE','HG','NE','ND','NB','PB','PA']
-	
+
         if(name in conflict_atoms and (name == resname)):
-            element_name = name	
+            element_name = name
         elif(name in hydrogen): element_name = 'H'
         elif(name in carbon): element_name = 'C'
         elif(name in nitrogen): element_name = 'N'
@@ -148,11 +149,10 @@ class PDB(object):
         else:
             my_message = '\nNO CHARACTERS FOUND FOR ATOM NAME\n'
             error = self.print_error(name,my_message)
-	
+
         return error,element_name
 
     def write_pdb(self,filename,frame,flag,**kwargs):
-
         '''
         This method writes the PDB file
         '''
@@ -160,15 +160,15 @@ class PDB(object):
         debug=0
         result=1
         conect = False
-	
+
         if(flag=='w' or flag=='W'):
             infile=open(filename,'w')
-        elif(flag=='a' or flag=='A'):				
+        elif(flag=='a' or flag=='A'):
             infile=open(filename,'a')
-	
+
         if 'conect' in kwargs:
             conect = kwargs['conect']
-		
+
         if 'model' in kwargs:
             this_frame = kwargs['model']
             infile.write("MODEL "+str(this_frame)+"\n")
@@ -178,9 +178,9 @@ class PDB(object):
             infile.write("01234567890123456789012345678901234567890123456789012345678901234567890123456789\n")
 
         for i in range(len(self._atom)):
-			
+
             this_index = self._index[i]
-	
+
             this_resid = self._resid[i]
 
             if(this_index > 99999):
@@ -250,7 +250,7 @@ class PDB(object):
         #     infile.write("END\n")
 
         infile.close()
-    
+
         return result
 
     def get_resnames(self):
@@ -259,37 +259,35 @@ class PDB(object):
         '''
 
         protein_resnames=['ALA','ARG','ASN','ASP','CYS','GLN','GLU','GLY','HIS','HSD','HSE','HSP','ILE','LEU','LYS','MET','PHE','PRO','SER','THR','TRP','TYR','VAL']
-	
+
         dna_resnames=['NUSA','NUSG','NUSC','NUSU','DA','DG','DC','DT','ADE','GUA','CYT','THY']
 
         rna_resnames=['RNUS','RNUA','RUUG','RNUC','A', 'C', 'G', 'U','ADE','CYT','GUA','URA']
 
         nucleic_resnames = ['GUA','ADE','CYT','THY','URA','G', 'A', 'C', 'T', 'U','DA','DG','DC','DT']
 
-        water_resnames=['TIP3','SPCE','TIP','SPC','TIP4','TP3M'] 
-			
+        water_resnames=['TIP3','SPCE','TIP','SPC','TIP4','TP3M']
+
         return protein_resnames,dna_resnames,rna_resnames,nucleic_resnames,water_resnames
 
     def initialize_children(self):
-
         '''
-            This initializes the following "children" with their
-            masks already defined to the "parent" molecule
+        This initializes the following "children" with their
+        masks already defined to the "parent" molecule
 
-            names() 		: names_mask()
-            resnames()		: resnames_mask()
-            resids()		: resids_mask()
-            chains()		: chains_mask()
-            segnames()		: segnames_mask()
-            occupancies()	: occupancies_mask()
-            betas()		: betas_mask()
-            elements()		: elements_mask()
-			
-            The objects on the left contain the unique values and
-            the objects on the right contain the masks that have
-            the indices to extract the information for each unique
-            value from the parent molecule.
+        names()        : names_mask()
+        resnames()     : resnames_mask()
+        resids()       : resids_mask()
+        chains()       : chains_mask()
+        segnames()     : segnames_mask()
+        occupancies()  : occupancies_mask()
+        betas()        : betas_mask()
+        elements()     : elements_mask()
 
+        The objects on the left contain the unique values and
+        the objects on the right contain the masks that have
+        the indices to extract the information for each unique
+        value from the parent molecule.
         '''
 
         number_of_names = self.number_of_names() ; unique_names = self.names()
@@ -304,7 +302,7 @@ class PDB(object):
         name = self.name() ; resname = self.resname() ; resid = self.resid() ; chain = self.chain()
         occupancy = self.occupancy() ; beta = self.beta() ; element = self.element() ; segname = self.segname()
 
-        names = [] ; resnames = [] ; resids = [] ; chains = [] 
+        names = [] ; resnames = [] ; resids = [] ; chains = []
         occupancies = [] ; betas = [] ; elements = [] ; segments = []
 
         names_mask = numpy.zeros((number_of_names,natoms),numpy.int)
@@ -343,8 +341,8 @@ class PDB(object):
 
     def check_for_all_zero_columns(self, coor, frame=0):
         '''
-            Make sure there are no two all zero columns in coordinates
-            This is needed for the alignment module 
+        Make sure there are no two all zero columns in coordinates
+        This is needed for the alignment module
         '''
         SMALL = 1.0E-10
         x0,y0,z0=False,False,False
@@ -365,15 +363,15 @@ class PDB(object):
 
     def read_pdb(self,filename,**kwargs):
         '''
-        This method reads a PDB file.  
+        This method reads a PDB file.
         '''
         debug=0
         result=1
 
         protein_resnames,dna_resnames,rna_resnames,nucleic_resnames,water_resnames = self.get_resnames()
 
-        ### LONG	Need to properly import header information
-	
+        ### LONG    Need to properly import header information
+
         # see: http://deposit.rcsb.org/adit/docs/pdb_atom_format.html
 
         fastread = False
@@ -383,7 +381,7 @@ class PDB(object):
 
         if 'verbose' in kwargs:
             printme = kwargs['verbose']
-			
+
         if 'fastread' in kwargs:
             fastread = kwargs['fastread']
             if(fastread):
@@ -391,24 +389,24 @@ class PDB(object):
 
         if 'pdbscan' in kwargs:
             pdbscan = kwargs['pdbscan']
-	
+
         infile=open(filename,'r').readlines()
 
         if(printme): print('reading filename: ',filename)
-		
+
         atom=[] ; index=[] ; original_index=[] ; name=[] ; loc=[] ; resname=[] ; chain=[] ; resid=[] ; rescode=[]
-        x=[] ; y=[] ; z=[] 
+        x=[] ; y=[] ; z=[]
         occupancy=[] ; beta=[] ; segname=[] ; element=[] ; charge=[] ; moltype=[] ; conect = {}
         residue_flag = [] ; original_resid=[] ; header = []
-	
+
         # first check to see how many frames are in the file
 
         num_model = 0
         num_endmdl = 0
         num_end = 0
-        
+
         num_frames = 1
-        
+
         count_index = 0
 
         num_counts_this_model = 0 # number of atoms encompassed by "MODEL" and "ENDMDL" lines
@@ -429,12 +427,12 @@ class PDB(object):
 
             record_name = string.strip(lin[0:6])
 #
-### 	OPEN 	need to re-factor the exception statements to a uniform reporting mechanism
+###     OPEN     need to re-factor the exception statements to a uniform reporting mechanism
 #
             try:
                 if(lins[0]=='MODEL'):
                     if modelON:
-                        raise Exception, 'Encountered two consecutive MODEL lines' 
+                        raise Exception, 'Encountered two consecutive MODEL lines'
                     if (num_counts_this_model != 0):
                         raise Exception, 'There should not be atoms after ENDMDL and before MODEL lines'
                     modelON = True
@@ -449,20 +447,20 @@ class PDB(object):
                     num_counts_this_end = 0
             except:
                 pass
-			#
+            #
             if((record_name == 'ATOM' or record_name == 'HETATM')):
                 count_index += 1
                 num_counts_this_model += 1
                 num_counts_this_end += 1
-		#
-		#
+        #
+        #
 
         if ( (len(num_counts_per_end)==0) and (len(num_counts_per_model)!=0) ):
             raise Exception, 'According to Protein Data Bank Contents Guide, END line must appear in each coor entry'
         if (len(num_counts_per_model)!=0 and (len(num_counts_per_end)>1 or sum(num_counts_per_model)!=sum(num_counts_per_end))):
             if(printme): print(num_counts_per_model,num_counts_per_end)
             raise Exception, 'Only one terminating END line is allowed for pdb entries with multiple MODEL'
-		#
+        #
         if (len(num_counts_per_model)>0):
             num_frames = len(num_counts_per_model)
             num_atoms = num_counts_per_model[0]
@@ -481,14 +479,14 @@ class PDB(object):
 
         if(printme): print('num_atoms = ',num_atoms)
 
-        if(printme): print('>>> found ',num_frames,' model(s) or frame(s)')			
-        this_frame = 1		
+        if(printme): print('>>> found ',num_frames,' model(s) or frame(s)')
+        this_frame = 1
 
         true_index = 0
-	
-        coor=numpy.zeros((num_frames,num_atoms,3),numpy.float)	
 
-        unique_names = [] ; unique_resnames = [] ; unique_resids = [] ; unique_chains = [] 
+        coor=numpy.zeros((num_frames,num_atoms,3),numpy.float)
+
+        unique_names = [] ; unique_resnames = [] ; unique_resids = [] ; unique_chains = []
         unique_occupancies = [] ; unique_betas = [] ; unique_segnames = [] ; unique_moltypes = []
 
         for i in range(len(infile)):
@@ -499,34 +497,34 @@ class PDB(object):
 
             if((record_name == 'ATOM' or record_name == 'HETATM') and this_frame == 1):
                 true_index += 1
-                atom.append(string.strip(lin[0:6]))		#	1-6		record name	
-                original_index.append(lin[6:11])				#	7-11		atom serial number
-                index.append(str(true_index))   	        #   set index so that > 99,999 atoms can be read and counted
-                this_name = string.strip(lin[12:16])		#	13-16		atom name
-                name.append(string.strip(lin[12:16]))		#	13-16		atom name
+                atom.append(string.strip(lin[0:6]))     #    1-6        record name
+                original_index.append(lin[6:11])        #    7-11        atom serial number
+                index.append(str(true_index))           #   set index so that > 99,999 atoms can be read and counted
+                this_name = string.strip(lin[12:16])    #    13-16        atom name
+                name.append(string.strip(lin[12:16]))   #    13-16        atom name
                 if pdbscan:
                     loc.append(lin[16])
                 else:
                     loc.append(' ')
-                this_resname = string.strip(lin[17:21])	#	18-20		residue name
-                resname.append(string.strip(lin[17:21]))	#	18-20		residue name
-                this_chain = lin[21]				#	22		chain identifier
-                chain.append(lin[21])				#	22		chain identifier
-                this_resid = locale.atoi(lin[22:26])			#	23-26		residue sequence number
-                original_resid.append(lin[22:26])			#	23-26		residue sequence number
-                resid.append(lin[22:26])			#	23-26		residue sequence number
-                rescode.append(lin[26])				#	27		code for insertion of residues
-                x.append(lin[30:38])				#	31-38		Real(8.3) X: angstroms	
-                y.append(lin[38:46])				#	39-46		Real(8.3) Y: angstroms	
-                z.append(lin[46:54])				#	47-54		Real(8.3) Z: angstroms	
-				
+                this_resname = string.strip(lin[17:21])  #    18-20        residue name
+                resname.append(string.strip(lin[17:21])) #    18-20        residue name
+                this_chain = lin[21]                     #    22        chain identifier
+                chain.append(lin[21])                    #    22        chain identifier
+                this_resid = locale.atoi(lin[22:26])     #    23-26        residue sequence number
+                original_resid.append(lin[22:26])        #    23-26        residue sequence number
+                resid.append(lin[22:26])                 #    23-26        residue sequence number
+                rescode.append(lin[26])                  #    27        code for insertion of residues
+                x.append(lin[30:38])                     #    31-38        Real(8.3) X: angstroms
+                y.append(lin[38:46])                     #    39-46        Real(8.3) Y: angstroms
+                z.append(lin[46:54])                     #    47-54        Real(8.3) Z: angstroms
+
                 residue_flag.append(False)
 
                 if not pdbscan:
 
-                    try:	
-                        occupancy.append(string.strip(lin[54:60]))      #	55-60		occupancy
-                        this_occupancy =string.strip(lin[54:60])      #	55-60		occupancy
+                    try:
+                        occupancy.append(string.strip(lin[54:60])) #    55-60        occupancy
+                        this_occupancy =string.strip(lin[54:60])   #    55-60        occupancy
                         if(occupancy[-1] == ''):
                             occupancy[-1] = "  1.00"
                             this_occupancy[-1] = "  1.00"
@@ -534,16 +532,16 @@ class PDB(object):
                         occupancy.append("  0.00")
                         this_occupancy = "  0.00"
                     try:
-                        beta.append(string.strip(lin[60:66]))		#	61-66		temperature factor
-                        this_beta = string.strip(lin[60:66])		#	61-66		temperature factor
+                        beta.append(string.strip(lin[60:66]))      #    61-66        temperature factor
+                        this_beta = string.strip(lin[60:66])       #    61-66        temperature factor
                         if(beta[-1] == ''):
                             beta[-1] = "  0.00"
                     except:
                         beta.append("  0.00")
                         this_beta = "  0.00"
                     try:
-                        segname.append(string.strip(lin[72:76]))	#	73-76		segment identifier
-                        this_segname = string.strip(lin[72:76])	#	73-76		segment identifier
+                        segname.append(string.strip(lin[72:76]))   #    73-76        segment identifier
+                        this_segname = string.strip(lin[72:76])    #    73-76        segment identifier
                         if(segname[-1] == '' and this_chain !=''):
                             segname[-1] = this_chain
                             this_segname = this_chain
@@ -551,27 +549,27 @@ class PDB(object):
                         this_segname = ""
                         segname.append("")
                     try:
-                        element.append(string.strip(lin[76:78]))	#	77-78		element symbol
+                        element.append(string.strip(lin[76:78]))   #    77-78        element symbol
                         if(element[-1] == ''):
                             element[-1] = "  "
                     except:
                         element.append("  ")
                     try:
-                        charge.append(string.strip(lin[78:80]))		#	79-80		charge on the atom
+                        charge.append(string.strip(lin[78:80]))    #    79-80        charge on the atom
                         if(charge[-1] == ''):
                             charge[-1] = "  "
                     except:
                         charge.append("  ")
 
                 else:
-                    occupancy.append(string.strip(lin[54:60]))      #	55-60		occupancy
-                    this_occupancy =string.strip(lin[54:60])      #	55-60		occupancy
-                    beta.append(string.strip(lin[60:66]))		#	61-66		temperature factor
-                    this_beta = string.strip(lin[60:66])		#	61-66		temperature factor
-                    segname.append(string.strip(lin[72:76]))	#	73-76		segment identifier
-                    this_segname = string.strip(lin[72:76])	#	73-76		segment identifier
-                    element.append(string.strip(lin[76:78]))	#	77-78		element symbol
-                    charge.append(string.strip(lin[78:80]))		#	79-80		charge on the atom
+                    occupancy.append(string.strip(lin[54:60]))     #    55-60        occupancy
+                    this_occupancy =string.strip(lin[54:60])       #    55-60        occupancy
+                    beta.append(string.strip(lin[60:66]))          #    61-66        temperature factor
+                    this_beta = string.strip(lin[60:66])           #    61-66        temperature factor
+                    segname.append(string.strip(lin[72:76]))       #    73-76        segment identifier
+                    this_segname = string.strip(lin[72:76])        #    73-76        segment identifier
+                    element.append(string.strip(lin[76:78]))       #    77-78        element symbol
+                    charge.append(string.strip(lin[78:80]))        #    79-80        charge on the atom
 
                 if(this_name not in unique_names): unique_names.append(this_name)
                 if(this_resname not in unique_resnames): unique_resnames.append(this_resname)
@@ -580,27 +578,27 @@ class PDB(object):
                 if(this_segname not in unique_segnames): unique_segnames.append(this_segname)
                 if(this_occupancy not in unique_occupancies): unique_occupancies.append(this_occupancy)
                 if(this_beta not in unique_betas): unique_betas.append(this_beta)
-	
+
                 this_resname=(string.strip(lin[17:21]))
                 if this_resname in protein_resnames:
                     moltype.append('protein')
                     this_moltype = 'protein'
-                elif this_resname in rna_resnames:	
+                elif this_resname in rna_resnames:
                     moltype.append('rna')
                     this_moltype = 'rna'
-                elif this_resname in dna_resnames:	
+                elif this_resname in dna_resnames:
                     moltype.append('dna')
                     this_moltype = 'dna'
-                elif this_resname in water_resnames:	
+                elif this_resname in water_resnames:
                     moltype.append('water')
                     this_moltype = 'water'
                 else:
                     moltype.append('other')
                     this_moltype = 'other'
-				
+
                 if(this_moltype not in unique_moltypes): unique_moltypes.append(this_moltype)
-					
-                if(true_index == num_atoms):				
+
+                if(true_index == num_atoms):
                     if(printme): print('finished reading frame = ',this_frame)
                     index=numpy.array(index,numpy.int)
                     original_index=numpy.array(original_index,numpy.int)
@@ -618,7 +616,7 @@ class PDB(object):
                         self._chain=chain ; self._resid=resid ; self._rescode=rescode ; self._original_resid=original_resid
                         self._occupancy=occupancy ; self._beta=beta ; self._segname=segname ; self._element=element
                         self._charge=charge ; self._moltype=moltype
-                        
+
                         self._number_of_names = len(unique_names) ; self._names = unique_names
                         self._number_of_resnames = len(unique_resnames) ; self._resnames = unique_resnames
                         self._number_of_resids = len(unique_resids) ; self._resids = unique_resids
@@ -634,13 +632,13 @@ class PDB(object):
                     this_frame += 1
             elif((record_name != 'ATOM' or record_name != 'HETATM' and record_name != 'CONECT') and this_frame == 1):
                 header.append(lin)
-	
+
             elif((record_name == 'ATOM' or record_name == 'HETATM') and this_frame > 1):
                 true_index += 1
-                x.append(lin[30:38])				#	31-38		Real(8.3) X: angstroms	
-                y.append(lin[38:46])				#	39-46		Real(8.3) Y: angstroms	
-                z.append(lin[46:54])				#	47-54		Real(8.3) Z: angstroms	
-		
+                x.append(lin[30:38])                #    31-38        Real(8.3) X: angstroms
+                y.append(lin[38:46])                #    39-46        Real(8.3) Y: angstroms
+                z.append(lin[46:54])                #    47-54        Real(8.3) Z: angstroms
+
                 if(true_index == num_atoms):
                     if(printme): print('finished reading frame = ',this_frame)
                     x=numpy.array(x,numpy.float32)
@@ -648,14 +646,14 @@ class PDB(object):
                     z=numpy.array(z,numpy.float32)
                     coor[this_frame-1,:,0]=x ; coor[this_frame-1,:,1]=y ; coor[this_frame-1,:,2]=z
                     true_index = 0
-                    this_frame += 1		
+                    this_frame += 1
                     x=[] ; y=[] ; z=[]
 
             elif ((record_name == 'CONECT') and pdbscan):
                 # Format of CONECT line:
-                # Record name CONECT followed by list of atom indexes in 6 
-                # character columns. First is the base atom, following atoms 
-                # are those connected to it. 
+                # Record name CONECT followed by list of atom indexes in 6
+                # character columns. First is the base atom, following atoms
+                # are those connected to it.
                 # Input line is filtered to ignore blank columns.
                 ndxs = [int(lin[i:i+5]) for i in range(6, len(lin), 5) if lin[i:i+5].strip()]
                 conect[ndxs[0]] = ndxs[1:]
@@ -667,7 +665,7 @@ class PDB(object):
 
         if 'check_zero_coor' in kwargs:
             self.check_for_all_zero_columns(self._coor)
-			
+
         unique_elements = self.element_filter()
 
         self._number_of_elements = len(unique_elements) ; self._elements = unique_elements
@@ -678,30 +676,30 @@ class PDB(object):
         error = []
 
         if 'saspdbrx_topology' in kwargs:
-            if kwargs['saspdbrx_topology']:	
+            if kwargs['saspdbrx_topology']:
                 error = self.check_charmm_atomic_order_reorganize()
                 return error
 
         self._header = header
         self._conect = conect
 
-        return 
+        return
 
     def create_conect_pdb_lines(self):
         """
-            Output stored conect information in PDB record format.
-            Indices are converted from those read in - original_index - to 
-            those used in output.
-            Format of CONECT line:
-            Record name CONECT followed by list of atom indexes in 6 character 
-            columns. First is the base atom, following atoms are those 
-            connected to it.
+        Output stored conect information in PDB record format.
+        Indices are converted from those read in - original_index - to
+        those used in output.
+        Format of CONECT line:
+        Record name CONECT followed by list of atom indexes in 6 character
+        columns. First is the base atom, following atoms are those
+        connected to it.
         """
 
         original_conect = self.conect()
         original_indexs = self.original_index()
         indexs = self.index()
-            
+
         # Convert from original to current indexing
         convert_index = dict(zip(original_indexs, indexs))
 
