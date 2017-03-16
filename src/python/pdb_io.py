@@ -63,13 +63,68 @@ class PDB(object):
 
         return error
 
+    def field_definitions(self):
+        '''
+        Containers for the fields required to define a pdb
+
+        Parameters
+        ----------
+        None
+
+        Returns
+        -------
+        pdb_dict
+            dictionary of containers for the fields requierd to define a pdb
+
+        Examples
+        --------
+
+        >>> import sasmol.system as system
+        >>> molecule = system.Molecule()
+        >>> pdb_dict = molecule.field_definitions()
+        >>> for key in sorted(pdb_dict.keys()):
+                print('{key}: {val}'.format(key=key, val=pdb_dict[key]))
+        beta: []
+        chain: []
+        charge: []
+        coor: None
+        element: []
+        index: None
+        loc: []
+        name: []
+        natoms: 0
+        occupancy: []
+        rescode: []
+        resid: []
+        resname: []
+        segname: []
+
+        '''
+
+        pdb_dict = {}
+        pdb_dict['natoms'] = 0
+        pdb_dict['index'] = None
+        pdb_dict['name'] = []
+        pdb_dict['loc'] = []
+        pdb_dict['resname'] = []
+        pdb_dict['chain'] = []
+        pdb_dict['resid'] = []
+        pdb_dict['rescode'] = []
+        pdb_dict['coor'] = None
+        pdb_dict['occupancy'] = []
+        pdb_dict['beta'] = []
+        pdb_dict['segname'] = []
+        pdb_dict['element'] = []
+        pdb_dict['charge'] = []
+        pdb_dict['segname'] = []
+
+        return pdb_dict
+
     def check_error(self, error):
 
         if(len(error) > 0):
             print(error)
             sys.exit()
-
-        return
 
     def element_filter(self):
         '''
@@ -454,8 +509,6 @@ class PDB(object):
         self._elements_mask = elements_mask
         self._segnames_mask = segnames_mask
 
-        return
-
     def check_for_all_zero_columns(self, coor, frame=0):
         '''
         Make sure there are no two all zero columns in coordinates
@@ -475,8 +528,6 @@ class PDB(object):
             coor[frame][0][1] = SMALL
         if z0:
             coor[frame][0][2] = SMALL
-
-        return
 
     def read_pdb(self, filename, **kwargs):
         '''
@@ -924,8 +975,6 @@ class PDB(object):
 
         self._header = header
         self._conect = conect
-
-        return
 
     def create_conect_pdb_lines(self):
         """
