@@ -15,7 +15,7 @@ the sasmol.system module through the file_io File() class.
 from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
-#from __future__ import unicode_literals
+# from __future__ import unicode_literals
 
 
 #    SASMOL: Copyright (C) 2011 Joseph E. Curtis, Ph.D.
@@ -51,20 +51,21 @@ import numpy
 
 class PDB(object):
 
-    def print_error(self,name,my_message):
+    def print_error(self, name, my_message):
 
         error = []
-        message = '\nELEMENT NAME NOT IN CHARMM DATABASE AND SINGLE CHARACTER OPTION NOT APPLICABLE\n'
-        message += '\n'+name+'\n'
-        message +=  my_message+'\n'
-        message += ' stopping now: name = '+name+'\n'
+        message = ('\nELEMENT NAME NOT IN CHARMM DATABASE AND SINGLE '
+                   'CHARACTER OPTION NOT APPLICABLE\n')
+        message += '\n' + name + '\n'
+        message += my_message + '\n'
+        message += ' stopping now: name = ' + name + '\n'
         error.append(message)
 
         return error
 
-    def check_error(self,error):
+    def check_error(self, error):
 
-        if(len(error)>0):
+        if(len(error) > 0):
             print(error)
             sys.exit()
 
@@ -79,24 +80,27 @@ class PDB(object):
         '''
         unique_elements = []
         error = []
-        single_atom_names = ['H','F','B','D','C','N','O','S','P','I','K','U','V','W','Y']
+        # single_atom_names = ['H', 'F', 'B', 'D', 'C', 'N', 'O', 'S', 'P',
+        #                      'I', 'K', 'U', 'V', 'W', 'Y']
 
         for i in range(len(self._name)):
             name = self._name[i].upper()
             resname = self._resname[i].upper()
-            if (self._element[i]=='' or self._element[i]==' ' or self._element[i]=='  '):
-                natoms = len(self._name[i])
-                error,self._element[i] = self.get_element(name,resname)
+            # if (self._element[i] == '' or self._element[i] == ' ' or
+            #     self._element[i] == '  '):
+            if self._element[i].strip() == '':
+                # natoms = len(self._name[i])
+                error, self._element[i] = self.get_element(name, resname)
                 self.check_error(error)
 #
-###    OPEN    Error exception handling stub
+#    OPEN    Error exception handling stub
 #
             if(self._element[i] not in unique_elements):
                 unique_elements.append(self._element[i])
 
         return unique_elements
 
-    def get_element(self,name,resname):
+    def get_element(self, name, resname):
         '''
         Get elment from charmm27 atom name list plus extras from periodic table
         and resolve name conflicts
@@ -105,7 +109,8 @@ class PDB(object):
         error = []
         element_name = ''
 
-        #hydrogen,carbon,nitrogen,oxygen,sulfur,phosphorus,other = self.charmm_names()
+        # (hydrogen, carbon, nitrogen, oxygen, sulfur,
+        #  phosphorus, other) = self.charmm_names()
         charmm_names = self.charmm_names()
         hydrogen = charmm_names['hydrogen']
         carbon = charmm_names['carbon']
@@ -115,67 +120,86 @@ class PDB(object):
         phosphorus = charmm_names['phosphorus']
         other = charmm_names['other']
 
-        conflict_atoms = ['CD','CE','HE','HG','NE','ND','NB','PB','PA']
+        conflict_atoms = ['CD', 'CE', 'HE', 'HG', 'NE', 'ND', 'NB', 'PB', 'PA']
 
         if(name in conflict_atoms and (name == resname)):
             element_name = name
-        elif(name in hydrogen): element_name = 'H'
-        elif(name in carbon): element_name = 'C'
-        elif(name in nitrogen): element_name = 'N'
-        elif(name in oxygen): element_name = 'O'
-        elif(name in sulfur): element_name = 'S'
-        elif(name in phosphorus): element_name = 'P'
-        elif(name == '1H'): element_name = name
-        elif(name == '2H'): element_name = "D"
-        elif(name == "SOD"): element_name = 'NA'
-        elif(name == "POT"): element_name = 'K'
-        elif(name == "CAL"): element_name = 'CA'
-        elif(name == "CLA"): element_name = 'CL'
-        elif(name == "CES"): element_name = 'CS'
-        elif(name == "F2'"): element_name = 'F'
-        elif(name in other): element_name = name
-        elif(len(name)>0):
+        elif(name in hydrogen):
+            element_name = 'H'
+        elif(name in carbon):
+            element_name = 'C'
+        elif(name in nitrogen):
+            element_name = 'N'
+        elif(name in oxygen):
+            element_name = 'O'
+        elif(name in sulfur):
+            element_name = 'S'
+        elif(name in phosphorus):
+            element_name = 'P'
+        elif(name == '1H'):
+            element_name = name
+        elif(name == '2H'):
+            element_name = "D"
+        elif(name == "SOD"):
+            element_name = 'NA'
+        elif(name == "POT"):
+            element_name = 'K'
+        elif(name == "CAL"):
+            element_name = 'CA'
+        elif(name == "CLA"):
+            element_name = 'CL'
+        elif(name == "CES"):
+            element_name = 'CS'
+        elif(name == "F2'"):
+            element_name = 'F'
+        elif(name in other):
+            element_name = name
+        elif(len(name) > 0):
             if(name[0].isalpha()):
                 element_name = name[0]
-            elif(name[0].isdigit() and len(name)>1):
+            elif(name[0].isdigit() and len(name) > 1):
                 if(name[1].isalpha()):
                     element_name = name[1]
                 else:
-                    my_message = '\nFIRST AND SECOND CHARACTER IN ATOM NAME CAN NOT BE A NUMBER\n'
-                    error = self.print_error(name,my_message)
+                    my_message = ('\nFIRST AND SECOND CHARACTER IN ATOM NAME '
+                                  'CAN NOT BE A NUMBER\n')
+                    error = self.print_error(name, my_message)
             else:
-                my_message = '\nFIRST CHARACTER IN ATOM NAME CAN NOT BE A NUMBER\n'
-                error = self.print_error(name,my_message)
+                my_message = ('\nFIRST CHARACTER IN ATOM NAME CAN NOT BE A '
+                              'NUMBER\n')
+                error = self.print_error(name, my_message)
         else:
             my_message = '\nNO CHARACTERS FOUND FOR ATOM NAME\n'
-            error = self.print_error(name,my_message)
+            error = self.print_error(name, my_message)
 
-        return error,element_name
+        return error, element_name
 
-    def write_pdb(self,filename,frame,flag,**kwargs):
+    def write_pdb(self, filename, frame, flag, **kwargs):
         '''
         This method writes the PDB file
         '''
 
-        debug=0
-        result=1
+        debug = 0
+        result = 1
         conect = False
 
-        if(flag=='w' or flag=='W'):
-            infile=open(filename,'w')
-        elif(flag=='a' or flag=='A'):
-            infile=open(filename,'a')
+        if(flag == 'w' or flag == 'W'):
+            infile = open(filename, 'w')
+        elif(flag == 'a' or flag == 'A'):
+            infile = open(filename, 'a')
 
         if 'conect' in kwargs:
             conect = kwargs['conect']
 
         if 'model' in kwargs:
             this_frame = kwargs['model']
-            infile.write("MODEL "+str(this_frame)+"\n")
+            infile.write("MODEL " + str(this_frame) + "\n")
 
-        if(debug==1):
-            infile.write("          1         2         3         4         5         6         7         \n")
-            infile.write("01234567890123456789012345678901234567890123456789012345678901234567890123456789\n")
+        if(debug == 1):
+            infile.write("          1         2         3         4         "
+                         "5         6         7         \n")
+            infile.write("01234567890123456789012345678901234567890123456789"
+                         "012345678901234567890123456789\n")
 
         for i in range(len(self._atom)):
 
@@ -196,30 +220,95 @@ class PDB(object):
                 this_resid = '-999'
 
             try:
-                sx = "{0:8.3f}".format(float(self._coor[frame,i,0]))[:8]
-                sy = "{0:8.3f}".format(float(self._coor[frame,i,1]))[:8]
-                sz = "{0:8.3f}".format(float(self._coor[frame,i,2]))[:8]
+                sx = "{0:8.3f}".format(float(self._coor[frame, i, 0]))[:8]
+                sy = "{0:8.3f}".format(float(self._coor[frame, i, 1]))[:8]
+                sz = "{0:8.3f}".format(float(self._coor[frame, i, 2]))[:8]
 
-                infile.write("%-6s%5s %-4s%1s%-4s%1s%4s%1s   %8s%8s%8s%6s%6s      %-4s%2s%2s\n" % (self._atom[i],this_index,self._name[i],self._loc[i],self._resname[i],self._chain[i],this_resid,self._rescode[i],sx,sy,sz,self._occupancy[i],self._beta[i],self._segname[i],self._element[i],self._charge[i]))
-            except:
+                infile.write("%-6s%5s %-4s%1s%-4s%1s%4s%1s   %8s%8s%8s%6s%6s"
+                             "      %-4s%2s%2s\n" %
+                             (self._atom[i], this_index, self._name[i],
+                              self._loc[i], self._resname[i], self._chain[i],
+                              this_resid, self._rescode[i], sx, sy, sz,
+                              self._occupancy[i], self._beta[i],
+                              self._segname[i], self._element[i],
+                              self._charge[i]))
+            except BaseException:
                 print('\n>>>> ERROR IN WRITE_PDB <<<<\n')
-                print('>> i = ',i)
-                print('atom = ',self._atom[i],' : type = ',type(self._atom[i]))
-                print('index = ',this_index,' : type = ',type(this_index))
-                print('name = ',self._name[i],' : type = ',type(self._name[i]))
-                print('loc = ',self._loc[i],' : type = ',type(self._loc[i]))
-                print('resname = ',self._resname[i],' : type = ',type(self._resname[i]))
-                print('chain = ',self._chain[i],' : type = ',type(self._chain[i]))
-                print('resid = ',self._resid[i],' : type = ',type(self._resid[i]))
-                print('rescode = ',self._rescode[i],' : type = ',type(self._rescode[i]))
-                print('coor_x = ',self._coor[frame,i,0],' : type = ',type(self._coor[frame,i,0]))
-                print('coor_y = ',self._coor[frame,i,1],' : type = ',type(self._coor[frame,i,1]))
-                print('coor_z = ',self._coor[frame,i,2],' : type = ',type(self._coor[frame,i,2]))
-                print('occupancy = ',self._occupancy[i],' : type = ',type(self._occupancy[i]))
-                print('beta = ',self._beta[i],' : type = ',type(self._beta[i]))
-                print('segname = ',self._segname[i],' : type = ',type(self._segname[i]))
-                print('element = ',self._element[i],' : type = ',type(self._element[i]))
-                print('charge = ',self._charge[i],' : type = ',type(self._charge[i]))
+                print('>> i = ', i)
+                print(
+                    'atom = ',
+                    self._atom[i],
+                    ' : type = ',
+                    type(
+                        self._atom[i]))
+                print('index = ', this_index, ' : type = ', type(this_index))
+                print(
+                    'name = ',
+                    self._name[i],
+                    ' : type = ',
+                    type(
+                        self._name[i]))
+                print('loc = ', self._loc[i], ' : type = ', type(self._loc[i]))
+                print(
+                    'resname = ',
+                    self._resname[i],
+                    ' : type = ',
+                    type(
+                        self._resname[i]))
+                print(
+                    'chain = ',
+                    self._chain[i],
+                    ' : type = ',
+                    type(
+                        self._chain[i]))
+                print(
+                    'resid = ',
+                    self._resid[i],
+                    ' : type = ',
+                    type(
+                        self._resid[i]))
+                print(
+                    'rescode = ',
+                    self._rescode[i],
+                    ' : type = ',
+                    type(
+                        self._rescode[i]))
+                print('coor_x = ', self._coor[frame, i, 0], ' : type = ', type(
+                    self._coor[frame, i, 0]))
+                print('coor_y = ', self._coor[frame, i, 1], ' : type = ', type(
+                    self._coor[frame, i, 1]))
+                print('coor_z = ', self._coor[frame, i, 2], ' : type = ', type(
+                    self._coor[frame, i, 2]))
+                print(
+                    'occupancy = ',
+                    self._occupancy[i],
+                    ' : type = ',
+                    type(
+                        self._occupancy[i]))
+                print(
+                    'beta = ',
+                    self._beta[i],
+                    ' : type = ',
+                    type(
+                        self._beta[i]))
+                print(
+                    'segname = ',
+                    self._segname[i],
+                    ' : type = ',
+                    type(
+                        self._segname[i]))
+                print(
+                    'element = ',
+                    self._element[i],
+                    ' : type = ',
+                    type(
+                        self._element[i]))
+                print(
+                    'charge = ',
+                    self._charge[i],
+                    ' : type = ',
+                    type(
+                        self._charge[i]))
 
         # TODO: Check with Joseph to see if logic acceptable -
         # i.e. is 'final' always accompanied by 'model'?
@@ -255,20 +344,28 @@ class PDB(object):
 
     def get_resnames(self):
         '''
-        This method holds names of residues to use to set moltype.  Based on Charmm 27 naming.
+        This method holds names of residues to use to set moltype.
+        Based on Charmm 27 naming.
         '''
 
-        protein_resnames=['ALA','ARG','ASN','ASP','CYS','GLN','GLU','GLY','HIS','HSD','HSE','HSP','ILE','LEU','LYS','MET','PHE','PRO','SER','THR','TRP','TYR','VAL']
+        protein_resnames = ['ALA', 'ARG', 'ASN', 'ASP', 'CYS', 'GLN', 'GLU',
+                            'GLY', 'HIS', 'HSD', 'HSE', 'HSP', 'ILE', 'LEU',
+                            'LYS', 'MET', 'PHE', 'PRO', 'SER', 'THR', 'TRP',
+                            'TYR', 'VAL']
 
-        dna_resnames=['NUSA','NUSG','NUSC','NUSU','DA','DG','DC','DT','ADE','GUA','CYT','THY']
+        dna_resnames = ['NUSA', 'NUSG', 'NUSC', 'NUSU', 'DA', 'DG', 'DC', 'DT',
+                        'ADE', 'GUA', 'CYT', 'THY']
 
-        rna_resnames=['RNUS','RNUA','RUUG','RNUC','A', 'C', 'G', 'U','ADE','CYT','GUA','URA']
+        rna_resnames = ['RNUS', 'RNUA', 'RUUG', 'RNUC', 'A', 'C', 'G', 'U',
+                        'ADE', 'CYT', 'GUA', 'URA']
 
-        nucleic_resnames = ['GUA','ADE','CYT','THY','URA','G', 'A', 'C', 'T', 'U','DA','DG','DC','DT']
+        nucleic_resnames = ['GUA', 'ADE', 'CYT', 'THY', 'URA', 'G', 'A', 'C',
+                            'T', 'U', 'DA', 'DG', 'DC', 'DT']
 
-        water_resnames=['TIP3','SPCE','TIP','SPC','TIP4','TP3M']
+        water_resnames = ['TIP3', 'SPCE', 'TIP', 'SPC', 'TIP4', 'TP3M']
 
-        return protein_resnames,dna_resnames,rna_resnames,nucleic_resnames,water_resnames
+        return (protein_resnames, dna_resnames, rna_resnames,
+                nucleic_resnames, water_resnames)
 
     def initialize_children(self):
         '''
@@ -290,31 +387,52 @@ class PDB(object):
         value from the parent molecule.
         '''
 
-        number_of_names = self.number_of_names() ; unique_names = self.names()
-        number_of_resnames = self.number_of_resnames() ; unique_resnames = self.resnames()
-        number_of_resids = self.number_of_resids() ; unique_resids = self.resids()
-        number_of_chains = self.number_of_chains() ; unique_chains = self.chains()
-        number_of_occupancies = self.number_of_occupancies() ; unique_occupancies = self.occupancies()
-        number_of_betas = self.number_of_betas() ; unique_betas = self.betas()
-        number_of_elements = self.number_of_elements() ; unique_elements = self.elements()
-        number_of_segnames = self.number_of_segnames() ; unique_segnames = self.segnames()
+        number_of_names = self.number_of_names()
+        unique_names = self.names()
+        number_of_resnames = self.number_of_resnames()
+        unique_resnames = self.resnames()
+        number_of_resids = self.number_of_resids()
+        unique_resids = self.resids()
+        number_of_chains = self.number_of_chains()
+        unique_chains = self.chains()
+        number_of_occupancies = self.number_of_occupancies()
+        unique_occupancies = self.occupancies()
+        number_of_betas = self.number_of_betas()
+        unique_betas = self.betas()
+        number_of_elements = self.number_of_elements()
+        unique_elements = self.elements()
+        number_of_segnames = self.number_of_segnames()
+        unique_segnames = self.segnames()
         natoms = self.natoms()
-        name = self.name() ; resname = self.resname() ; resid = self.resid() ; chain = self.chain()
-        occupancy = self.occupancy() ; beta = self.beta() ; element = self.element() ; segname = self.segname()
+        name = self.name()
+        resname = self.resname()
+        resid = self.resid()
+        chain = self.chain()
+        occupancy = self.occupancy()
+        beta = self.beta()
+        element = self.element()
+        segname = self.segname()
 
-        names = [] ; resnames = [] ; resids = [] ; chains = []
-        occupancies = [] ; betas = [] ; elements = [] ; segments = []
+        # these do not get used
+        # names = []
+        # resnames = []
+        # resids = []
+        # chains = []
+        # occupancies = []
+        # betas = []
+        # elements = []
+        # segments = []
+        # nresid = 0
 
-        names_mask = numpy.zeros((number_of_names,natoms),numpy.int)
-        resnames_mask = numpy.zeros((number_of_resnames,natoms),numpy.int)
-        resids_mask = numpy.zeros((number_of_resids,natoms),numpy.int)
-        chains_mask = numpy.zeros((number_of_chains,natoms),numpy.int)
-        occupancies_mask = numpy.zeros((number_of_occupancies,natoms),numpy.int)
-        betas_mask = numpy.zeros((number_of_betas,natoms),numpy.int)
-        elements_mask = numpy.zeros((number_of_elements,natoms),numpy.int)
-        segnames_mask = numpy.zeros((number_of_segnames,natoms),numpy.int)
-
-        nresid = 0
+        names_mask = numpy.zeros((number_of_names, natoms), numpy.int)
+        resnames_mask = numpy.zeros((number_of_resnames, natoms), numpy.int)
+        resids_mask = numpy.zeros((number_of_resids, natoms), numpy.int)
+        chains_mask = numpy.zeros((number_of_chains, natoms), numpy.int)
+        occupancies_mask = numpy.zeros((number_of_occupancies, natoms),
+                                       numpy.int)
+        betas_mask = numpy.zeros((number_of_betas, natoms), numpy.int)
+        elements_mask = numpy.zeros((number_of_elements, natoms), numpy.int)
+        segnames_mask = numpy.zeros((number_of_segnames, natoms), numpy.int)
 
         for i in xrange(natoms):
 
@@ -338,39 +456,39 @@ class PDB(object):
 
         return
 
-
     def check_for_all_zero_columns(self, coor, frame=0):
         '''
         Make sure there are no two all zero columns in coordinates
         This is needed for the alignment module
         '''
         SMALL = 1.0E-10
-        x0,y0,z0=False,False,False
-        if sum(coor[frame][:,0]**2)<SMALL:
-            x0=True
-        if sum(coor[frame][:,1]**2)<SMALL:
-            y0=True
-        if sum(coor[frame][:,2]**2)<SMALL:
-            z0=True
+        x0, y0, z0 = False, False, False
+        if sum(coor[frame][:, 0]**2) < SMALL:
+            x0 = True
+        if sum(coor[frame][:, 1]**2) < SMALL:
+            y0 = True
+        if sum(coor[frame][:, 2]**2) < SMALL:
+            z0 = True
         if x0:
-            coor[frame][0][0]=SMALL
+            coor[frame][0][0] = SMALL
         if y0:
-            coor[frame][0][1]=SMALL
+            coor[frame][0][1] = SMALL
         if z0:
-            coor[frame][0][2]=SMALL
+            coor[frame][0][2] = SMALL
 
         return
 
-    def read_pdb(self,filename,**kwargs):
+    def read_pdb(self, filename, **kwargs):
         '''
         This method reads a PDB file.
         '''
-        debug=0
-        result=1
+        # debug = 0
+        # result = 1
 
-        protein_resnames,dna_resnames,rna_resnames,nucleic_resnames,water_resnames = self.get_resnames()
+        (protein_resnames, dna_resnames, rna_resnames, nucleic_resnames,
+         water_resnames) = self.get_resnames()
 
-        ### LONG    Need to properly import header information
+        # LONG    Need to properly import header information
 
         # see: http://deposit.rcsb.org/adit/docs/pdb_atom_format.html
 
@@ -390,196 +508,276 @@ class PDB(object):
         if 'pdbscan' in kwargs:
             pdbscan = kwargs['pdbscan']
 
-        infile=open(filename,'r').readlines()
+        infile = open(filename, 'r').readlines()
 
-        if(printme): print('reading filename: ',filename)
+        if(printme):
+            print('reading filename: ', filename)
 
-        atom=[] ; index=[] ; original_index=[] ; name=[] ; loc=[] ; resname=[] ; chain=[] ; resid=[] ; rescode=[]
-        x=[] ; y=[] ; z=[]
-        occupancy=[] ; beta=[] ; segname=[] ; element=[] ; charge=[] ; moltype=[] ; conect = {}
-        residue_flag = [] ; original_resid=[] ; header = []
+        atom = []
+        index = []
+        original_index = []
+        name = []
+        loc = []
+        resname = []
+        chain = []
+        resid = []
+        rescode = []
+        x = []
+        y = []
+        z = []
+        occupancy = []
+        beta = []
+        segname = []
+        element = []
+        charge = []
+        moltype = []
+        conect = {}
+        residue_flag = []
+        original_resid = []
+        header = []
 
         # first check to see how many frames are in the file
 
-        num_model = 0
-        num_endmdl = 0
-        num_end = 0
+        # num_model = 0
+        # num_endmdl = 0
+        # num_end = 0
 
         num_frames = 1
 
         count_index = 0
 
-        num_counts_this_model = 0 # number of atoms encompassed by "MODEL" and "ENDMDL" lines
-        num_counts_this_end = 0 # number of atoms before the first "END" line or between two consecutive "END" lines
-        num_counts_per_model = [] # array of number of atoms encompassed by "MODEL" and "ENDMDL" lines
-        num_counts_per_end = [] # array of number of atoms before the first "END" line or between two consecutive "END" lines
-        modelON = False # Flag to indicate that a "MODEL" frame is being read
+        # number of atoms encompassed by "MODEL" and "ENDMDL" lines
+        num_counts_this_model = 0
+
+        # number of atoms before the first "END" line or between two
+        # consecutive "END" lines
+        num_counts_this_end = 0
+
+        # array of number of atoms encompassed by "MODEL" and "ENDMDL" lines
+        num_counts_per_model = []
+
+        # array of number of atoms before the first "END" line or between two
+        # consecutive "END" lines
+        num_counts_per_end = []
+
+        # Flag to indicate that a "MODEL" frame is being read
+        modelON = False
+
         for i in range(len(infile)):
-            lin=infile[i]
-            lins=string.split(infile[i])
-            if (len(lins)==0):
-                if ((i+1)==len(infile)):
-                    lins=['']
+            lin = infile[i]
+            lins = string.split(infile[i])
+            if (len(lins) == 0):
+                if ((i + 1) == len(infile)):
+                    lins = ['']
                     if modelON:
-                        raise Exception, 'There should be an ENDMDL pairing with MODEL'
+                        raise Exception(
+                            'There should be an ENDMDL pairing with MODEL')
                     else:
                         continue
 
             record_name = string.strip(lin[0:6])
 #
-###     OPEN     need to re-factor the exception statements to a uniform reporting mechanism
+# OPEN need to re-factor exception statements to a uniform reporting mechanism
 #
             try:
-                if(lins[0]=='MODEL'):
+                if(lins[0] == 'MODEL'):
                     if modelON:
-                        raise Exception, 'Encountered two consecutive MODEL lines'
+                        raise Exception(
+                            'Encountered two consecutive MODEL lines')
                     if (num_counts_this_model != 0):
-                        raise Exception, 'There should not be atoms after ENDMDL and before MODEL lines'
+                        raise Exception('There should not be atoms after '
+                                        'ENDMDL and before MODEL lines')
                     modelON = True
-                elif(lins[0]=='ENDMDL'):
+                elif(lins[0] == 'ENDMDL'):
                     if not modelON:
-                        raise Exception, 'Encountered two consecutive ENDMDL lines'
+                        raise Exception(
+                            'Encountered two consecutive ENDMDL lines')
                     modelON = False
                     num_counts_per_model.append(num_counts_this_model)
                     num_counts_this_model = 0
-                elif(lins[0]=='END'):
+                elif(lins[0] == 'END'):
                     num_counts_per_end.append(num_counts_this_end)
                     num_counts_this_end = 0
-            except:
+            except BaseException:
                 pass
-            #
+
             if((record_name == 'ATOM' or record_name == 'HETATM')):
                 count_index += 1
                 num_counts_this_model += 1
                 num_counts_this_end += 1
-        #
-        #
 
-        if ( (len(num_counts_per_end)==0) and (len(num_counts_per_model)!=0) ):
-            raise Exception, 'According to Protein Data Bank Contents Guide, END line must appear in each coor entry'
-        if (len(num_counts_per_model)!=0 and (len(num_counts_per_end)>1 or sum(num_counts_per_model)!=sum(num_counts_per_end))):
-            if(printme): print(num_counts_per_model,num_counts_per_end)
-            raise Exception, 'Only one terminating END line is allowed for pdb entries with multiple MODEL'
-        #
-        if (len(num_counts_per_model)>0):
+        if ((len(num_counts_per_end) == 0) and (
+                len(num_counts_per_model) != 0)):
+            raise Exception('According to Protein Data Bank Contents Guide, '
+                            'END line must appear in each coor entry')
+        if (len(num_counts_per_model) != 0 and
+            (len(num_counts_per_end) > 1 or
+             sum(num_counts_per_model) != sum(num_counts_per_end)
+             )):
+            if(printme):
+                print(num_counts_per_model, num_counts_per_end)
+            raise Exception('Only one terminating END line is allowed for '
+                            'pdb entries with multiple MODEL')
+
+        if len(num_counts_per_model) > 0:
             num_frames = len(num_counts_per_model)
             num_atoms = num_counts_per_model[0]
             if not all(x == num_atoms for x in num_counts_per_model):
-                raise Exception, 'number of atoms per frame is not equal'
-        elif (len(num_counts_per_end)>0):
+                raise Exception('number of atoms per frame is not equal')
+        elif len(num_counts_per_end) > 0:
             num_frames = len(num_counts_per_end)
             num_atoms = num_counts_per_end[0]
             if not all(x == num_atoms for x in num_counts_per_end):
-                raise Exception, 'number of atoms per frame is not equal'
-        elif ( (len(num_counts_per_model)==0) and (len(num_counts_per_end)==0) ):
+                raise Exception('number of atoms per frame is not equal')
+        elif len(num_counts_per_model) == 0 and len(num_counts_per_end) == 0:
             num_frames = 1
             num_atoms = num_counts_this_model
         else:
-            raise Exception, 'unexpected error!'
+            raise Exception('unexpected error!')
 
-        if(printme): print('num_atoms = ',num_atoms)
+        if(printme):
+            print('num_atoms = ', num_atoms)
 
-        if(printme): print('>>> found ',num_frames,' model(s) or frame(s)')
+        if(printme):
+            print('>>> found ', num_frames, ' model(s) or frame(s)')
         this_frame = 1
 
         true_index = 0
 
-        coor=numpy.zeros((num_frames,num_atoms,3),numpy.float)
+        coor = numpy.zeros((num_frames, num_atoms, 3), numpy.float)
 
-        unique_names = [] ; unique_resnames = [] ; unique_resids = [] ; unique_chains = []
-        unique_occupancies = [] ; unique_betas = [] ; unique_segnames = [] ; unique_moltypes = []
+        unique_names = []
+        unique_resnames = []
+        unique_resids = []
+        unique_chains = []
+        unique_occupancies = []
+        unique_betas = []
+        unique_segnames = []
+        unique_moltypes = []
 
         for i in range(len(infile)):
-            lin=infile[i]
-            lins=string.split(infile[i])
+            lin = infile[i]
+            lins = string.split(infile[i])
 
             record_name = string.strip(lin[0:6])
 
-            if((record_name == 'ATOM' or record_name == 'HETATM') and this_frame == 1):
+            if ((record_name == 'ATOM' or record_name == 'HETATM'
+                 ) and this_frame == 1):
                 true_index += 1
-                atom.append(string.strip(lin[0:6]))     #    1-6        record name
-                original_index.append(lin[6:11])        #    7-11        atom serial number
-                index.append(str(true_index))           #   set index so that > 99,999 atoms can be read and counted
-                this_name = string.strip(lin[12:16])    #    13-16        atom name
-                name.append(string.strip(lin[12:16]))   #    13-16        atom name
+                atom.append(string.strip(lin[0:6]))  # 1-6        record name
+                # 7-11        atom serial number
+                original_index.append(lin[6:11])
+                # set index so that > 99,999 atoms can be read and counted
+                index.append(str(true_index))
+                this_name = string.strip(lin[12:16])  # 13-16        atom name
+                name.append(string.strip(lin[12:16]))  # 13-16        atom name
                 if pdbscan:
                     loc.append(lin[16])
                 else:
                     loc.append(' ')
-                this_resname = string.strip(lin[17:21])  #    18-20        residue name
-                resname.append(string.strip(lin[17:21])) #    18-20        residue name
-                this_chain = lin[21]                     #    22        chain identifier
-                chain.append(lin[21])                    #    22        chain identifier
-                this_resid = locale.atoi(lin[22:26])     #    23-26        residue sequence number
-                original_resid.append(lin[22:26])        #    23-26        residue sequence number
-                resid.append(lin[22:26])                 #    23-26        residue sequence number
-                rescode.append(lin[26])                  #    27        code for insertion of residues
-                x.append(lin[30:38])                     #    31-38        Real(8.3) X: angstroms
-                y.append(lin[38:46])                     #    39-46        Real(8.3) Y: angstroms
-                z.append(lin[46:54])                     #    47-54        Real(8.3) Z: angstroms
+                # 18-20        residue name
+                this_resname = string.strip(lin[17:21])
+                # 18-20        residue name
+                resname.append(string.strip(lin[17:21]))
+                this_chain = lin[21]  # 22        chain identifier
+                chain.append(lin[21])  # 22        chain identifier
+                # 23-26        residue sequence number
+                this_resid = locale.atoi(lin[22:26])
+                # 23-26        residue sequence number
+                original_resid.append(lin[22:26])
+                # 23-26        residue sequence number
+                resid.append(lin[22:26])
+                # 27        code for insertion of residues
+                rescode.append(lin[26])
+                x.append(lin[30:38])  # 31-38        Real(8.3) X: angstroms
+                y.append(lin[38:46])  # 39-46        Real(8.3) Y: angstroms
+                z.append(lin[46:54])  # 47-54        Real(8.3) Z: angstroms
 
                 residue_flag.append(False)
 
                 if not pdbscan:
 
                     try:
-                        occupancy.append(string.strip(lin[54:60])) #    55-60        occupancy
-                        this_occupancy =string.strip(lin[54:60])   #    55-60        occupancy
+                        # 55-60        occupancy
+                        occupancy.append(string.strip(lin[54:60]))
+                        this_occupancy = string.strip(
+                            lin[54:60])  # 55-60        occupancy
                         if(occupancy[-1] == ''):
                             occupancy[-1] = "  1.00"
                             this_occupancy[-1] = "  1.00"
-                    except:
+                    except BaseException:
                         occupancy.append("  0.00")
                         this_occupancy = "  0.00"
                     try:
-                        beta.append(string.strip(lin[60:66]))      #    61-66        temperature factor
-                        this_beta = string.strip(lin[60:66])       #    61-66        temperature factor
+                        # 61-66        temperature factor
+                        beta.append(string.strip(lin[60:66]))
+                        # 61-66        temperature factor
+                        this_beta = string.strip(lin[60:66])
                         if(beta[-1] == ''):
                             beta[-1] = "  0.00"
-                    except:
+                    except BaseException:
                         beta.append("  0.00")
                         this_beta = "  0.00"
                     try:
-                        segname.append(string.strip(lin[72:76]))   #    73-76        segment identifier
-                        this_segname = string.strip(lin[72:76])    #    73-76        segment identifier
-                        if(segname[-1] == '' and this_chain !=''):
+                        # 73-76        segment identifier
+                        segname.append(string.strip(lin[72:76]))
+                        # 73-76        segment identifier
+                        this_segname = string.strip(lin[72:76])
+                        if(segname[-1] == '' and this_chain != ''):
                             segname[-1] = this_chain
                             this_segname = this_chain
-                    except:
+                    except BaseException:
                         this_segname = ""
                         segname.append("")
                     try:
-                        element.append(string.strip(lin[76:78]))   #    77-78        element symbol
+                        # 77-78        element symbol
+                        element.append(string.strip(lin[76:78]))
                         if(element[-1] == ''):
                             element[-1] = "  "
-                    except:
+                    except BaseException:
                         element.append("  ")
                     try:
-                        charge.append(string.strip(lin[78:80]))    #    79-80        charge on the atom
+                        # 79-80        charge on the atom
+                        charge.append(string.strip(lin[78:80]))
                         if(charge[-1] == ''):
                             charge[-1] = "  "
-                    except:
+                    except BaseException:
                         charge.append("  ")
 
                 else:
-                    occupancy.append(string.strip(lin[54:60]))     #    55-60        occupancy
-                    this_occupancy =string.strip(lin[54:60])       #    55-60        occupancy
-                    beta.append(string.strip(lin[60:66]))          #    61-66        temperature factor
-                    this_beta = string.strip(lin[60:66])           #    61-66        temperature factor
-                    segname.append(string.strip(lin[72:76]))       #    73-76        segment identifier
-                    this_segname = string.strip(lin[72:76])        #    73-76        segment identifier
-                    element.append(string.strip(lin[76:78]))       #    77-78        element symbol
-                    charge.append(string.strip(lin[78:80]))        #    79-80        charge on the atom
+                    # 55-60        occupancy
+                    occupancy.append(string.strip(lin[54:60]))
+                    this_occupancy = string.strip(
+                        lin[54:60])  # 55-60        occupancy
+                    # 61-66        temperature factor
+                    beta.append(string.strip(lin[60:66]))
+                    # 61-66        temperature factor
+                    this_beta = string.strip(lin[60:66])
+                    # 73-76        segment identifier
+                    segname.append(string.strip(lin[72:76]))
+                    # 73-76        segment identifier
+                    this_segname = string.strip(lin[72:76])
+                    # 77-78        element symbol
+                    element.append(string.strip(lin[76:78]))
+                    # 79-80        charge on the atom
+                    charge.append(string.strip(lin[78:80]))
 
-                if(this_name not in unique_names): unique_names.append(this_name)
-                if(this_resname not in unique_resnames): unique_resnames.append(this_resname)
-                if(this_resid not in unique_resids): unique_resids.append(this_resid)
-                if(this_chain not in unique_chains): unique_chains.append(this_chain)
-                if(this_segname not in unique_segnames): unique_segnames.append(this_segname)
-                if(this_occupancy not in unique_occupancies): unique_occupancies.append(this_occupancy)
-                if(this_beta not in unique_betas): unique_betas.append(this_beta)
+                if(this_name not in unique_names):
+                    unique_names.append(this_name)
+                if(this_resname not in unique_resnames):
+                    unique_resnames.append(this_resname)
+                if(this_resid not in unique_resids):
+                    unique_resids.append(this_resid)
+                if(this_chain not in unique_chains):
+                    unique_chains.append(this_chain)
+                if(this_segname not in unique_segnames):
+                    unique_segnames.append(this_segname)
+                if(this_occupancy not in unique_occupancies):
+                    unique_occupancies.append(this_occupancy)
+                if(this_beta not in unique_betas):
+                    unique_betas.append(this_beta)
 
-                this_resname=(string.strip(lin[17:21]))
+                this_resname = (string.strip(lin[17:21]))
                 if this_resname in protein_resnames:
                     moltype.append('protein')
                     this_moltype = 'protein'
@@ -596,58 +794,94 @@ class PDB(object):
                     moltype.append('other')
                     this_moltype = 'other'
 
-                if(this_moltype not in unique_moltypes): unique_moltypes.append(this_moltype)
+                if(this_moltype not in unique_moltypes):
+                    unique_moltypes.append(this_moltype)
 
                 if(true_index == num_atoms):
-                    if(printme): print('finished reading frame = ',this_frame)
-                    index=numpy.array(index,numpy.int)
-                    original_index=numpy.array(original_index,numpy.int)
-                    resid=numpy.array(resid,numpy.int)
-                    original_resid=numpy.array(original_resid,numpy.int)
+                    if(printme):
+                        print('finished reading frame = ', this_frame)
+                    index = numpy.array(index, numpy.int)
+                    original_index = numpy.array(original_index, numpy.int)
+                    resid = numpy.array(resid, numpy.int)
+                    original_resid = numpy.array(original_resid, numpy.int)
 
-                    x=numpy.array(x,numpy.float32)
-                    y=numpy.array(y,numpy.float32)
-                    z=numpy.array(z,numpy.float32)
-                    coor[0,:,0]=x.astype(numpy.float) ; coor[0,:,1]=y.astype(numpy.float) ; coor[0,:,2]=z.astype(numpy.float)
+                    x = numpy.array(x, numpy.float32)
+                    y = numpy.array(y, numpy.float32)
+                    z = numpy.array(z, numpy.float32)
+                    coor[0, :, 0] = x.astype(numpy.float)
+                    coor[0, :, 1] = y.astype(numpy.float)
+                    coor[0, :, 2] = z.astype(numpy.float)
                     true_index = 0
-                    x=[] ; y=[] ; z=[]
+                    x = []
+                    y = []
+                    z = []
                     if(this_frame == 1):
-                        self._atom=atom ; self._index=index  ; self._original_index = original_index ; self._name=name ; self._loc=loc ; self._resname=resname ; self._residue_flag = residue_flag
-                        self._chain=chain ; self._resid=resid ; self._rescode=rescode ; self._original_resid=original_resid
-                        self._occupancy=occupancy ; self._beta=beta ; self._segname=segname ; self._element=element
-                        self._charge=charge ; self._moltype=moltype
+                        self._atom = atom
+                        self._index = index
+                        self._original_index = original_index
+                        self._name = name
+                        self._loc = loc
+                        self._resname = resname
+                        self._residue_flag = residue_flag
+                        self._chain = chain
+                        self._resid = resid
+                        self._rescode = rescode
+                        self._original_resid = original_resid
+                        self._occupancy = occupancy
+                        self._beta = beta
+                        self._segname = segname
+                        self._element = element
+                        self._charge = charge
+                        self._moltype = moltype
 
-                        self._number_of_names = len(unique_names) ; self._names = unique_names
-                        self._number_of_resnames = len(unique_resnames) ; self._resnames = unique_resnames
-                        self._number_of_resids = len(unique_resids) ; self._resids = unique_resids
-                        self._number_of_chains = len(unique_chains) ; self._chains = unique_chains
-                        self._number_of_segnames = len(unique_segnames) ; self._segnames = unique_segnames
-                        self._number_of_occupancies = len(unique_occupancies) ; self._occupancies = unique_occupancies
-                        self._number_of_betas = len(unique_betas) ; self._betas = unique_betas
-                        self._number_of_moltypes = len(unique_moltypes) ; self._moltypes = unique_moltypes
+                        self._number_of_names = len(unique_names)
+                        self._names = unique_names
+                        self._number_of_resnames = len(unique_resnames)
+                        self._resnames = unique_resnames
+                        self._number_of_resids = len(unique_resids)
+                        self._resids = unique_resids
+                        self._number_of_chains = len(unique_chains)
+                        self._chains = unique_chains
+                        self._number_of_segnames = len(unique_segnames)
+                        self._segnames = unique_segnames
+                        self._number_of_occupancies = len(unique_occupancies)
+                        self._occupancies = unique_occupancies
+                        self._number_of_betas = len(unique_betas)
+                        self._betas = unique_betas
+                        self._number_of_moltypes = len(unique_moltypes)
+                        self._moltypes = unique_moltypes
                         if(fastread):
-                            self._natoms=len(index)
+                            self._natoms = len(index)
                             break
 
                     this_frame += 1
-            elif((record_name != 'ATOM' or record_name != 'HETATM' and record_name != 'CONECT') and this_frame == 1):
+            elif((record_name != 'ATOM' or
+                  record_name != 'HETATM' and
+                  record_name != 'CONECT') and
+                 this_frame == 1):
                 header.append(lin)
 
-            elif((record_name == 'ATOM' or record_name == 'HETATM') and this_frame > 1):
+            elif((record_name == 'ATOM' or record_name == 'HETATM') and
+                 this_frame > 1):
                 true_index += 1
-                x.append(lin[30:38])                #    31-38        Real(8.3) X: angstroms
-                y.append(lin[38:46])                #    39-46        Real(8.3) Y: angstroms
-                z.append(lin[46:54])                #    47-54        Real(8.3) Z: angstroms
+                x.append(lin[30:38])  # 31-38        Real(8.3) X: angstroms
+                y.append(lin[38:46])  # 39-46        Real(8.3) Y: angstroms
+                z.append(lin[46:54])  # 47-54        Real(8.3) Z: angstroms
 
                 if(true_index == num_atoms):
-                    if(printme): print('finished reading frame = ',this_frame)
-                    x=numpy.array(x,numpy.float32)
-                    y=numpy.array(y,numpy.float32)
-                    z=numpy.array(z,numpy.float32)
-                    coor[this_frame-1,:,0]=x ; coor[this_frame-1,:,1]=y ; coor[this_frame-1,:,2]=z
+                    if(printme):
+                        print('finished reading frame = ', this_frame)
+                    x = numpy.array(x, numpy.float32)
+                    y = numpy.array(y, numpy.float32)
+                    z = numpy.array(z, numpy.float32)
+                    coor[this_frame - 1, :, 0] = x
+                    coor[this_frame - 1, :, 1] = y
+                    coor[this_frame - 1, :, 2] = z
                     true_index = 0
                     this_frame += 1
-                    x=[] ; y=[] ; z=[]
+                    x = []
+                    y = []
+                    z = []
 
             elif ((record_name == 'CONECT') and pdbscan):
                 # Format of CONECT line:
@@ -655,24 +889,32 @@ class PDB(object):
                 # character columns. First is the base atom, following atoms
                 # are those connected to it.
                 # Input line is filtered to ignore blank columns.
-                ndxs = [int(lin[i:i+5]) for i in range(6, len(lin), 5) if lin[i:i+5].strip()]
+                ndxs = [int(lin[i:i + 5])
+                        for i in range(6, len(lin), 5) if lin[i:i + 5].strip()]
                 conect[ndxs[0]] = ndxs[1:]
 
         if(((this_frame - 1) != num_frames) and not fastread):
-            if(printme): print('>>> WARNING: pdb file had ',num_frames,' file_io read ',this_frame-1,' frames')
+            if(printme):
+                print(
+                    '>>> WARNING: pdb file had ',
+                    num_frames,
+                    ' file_io read ',
+                    this_frame - 1,
+                    ' frames')
 
-        self._coor=numpy.array(coor)
+        self._coor = numpy.array(coor)
 
         if 'check_zero_coor' in kwargs:
             self.check_for_all_zero_columns(self._coor)
 
         unique_elements = self.element_filter()
 
-        self._number_of_elements = len(unique_elements) ; self._elements = unique_elements
+        self._number_of_elements = len(unique_elements)
+        self._elements = unique_elements
 
-        self._natoms=len(index)
+        self._natoms = len(index)
 
-        total_mass = self.calculate_mass()
+        # total_mass = self.calculate_mass()
         error = []
 
         if 'saspdbrx_topology' in kwargs:
