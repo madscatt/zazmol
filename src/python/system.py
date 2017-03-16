@@ -997,24 +997,10 @@ class Molecule_Maker(Molecule):
 
     """
 
-    def __init__(
-            self,
-            natoms,
-            atom='ATOM',
-            index=None,
-            name='C',
-            loc=' ',
-            resname='DUM',
-            chain='A',
-            resid=None,
-            rescode=' ',
-            coor=None,
-            occupancy='0.00',
-            beta='0.00',
-            segname='DUM',
-            element='C',
-            charge=' ',
-            **kwargs):
+    def __init__(self, natoms, atom='ATOM', index=None, name='C', loc=' ',
+                 resname='DUM', chain='A', resid=None, rescode=' ', coor=None,
+                 occupancy='0.00', beta='0.00', segname='DUM', element='C',
+                 charge=' ', **kwargs):
 
         Atom.__init__(self)
 
