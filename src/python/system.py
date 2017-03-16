@@ -1,7 +1,20 @@
+'''
+System is the main module that contains the base classes that
+describe the objects in the system.  An instance of the system
+can be created of Atom, Molecule, or System classes.
+
+For purely atomic based systems, a set of utilities are provided
+to hold information, to calculate properties, and to manipulate
+the structures in space.  In addition, basic file input / output
+is provided in the Mol class (and inherited up the classes
+as dictated by the calling code).
+'''
+
 from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 # from __future__ import unicode_literals
+
 
 #    SASMOL: Copyright (C) 2011 Joseph E. Curtis, Ph.D.
 #
@@ -29,19 +42,7 @@ from __future__ import print_function
 #
 #        1         2         3         4         5         6         7
 # 34567890123456789012345678901234567890123456789012345678901234567890123456789
-#
-'''
-    System is the main module that contains the base classes that
-    describe the objects in the system.  An instance of the system
-    can be created of Atom, Molecule, or System classes.
 
-    For purely atomic based systems, a set of utilities are provided
-    to hold information, to calculate properties, and to manipulate
-    the structures in space.  In addition, basic file input / output
-    is provided in the Mol class (and inherited up the classes
-    as dictated by the calling code).
-
-'''
 
 import os
 import numpy
@@ -58,8 +59,7 @@ import sasmol.config as config
 
 class Atom(file_io.Files, calculate.Calculate, operate.Move, subset.Mask,
            properties.Atomic, topology.Topology, view.View):
-
-    """
+    '''
     Base class containing methods to define system objects.
 
     Atom is the base class to build and deal with molecular systems.
@@ -179,7 +179,7 @@ class Atom(file_io.Files, calculate.Calculate, operate.Move, subset.Mask,
         other_keys = ['_fasta', '_header', '_conect', '_debug', '_formula',
                       '_unitcell']
 
-    """
+    '''
 
     def __init__(self, *args, **kwargs):
         self._filename = kwargs.pop('filename', None)
@@ -239,7 +239,7 @@ class Atom(file_io.Files, calculate.Calculate, operate.Move, subset.Mask,
             return "sasmol object"
 
     def __add__(self, other, **kwargs):
-        """
+        '''
         Override the python __add__ method to combine other molecule into
         instance molecule
 
@@ -259,7 +259,7 @@ class Atom(file_io.Files, calculate.Calculate, operate.Move, subset.Mask,
         Examples
         -------
 
-        >>> import sasmol.system as system
+        >>> import sasmol.system as systemdef_dict
         >>> molecule_1 = system.Molecule(filename='hiv1_gag.pdb')
         >>> molecule_2 = system.Molecule(filename='lysozyme.pdb')
         >>> molecule_1.natoms()
@@ -287,7 +287,7 @@ class Atom(file_io.Files, calculate.Calculate, operate.Move, subset.Mask,
         Currently no check is made on the number of frames in each molecule
         that are being added together.
 
-        """
+        '''
 
         for key, value in self.__dict__.iteritems():
             try:
@@ -313,6 +313,135 @@ class Atom(file_io.Files, calculate.Calculate, operate.Move, subset.Mask,
             self._index = numpy.array([x + 1 for x in xrange(self._natoms)],
                                       numpy.int)
 
+
+    def creator(self, natoms, atom='ATOM', index=None, name='C', loc=' ',
+                resname='DUM', chain='A', resid=None, rescode=' ', coor=None,
+                occupancy='0.00', beta='0.00', segname='DUM', element='C',
+                charge=' '):
+        '''
+        This method is used to populate the fields required for a sasmol object
+        to use read_pdb() and write_pdb() methods from file_io.
+
+        Default inputs are itemized below. The values are assigned to all
+        atoms in the molecule.
+
+        Once defined, attributes can be set using setters in the Atom class.
+
+        Class has several initialization options
+
+        Parameters
+        ----------
+        natoms
+            integer : number listof atoms in the molecule
+
+        atom
+            string  : name of ATOM keyword, typically either ATOM or HETATM
+
+        index
+            numpy array of integers : atom number
+
+        name
+            string : atom name
+
+        loc
+            string : alt loc
+
+        resname
+            string  : residue name
+
+        chain
+            string  : chain name
+
+        resid
+            integer list : residue number
+
+        rescode
+            string  : residue code
+
+        coor
+            numpy float array : x, y, z coordinates
+
+        occupancy
+            string  : occupancy value
+
+        beta
+            string  : beta value
+
+        segname
+            string  : segment name
+
+        element
+            string  : element name
+
+        charge
+            string  : element charge
+
+        kwargs
+            optional future arguments
+
+        Returns
+        -------
+        system object
+
+        Examples
+        -------
+
+        >>> import sasmol.system as system
+        >>> molecule = system.Molecule_Maker(2048)
+        >>> molecule = system.Molecule_Maker(2048, name='Ar')
+        >>> molecule = system.Molecule_Maker(2048, name='Ar', segname='ARG0')
+        >>> index = [x for x in xrange(340,1000)]
+        >>> molecule = system.Molecule_Maker(660, name='Ar', index=index)
+        >>> molecule.index()[0]
+        340
+
+        '''
+        pdb_dict = self.field_definitions()
+
+        for key, value in pdb_dict.iteritems():
+
+            print('{}: {}'.format(key, value))
+            pass
+
+        if str == type(atom):
+            atom = [atom] * natoms
+        assert len(atom) == natoms and list == type(atom), 'bad <{}> input'.format('atom')
+        def_dict['atom'] = atom
+
+
+
+        self._natoms = natoms
+        self._atom = [atom for x in xrange(natoms)]
+
+        if index is not None:
+            self._index = index
+        else:
+            self._index = numpy.array(
+                [x + 1 for x in xrange(natoms)], numpy.int)
+
+        self._name = [name for x in xrange(natoms)]
+        self._loc = [loc for x in xrange(natoms)]
+        self._resname = [resname for x in xrange(natoms)]
+        self._chain = [chain for x in xrange(natoms)]
+
+        if resid is not None:
+            self._resid = resid
+        else:
+            self._resid = numpy.array(
+                [x + 1 for x in xrange(natoms)], numpy.int)
+
+        self._rescode = [rescode for x in xrange(natoms)]
+
+        if coor is not None:
+            self._coor = coor
+        else:
+            self._coor = numpy.zeros((1, natoms, 3), numpy.float)
+
+        self._occupancy = [occupancy for x in xrange(natoms)]
+        self._beta = [beta for x in xrange(natoms)]
+        self._charge = [charge for x in xrange(natoms)]
+        self._segname = [segname for x in xrange(natoms)]
+        self._element = [element for x in xrange(natoms)]
     def setId(self, newValue):
         self._id = newValue
 
@@ -475,8 +604,7 @@ class Atom(file_io.Files, calculate.Calculate, operate.Move, subset.Mask,
 
 
 class Molecule(Atom):
-
-    """
+    '''
     Molecule is a class that is used to describe molecules. It inherits
     attributes from Atom.  An example of a molecule is
     a single protein, a single nucleic acid strand.
@@ -512,13 +640,13 @@ class Molecule(Atom):
     >>> molecule = system.Molecule('hiv1_gag.pdb')
     >>> molecule = system.Molecule(filename='hiv1_gag.pdb', id=0, debug=False)
 
-    """
+    '''
 
     def __init__(self, *args, **kwargs):
         Atom.__init__(self, *args, **kwargs)
 
     def __add__(self, other):
-        """
+        '''
         Override the python __add__ method to combine molecules
 
         Parameters
@@ -561,12 +689,12 @@ class Molecule(Atom):
         ____
 
         An assertion error will occur if items are missing from either molecule
-
+list
         self._natoms is updated based on the len(self._names)
 
         self._index is reset to start at 1 and end at self._natoms
 
-        """
+        '''
         natoms = self._natoms + other._natoms
 
         # atom = self._atom + other._atom
@@ -871,8 +999,7 @@ class Molecule(Atom):
 
 
 class System(Atom):
-
-    """
+    '''
     System is a class that is used to aggregate all components. It inherits
     all of attributes from Atom.
 
@@ -909,127 +1036,12 @@ class System(Atom):
     >>> molecule = system.Molecule('hiv1_gag.pdb')
     >>> molecule = system.Molecule(filename='hiv1_gag.pdb', id=0, debug=False)
 
-    """
-
-    def __init__(self, *args, **kwargs):
-        Atom.__init__(self, *args, **kwargs)
+    '''
 
 
-class Molecule_Maker(Molecule):
 
-    """
-    This class is used to define the minimum number of fields required to
-    use within sasmol to use read_pdb() and write_pdb() methods in file_io.
+if __name__ == '__main__':
+    mol = Molecule()
+    mol.creator(5)
 
-    Default inputs are listed in the variables in __init__ and itemized below.
-    The values are assigned to all atoms in the molecule.
-
-    Once defined, attributes can be set using setters in the Atom class.
-
-    Class has several initialization options
-
-    Parameters
-    ----------
-    natoms
-        integer : number of atoms in the molecule
-
-    atom
-        string  : name of ATOM keyword, typically either ATOM or HETATM
-
-    index
-        integer list : atom number
-
-    name
-        string : atom name
-
-    loc
-        string : alt loc
-
-    resname
-        string  : residue name
-
-    chain
-        string  : chain name
-
-    resid
-        integer list : residue number
-
-    rescode
-        string  : residue code
-
-    coor
-        numpy float array : x, y, z coordinates
-
-    occupancy
-        string  : occupancy value
-
-    beta
-        string  : beta value
-
-    segname
-        string  : segment name
-
-    element
-        string  : element name
-
-    charge
-        string  : element charge
-
-    kwargs
-        optional future arguments
-
-    Returns
-    -------
-    system object
-
-    Examples
-    -------
-
-    >>> import sasmol.system as system
-    >>> molecule = system.Molecule_Maker(2048)
-    >>> molecule = system.Molecule_Maker(2048, name='Ar')
-    >>> molecule = system.Molecule_Maker(2048, name='Ar', segname='ARG0')
-    >>> index = [x for x in xrange(340,1000)]
-    >>> molecule = system.Molecule_Maker(660, name='Ar', index=index)
-    >>> molecule.index()[0]
-    340
-
-    """
-
-    def __init__(self, natoms, atom='ATOM', index=None, name='C', loc=' ',
-                 resname='DUM', chain='A', resid=None, rescode=' ', coor=None,
-                 occupancy='0.00', beta='0.00', segname='DUM', element='C',
-                 charge=' ', **kwargs):
-
-        self._natoms = natoms
-        self._atom = [atom for x in xrange(natoms)]
-
-        if index is not None:
-            self._index = index
-        else:
-            self._index = numpy.array(
-                [x + 1 for x in xrange(natoms)], numpy.int)
-
-        self._name = [name for x in xrange(natoms)]
-        self._loc = [loc for x in xrange(natoms)]
-        self._resname = [resname for x in xrange(natoms)]
-        self._chain = [chain for x in xrange(natoms)]
-
-        if resid is not None:
-            self._resid = resid
-        else:
-            self._resid = numpy.array(
-                [x + 1 for x in xrange(natoms)], numpy.int)
-
-        self._rescode = [rescode for x in xrange(natoms)]
-
-        if coor is not None:
-            self._coor = coor
-        else:
-            self._coor = numpy.zeros((1, natoms, 3), numpy.float)
-
-        self._occupancy = [occupancy for x in xrange(natoms)]
-        self._beta = [beta for x in xrange(natoms)]
-        self._charge = [charge for x in xrange(natoms)]
-        self._segname = [segname for x in xrange(natoms)]
-        self._element = [element for x in xrange(natoms)]
+    print('\m/ >.< \m/>')
