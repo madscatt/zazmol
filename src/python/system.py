@@ -205,8 +205,8 @@ class Atom(file_io.Files, calculate.Calculate, operate.Move, subset.Mask,
                 if(os.path.isfile(self._filename)):
                     self.read_pdb(self._filename)
                     self._defined_with_input_file = True
-            else:
 
+            else:
                 for argument in args:
                     self._argument_flag = True
                     if(os.path.isfile(str(argument))):
@@ -569,8 +569,8 @@ class Molecule(Atom):
         """
         natoms = self._natoms + other._natoms
 
-        atom = self._atom + other._atom
-        assert len(atom) == natoms, 'atom definition/s incorrect'
+        # atom = self._atom + other._atom
+        # assert len(atom) == natoms, 'atom definition/s incorrect'
 
         name = self._name + other._name
         assert len(name) == natoms, 'name definition/s incorrect'
@@ -612,13 +612,12 @@ class Molecule(Atom):
         resid = numpy.append(self._resid, other._resid)
         assert len(resid) == natoms, 'resid definition/s incorrect'
 
-        index = numpy.arange(natoms) + 1
+        # index = numpy.arange(natoms) + 1
 
-        return Molecule_Maker(natoms, atom=atom, index=index, name=name,
-                              resname=resname, chain=chain, resid=resid,
-                              rescode=rescode, coor=coor, occupancy=occupancy,
-                              beta=beta, segname=segname, element=element,
-                              charge=charge)
+        return Molecule_Maker(natoms, name=name, resname=resname, chain=chain,
+                              resid=resid, rescode=rescode, coor=coor,
+                              occupancy=occupancy, beta=beta, segname=segname,
+                              element=element, charge=charge)
 
     def __radd__(self, other):
         if other == 0:
@@ -1001,8 +1000,6 @@ class Molecule_Maker(Molecule):
                  resname='DUM', chain='A', resid=None, rescode=' ', coor=None,
                  occupancy='0.00', beta='0.00', segname='DUM', element='C',
                  charge=' ', **kwargs):
-
-        Atom.__init__(self)
 
         self._natoms = natoms
         self._atom = [atom for x in xrange(natoms)]
