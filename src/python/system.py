@@ -382,12 +382,24 @@ class Atom(file_io.Files, calculate.Calculate, operate.Move, subset.Mask,
         -------
         >>> import sasmol.system as system
         >>> molecule = system.Molecule()
-        >>> molecule.creator(2048, name='Ar')
-        >>> molecule = system.Molecule_Maker(2048, name='Ar', segname='ARG0')
-        >>> index = [x for x in xrange(340,1000)]
-        >>> molecule = system.Molecule_Maker(660, name='Ar', index=index)
+        >>> molecule.creator(2048, name='O')
+        >>> molecule.natoms()
+        2048
+        >>> molecule.names()
+        ['O']
+        >>> molecule.creator(1024, name='Ar', segname='ARG0')
+        >>> molecule.natoms()
+        1024
+        >>> molecule.names()
+        ['Ar']
+        >>> molecule.segnames()
+        ['ARG0']
+        >>> index = [x for x in xrange(34,40)]
+        >>> molecule.creator(6, name='He', index=index)
         >>> molecule.index()[0]
-        340
+        34
+        >>> molecule.original_index()
+        [34, 35, 36, 37, 38, 39]
 
         '''
         # setup the default values
@@ -414,7 +426,7 @@ class Atom(file_io.Files, calculate.Calculate, operate.Move, subset.Mask,
         for key in ['index', 'resid']:
             _key = '_{}'.format(key)
             val = kwargs.pop(key, pdb_defaults.pop(key))
-            if val is not None and len(val) is natoms:
+            if val is not None and len(val) == natoms:
                 self.__dict__[_key] = val
             else:
                 self.__dict__[_key] = numpy.arange(natoms) + 1
@@ -431,7 +443,7 @@ class Atom(file_io.Files, calculate.Calculate, operate.Move, subset.Mask,
         for key in pdb_defaults.keys():
             val = kwargs.pop(key, pdb_defaults.pop(key))
             _key = '_{}'.format(key)
-            if type(val) is list and len(val) is natoms:
+            if type(val) is list and len(val) == natoms:
                 self.__dict__[_key] = val
             else:
                 self.__dict__[_key] = [val] * natoms
@@ -439,11 +451,11 @@ class Atom(file_io.Files, calculate.Calculate, operate.Move, subset.Mask,
         # populate the values returned when reading a pdb
         (protein_resnames, dna_resnames, rna_resnames, nucleic_resnames,
          water_resnames) = self.get_resnames()
-        moltype_dict = dict.fromkeys(protein_resnames, 'protein')
-        moltype_dict.update(dict.fromkeys(rna_resnames, 'rna'))
-        moltype_dict.update(dict.fromkeys(dna_resnames, 'dna'))
-        moltype_dict.update(dict.fromkeys(water_resnames, 'water'))
-        self._moltype = [moltye_dict[resname] for resname in self._resname]
+        moltype = dict.fromkeys(protein_resnames, 'protein')
+        moltype.update(dict.fromkeys(rna_resnames, 'rna'))
+        moltype.update(dict.fromkeys(dna_resnames, 'dna'))
+        moltype.update(dict.fromkeys(water_resnames, 'water'))
+        self._moltype = [moltype.get(rn, 'other') for rn in self._resname]
 
         add_s = ['beta', 'chain', 'element', 'moltype', 'name', 'resid',
                  'resname', 'segname']
@@ -1063,5 +1075,21 @@ class System(Atom):
 if __name__ == '__main__':
     mol = Molecule()
     mol.creator(5)
+    molecule = Molecule()
+    molecule.creator(2048, name='O')
+    molecule.natoms()
+    molecule.names()
+
+    molecule.creator(1024, name='Ar', segname='ARG0')
+    molecule.natoms()
+
+    molecule.names()
+
+    molecule.segnames()
+
+    index = [x for x in xrange(340,1000)]
+    molecule.creator(660, name='He', index=index)
+    print(molecule.index()[0])
+
 
     print('\m/ >.< \m/>')
