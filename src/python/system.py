@@ -183,7 +183,7 @@ class Atom(file_io.Files, calculate.Calculate, operate.Move, subset.Mask,
 
     def __init__(self, *args, **kwargs):
         self._filename = kwargs.pop('filename', None)
-        self._parameters = kwargs.pop('create', None)
+        parameters = kwargs.pop('create', None)
         self._id = kwargs.pop('id', 0)
         self._debug = kwargs.pop('debug', None)
 
@@ -207,8 +207,8 @@ class Atom(file_io.Files, calculate.Calculate, operate.Move, subset.Mask,
                 if(os.path.isfile(self._filename)):
                     self.read_pdb(self._filename)
                     self._defined_with_input_file = True
-            elif self._parameters is not None:
-                self.creator(**self._parameters)
+            elif parameters is not None:
+                self.creator(**parameters)
                 self._defined_from_parameters = True
             else:
                 for argument in args:
@@ -236,9 +236,11 @@ class Atom(file_io.Files, calculate.Calculate, operate.Move, subset.Mask,
     def __repr__(self):
 
         if self._defined_with_input_file:
-            return "sasmol object initialied with filename = " + self._filename
+            return "sasmol object initialized with filename = " + self._filename
         elif self._argument_flag and not self._id_flag:
             return "sasmol object (no file found)"
+        elif self._defined_from_parameters:
+            return "sasmol object initialized using input parameters"
         else:
             return "sasmol object"
 
@@ -272,15 +274,15 @@ class Atom(file_io.Files, calculate.Calculate, operate.Move, subset.Mask,
 
         >>> molecule_3 = molecule_1 + molecule_2
         >>> molecule_3.natoms()
-        17380
+        8690
         >>> molecule_3.index()[-1]
-        17380
+        8690
 
         >>> molecule_4 = sum([molecule_1, molecule_2, molecule_3])
         >>> molecule_4.natoms()
-        8690
+        17380
         >>> molecule_4.index()[-1]
-        8690
+        17380
 
         Note
         ____
@@ -324,7 +326,7 @@ class Atom(file_io.Files, calculate.Calculate, operate.Move, subset.Mask,
         values['natoms'] = natoms
         values['coor'] = coor
         values['resid'] = resid
-        return Atom(create=values)
+        return Molecule(create=values)
 
     def __radd__(self, other):
         if other == 0:
@@ -408,6 +410,11 @@ class Atom(file_io.Files, calculate.Calculate, operate.Move, subset.Mask,
                                       numpy.int)
 
         self._update_unique_properties()
+
+    def create(self, natoms, **kwargs):
+        parameters = {'natoms': natoms}
+        parameters.update(kwargs)
+        self.creator(**parameters)
 
     def creator(self, **kwargs):
         '''
@@ -561,6 +568,8 @@ class Atom(file_io.Files, calculate.Calculate, operate.Move, subset.Mask,
         self._original_resid = numpy.copy(self._resid)
         self._residue_flag = [False] * self._natoms
         self._header = []
+
+        # return self for __add__
         return self
 
     def _update_unique_properties(self):
