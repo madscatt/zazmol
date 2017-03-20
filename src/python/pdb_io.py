@@ -84,6 +84,7 @@ class PDB(object):
         >>> pdb_dict = molecule.field_definitions()
         >>> for key in sorted(pdb_dict.keys()):
                 print('{key}: {val}'.format(key=key, val=pdb_dict[key]))
+        atom: []
         beta: []
         chain: []
         charge: []
@@ -103,6 +104,7 @@ class PDB(object):
 
         pdb_dict = {}
         pdb_dict['natoms'] = 0
+        pdb_dict['atom'] = []
         pdb_dict['index'] = None
         pdb_dict['name'] = []
         pdb_dict['loc'] = []
