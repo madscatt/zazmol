@@ -328,53 +328,51 @@ class Atom(file_io.Files, calculate.Calculate, operate.Move, subset.Mask,
 
         Parameters
         ----------
-        natoms
-            integer : number listof atoms in the molecule
+        kwargs:
+            natoms
+                integer : number listof atoms in the molecule
 
-        atom
-            string  : name of ATOM keyword, typically either ATOM or HETATM
+            atom
+                string  : name of ATOM keyword, typically either ATOM or HETATM
 
-        index
-            numpy array of integers : atom number
+            index
+                numpy array of integers : atom number
 
-        name
-            string : atom name
+            name
+                string : atom name
 
-        loc
-            string : alt loc
+            loc
+                string : alt loc
 
-        resname
-            string  : residue name
+            resname
+                string  : residue name
 
-        chain
-            string  : chain name
+            chain
+                string  : chain name
 
-        resid
-            integer list : residue number
+            resid
+                integer list : residue number
 
-        rescode
-            string  : residue code
+            rescode
+                string  : residue code
 
-        coor
-            numpy float array : x, y, z coordinates
+            coor
+                numpy float array : x, y, z coordinates
 
-        occupancy
-            string  : occupancy value
+            occupancy
+                string  : occupancy value
 
-        beta
-            string  : beta value
+            beta
+                string  : beta value
 
-        segname
-            string  : segment name
+            segname
+                string  : segment name
 
-        element
-            string  : element name
+            element
+                string  : element name
 
-        charge
-            string  : element charge
-
-        kwargs
-            optional future arguments
+            charge
+                string  : element charge
 
         Returns
         -------
@@ -382,10 +380,9 @@ class Atom(file_io.Files, calculate.Calculate, operate.Move, subset.Mask,
 
         Examples
         -------
-
         >>> import sasmol.system as system
-        >>> molecule = system.Molecule_Maker(2048)
-        >>> molecule = system.Molecule_Maker(2048, name='Ar')
+        >>> molecule = system.Molecule()
+        >>> molecule.creator(2048, name='Ar')
         >>> molecule = system.Molecule_Maker(2048, name='Ar', segname='ARG0')
         >>> index = [x for x in xrange(340,1000)]
         >>> molecule = system.Molecule_Maker(660, name='Ar', index=index)
@@ -410,6 +407,7 @@ class Atom(file_io.Files, calculate.Calculate, operate.Move, subset.Mask,
         pdb_defaults['element'] = 'C'
         pdb_defaults['charge'] = ' '
 
+        # populate the values required to write a pdb
         self._natoms = natoms
         pdb_defaults.pop('natoms')
 
@@ -437,6 +435,32 @@ class Atom(file_io.Files, calculate.Calculate, operate.Move, subset.Mask,
                 self.__dict__[_key] = val
             else:
                 self.__dict__[_key] = [val] * natoms
+
+        # populate the values returned when reading a pdb
+        (protein_resnames, dna_resnames, rna_resnames, nucleic_resnames,
+         water_resnames) = self.get_resnames()
+        moltype_dict = dict.fromkeys(protein_resnames, 'protein')
+        moltype_dict.update(dict.fromkeys(rna_resnames, 'rna'))
+        moltype_dict.update(dict.fromkeys(dna_resnames, 'dna'))
+        moltype_dict.update(dict.fromkeys(water_resnames, 'water'))
+        self._moltype = [moltye_dict[resname] for resname in self._resname]
+
+        add_s = ['beta', 'chain', 'element', 'moltype', 'name', 'resid',
+                 'resname', 'segname']
+        for key in add_s:
+            _key = '_{}'.format(key)
+            _keys = '{}s'.format(_key)
+            self.__dict__[_keys] = list(set(self.__dict__[_key]))
+
+            _number_of_key = '_number_of_{}'.format(key)
+            self.__dict__[_number_of_key] = len(self.__dict__[_keys])
+        self._occupancies = list(set())
+        self._number_of_occupancies = len(self._occupancies)
+
+        self._original_index = numpy.copy(self._index)
+        self._original_resid = numpy.copy(self._resid)
+        self._residue_flag = [False] * natoms
+        self._header = []
 
     def setId(self, newValue):
         self._id = newValue
