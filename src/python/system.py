@@ -314,10 +314,7 @@ class Atom(file_io.Files, calculate.Calculate, operate.Move, subset.Mask,
                                       numpy.int)
 
 
-    def creator(self, natoms, atom='ATOM', index=None, name='C', loc=' ',
-                resname='DUM', chain='A', resid=None, rescode=' ', coor=None,
-                occupancy='0.00', beta='0.00', segname='DUM', element='C',
-                charge=' '):
+    def creator(self, natoms, **kwargs):
         '''
         This method is used to populate the fields required for a sasmol object
         to use read_pdb() and write_pdb() methods from file_io.
@@ -396,52 +393,51 @@ class Atom(file_io.Files, calculate.Calculate, operate.Move, subset.Mask,
         340
 
         '''
-        pdb_dict = self.field_definitions()
-
-        for key, value in pdb_dict.iteritems():
-
-            print('{}: {}'.format(key, value))
-            pass
-
-        if str == type(atom):
-            atom = [atom] * natoms
-        assert len(atom) == natoms and list == type(atom), 'bad <{}> input'.format('atom')
-        def_dict['atom'] = atom
-
-
+        # setup the default values
+        pdb_defaults = self.field_definitions()
+        pdb_defaults['atom'] = 'ATOM'
+        pdb_defaults['index'] = None
+        pdb_defaults['coor'] = None
+        pdb_defaults['resid'] = None
+        pdb_defaults['loc'] = ' '
+        pdb_defaults['resname'] = 'DUM'
+        pdb_defaults['chain'] = 'A'
+        pdb_defaults['name'] = 'C'
+        pdb_defaults['rescode'] = ' '
+        pdb_defaults['occupancy'] = '0.00'
+        pdb_defaults['beta'] = '0.00'
+        pdb_defaults['segname'] = 'DUM'
+        pdb_defaults['element'] = 'C'
+        pdb_defaults['charge'] = ' '
 
         self._natoms = natoms
-        self._atom = [atom for x in xrange(natoms)]
+        pdb_defaults.pop('natoms')
 
-        if index is not None:
-            self._index = index
-        else:
-            self._index = numpy.array(
-                [x + 1 for x in xrange(natoms)], numpy.int)
+        for key in ['index', 'resid']:
+            _key = '_{}'.format(key)
+            val = kwargs.pop(key, pdb_defaults.pop(key))
+            if val is not None and len(val) is natoms:
+                self.__dict__[_key] = val
+            else:
+                self.__dict__[_key] = numpy.arange(natoms) + 1
 
-        self._name = [name for x in xrange(natoms)]
-        self._loc = [loc for x in xrange(natoms)]
-        self._resname = [resname for x in xrange(natoms)]
-        self._chain = [chain for x in xrange(natoms)]
-
-        if resid is not None:
-            self._resid = resid
-        else:
-            self._resid = numpy.array(
-                [x + 1 for x in xrange(natoms)], numpy.int)
-
-        self._rescode = [rescode for x in xrange(natoms)]
-
-        if coor is not None:
+        coor = kwargs.pop('coor', pdb_defaults.pop('coor'))
+        try:
+            assert coor is not None
+            assert 3 == coor.shape[2]
+            assert natoms == coor.shape[1]
             self._coor = coor
-        else:
+        except (IndexError, AttributeError, AssertionError):
             self._coor = numpy.zeros((1, natoms, 3), numpy.float)
 
-        self._occupancy = [occupancy for x in xrange(natoms)]
-        self._beta = [beta for x in xrange(natoms)]
-        self._charge = [charge for x in xrange(natoms)]
-        self._segname = [segname for x in xrange(natoms)]
-        self._element = [element for x in xrange(natoms)]
+        for key in pdb_defaults.keys():
+            val = kwargs.pop(key, pdb_defaults.pop(key))
+            _key = '_{}'.format(key)
+            if type(val) is list and len(val) is natoms:
+                self.__dict__[_key] = val
+            else:
+                self.__dict__[_key] = [val] * natoms
+
     def setId(self, newValue):
         self._id = newValue
 
