@@ -1067,13 +1067,11 @@ class System(Atom):
     -------
 
     >>> import sasmol.system as system
-    >>> molecule = system.Molecule(filename='hiv1_gag.pdb')
-
-
-    >>> molecule = system.Molecule()
-    >>> molecule = system.Molecule(id=7)
-    >>> molecule = system.Molecule(debug=True)
-    >>> molecule = system.Molecule('hiv1_gag.pdb')
-    >>> molecule = system.Molecule(filename='hiv1_gag.pdb', id=0, debug=False)
+    >>> molecule = system.System(filename='hiv1_gag.pdb')
+    >>> molecule = system.System()
+    >>> molecule = system.System(id=7)
+    >>> molecule = system.System(debug=True)
+    >>> molecule = system.System('hiv1_gag.pdb')
+    >>> molecule = system.System(filename='hiv1_gag.pdb', id=0, debug=False)
 
     '''
