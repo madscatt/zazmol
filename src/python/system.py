@@ -183,6 +183,7 @@ class Atom(file_io.Files, calculate.Calculate, operate.Move, subset.Mask,
 
     def __init__(self, *args, **kwargs):
         self._filename = kwargs.pop('filename', None)
+        self._parameters = kwargs.pop('create', None)
         self._id = kwargs.pop('id', 0)
         self._debug = kwargs.pop('debug', None)
 
@@ -197,6 +198,7 @@ class Atom(file_io.Files, calculate.Calculate, operate.Move, subset.Mask,
             self._debug = True
 
         self._defined_with_input_file = False
+        self._defined_from_parameters = False
         self._argument_flag = False
         self._id_flag = False
 
@@ -205,7 +207,9 @@ class Atom(file_io.Files, calculate.Calculate, operate.Move, subset.Mask,
                 if(os.path.isfile(self._filename)):
                     self.read_pdb(self._filename)
                     self._defined_with_input_file = True
-
+            elif self._parameters is not None:
+                self.creator(**self._parameters)
+                self._defined_from_parameters = True
             else:
                 for argument in args:
                     self._argument_flag = True
@@ -237,6 +241,97 @@ class Atom(file_io.Files, calculate.Calculate, operate.Move, subset.Mask,
             return "sasmol object (no file found)"
         else:
             return "sasmol object"
+
+    def __add__(self, other):
+        '''
+        Override the python __add__ method to combine molecules
+
+        Parameters
+        ----------
+        other
+            system object
+
+        kwargs
+            optional keyword arguments
+
+        Returns
+        -------
+        None
+            modified system object
+
+        Examples
+        -------
+
+        >>> import sasmol.system as system
+        >>> molecule_1 = system.Molecule(filename='hiv1_gag.pdb')
+        >>> molecule_2 = system.Molecule(filename='lysozyme.pdb')
+        >>> molecule_1.natoms()
+        6730
+        >>> molecule_2.natoms()
+        1960
+
+        >>> molecule_3 = molecule_1 + molecule_2
+        >>> molecule_3.natoms()
+        17380
+        >>> molecule_3.index()[-1]
+        17380
+
+        >>> molecule_4 = sum([molecule_1, molecule_2, molecule_3])
+        >>> molecule_4.natoms()
+        8690
+        >>> molecule_4.index()[-1]
+        8690
+
+        Note
+        ____
+
+        An assertion error will occur if items are missing from either molecule
+
+        self._natoms is updated based on the len(self._names)
+
+        self._index is reset to start at 1 and end at self._natoms
+
+        '''
+        values = self.field_definitions()
+
+        natoms = self._natoms + other._natoms
+        values.pop('natoms')
+
+        # combine the numpy arrays
+        assert self._coor.shape[0] == other._coor.shape[0], (
+            'inconsistent number of frames')
+        assert self._coor.shape[2] == 3, 'improperly shaped coordinates'
+        assert other._coor.shape[2] == 3, 'improperly shaped coordinates'
+        coor = []
+        for i in range(len(self._coor)):
+            coor.append(numpy.vstack((self._coor[i], other._coor[i])))
+        coor = numpy.array(coor)
+        assert len(coor[0]) == natoms
+        values.pop('coor')
+
+        resid = numpy.append(self._resid, other._resid)
+        assert len(resid) == natoms, 'resid definition/s incorrect'
+        values.pop('resid')
+
+        values.pop('index')  # reindexed combined results from 1
+
+        # combine the lists
+        for key in values.keys():
+            _key = '_{}'.format(key)
+            values[key] = self.__dict__[_key] + other.__dict__[_key]
+            assert len(values[key]) == natoms, 'missing {} entries'.format(key)
+
+        values['natoms'] = natoms
+        values['coor'] = coor
+        values['resid'] = resid
+        return Atom(create=values)
+
+    def __radd__(self, other):
+        if other == 0:
+            return self
+        else:
+            return self.__add__(other)
+
 
     def append(self, other, **kwargs):
         '''
@@ -314,7 +409,7 @@ class Atom(file_io.Files, calculate.Calculate, operate.Move, subset.Mask,
 
         self._update_unique_properties()
 
-    def creator(self, natoms, **kwargs):
+    def creator(self, **kwargs):
         '''
         This method is used to populate the fields required for a sasmol object
         to use read_pdb() and write_pdb() methods from file_io.
@@ -404,10 +499,11 @@ class Atom(file_io.Files, calculate.Calculate, operate.Move, subset.Mask,
         '''
         # setup the default values
         pdb_defaults = self.field_definitions()
-        pdb_defaults['atom'] = 'ATOM'
         pdb_defaults['index'] = None
         pdb_defaults['coor'] = None
         pdb_defaults['resid'] = None
+        pdb_defaults['natoms'] = 1
+        pdb_defaults['atom'] = 'ATOM'
         pdb_defaults['loc'] = ' '
         pdb_defaults['resname'] = 'DUM'
         pdb_defaults['chain'] = 'A'
@@ -420,33 +516,35 @@ class Atom(file_io.Files, calculate.Calculate, operate.Move, subset.Mask,
         pdb_defaults['charge'] = ' '
 
         # populate the values required to write a pdb
-        self._natoms = natoms
-        pdb_defaults.pop('natoms')
+        natoms_default = pdb_defaults.pop('natoms')
+        self._natoms = kwargs.pop('natoms', natoms_default)
 
         for key in ['index', 'resid']:
             _key = '_{}'.format(key)
-            val = kwargs.pop(key, pdb_defaults.pop(key))
-            if val is not None and len(val) == natoms:
+            val_default = pdb_defaults.pop(key)
+            val = kwargs.pop(key, val_default)
+            if val is not None and len(val) == self._natoms:
                 self.__dict__[_key] = val
             else:
-                self.__dict__[_key] = numpy.arange(natoms) + 1
+                self.__dict__[_key] = numpy.arange(self._natoms) + 1
 
-        coor = kwargs.pop('coor', pdb_defaults.pop('coor'))
+        coor_default = pdb_defaults.pop('coor')
+        coor = kwargs.pop('coor', coor_default)
         try:
             assert coor is not None
             assert 3 == coor.shape[2]
-            assert natoms == coor.shape[1]
+            assert self._natoms == coor.shape[1]
             self._coor = coor
         except (IndexError, AttributeError, AssertionError):
-            self._coor = numpy.zeros((1, natoms, 3), numpy.float)
+            self._coor = numpy.zeros((1, self._natoms, 3), numpy.float)
 
         for key in pdb_defaults.keys():
             val = kwargs.pop(key, pdb_defaults.pop(key))
             _key = '_{}'.format(key)
-            if type(val) is list and len(val) == natoms:
+            if type(val) is list and len(val) == self._natoms:
                 self.__dict__[_key] = val
             else:
-                self.__dict__[_key] = [val] * natoms
+                self.__dict__[_key] = [val] * self._natoms
 
         # populate the values returned when reading a pdb
         (protein_resnames, dna_resnames, rna_resnames, nucleic_resnames,
@@ -461,8 +559,9 @@ class Atom(file_io.Files, calculate.Calculate, operate.Move, subset.Mask,
 
         self._original_index = numpy.copy(self._index)
         self._original_resid = numpy.copy(self._resid)
-        self._residue_flag = [False] * natoms
+        self._residue_flag = [False] * self._natoms
         self._header = []
+        return self
 
     def _update_unique_properties(self):
         properties = ['beta', 'chain', 'element', 'moltype', 'name', 'resid',
@@ -681,117 +780,6 @@ class Molecule(Atom):
     >>> molecule = system.Molecule(filename='hiv1_gag.pdb', id=0, debug=False)
 
     '''
-
-    def __init__(self, *args, **kwargs):
-        Atom.__init__(self, *args, **kwargs)
-
-    def __add__(self, other):
-        '''
-        Override the python __add__ method to combine molecules
-
-        Parameters
-        ----------
-        other
-            system object
-
-        kwargs
-            optional keyword arguments
-
-        Returns
-        -------
-        None
-            modified system object
-
-        Examples
-        -------
-
-        >>> import sasmol.system as system
-        >>> molecule_1 = system.Molecule(filename='hiv1_gag.pdb')
-        >>> molecule_2 = system.Molecule(filename='lysozyme.pdb')
-        >>> molecule_1.natoms()
-        6730
-        >>> molecule_2.natoms()
-        1960
-
-        >>> molecule_3 = molecule_1 + molecule_2
-        >>> molecule_3.natoms()
-        17380
-        >>> molecule_3.index()[-1]
-        17380
-
-        >>> molecule_4 = sum([molecule_1, molecule_2, molecule_3])
-        >>> molecule_4.natoms()
-        8690
-        >>> molecule_4.index()[-1]
-        8690
-
-        Note
-        ____
-
-        An assertion error will occur if items are missing from either molecule
-list
-        self._natoms is updated based on the len(self._names)
-
-        self._index is reset to start at 1 and end at self._natoms
-
-        '''
-        natoms = self._natoms + other._natoms
-
-        # atom = self._atom + other._atom
-        # assert len(atom) == natoms, 'atom definition/s incorrect'
-
-        name = self._name + other._name
-        assert len(name) == natoms, 'name definition/s incorrect'
-
-        resname = self._resname + other._resname
-        assert len(resname) == natoms, 'resname definition/s incorrect'
-
-        chain = self._chain + other._chain
-        assert len(chain) == natoms, 'chain definition/s incorrect'
-
-        rescode = self._rescode + other._rescode
-        assert len(rescode) == natoms, 'rescode definition/s incorrect'
-
-        occupancy = self._occupancy + other._occupancy
-        assert len(occupancy) == natoms, 'occupancy definition/s incorrect'
-
-        beta = self._beta + other._beta
-        assert len(beta) == natoms, 'beta definition/s incorrect'
-
-        segname = self._segname + other._segname
-        assert len(segname) == natoms, 'segname definition/s incorrect'
-
-        element = self._element + other._element
-        assert len(element) == natoms, 'element definition/s incorrect'
-
-        charge = self._charge + other._charge
-        assert len(charge) == natoms, 'charge definition/s incorrect'
-
-        assert self._coor.shape[0] == other._coor.shape[0], (
-            'inconsistent number of frames')
-        assert self._coor.shape[2] == 3, 'improperly shaped coordinates'
-        assert other._coor.shape[2] == 3, 'improperly shaped coordinates'
-        coor = []
-        for i in range(len(self._coor)):
-            coor.append(numpy.vstack((self._coor[i], other._coor[i])))
-        coor = numpy.array(coor)
-        assert len(coor[0]) == natoms
-
-        resid = numpy.append(self._resid, other._resid)
-        assert len(resid) == natoms, 'resid definition/s incorrect'
-
-        # index = numpy.arange(natoms) + 1
-
-        return Molecule_Maker(natoms, name=name, resname=resname, chain=chain,
-                              resid=resid, rescode=rescode, coor=coor,
-                              occupancy=occupancy, beta=beta, segname=segname,
-                              element=element, charge=charge)
-
-    def __radd__(self, other):
-        if other == 0:
-            return self
-        else:
-            return self.__add__(other)
 
     def fasta(self):
         return self._fasta
