@@ -238,7 +238,7 @@ class Atom(file_io.Files, calculate.Calculate, operate.Move, subset.Mask,
         else:
             return "sasmol object"
 
-    def __add__(self, other, **kwargs):
+    def append(self, other, **kwargs):
         '''
         Override the python __add__ method to combine other molecule into
         instance molecule
@@ -267,7 +267,7 @@ class Atom(file_io.Files, calculate.Calculate, operate.Move, subset.Mask,
         >>> molecule_2.natoms()
         1960
 
-        >>> molecule_1 + molecule_2
+        >>> molecule_1.append(molecule_2)
         >>> molecule_1.natoms()
         8690
         >>> molecule_1.index()[-1]
@@ -298,7 +298,6 @@ class Atom(file_io.Files, calculate.Calculate, operate.Move, subset.Mask,
                         self.__dict__[key] = numpy.concatenate(
                             (self.__dict__[key], other.__dict__[key]), axis=1)
                     elif len(value.shape) == 1:
-                        # print(key)
                         self.__dict__[key] = numpy.concatenate(
                             (self.__dict__[key], other.__dict__[key]))
                     else:
@@ -313,6 +312,7 @@ class Atom(file_io.Files, calculate.Calculate, operate.Move, subset.Mask,
             self._index = numpy.array([x + 1 for x in xrange(self._natoms)],
                                       numpy.int)
 
+        self._update_unique_properties()
 
     def creator(self, natoms, **kwargs):
         '''
@@ -457,22 +457,30 @@ class Atom(file_io.Files, calculate.Calculate, operate.Move, subset.Mask,
         moltype.update(dict.fromkeys(water_resnames, 'water'))
         self._moltype = [moltype.get(rn, 'other') for rn in self._resname]
 
-        add_s = ['beta', 'chain', 'element', 'moltype', 'name', 'resid',
-                 'resname', 'segname']
-        for key in add_s:
-            _key = '_{}'.format(key)
-            _keys = '{}s'.format(_key)
-            self.__dict__[_keys] = list(set(self.__dict__[_key]))
-
-            _number_of_key = '_number_of_{}'.format(key)
-            self.__dict__[_number_of_key] = len(self.__dict__[_keys])
-        self._occupancies = list(set())
-        self._number_of_occupancies = len(self._occupancies)
+        self._update_unique_properties()
 
         self._original_index = numpy.copy(self._index)
         self._original_resid = numpy.copy(self._resid)
         self._residue_flag = [False] * natoms
         self._header = []
+
+    def _update_unique_properties(self):
+        properties = ['beta', 'chain', 'element', 'moltype', 'name', 'resid',
+                      'resname', 'segname', 'occupancy']
+        for key in properties:
+            _key = '_{}'.format(key)
+            if _key in self.__dict__.keys():
+                if key != 'occupancy':
+
+                    _keys = '{}s'.format(_key)
+                    self.__dict__[_keys] = list(set(self.__dict__[_key]))
+
+                    _number_of_key = '_number_of_{}'.format(key)
+                    self.__dict__[_number_of_key] = len(self.__dict__[_keys])
+
+                else:
+                    self._occupancies = list(set(self._occupancy))
+                    self._number_of_occupancies = len(self._occupancies)
 
     def setId(self, newValue):
         self._id = newValue
@@ -1069,27 +1077,3 @@ class System(Atom):
     >>> molecule = system.Molecule(filename='hiv1_gag.pdb', id=0, debug=False)
 
     '''
-
-
-
-if __name__ == '__main__':
-    mol = Molecule()
-    mol.creator(5)
-    molecule = Molecule()
-    molecule.creator(2048, name='O')
-    molecule.natoms()
-    molecule.names()
-
-    molecule.creator(1024, name='Ar', segname='ARG0')
-    molecule.natoms()
-
-    molecule.names()
-
-    molecule.segnames()
-
-    index = [x for x in xrange(340,1000)]
-    molecule.creator(660, name='He', index=index)
-    print(molecule.index()[0])
-
-
-    print('\m/ >.< \m/>')
