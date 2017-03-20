@@ -96,7 +96,7 @@ class PDB(object):
         natoms: 0
         occupancy: []
         rescode: []
-        resid: []
+        resid: None
         resname: []
         segname: []
 
@@ -110,7 +110,7 @@ class PDB(object):
         pdb_dict['loc'] = []
         pdb_dict['resname'] = []
         pdb_dict['chain'] = []
-        pdb_dict['resid'] = []
+        pdb_dict['resid'] = None
         pdb_dict['rescode'] = []
         pdb_dict['coor'] = None
         pdb_dict['occupancy'] = []
