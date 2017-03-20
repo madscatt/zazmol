@@ -834,12 +834,12 @@ class PDB(object):
                 if this_resname in protein_resnames:
                     moltype.append('protein')
                     this_moltype = 'protein'
-                elif this_resname in rna_resnames:
-                    moltype.append('rna')
-                    this_moltype = 'rna'
                 elif this_resname in dna_resnames:
                     moltype.append('dna')
                     this_moltype = 'dna'
+                elif this_resname in rna_resnames:
+                    moltype.append('rna')
+                    this_moltype = 'rna'
                 elif this_resname in water_resnames:
                     moltype.append('water')
                     this_moltype = 'water'
