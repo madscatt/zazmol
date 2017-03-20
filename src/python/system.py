@@ -93,10 +93,14 @@ class Atom(file_io.Files, calculate.Calculate, operate.Move, subset.Mask,
     common use case involves molecules, examples will use the Molecule()
     class instead of Atom.
 
-    Define instance of class and read in PDB file at same time
+    Intantiate a Molecule reading a PDB to get the definitions
 
     >>> import sasmol.system as system
     >>> molecule = system.Molecule(filename='hiv1_gag.pdb')
+
+    Intantiate a Molecule based of input definitions
+
+    >>> molecule = system.Molecule(create={'natoms': 24, 'name': 'Ar'})
 
     Other instance definition examples (not-exhaustive)
 
