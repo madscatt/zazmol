@@ -108,8 +108,7 @@ class Atom(file_io.Files, calculate.Calculate, operate.Move, subset.Mask,
     >>> molecule = system.Molecule(id=7)
     >>> molecule = system.Molecule(debug=True)
     >>> molecule = system.Molecule('hiv1_gag.pdb')
-    >>> molecule = system.Molecule(filename='hiv1_gag.pdb', id=0,
-                                   debug=False)
+    >>> molecule = system.Molecule(filename='hiv1_gag.pdb', id=0, debug=False)
 
     Example of how setters and getters work.  Below, the original index
     values are adjusted by a value (-10) and setIndex() is used to assign
@@ -360,7 +359,7 @@ class Atom(file_io.Files, calculate.Calculate, operate.Move, subset.Mask,
         Examples
         -------
 
-        >>> import sasmol.system as systemdef_dict
+        >>> import sasmol.system as system
         >>> molecule_1 = system.Molecule(filename='hiv1_gag.pdb')
         >>> molecule_2 = system.Molecule(filename='lysozyme.pdb')
         >>> molecule_1.natoms()
@@ -415,22 +414,18 @@ class Atom(file_io.Files, calculate.Calculate, operate.Move, subset.Mask,
 
         self._update_unique_properties()
 
-    def create(self, natoms, **kwargs):
-        parameters = {'natoms': natoms}
-        parameters.update(kwargs)
-        self.creator(**parameters)
-
     def creator(self, **kwargs):
         '''
         This method is used to populate the fields required for a sasmol object
-        to use read_pdb() and write_pdb() methods from file_io.
+        to use `read_pdb()` and `write_pdb()` methods from `file_io`.
 
-        Default inputs are itemized below. The values are assigned to all
-        atoms in the molecule.
+        Input values are provided using keyword arguments. Available inputs are
+        itemized below. These should be provided as either a single value or a
+        list or numpy array with the appropriate length.  Note the array shape
+        for coordinates should be (F, N, 3) where F is the number of frames,
+        and N is the number of atoms.
 
         Once defined, attributes can be set using setters in the Atom class.
-
-        Class has several initialization options
 
         Parameters
         ----------
@@ -487,25 +482,30 @@ class Atom(file_io.Files, calculate.Calculate, operate.Move, subset.Mask,
         Examples
         -------
         >>> import sasmol.system as system
-        >>> molecule = system.Molecule()
-        >>> molecule.creator(2048, name='O')
-        >>> molecule.natoms()
+        >>> molecule_1 = system.Molecule()
+        >>> molecule_1.creator(natoms=2048, name='O')
+        >>> molecule_1.natoms()
         2048
-        >>> molecule.names()
+        >>> molecule_1.names()
         ['O']
-        >>> molecule.creator(1024, name='Ar', segname='ARG0')
-        >>> molecule.natoms()
+
+        Notice how calling the `creator` method againg will overide the
+        molecule definitions
+        >>> molecule_1.creator(natoms=1024, name='Ar', segname='ARG0')
+        >>> molecule_1.natoms()
         1024
-        >>> molecule.names()
+        >>> molecule_1.names()
         ['Ar']
-        >>> molecule.segnames()
+        >>> molecule_1.segnames()
         ['ARG0']
+
+        >>> molecule_2 = system.Molecule()
         >>> index = [x for x in xrange(34,40)]
-        >>> molecule.creator(6, name='He', index=index)
-        >>> molecule.index()[0]
+        >>> molecule_2.creator(natoms=6, name='He', index=index)
+        >>> molecule_2.index()[0]
         34
-        >>> molecule.original_index()
-        [34, 35, 36, 37, 38, 39]
+        >>> molecule_2.original_index()
+        array([34, 35, 36, 37, 38, 39])
 
         '''
         # setup the default values
@@ -574,7 +574,7 @@ class Atom(file_io.Files, calculate.Calculate, operate.Move, subset.Mask,
         self._header = []
 
         # return self for __add__
-        return self
+        # return self
 
     def _update_unique_properties(self):
         properties = ['beta', 'chain', 'element', 'moltype', 'name', 'resid',
@@ -1076,3 +1076,8 @@ class System(Atom):
     >>> molecule = system.System(filename='hiv1_gag.pdb', id=0, debug=False)
 
     '''
+
+
+if __name__ == "__main__":
+    import doctest
+    doctest.testmod()
