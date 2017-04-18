@@ -249,7 +249,7 @@ class Calculate(object):
 
         return self._rmsd
 
-    def calculate_principle_moments_of_inertia(self, frame, **kwargs):
+    def calculate_principal_moments_of_inertia(self, frame, **kwargs):
         '''
         This method calculates the principal moments of inertia
         of the object. It uses the center method from operate.Move
@@ -270,7 +270,7 @@ class Calculate(object):
         Returns
         -------
         tuple of numpy arrays
-            principle moments of inertia of object :
+            principal moments of inertia of object :
             eigenvalues, eigenvectors, and I
 
         Examples
@@ -278,7 +278,7 @@ class Calculate(object):
 
         >>> import sasmol.system as system
         >>> molecule = system.Molecule('hiv1_gag.pdb')
-        >>> molecule.calculate_principle_moments_of_inetia(0)
+        >>> molecule.calculate_principal_moments_of_inetia(0)
         (array([  1.30834716e+07,   1.91993314e+08,   1.85015201e+08]),
         array([[-0.08711655, -0.97104917,  0.22242802],
                [-0.512547  ,  0.23514759,  0.82583363],
