@@ -331,6 +331,9 @@ class Calculate(object):
             I = None
         else:
             uk, ak = numpy.linalg.eig(I)
+            order = uk.argsort()
+            uk = uk[order]
+            ak = ak[order]
 
             order = uk.argsort()
             uk = uk[order]
