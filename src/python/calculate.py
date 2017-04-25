@@ -57,17 +57,17 @@ class Calculate(object):
         >>> import sasmol.system as system
         >>> import sasmol.calculate as calculate
         >>> molecule = system.Molecule('hiv1_gag.pdb')
-        >>> calculate.Calculate.calculate_mass(molecule) 
+        >>> calculate.Calculate.calculate_mass(molecule)
         47896.61864599498
 
         Note
         ----
-    
+
         `self` parameter is not shown in the ``Parameters`` section in the documentation
 
         TODO:  Need to write a generic driver to loop over single or multiple frames
 
-    """ 
+    """
 
     def calculate_mass(self, **kwargs):
         '''
@@ -81,15 +81,15 @@ class Calculate(object):
 
         standard atomic weight is based on the natural istopic composition
 
-        NOTE: deuterium is 'D' 2H1 and '1H' is 1H1, all other elements 
+        NOTE: deuterium is 'D' 2H1 and '1H' is 1H1, all other elements
         have their natural abundance weight. These elements are located
         at the end of the dictionary.
 
         Parameters
         ----------
-        kwargs 
+        kwargs
             optional future arguments
-                                                                                     
+
         Returns
         -------
         float
@@ -126,20 +126,20 @@ class Calculate(object):
         return self._total_mass
 
     def calculate_center_of_mass(self, frame, **kwargs):
-        '''	
-        This method calculates the center of mass of the object.  
+        '''
+        This method calculates the center of mass of the object.
 
         Parameters
         ----------
-        frame 
+        frame
             integer : trajectory frame number to use
 
-        kwargs 
+        kwargs
             optional future arguments
-                                                                                     
+
         Returns
         -------
-        numpy array 
+        numpy array
             coordinates of center of mass
 
         Examples
@@ -163,26 +163,26 @@ class Calculate(object):
         comy = numpy.sum(self._mass * y) / self._total_mass
         comz = numpy.sum(self._mass * z) / self._total_mass
 
-        self._com = numpy.array([comx, comy, comz], numpy.float)
+        self._center_of_mass = numpy.array([comx, comy, comz], numpy.float)
 
-        return self._com
+        return self._center_of_mass
 
     def calculate_radius_of_gyration(self, frame, **kwargs):
-        '''	
+        '''
         This method calculates the radius of gyration of the object
 
         Parameters
         ----------
-        frame 
+        frame
             integer : trajectory frame number to use
 
-        kwargs 
+        kwargs
             optional future arguments
-                                                                                     
+
         Returns
         -------
         float
-            radius of gyration of object 
+            radius of gyration of object
 
         Examples
         -------
@@ -190,7 +190,7 @@ class Calculate(object):
         >>> import sasmol.system as system
         >>> molecule = system.Molecule('hiv1_gag.pdb')
         >>> molecule.calculate_radius_of_gyration(0)
-        64.043168998442368 
+        64.043168998442368
 
         '''
 
@@ -204,30 +204,30 @@ class Calculate(object):
         return self._rg
 
     def calculate_root_mean_square_deviation(self, other, **kwargs):
-        '''	
+        '''
         This method calculates the radius root mean square deviation (rmsd)
         of one set of coordinates compared to another
 
         self contains the coordinates of set 1
         other contains the coordinates of set 2
 
-        the number of coordinates in each set must be equal	
+        the number of coordinates in each set must be equal
 
         To use this over multiple frames you must call this function
         repeatedly.
 
         Parameters
         ----------
-        other 
+        other
             system object with coordinates with equal number of frames
 
-        kwargs 
+        kwargs
             optional future arguments
-                                                                                     
+
         Returns
         -------
         float
-            root mean square deviation between objects 
+            root mean square deviation between objects
 
         Examples
         -------
@@ -249,11 +249,11 @@ class Calculate(object):
 
         return self._rmsd
 
-    def calculate_principle_moments_of_inertia(self, frame, **kwargs):
-        '''	
+    def calculate_principal_moments_of_inertia(self, frame, **kwargs):
+        '''
         This method calculates the principal moments of inertia
         of the object. It uses the center method from operate.Move
-        to center the molecule. 
+        to center the molecule.
         The present method is designated for the non-linear system with
         non-singular moment of inertia matrix only. For the linear systems, it
         will return eigenvectors and I as None.  Testing for non-None return
@@ -261,16 +261,16 @@ class Calculate(object):
 
         Parameters
         ----------
-        frame 
+        frame
             integer : trajectory frame number to use
 
-        kwargs 
+        kwargs
             optional future arguments
-                                                                                     
+
         Returns
         -------
-        tuple of numpy arrays 
-            principle moments of inertia of object :
+        tuple of numpy arrays
+            principal moments of inertia of object :
             eigenvalues, eigenvectors, and I
 
         Examples
@@ -278,15 +278,15 @@ class Calculate(object):
 
         >>> import sasmol.system as system
         >>> molecule = system.Molecule('hiv1_gag.pdb')
-        >>> molecule.calculate_principle_moments_of_inetia(0)
-        (array([  1.30834716e+07,   1.91993314e+08,   1.85015201e+08]), 
+        >>> molecule.calculate_principal_moments_of_inetia(0)
+        (array([  1.30834716e+07,   1.91993314e+08,   1.85015201e+08]),
         array([[-0.08711655, -0.97104917,  0.22242802],
                [-0.512547  ,  0.23514759,  0.82583363],
-               [ 0.85422847,  0.04206103,  0.51819358]]), 
+               [ 0.85422847,  0.04206103,  0.51819358]]),
         array([[  1.90290278e+08,  -9.27036144e+06,   1.25097100e+07],
                [ -9.27036144e+06,   1.40233826e+08,   7.53462715e+07],
-               [  1.25097100e+07,   7.53462715e+07,   5.95678834e+07]])) 
-        
+               [  1.25097100e+07,   7.53462715e+07,   5.95678834e+07]]))
+
         '''
 
         com = self.calculate_center_of_mass(frame)
@@ -332,12 +332,18 @@ class Calculate(object):
         else:
             uk, ak = numpy.linalg.eig(I)
 
+            order = uk.argsort()
+            uk = uk[order]
+            ak = ak[:, order]
+            if numpy.allclose(numpy.cross(ak[:, 0], ak[:, 1]), -1 * ak[:, 2]):
+                ak[:, 2] = -ak[:, 2]  # force right-hand systems
+
         operate.Move.translate(self, frame, com, point=True)
 
         return uk, ak, I
 
     def calculate_minimum_and_maximum(self, **kwargs):
-        '''	
+        '''
         This method calculates the minimum and maximum values
         of of the object in (x,y,z)
 
@@ -348,13 +354,13 @@ class Calculate(object):
 
         Parameters
         ----------
-        kwargs 
-           frames = [] : integer list of frames to process 
-                                                                                     
+        kwargs
+           frames = [] : integer list of frames to process
+
         Returns
         -------
-        numpy array 
-            nested list of minimum and maximum values 
+        numpy array
+            nested list of minimum and maximum values
             [ [ min_x, min_y, min_z ], [max_x, max_y, max_z] ]
 
         Examples
@@ -363,34 +369,34 @@ class Calculate(object):
         >>> import sasmol.system as system
         >>> molecule = system.Molecule('hiv1_gag.pdb')
         >>> molecule.calculate_minimum_and_maximum()
-        [array([-31.29899979, -93.23899841, -85.81900024]), array([ 19.64699936,  30.37800026,  99.52999878])] 
-      
+        [array([-31.29899979, -93.23899841, -85.81900024]), array([ 19.64699936,  30.37800026,  99.52999878])]
+
         >>> import sasmol.system as system
         >>> molecule = system.Molecule('hiv1_gag.pdb')
         >>> molecule.read_dcd('hiv1_gag_200_frames')
         >>> molecule.calculate_minimum_and_maximum()
         [array([ -94.47146606, -121.88082886,  -99.94940948]), array([  52.85133362,   65.53725433,  100.76850891])]
         >>> molecule.calculate_minimum_and_maximum(frames=[0,1,2,3])
-        [array([-30.9330883 , -92.68256378, -84.51082611]), array([ 20.98281288,  38.45230484,  99.91564178])] 
-      
-       
+        [array([-30.9330883 , -92.68256378, -84.51082611]), array([ 20.98281288,  38.45230484,  99.91564178])]
+
+
         '''
-        
-        try: 
+
+        try:
             frames = kwargs['frames']
         except:
             frames = [x for x in xrange(self.number_of_frames())]
 
-        first_flag = True        
+        first_flag = True
 
         for frame in frames:
 
             this_min_x=numpy.min(self._coor[frame,:,0])
-            this_max_x=numpy.max(self._coor[frame,:,0])		
+            this_max_x=numpy.max(self._coor[frame,:,0])
             this_min_y=numpy.min(self._coor[frame,:,1])
-            this_max_y=numpy.max(self._coor[frame,:,1])		
+            this_max_y=numpy.max(self._coor[frame,:,1])
             this_min_z=numpy.min(self._coor[frame,:,2])
-            this_max_z=numpy.max(self._coor[frame,:,2])		
+            this_max_z=numpy.max(self._coor[frame,:,2])
 
             if(first_flag or (this_min_x < min_x)):
                 min_x = this_min_x
@@ -405,7 +411,7 @@ class Calculate(object):
                 max_y = this_max_y
             if(first_flag or (this_max_z > max_z)):
                 max_z = this_max_z
-    
+
             first_flag = False
 
         self._minimum = numpy.array([min_x, min_y, min_z])
@@ -421,13 +427,13 @@ class Calculate(object):
 
         Note
         ----------
-        Requires that the atom_charge() attribute of object is complete        
+        Requires that the atom_charge() attribute of object is complete
 
         Parameters
         ----------
-        kwargs 
+        kwargs
             optional future arguments
-                                                                                     
+
         Returns
         -------
         float
@@ -490,14 +496,14 @@ class Calculate(object):
 
         Parameters
         ----------
-        kwargs 
+        kwargs
             optional future arguments
-                                                                                     
+
         Returns
         -------
         dictionary
             {element : integer number, ... }
-        
+
         Examples
         -------
 
