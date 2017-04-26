@@ -311,7 +311,7 @@ class Calculate(object):
             uk, ak = numpy.linalg.eig(I)
             order = uk.argsort()
             uk = uk[order]
-            ak = ak[order]
+            ak = ak[:, order]
 
         operate.Move.translate(self, frame, com, point=True)
 
