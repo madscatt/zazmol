@@ -293,6 +293,7 @@ class Calculate(object):
 
         operate.Move.center(self, frame)
 
+        '''
         Ixx = 0.0
         Iyy = 0.0
         Izz = 0.0
@@ -321,6 +322,13 @@ class Calculate(object):
             Izy = Izy - self._mass[i] * zp * yp
 
         I = numpy.array([[Ixx, Ixy, Ixz], [Iyx, Iyy, Iyz], [Izx, Izy, Izz]])
+        '''
+        n_atoms = self._natoms
+        m = self._mass.reshape(n_atoms, -1)
+        m_coor = m * self._coor[frame]
+        m_coor2 = numpy.dot(self._coor[frame].T, m_coor)
+        numpy.fill_diagonal(m_coor2, m_coor2.diagonal() - m_coor2.trace())
+        I = -m_coor2
 
         if numpy.linalg.matrix_rank(I) < 3:
             print("You are requesting the pmi calculation for a singular system.")
