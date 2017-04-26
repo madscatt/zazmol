@@ -293,36 +293,6 @@ class Calculate(object):
 
         operate.Move.center(self, frame)
 
-        '''
-        Ixx = 0.0
-        Iyy = 0.0
-        Izz = 0.0
-        Ixy = 0.0
-        Ixz = 0.0
-        Iyz = 0.0
-        Iyx = 0.0
-        Izx = 0.0
-        Izy = 0.0
-
-        for i in range(self._natoms):
-
-            xp = self._coor[frame, i, 0]
-            yp = self._coor[frame, i, 1]
-            zp = self._coor[frame, i, 2]
-
-            Ixx = Ixx + self._mass[i] * (yp * yp + zp * zp)
-            Iyy = Iyy + self._mass[i] * (xp * xp + zp * zp)
-            Izz = Izz + self._mass[i] * (xp * xp + yp * yp)
-
-            Ixy = Ixy - self._mass[i] * xp * yp
-            Ixz = Ixz - self._mass[i] * xp * zp
-            Iyz = Iyz - self._mass[i] * yp * zp
-            Iyx = Iyx - self._mass[i] * yp * xp
-            Izx = Izx - self._mass[i] * zp * xp
-            Izy = Izy - self._mass[i] * zp * yp
-
-        I = numpy.array([[Ixx, Ixy, Ixz], [Iyx, Iyy, Iyz], [Izx, Izy, Izz]])
-        '''
         n_atoms = self._natoms
         m = self._mass.reshape(n_atoms, -1)
         m_coor = m * self._coor[frame]
