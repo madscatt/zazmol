@@ -119,7 +119,7 @@ molecule.calculate_center_of_mass(frame)
 
 
 ```python
-molecule.calculate_principle_moments_of_inertia(frame)
+molecule.calculate_principal_moments_of_inertia(frame)
 ```
 
 
