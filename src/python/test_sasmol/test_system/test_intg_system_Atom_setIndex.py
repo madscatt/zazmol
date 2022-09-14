@@ -34,12 +34,12 @@ class Test_intg_system_Atom_setIndex(MockerTestCase):
 	   test a regular pdb file with 3 frame
 	   '''
       #
-      expected = range(1,327)
+      expected = list(range(1,327))
       #
       self.o.setIndex(expected)
       #
       result = self.o.index()
-      print result
+      print(result)
       #
       self.assertEqual(expected, result)
 

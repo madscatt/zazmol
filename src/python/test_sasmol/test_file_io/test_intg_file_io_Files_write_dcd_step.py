@@ -70,7 +70,7 @@ class Test_intg_file_io_Files_write_dcd_step(MockerTestCase):
       otest.read_dcd(dcdFileName)
       result_coor = otest.coor()
       sum_result_coor = sum(sum(sum(result_coor)))
-      print '\ncoor\n',result_coor
+      print('\ncoor\n',result_coor)
       expected_coor = numpy.array([[[76.944, 41.799, 41.652]]],floattype)
       sum_expected_coor = 160.395
       self.assert_list_almost_equal(expected_coor, result_coor, self.prcsn)
@@ -133,7 +133,7 @@ class Test_intg_file_io_Files_write_dcd_step(MockerTestCase):
       otest.read_dcd(dcdFileName)
       result_coor = otest.coor()
       sum_result_coor = sum(sum(sum(result_coor)))
-      print '\nresult_coor\n',result_coor
+      print('\nresult_coor\n',result_coor)
       expected_coor = numpy.array([[[  73.944,   41.799,   41.652], [  74.229,   42.563,   40.456], [  75.667,   43.093,   40.463], [  76.264,   43.279,   39.401], [  73.210,   43.734,   40.336], [  71.856,   43.168,   39.926], [  73.677,   44.782,   39.354], [  70.721,   44.177,   39.946], [  76.231,   43.330,   41.647], [  77.592,   43.852,   41.730], [  78.617,   42.820,   42.184], [  79.712,   43.169,   42.656], [  77.671,   45.097,   42.648], [  77.054,   44.816,   43.910], [  76.970,   46.273,   42.000]]],floattype)
       sum_expected_coor = 2407.676
       self.assert_list_almost_equal(expected_coor, result_coor, self.prcsn)
@@ -230,7 +230,7 @@ class Test_intg_file_io_Files_write_dcd_step(MockerTestCase):
       otest.read_dcd(dcdFileName)
       result_coor = otest.coor()
       sum_result_coor = sum(sum(sum(result_coor)))
-      print '\nresult_coor \n',result_coor
+      print('\nresult_coor \n',result_coor)
       self.assertEqual(len(result_coor[0]),10632)
       expected_sample_coor = numpy.array([-5.798, 13.082, 22.068],floattype)
       sum_expected_coor = -43307.390
@@ -264,7 +264,7 @@ class Test_intg_file_io_Files_write_dcd_step(MockerTestCase):
       otest.read_dcd(dcdFileName)
       result_coor = otest.coor()
       sum_result_coor = sum(sum(sum(result_coor)))
-      print '\nresult_coor \n',result_coor
+      print('\nresult_coor \n',result_coor)
       self.assertEqual(len(result_coor[0]),10632)
       expected_sample_coor = numpy.array([-6.348, 14.130, 20.916],floattype)
       sum_expected_coor = -42996.475
@@ -298,7 +298,7 @@ class Test_intg_file_io_Files_write_dcd_step(MockerTestCase):
       otest.read_dcd(dcdFileName)
       result_coor = otest.coor()
       sum_result_coor = sum(sum(sum(result_coor)))
-      print '\nresult_coor \n',result_coor
+      print('\nresult_coor \n',result_coor)
       self.assertEqual(len(result_coor[0]),10632)
       expected_sample_coor = numpy.array([-6.392, 14.348, 20.914],floattype)
       sum_expected_coor = -42837.531
@@ -333,7 +333,7 @@ class Test_intg_file_io_Files_write_dcd_step(MockerTestCase):
       otest.read_dcd(dcdFileName)
       result_coor = otest.coor()
       sum_result_coor = sum(sum(sum(result_coor)))
-      print '\nresult_coor \n',result_coor
+      print('\nresult_coor \n',result_coor)
       self.assertEqual(len(result_coor[0]),10632)
       expected_sample_coor = numpy.array([-5.798, 13.082, 22.068],floattype)
       sum_expected_coor = -43307.390
@@ -367,7 +367,7 @@ class Test_intg_file_io_Files_write_dcd_step(MockerTestCase):
       otest.read_dcd(dcdFileName)
       result_coor = otest.coor()
       sum_result_coor = sum(sum(sum(result_coor)))
-      print '\nresult_coor \n',result_coor
+      print('\nresult_coor \n',result_coor)
       self.assertEqual(len(result_coor[0]),10632)
       expected_sample_coor = numpy.array([-6.348, 14.130, 20.916],floattype)
       sum_expected_coor = -42996.475
@@ -401,7 +401,7 @@ class Test_intg_file_io_Files_write_dcd_step(MockerTestCase):
       otest.read_dcd(dcdFileName)
       result_coor = otest.coor()
       sum_result_coor = sum(sum(sum(result_coor)))
-      print '\nresult_coor \n',result_coor
+      print('\nresult_coor \n',result_coor)
       self.assertEqual(len(result_coor[0]),10632)
       expected_sample_coor = numpy.array([-6.392, 14.348, 20.914],floattype)
       sum_expected_coor = -42837.531
@@ -432,7 +432,7 @@ class Test_intg_file_io_Files_write_dcd_step(MockerTestCase):
       otest.read_dcd(dcdFileName)
       result_coor = otest.coor()
       sum_result_coor = sum(sum(sum(result_coor)))
-      print '\nresult_coor \n',result_coor
+      print('\nresult_coor \n',result_coor)
       os.remove(dcdFileName)
       self.assertEqual(len(result_coor[0]),327)
       expected_sample_coor = numpy.array([9.555, 2.856, 3.730],floattype)
@@ -464,7 +464,7 @@ class Test_intg_file_io_Files_write_dcd_step(MockerTestCase):
       otest.read_dcd(dcdFileName)
       result_coor = otest.coor()
       sum_result_coor = sum(sum(sum(result_coor)))
-      print '\nresult_coor \n',result_coor
+      print('\nresult_coor \n',result_coor)
       self.assertEqual(len(result_coor[0]),57085)
       expected_sample_coor = numpy.array([104.484, 26.915, 12.538],floattype)
       sum_expected_coor = 6269170.260

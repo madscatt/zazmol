@@ -66,7 +66,7 @@ class Test_linear_algebra(MockerTestCase):
     def test_against_mathematica_two_unit_atoms(self):
         x=numpy.array([[1.0, 1.0, 1.0], [2.0, 1.0, 1.0]], floattype)
         y=numpy.array([[1.0, 1.0, 1.0], [1.0, 2.0, 1.0]], floattype)
-        result_u = linear_algebra.find_u(x,y); print result_u
+        result_u = linear_algebra.find_u(x,y); print(result_u)
         expected_u = [[0.0, 1.0, 0.0], [0.0, 0.0, 1.0], [1.0, 0.0, 0.0]];
         for i in range(len(result_u)):
           self.assert_list_almost_equal(list(result_u[i]),expected_u[i])
@@ -74,8 +74,8 @@ class Test_linear_algebra(MockerTestCase):
     def test_against_mathematica_two_overlap_unit_atoms(self):
         x=numpy.array([[1.0, 1.0, 1.0], [1.0, 2.0, 1.0]], floattype)
         y=numpy.array([[1.0, 1.0, 1.0], [1.0, 2.0, 1.0]], floattype)
-        result_u = linear_algebra.find_u(x,y); print result_u
-        print result_u
+        result_u = linear_algebra.find_u(x,y); print(result_u)
+        print(result_u)
         expected_u = [[1.0, 0.0, 0.0], [0.0, 1.0, 0.0], [0.0, 0.0, 1.0]];
         for i in range(len(result_u)):
           self.assert_list_almost_equal(list(result_u[i]),expected_u[i])

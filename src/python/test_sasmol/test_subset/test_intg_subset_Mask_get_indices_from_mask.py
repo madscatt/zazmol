@@ -100,7 +100,7 @@ class Test_subset_Mask_set_descriptor_using_mask(MockerTestCase):
       #
       result_indices = self.o.get_indices_from_mask(mask)
       #
-      print 'expected_indices:\n', expected_indices, '\nresult_indices:\n',result_indices
+      print('expected_indices:\n', expected_indices, '\nresult_indices:\n',result_indices)
       self.assert_list_almost_equal(expected_indices, result_indices)
 
 
@@ -142,7 +142,7 @@ class Test_subset_Mask_set_descriptor_using_mask(MockerTestCase):
       #
       result_indices = self.o.get_indices_from_mask(mask)
       #
-      print 'expected_indices:\n', expected_indices, '\nresult_indices:\n',result_indices
+      print('expected_indices:\n', expected_indices, '\nresult_indices:\n',result_indices)
       self.assert_list_almost_equal(expected_indices, result_indices)
 
 
@@ -158,7 +158,7 @@ class Test_subset_Mask_set_descriptor_using_mask(MockerTestCase):
       #
       result_indices = self.o.get_indices_from_mask(mask)
       #
-      print 'expected_indices:\n', expected_indices, '\nresult_indices:\n',result_indices
+      print('expected_indices:\n', expected_indices, '\nresult_indices:\n',result_indices)
       self.assert_list_almost_equal(expected_indices, result_indices)
 
 
@@ -174,7 +174,7 @@ class Test_subset_Mask_set_descriptor_using_mask(MockerTestCase):
       #
       result_indices = self.o.get_indices_from_mask(mask)
       #
-      print 'expected_indices:\n', expected_indices, '\nresult_indices:\n',result_indices
+      print('expected_indices:\n', expected_indices, '\nresult_indices:\n',result_indices)
       self.assert_list_almost_equal(expected_indices, result_indices)
 
 
@@ -190,7 +190,7 @@ class Test_subset_Mask_set_descriptor_using_mask(MockerTestCase):
       #
       result_indices = self.o.get_indices_from_mask(mask)
       #
-      print 'expected_indices:\n', expected_indices, '\nresult_indices:\n',result_indices
+      print('expected_indices:\n', expected_indices, '\nresult_indices:\n',result_indices)
       self.assert_list_almost_equal(expected_indices, result_indices)
 
 
@@ -202,11 +202,11 @@ class Test_subset_Mask_set_descriptor_using_mask(MockerTestCase):
       self.o.read_pdb(PdbDataPath+'2AAD.pdb')
       mask = [0]*8+[1]*7
       #
-      expected_indices = range(8,15)
+      expected_indices = list(range(8,15))
       #
       result_indices = self.o.get_indices_from_mask(mask)
       #
-      print 'expected_indices:\n', expected_indices, '\nresult_indices:\n',result_indices
+      print('expected_indices:\n', expected_indices, '\nresult_indices:\n',result_indices)
       self.assert_list_almost_equal(expected_indices, result_indices)
 
 
@@ -218,11 +218,11 @@ class Test_subset_Mask_set_descriptor_using_mask(MockerTestCase):
       self.o.read_pdb(PdbDataPath+'2AAD.pdb')
       mask = [1]*15
       #
-      expected_indices = range(15)
+      expected_indices = list(range(15))
       #
       result_indices = self.o.get_indices_from_mask(mask)
       #
-      print 'expected_indices:\n', expected_indices, '\nresult_indices:\n',result_indices
+      print('expected_indices:\n', expected_indices, '\nresult_indices:\n',result_indices)
       self.assert_list_almost_equal(expected_indices, result_indices)
 
 
@@ -238,7 +238,7 @@ class Test_subset_Mask_set_descriptor_using_mask(MockerTestCase):
       #
       result_indices = self.o.get_indices_from_mask(mask)
       #
-      print 'expected_indices:\n', expected_indices, '\nresult_indices:\n',result_indices
+      print('expected_indices:\n', expected_indices, '\nresult_indices:\n',result_indices)
       self.assert_list_almost_equal(expected_indices, result_indices)
 
 
@@ -250,11 +250,11 @@ class Test_subset_Mask_set_descriptor_using_mask(MockerTestCase):
       self.o.read_pdb(PdbDataPath+'rna.pdb')
       mask = [0]*100+[1]*200+[0]*(self.o.natoms()-300)
       #
-      expected_indices = range(100,300)
+      expected_indices = list(range(100,300))
       #
       result_indices = self.o.get_indices_from_mask(mask)
       #
-      print 'expected_indices:\n', expected_indices, '\nresult_indices:\n',result_indices
+      print('expected_indices:\n', expected_indices, '\nresult_indices:\n',result_indices)
       self.assert_list_almost_equal(expected_indices, result_indices)
 
 
@@ -266,11 +266,11 @@ class Test_subset_Mask_set_descriptor_using_mask(MockerTestCase):
       self.o.read_pdb(PdbDataPath+'rna.pdb')
       mask = [1]*self.o.natoms()
       #
-      expected_indices = range(self.o.natoms())
+      expected_indices = list(range(self.o.natoms()))
       #
       result_indices = self.o.get_indices_from_mask(mask)
       #
-      print 'expected_indices:\n', expected_indices, '\nresult_indices:\n',result_indices
+      print('expected_indices:\n', expected_indices, '\nresult_indices:\n',result_indices)
       self.assert_list_almost_equal(expected_indices, result_indices)
 
 
@@ -286,7 +286,7 @@ class Test_subset_Mask_set_descriptor_using_mask(MockerTestCase):
       #
       result_indices = self.o.get_indices_from_mask(mask)
       #
-      print 'expected_indices:\n', expected_indices, '\nresult_indices:\n',result_indices
+      print('expected_indices:\n', expected_indices, '\nresult_indices:\n',result_indices)
       self.assert_list_almost_equal(expected_indices, result_indices)
       
 
@@ -298,11 +298,11 @@ class Test_subset_Mask_set_descriptor_using_mask(MockerTestCase):
       self.o.read_pdb(PdbDataPath+'1CRN.pdb')
       mask = [0]*20+[1]*30+[0]*10+[1]*(self.o.natoms()-60)
       #
-      expected_indices = range(20,50)+range(60,self.o.natoms())
+      expected_indices = list(range(20,50))+list(range(60,self.o.natoms()))
       #
       result_indices = self.o.get_indices_from_mask(mask)
       #
-      print 'expected_indices:\n', expected_indices, '\nresult_indices:\n',result_indices
+      print('expected_indices:\n', expected_indices, '\nresult_indices:\n',result_indices)
       self.assert_list_almost_equal(expected_indices, result_indices)
 
 
@@ -315,11 +315,11 @@ class Test_subset_Mask_set_descriptor_using_mask(MockerTestCase):
       self.o.read_pdb(PdbDataPath+'1CRN.pdb')
       mask = [1]*self.o.natoms()
       #
-      expected_indices = range(self.o.natoms())
+      expected_indices = list(range(self.o.natoms()))
       #
       result_indices = self.o.get_indices_from_mask(mask)
       #
-      print 'expected_indices:\n', expected_indices, '\nresult_indices:\n',result_indices
+      print('expected_indices:\n', expected_indices, '\nresult_indices:\n',result_indices)
       self.assert_list_almost_equal(expected_indices, result_indices)
 
 
@@ -337,7 +337,7 @@ class Test_subset_Mask_set_descriptor_using_mask(MockerTestCase):
       #
       result_indices = self.o.get_indices_from_mask(mask)
       #
-      print 'expected_indices:\n', expected_indices, '\nresult_indices:\n',result_indices
+      print('expected_indices:\n', expected_indices, '\nresult_indices:\n',result_indices)
       self.assert_list_almost_equal(expected_indices, result_indices)
 
 
@@ -350,11 +350,11 @@ class Test_subset_Mask_set_descriptor_using_mask(MockerTestCase):
       self.o.read_pdb(PdbDataPath+'1KP8.pdb')
       mask = [0]*100+[1]*(self.o.natoms()-100)
       #
-      expected_indices = range(100,self.o.natoms())
+      expected_indices = list(range(100,self.o.natoms()))
       #
       result_indices = self.o.get_indices_from_mask(mask)
       #
-      print 'expected_indices:\n', expected_indices, '\nresult_indices:\n',result_indices
+      print('expected_indices:\n', expected_indices, '\nresult_indices:\n',result_indices)
       self.assert_list_almost_equal(expected_indices, result_indices)
 
 
@@ -368,11 +368,11 @@ class Test_subset_Mask_set_descriptor_using_mask(MockerTestCase):
       self.o.read_pdb(PdbDataPath+'1KP8.pdb')
       mask = [1]*self.o.natoms()
       #
-      expected_indices = range(self.o.natoms())
+      expected_indices = list(range(self.o.natoms()))
       #
       result_indices = self.o.get_indices_from_mask(mask)
       #
-      print 'expected_indices:\n', expected_indices, '\nresult_indices:\n',result_indices
+      print('expected_indices:\n', expected_indices, '\nresult_indices:\n',result_indices)
       self.assert_list_almost_equal(expected_indices, result_indices)
 
 
@@ -392,7 +392,7 @@ class Test_subset_Mask_set_descriptor_using_mask(MockerTestCase):
       #
       result_indices = self.o.get_indices_from_mask(mask)
       #
-      print 'expected_indices:\n', expected_indices, '\nresult_indices:\n',result_indices
+      print('expected_indices:\n', expected_indices, '\nresult_indices:\n',result_indices)
       self.assert_list_almost_equal(expected_indices, result_indices)
 
 

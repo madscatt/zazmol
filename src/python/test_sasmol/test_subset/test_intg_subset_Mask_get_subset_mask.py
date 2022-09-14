@@ -384,7 +384,7 @@ class Test_subset_Mask_get_subset_mask(MockerTestCase):
       basis_filter = 'moltype[i]=="rna"'
       #
       error, mask = self.o.get_subset_mask(basis_filter)
-      print error, mask
+      print(error, mask)
       #
       expecting_error = False
       expectd_mask = [0]*10632

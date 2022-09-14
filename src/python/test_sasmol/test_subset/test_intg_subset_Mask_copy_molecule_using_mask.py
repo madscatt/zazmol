@@ -561,7 +561,7 @@ class Test_subset_Mask_copy_molecule_using_mask(MockerTestCase):
       #
       error = self.o.copy_molecule_using_mask(self.o_result, mask, frame)
       #
-      print self.o_result.natoms()
+      print(self.o_result.natoms())
       self.assertEqual(len(error)>0, expecting_error)
       self.assert_pdb(self.o_result, self.o_expected)
 

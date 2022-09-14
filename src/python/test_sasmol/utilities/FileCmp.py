@@ -4,7 +4,7 @@ def cmp_skip(f1, f2, skip=[]):
    '''
    compare two text files by skipping some lines
    '''
-   print 'skipping ',skip
+   print('skipping ',skip)
    with open(f1,'r') as fp1, open(f2,'r') as fp2:
       count = 0
       while True:
@@ -16,7 +16,7 @@ def cmp_skip(f1, f2, skip=[]):
          elif (not line1):
             return True
          elif (line1 != line2):
-            print '\ndiffer beginning at:\n',line1, '\n', line2, '\n'
+            print('\ndiffer beginning at:\n',line1, '\n', line2, '\n')
             return False
       return True
 
@@ -30,7 +30,7 @@ def cmp_dcd_skip_date(f1,f2,start=179,end=202):
    fcont2 = fp2.read()
    l = len(fcont1)
    if l!=len(fcont2):
-      print "File length does not match"
+      print("File length does not match")
       return False
    else:
       for i in range(l):
@@ -44,5 +44,5 @@ def cmp_dcd_skip_date(f1,f2,start=179,end=202):
 
 if __name__ == '__main__':
    cmp_skip('a','b',[4, 59])
-   print cmp_dcd_skip_date('c.dcd','d.dcd')
+   print(cmp_dcd_skip_date('c.dcd','d.dcd'))
 

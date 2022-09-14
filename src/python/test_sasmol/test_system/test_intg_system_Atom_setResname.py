@@ -39,7 +39,7 @@ class Test_intg_system_Atom_setResname(MockerTestCase):
       self.o.setResname(expected)
       #
       result = self.o.resname()
-      print result
+      print(result)
       #
       self.assertEqual(expected, result)
 

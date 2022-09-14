@@ -68,7 +68,7 @@ class Test_unit_file_io_Files_get_elements(MockerTestCase):
          resname = name
          realname = name
          (error, element_name) = self.o.get_element(name,resname)
-         print error, element_name
+         print(error, element_name)
          self.assertEqual(len(error),0)
          self.assertEqual(element_name,realname)
 
@@ -84,7 +84,7 @@ class Test_unit_file_io_Files_get_elements(MockerTestCase):
          name = atom.split()[0]
          realname = atom.split()[1]
          (error, element_name) = self.o.get_element(name,resname)
-         print error, element_name
+         print(error, element_name)
          self.assertEqual(len(error),0)
          self.assertEqual(element_name,realname)
 
@@ -100,7 +100,7 @@ class Test_unit_file_io_Files_get_elements(MockerTestCase):
       for atom in open(datafile).readlines():
          name = atom.strip()
          (error, element_name) = self.o.get_element(name,resname)
-         print error, element_name
+         print(error, element_name)
          self.assertEqual(len(error),0)
          self.assertEqual(element_name,realname)
 
@@ -115,7 +115,7 @@ class Test_unit_file_io_Files_get_elements(MockerTestCase):
       for atom in open(datafile).readlines():
          name = atom.strip()
          (error, element_name) = self.o.get_element(name,resname)
-         print error, element_name
+         print(error, element_name)
          self.assertEqual(len(error),0)
          self.assertEqual(element_name,realname)
 
@@ -130,7 +130,7 @@ class Test_unit_file_io_Files_get_elements(MockerTestCase):
       for atom in open(datafile).readlines():
          name = atom.strip()
          (error, element_name) = self.o.get_element(name,resname)
-         print error, element_name
+         print(error, element_name)
          self.assertEqual(len(error),0)
          self.assertEqual(element_name,realname)
 
@@ -145,7 +145,7 @@ class Test_unit_file_io_Files_get_elements(MockerTestCase):
       for atom in open(datafile).readlines():
          name = atom.strip()
          (error, element_name) = self.o.get_element(name,resname)
-         print error, element_name
+         print(error, element_name)
          self.assertEqual(len(error),0)
          self.assertEqual(element_name,realname)
 
@@ -160,7 +160,7 @@ class Test_unit_file_io_Files_get_elements(MockerTestCase):
       for atom in open(datafile).readlines():
          name = atom.strip()
          (error, element_name) = self.o.get_element(name,resname)
-         print error, element_name
+         print(error, element_name)
          self.assertEqual(len(error),0)
          self.assertEqual(element_name,realname)
 
@@ -175,7 +175,7 @@ class Test_unit_file_io_Files_get_elements(MockerTestCase):
       for atom in open(datafile).readlines():
          name = atom.strip()
          (error, element_name) = self.o.get_element(name,resname)
-         print error, element_name
+         print(error, element_name)
          self.assertEqual(len(error),0)
          self.assertEqual(element_name,realname)
 
@@ -190,7 +190,7 @@ class Test_unit_file_io_Files_get_elements(MockerTestCase):
          name = atom.strip()
          realname = name
          (error, element_name) = self.o.get_element(name,resname)
-         print error, element_name,realname
+         print(error, element_name,realname)
          self.assertEqual(len(error),0)
          self.assertEqual(element_name,realname)
 
@@ -206,7 +206,7 @@ class Test_unit_file_io_Files_get_elements(MockerTestCase):
          name = atom.split()[0]
          realname = atom.split()[1]
          (error, element_name) = self.o.get_element(name,resname)
-         print error, element_name
+         print(error, element_name)
          self.assertEqual(len(error),0)
          self.assertEqual(element_name,realname)
 
@@ -218,7 +218,7 @@ class Test_unit_file_io_Files_get_elements(MockerTestCase):
       name = 'OXT'
       resname = 'RES'
       (error, element_name) = self.o.get_element(name,resname)
-      print error, element_name
+      print(error, element_name)
       self.assertTrue(len(error)==0)
       self.assertEqual(element_name,'O')
 
@@ -230,7 +230,7 @@ class Test_unit_file_io_Files_get_elements(MockerTestCase):
       name = '1H11'
       resname = 'RES'
       (error, element_name) = self.o.get_element(name,resname)
-      print error, element_name
+      print(error, element_name)
       self.assertTrue(len(error)==0)
       self.assertEqual(element_name,'H')
 
@@ -243,7 +243,7 @@ class Test_unit_file_io_Files_get_elements(MockerTestCase):
       name = '$ABC'
       resname = 'RES'
       (error, element_name) = self.o.get_element(name,resname)
-      print error, element_name
+      print(error, element_name)
       self.assertTrue(len(error)>0)
       self.assertEqual(element_name,'')
 
@@ -255,7 +255,7 @@ class Test_unit_file_io_Files_get_elements(MockerTestCase):
       name = '11H'
       resname = 'RES'
       (error, element_name) = self.o.get_element(name,resname)
-      print error, element_name
+      print(error, element_name)
       self.assertTrue(len(error)>0)
       self.assertEqual(element_name,'')
 

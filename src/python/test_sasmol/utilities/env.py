@@ -18,15 +18,15 @@ def determine_float_type():
       return 'float'
 
 
-if os.environ.has_key('SASMOL_LARGETEST'):
-   print '\nKEY CONFLICT IN os.envrion of SASMOL_LARGETEST!\nWILL QUIT!'
+if 'SASMOL_LARGETEST' in os.environ:
+   print('\nKEY CONFLICT IN os.envrion of SASMOL_LARGETEST!\nWILL QUIT!')
    exit()
 else:
    os.environ['SASMOL_LARGETEST']='n'
 
 
-if os.environ.has_key('SASMOL_HUGETEST'):
-   print '\nKEY CONFLICT IN os.envrion of SASMOL_HUGETEST!\nWILL QUIT!'
+if 'SASMOL_HUGETEST' in os.environ:
+   print('\nKEY CONFLICT IN os.envrion of SASMOL_HUGETEST!\nWILL QUIT!')
    exit()
 else:
    os.environ['SASMOL_HUGETEST']='n'
@@ -39,8 +39,8 @@ if os.environ['SASMOL_HUGETEST']=='y':
 	generate_huge_dcd_onthefly.generate_huge_dcd()
 
 
-if os.environ.has_key('SASMOL_FLOATTYPE'):
-   print '\nKEY CONFLICT IN os.envrion of SASMOL_FLOATTYPE!\nWILL QUIT!'
+if 'SASMOL_FLOATTYPE' in os.environ:
+   print('\nKEY CONFLICT IN os.envrion of SASMOL_FLOATTYPE!\nWILL QUIT!')
    exit()
 else:
    os.environ['SASMOL_FLOATTYPE']= determine_float_type()

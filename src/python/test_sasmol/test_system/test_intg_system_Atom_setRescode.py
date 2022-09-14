@@ -39,7 +39,7 @@ class Test_intg_system_Atom_setRescode(MockerTestCase):
       self.o.setRescode(expected)
       #
       result = self.o.rescode()
-      print result
+      print(result)
       #
       self.assertEqual(expected, result)
 

@@ -70,9 +70,9 @@ import numpy
 import os
 
 PdbDataPath = os.path.join(os.path.dirname(os.path.realpath(__file__)),'..','data','pdb_common')+os.path.sep
-print 'PdbDataPath = ', PdbDataPath
-print 'PdbDataPath = ', PdbDataPath
-print 'PdbDataPath = ', PdbDataPath
+print('PdbDataPath = ', PdbDataPath)
+print('PdbDataPath = ', PdbDataPath)
+print('PdbDataPath = ', PdbDataPath)
 
 class Test_subset_Mask_merge_two_molecules(MockerTestCase): 
  
@@ -98,7 +98,7 @@ class Test_subset_Mask_merge_two_molecules(MockerTestCase):
       frame = 0
       try:
          self.assertEqual(o1.atom()+o2.atom(), o3.atom())
-         self.assert_list_almost_equal(list(o3.index()), range(1,len(list(o3.index()))+1))
+         self.assert_list_almost_equal(list(o3.index()), list(range(1,len(list(o3.index()))+1)))
          self.assertEqual(o1.name()+o2.name(), o3.name())
          self.assertEqual(o1.loc()+o2.loc(), o3.loc())
          self.assertEqual(o1.resname()+o2.resname(), o3.resname())

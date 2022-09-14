@@ -33,17 +33,17 @@ class Foo:
         new_dict = {}
         natoms = len(class_instance.__dict__['_var_a'])
         #natoms = len(class_instance.__dict__['_natoms'])
-        all_data = [[] for x in xrange(natoms)]
-        for i in xrange(natoms):
+        all_data = [[] for x in range(natoms)]
+        for i in range(natoms):
             if i in mask:
                 count = 0
-                for key, value in class_instance.__dict__.iteritems():
+                for key, value in class_instance.__dict__.items():
                     #print key, value
                     #print i, value[i]
                     all_data[count].append(value[i])
                     count += 1
         count = 0
-        for key, value in class_instance.__dict__.iteritems():
+        for key, value in class_instance.__dict__.items():
             new_dict[key] = all_data[count]
             count += 1
             
@@ -54,27 +54,27 @@ class Foo:
        # return cls(**new_dict)
        # return cls(var_a = data, var_b = [3,2])
 
-data = [x for x in xrange(10)]
-data2 = [x*2 for x in xrange(10)]
+data = [x for x in range(10)]
+data2 = [x*2 for x in range(10)]
 foo = Foo()
 
-print 'foo.__dict__ = ', foo.__dict__
+print('foo.__dict__ = ', foo.__dict__)
 foo.setVar_a(data)
 foo.setVar_b(data2)
 
-print 'foo.__dict__ = ', foo.__dict__
+print('foo.__dict__ = ', foo.__dict__)
 
-print 'foo.var_a() = ', foo.var_a()
-print 'foo.var_b() = ', foo.var_b()
+print('foo.var_a() = ', foo.var_a())
+print('foo.var_b() = ', foo.var_b())
 
 mask = [0,8]
 #new_foo = Foo()
 new_foo = Foo.from_foo(foo,mask)
-print 'new_foo.__dict__ = ', new_foo.__dict__
+print('new_foo.__dict__ = ', new_foo.__dict__)
 
 
-print 'new_foo._var_a = ', new_foo._var_a
-print 'new_foo._var_b = ', new_foo._var_b
+print('new_foo._var_a = ', new_foo._var_a)
+print('new_foo._var_b = ', new_foo._var_b)
 
 '''
 new_foo.var_a()[0] = 3

@@ -41,7 +41,7 @@ class Test_intg_sasmol_Atom_chain(MockerTestCase):
       self.o.read_pdb(DataPath+'1CRN-3frames.pdb')
       #
       result = self.o.chain()
-      print result
+      print(result)
       #
       self.assertEqual(expected, result)
 

@@ -127,7 +127,7 @@ class Test_intg_subset_Mask_get_dihedral_subset_mask(MockerTestCase):
       #
       expected_farray =  self.hard_wired_get_all_dihedral_subset_mask(self.o, flexible_residues, mtype)
       #
-      print 'result_mask:\n', result_farray, '\nexpected_mask:\n',expected_farray
+      print('result_mask:\n', result_farray, '\nexpected_mask:\n',expected_farray)
       self.assertTrue(isinstance(result_farray, numpy.ndarray))
       self.assert_list_almost_equal(result_farray, expected_farray)
 
@@ -146,7 +146,7 @@ class Test_intg_subset_Mask_get_dihedral_subset_mask(MockerTestCase):
       #
       expected_farray =  self.hard_wired_get_all_dihedral_subset_mask(self.o, flexible_residues, mtype)
       #
-      print 'result_mask:\n', result_farray, '\nexpected_mask:\n',expected_farray
+      print('result_mask:\n', result_farray, '\nexpected_mask:\n',expected_farray)
       self.assertTrue(isinstance(result_farray, numpy.ndarray))
       self.assert_list_almost_equal(result_farray, expected_farray)
 
@@ -179,7 +179,7 @@ class Test_intg_subset_Mask_get_dihedral_subset_mask(MockerTestCase):
       #
       expected_farray =  self.hard_wired_get_all_dihedral_subset_mask(self.o, flexible_residues, mtype)
       #
-      print 'result_mask:\n', result_farray, '\nexpected_mask:\n',expected_farray
+      print('result_mask:\n', result_farray, '\nexpected_mask:\n',expected_farray)
       self.assertTrue(isinstance(result_farray, numpy.ndarray))
       self.assert_list_almost_equal(result_farray, expected_farray)
 
@@ -198,7 +198,7 @@ class Test_intg_subset_Mask_get_dihedral_subset_mask(MockerTestCase):
       #
       expected_farray =  self.hard_wired_get_all_dihedral_subset_mask(self.o, flexible_residues, mtype)
       #
-      print 'result_mask:\n', result_farray, '\nexpected_mask:\n',expected_farray
+      print('result_mask:\n', result_farray, '\nexpected_mask:\n',expected_farray)
       self.assertTrue(isinstance(result_farray, numpy.ndarray))
       self.assert_list_almost_equal(result_farray, expected_farray)
 
@@ -217,7 +217,7 @@ class Test_intg_subset_Mask_get_dihedral_subset_mask(MockerTestCase):
       #
       expected_farray =  self.hard_wired_get_all_dihedral_subset_mask(self.o, flexible_residues, mtype)
       #
-      print 'result_mask:\n', result_farray, '\nexpected_mask:\n',expected_farray
+      print('result_mask:\n', result_farray, '\nexpected_mask:\n',expected_farray)
       self.assertTrue(isinstance(result_farray, numpy.ndarray))
       self.assert_list_almost_equal(result_farray, expected_farray)
 
@@ -236,7 +236,7 @@ class Test_intg_subset_Mask_get_dihedral_subset_mask(MockerTestCase):
       #
       expected_farray =  self.hard_wired_get_all_dihedral_subset_mask(self.o, flexible_residues, mtype)
       #
-      print 'result_mask:\n', result_farray, '\nexpected_mask:\n',expected_farray
+      print('result_mask:\n', result_farray, '\nexpected_mask:\n',expected_farray)
       self.assertTrue(isinstance(result_farray, numpy.ndarray))
       self.assert_list_almost_equal(result_farray, expected_farray)
 
@@ -256,7 +256,7 @@ class Test_intg_subset_Mask_get_dihedral_subset_mask(MockerTestCase):
       #
       expected_farray =  self.hard_wired_get_all_dihedral_subset_mask(self.o, flexible_residues, mtype)
       #
-      print 'result_mask:\n', result_farray, '\nexpected_mask:\n',expected_farray
+      print('result_mask:\n', result_farray, '\nexpected_mask:\n',expected_farray)
       self.assertTrue(isinstance(result_farray, numpy.ndarray))
       self.assert_list_almost_equal(result_farray, expected_farray)
 
@@ -275,7 +275,7 @@ class Test_intg_subset_Mask_get_dihedral_subset_mask(MockerTestCase):
       #
       expected_farray =  self.hard_wired_get_all_dihedral_subset_mask(self.o, flexible_residues, mtype)
       #
-      print 'result_mask:\n', result_farray, '\nexpected_mask:\n',expected_farray
+      print('result_mask:\n', result_farray, '\nexpected_mask:\n',expected_farray)
       self.assertTrue(isinstance(result_farray, numpy.ndarray))
       self.assert_list_almost_equal(result_farray, expected_farray)
 
@@ -294,7 +294,7 @@ class Test_intg_subset_Mask_get_dihedral_subset_mask(MockerTestCase):
       #
       expected_farray =  self.hard_wired_get_all_dihedral_subset_mask(self.o, flexible_residues, mtype)
       #
-      print 'result_mask:\n', result_farray, '\nexpected_mask:\n',expected_farray
+      print('result_mask:\n', result_farray, '\nexpected_mask:\n',expected_farray)
       self.assertTrue(isinstance(result_farray, numpy.ndarray))
       self.assert_list_almost_equal(result_farray, expected_farray)
 
@@ -313,7 +313,7 @@ class Test_intg_subset_Mask_get_dihedral_subset_mask(MockerTestCase):
       #
       expected_farray =  self.hard_wired_get_all_dihedral_subset_mask(self.o, flexible_residues, mtype)
       #
-      print 'result_mask:\n', result_farray, '\nexpected_mask:\n',expected_farray
+      print('result_mask:\n', result_farray, '\nexpected_mask:\n',expected_farray)
       self.assertTrue(isinstance(result_farray, numpy.ndarray))
       self.assert_list_almost_equal(result_farray, expected_farray)
       
@@ -326,13 +326,13 @@ class Test_intg_subset_Mask_get_dihedral_subset_mask(MockerTestCase):
       #
       self.o.read_pdb(PdbDataPath+'1CRN.pdb')
       #
-      flexible_residues = range(1,46)
+      flexible_residues = list(range(1,46))
       mtype=0
       result_farray = self.o.get_dihedral_subset_mask(flexible_residues,mtype)
       #
       expected_farray =  self.hard_wired_get_all_dihedral_subset_mask(self.o, flexible_residues, mtype)
       #
-      print 'result_mask:\n', result_farray, '\nexpected_mask:\n',expected_farray
+      print('result_mask:\n', result_farray, '\nexpected_mask:\n',expected_farray)
       self.assertTrue(isinstance(result_farray, numpy.ndarray))
       self.assert_list_almost_equal(result_farray, expected_farray)
 
@@ -352,7 +352,7 @@ class Test_intg_subset_Mask_get_dihedral_subset_mask(MockerTestCase):
       #
       expected_farray =  self.hard_wired_get_all_dihedral_subset_mask(self.o, flexible_residues, mtype)
       #
-      print 'result_mask:\n', result_farray, '\nexpected_mask:\n',expected_farray
+      print('result_mask:\n', result_farray, '\nexpected_mask:\n',expected_farray)
       self.assertTrue(isinstance(result_farray, numpy.ndarray))
       self.assert_list_almost_equal(result_farray, expected_farray)
       
@@ -366,13 +366,13 @@ class Test_intg_subset_Mask_get_dihedral_subset_mask(MockerTestCase):
       #
       self.o.read_pdb(PdbDataPath+'1KP8.pdb')
       #
-      flexible_residues = range(2,527)
+      flexible_residues = list(range(2,527))
       mtype=0
       result_farray = self.o.get_dihedral_subset_mask(flexible_residues,mtype)
       #
       expected_farray =  self.hard_wired_get_all_dihedral_subset_mask(self.o, flexible_residues, mtype)
       #
-      print 'result_mask:\n', result_farray, '\nexpected_mask:\n',expected_farray
+      print('result_mask:\n', result_farray, '\nexpected_mask:\n',expected_farray)
       self.assertTrue(isinstance(result_farray, numpy.ndarray))
       self.assert_list_almost_equal(result_farray, expected_farray)
 
@@ -390,7 +390,7 @@ class Test_intg_subset_Mask_get_dihedral_subset_mask(MockerTestCase):
       #
       expected_farray =  self.hard_wired_get_all_dihedral_subset_mask(self.o, flexible_residues, mtype)
       #
-      print 'result_mask:\n', result_farray, '\nexpected_mask:\n',expected_farray
+      print('result_mask:\n', result_farray, '\nexpected_mask:\n',expected_farray)
       self.assertTrue(isinstance(result_farray, numpy.ndarray))
       self.assert_list_almost_equal(result_farray, expected_farray)
 
@@ -403,13 +403,13 @@ class Test_intg_subset_Mask_get_dihedral_subset_mask(MockerTestCase):
       #
       self.o.read_pdb(PdbDataPath+'rna.pdb')
       #
-      flexible_residues = range(1,25)
+      flexible_residues = list(range(1,25))
       mtype=1
       result_farray = self.o.get_dihedral_subset_mask(flexible_residues,mtype)
       #
       expected_farray =  self.hard_wired_get_all_dihedral_subset_mask(self.o, flexible_residues, mtype)
       #
-      print 'result_mask:\n', result_farray, '\nexpected_mask:\n',expected_farray
+      print('result_mask:\n', result_farray, '\nexpected_mask:\n',expected_farray)
       self.assertTrue(isinstance(result_farray, numpy.ndarray))
       self.assert_list_almost_equal(result_farray, expected_farray)
 
@@ -425,7 +425,7 @@ class Test_intg_subset_Mask_get_dihedral_subset_mask(MockerTestCase):
       except Exception:
          pass
       #
-      flexible_residues = range(2,527)
+      flexible_residues = list(range(2,527))
       mtype=0
       #
       with self.assertRaises(Exception):

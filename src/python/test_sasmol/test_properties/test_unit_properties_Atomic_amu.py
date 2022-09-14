@@ -52,8 +52,8 @@ class Test_unit_properties_Atomic_charmm_names(MockerTestCase):
 	   make sure the keys are unique
       '''
       #
-      standard_atomic_weight_unique = self.unique(self.standard_atomic_weight.keys())
-      self.assertEqual(self.standard_atomic_weight.keys(), standard_atomic_weight_unique)
+      standard_atomic_weight_unique = self.unique(list(self.standard_atomic_weight.keys()))
+      self.assertEqual(list(self.standard_atomic_weight.keys()), standard_atomic_weight_unique)
 
 
 

@@ -98,7 +98,7 @@ class Test_linear_algebra_cross_product(MockerTestCase):
         x=numpy.array([util.HUGE, 3.0, -100.2],floattype)
         y=numpy.array([2.0, 0.9, -2.2],floattype)
         result=linear_algebra.cross_product(x,y)
-        print result
+        print(result)
         resultnp = numpy.cross(x,y)
         self.assert_list_almost_equal(result,resultnp)
 

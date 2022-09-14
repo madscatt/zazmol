@@ -60,7 +60,7 @@ class Test_intg_operate_Move_translate(MockerTestCase):
         value = numpy.array([1.0, 3.0, 6.0],floattype)
         self.o.translate(0,value)
         result_coor = self.o.coor()
-        print result_coor
+        print(result_coor)
         expected_coor = numpy.array([[[74.944, 44.799, 47.652]]], floattype)
         self.assert_list_almost_equal(expected_coor, result_coor,self.tol)
 
@@ -72,7 +72,7 @@ class Test_intg_operate_Move_translate(MockerTestCase):
         self.o.translate(0,value)
         result_coor = self.o.coor()
         numpy.set_printoptions(precision=3)
-        print result_coor
+        print(result_coor)
         expected_coor = numpy.array([[[ 74.944, 44.799, 47.652],\
                                       [ 75.229, 45.563, 46.456],\
                                       [ 76.667, 46.093, 46.463],\

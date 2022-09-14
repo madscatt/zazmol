@@ -78,11 +78,11 @@ class Test_intg_file_io_Files_initialize_children(MockerTestCase):
       self.o.read_pdb(DataPath+'2AAD.pdb')
       self.o.initialize_children()
       result_names_mask = self.o.names_mask()
-      print '\nresult_names_mask \n',result_names_mask.tolist()
+      print('\nresult_names_mask \n',result_names_mask.tolist())
       #
       expected_names_mask = numpy.array([[1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0], [0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0], [0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0], [0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0], [0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0], [0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1], [0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0]],numpy.int)
 
-      print '\nexpected_names_mask \n',expected_names_mask
+      print('\nexpected_names_mask \n',expected_names_mask)
       #
       self.assert_list_almost_equal(expected_names_mask, result_names_mask,3)
  
@@ -94,11 +94,11 @@ class Test_intg_file_io_Files_initialize_children(MockerTestCase):
       self.o.read_pdb(DataPath+'2AAD.pdb')
       self.o.initialize_children()
       result_mask = self.o.resnames_mask()
-      print '\nresult_names_mask \n',result_mask.tolist()
+      print('\nresult_names_mask \n',result_mask.tolist())
       #
       expected_mask = numpy.array([[1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1]],numpy.int)
 
-      print '\nexpected_mask \n',expected_mask
+      print('\nexpected_mask \n',expected_mask)
       #
       self.assert_list_almost_equal(expected_mask, result_mask,3)
 
@@ -110,11 +110,11 @@ class Test_intg_file_io_Files_initialize_children(MockerTestCase):
       self.o.read_pdb(DataPath+'2AAD.pdb')
       self.o.initialize_children()
       result_mask = self.o.resids_mask()
-      print '\nresult_names_mask \n',result_mask.tolist()
+      print('\nresult_names_mask \n',result_mask.tolist())
       #
       expected_mask = numpy.array([[1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1]],numpy.int)
 
-      print '\nexpected_mask \n',expected_mask
+      print('\nexpected_mask \n',expected_mask)
       #
       self.assert_list_almost_equal(expected_mask, result_mask,3)
 
@@ -126,10 +126,10 @@ class Test_intg_file_io_Files_initialize_children(MockerTestCase):
       self.o.read_pdb(DataPath+'2AAD.pdb')
       self.o.initialize_children()
       result_mask = self.o.chains_mask()
-      print '\nresult_names_mask \n',result_mask.tolist()
+      print('\nresult_names_mask \n',result_mask.tolist())
       #
       expected_mask = numpy.array([[1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]],numpy.int)
-      print '\nexpected_mask \n',expected_mask
+      print('\nexpected_mask \n',expected_mask)
       #
       self.assert_list_almost_equal(expected_mask, result_mask,3)
 
@@ -141,10 +141,10 @@ class Test_intg_file_io_Files_initialize_children(MockerTestCase):
       self.o.read_pdb(DataPath+'2AAD.pdb')
       self.o.initialize_children()
       result_mask = self.o.occupancies_mask()
-      print '\nresult_names_mask \n',result_mask.tolist()
+      print('\nresult_names_mask \n',result_mask.tolist())
       #
       expected_mask = numpy.array([[1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]],numpy.int)
-      print '\nexpected_mask \n',expected_mask
+      print('\nexpected_mask \n',expected_mask)
       #
       self.assert_list_almost_equal(expected_mask, result_mask,3)
 
@@ -156,10 +156,10 @@ class Test_intg_file_io_Files_initialize_children(MockerTestCase):
       self.o.read_pdb(DataPath+'2AAD.pdb')
       self.o.initialize_children()
       result_mask = self.o.betas_mask()
-      print '\nresult_names_mask \n',result_mask.tolist()
+      print('\nresult_names_mask \n',result_mask.tolist())
       #
       expected_mask = numpy.array([[1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1]],numpy.int)
-      print '\nexpected_mask \n',expected_mask
+      print('\nexpected_mask \n',expected_mask)
       #
       self.assert_list_almost_equal(expected_mask, result_mask,3)
 
@@ -171,10 +171,10 @@ class Test_intg_file_io_Files_initialize_children(MockerTestCase):
       self.o.read_pdb(DataPath+'2AAD.pdb')
       self.o.initialize_children()
       result_mask = self.o.elements_mask()
-      print '\nresult_elements_mask \n',result_mask.tolist()
+      print('\nresult_elements_mask \n',result_mask.tolist())
       #
       expected_mask = numpy.array([[1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0], [0, 1, 1, 0, 1, 1, 1, 1, 0, 1, 1, 0, 1, 0, 1], [0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0]],numpy.int)
-      print '\nexpected_mask \n',expected_mask
+      print('\nexpected_mask \n',expected_mask)
       #
       self.assert_list_almost_equal(expected_mask, result_mask,3)
 
@@ -186,10 +186,10 @@ class Test_intg_file_io_Files_initialize_children(MockerTestCase):
       self.o.read_pdb(DataPath+'2AAD.pdb')
       self.o.initialize_children()
       result_mask = self.o.segnames_mask()
-      print '\nresult_segnames_mask \n',result_mask.tolist()
+      print('\nresult_segnames_mask \n',result_mask.tolist())
       #
       expected_mask = numpy.array([[1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]],numpy.int)
-      print '\nexpected_mask \n',expected_mask
+      print('\nexpected_mask \n',expected_mask)
       #
       self.assert_list_almost_equal(expected_mask, result_mask,3)
 

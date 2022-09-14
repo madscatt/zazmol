@@ -111,12 +111,12 @@ class Test_subset_Mask_get_subset_mask(MockerTestCase):
       test for for single atom which will not be masked
       '''
       natoms=1
-      index=range(1,natoms+1)
+      index=list(range(1,natoms+1))
       name=['CA']*natoms
       loc=[' ']*natoms
       resname=['ALA']*natoms
       chain=['A']*natoms
-      resid=range(1,natoms+1)
+      resid=list(range(1,natoms+1))
       rescode=[' ']*natoms
       occupancy=[1.0]*natoms
       beta=[10.00]*natoms
@@ -142,12 +142,12 @@ class Test_subset_Mask_get_subset_mask(MockerTestCase):
       test for for single atom which will be masked
       '''
       natoms=1
-      index=range(1,natoms+1)
+      index=list(range(1,natoms+1))
       name=['CA']*natoms
       loc=[' ']*natoms
       resname=['ALA']*natoms
       chain=['A']*natoms
-      resid=range(1,natoms+1)
+      resid=list(range(1,natoms+1))
       rescode=[' ']*natoms
       occupancy=[1.0]*natoms
       beta=[10.00]*natoms
@@ -173,12 +173,12 @@ class Test_subset_Mask_get_subset_mask(MockerTestCase):
       test for for single atom which will not be masked due to filter error
       '''
       natoms=1
-      index=range(1,natoms+1)
+      index=list(range(1,natoms+1))
       name=['CA']*natoms
       loc=[' ']*natoms
       resname=['ALA']*natoms
       chain=['A']*natoms
-      resid=range(1,natoms+1)
+      resid=list(range(1,natoms+1))
       rescode=[' ']*natoms
       occupancy=[1.0]*natoms
       beta=[10.00]*natoms
@@ -204,12 +204,12 @@ class Test_subset_Mask_get_subset_mask(MockerTestCase):
       test for for single atom which will be masked
       '''
       natoms=1
-      index=range(1,natoms+1)
+      index=list(range(1,natoms+1))
       name=['CA']*natoms
       loc=[' ']*natoms
       resname=['ALA']*natoms
       chain=['A']*natoms
-      resid=range(1,natoms+1)
+      resid=list(range(1,natoms+1))
       rescode=[' ']*natoms
       occupancy=[1.0]*natoms
       beta=[10.00]*natoms
@@ -235,12 +235,12 @@ class Test_subset_Mask_get_subset_mask(MockerTestCase):
       test for for single atom which will be masked
       '''
       natoms=1
-      index=range(1,natoms+1)
+      index=list(range(1,natoms+1))
       name=['CA']*natoms
       loc=[' ']*natoms
       resname=['ALA']*natoms
       chain=['A']*natoms
-      resid=range(1,natoms+1)
+      resid=list(range(1,natoms+1))
       rescode=[' ']*natoms
       occupancy=[1.0]*natoms
       beta=[10.00]*natoms
@@ -266,7 +266,7 @@ class Test_subset_Mask_get_subset_mask(MockerTestCase):
       test for for three atoms where none will be masked
       '''
       natoms=3
-      index=range(1,natoms+1)
+      index=list(range(1,natoms+1))
       name=['CA','N','C']
       loc=[' ']*natoms
       resname=['ALA']*natoms
@@ -297,7 +297,7 @@ class Test_subset_Mask_get_subset_mask(MockerTestCase):
       test for for three atoms where one will be masked
       '''
       natoms=3
-      index=range(1,natoms+1)
+      index=list(range(1,natoms+1))
       name=['CA','N','C']
       loc=[' ']*natoms
       resname=['ALA']*natoms
@@ -327,7 +327,7 @@ class Test_subset_Mask_get_subset_mask(MockerTestCase):
       test for for three atoms where one will be masked
       '''
       natoms=3
-      index=range(1,natoms+1)
+      index=list(range(1,natoms+1))
       name=['CA','N','C']
       loc=[' ']*natoms
       resname=['ALA']*natoms
@@ -357,7 +357,7 @@ class Test_subset_Mask_get_subset_mask(MockerTestCase):
       test for for three atoms where all will be masked
       '''
       natoms=3
-      index=range(1,natoms+1)
+      index=list(range(1,natoms+1))
       name=['CA','N','C']
       loc=[' ']*natoms
       resname=['ALA']*natoms
@@ -388,7 +388,7 @@ class Test_subset_Mask_get_subset_mask(MockerTestCase):
       test for for three atoms where none will be masked
       '''
       natoms=3
-      index=range(1,natoms+1)
+      index=list(range(1,natoms+1))
       name=['CA','N','C']
       loc=[' ']*natoms
       resname=['ALA']*natoms
@@ -420,7 +420,7 @@ class Test_subset_Mask_get_subset_mask(MockerTestCase):
       '''
       natoms=500
       aasize=5
-      index=range(1,natoms+1)
+      index=list(range(1,natoms+1))
       name=['N','CA','C','O','CB']*(natoms/aasize)
       loc=[' ']*natoms
       resname=['ALA']*natoms
@@ -453,7 +453,7 @@ class Test_subset_Mask_get_subset_mask(MockerTestCase):
       '''
       natoms=50000
       aasize=5
-      index=range(1,natoms+1)
+      index=list(range(1,natoms+1))
       name=['N','CA','C','O','CB']*(natoms/aasize)
       loc=[' ']*natoms
       resname=['ALA']*natoms
@@ -486,7 +486,7 @@ class Test_subset_Mask_get_subset_mask(MockerTestCase):
       '''
       natoms=5000000
       aasize=5
-      index=range(1,natoms+1)
+      index=list(range(1,natoms+1))
       name=['N','CA','C','O','CB']*(natoms/aasize)
       loc=[' ']*natoms
       resname=['ALA']*natoms

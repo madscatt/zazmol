@@ -39,7 +39,7 @@ class Test_intg_system_Atom_setCharge(MockerTestCase):
       self.o.setCharge(expected)
       #
       result = self.o.charge()
-      print result
+      print(result)
       #
       self.assertEqual(expected, result)
 

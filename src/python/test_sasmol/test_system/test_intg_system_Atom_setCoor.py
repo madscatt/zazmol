@@ -58,7 +58,7 @@ class Test_intg_system_Atom_setCoor(MockerTestCase):
       self.o.setAtom(expected)
       #
       result = self.o.atom()
-      print result
+      print(result)
       #
       self.assert_list_almost_equal(expected, result)
 

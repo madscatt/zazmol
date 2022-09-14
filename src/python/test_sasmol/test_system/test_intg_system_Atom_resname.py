@@ -39,7 +39,7 @@ class Test_intg_sasmol_Atom_resname(MockerTestCase):
       self.o.read_pdb(DataPath+'1CRN-3frames.pdb')
       #
       result = self.o.resname()
-      print result
+      print(result)
       #
       self.assertEqual(expected, result)
 

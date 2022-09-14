@@ -79,7 +79,7 @@ class Test_unit_file_io_Files_element_filter(MockerTestCase):
          resnames.append(resname)
          elements.append('  ')
          expected_elements.append(element)
-      print 'names\n',names
+      print('names\n',names)
       self.o.setName(names)
       self.o.setResname(resnames)
       self.o.setElement(elements)
@@ -106,7 +106,7 @@ class Test_unit_file_io_Files_element_filter(MockerTestCase):
          resnames.append(resname)
          elements.append('  ')
          expected_elements.append(element)
-      print 'names\n',names
+      print('names\n',names)
       self.o.setName(names)
       self.o.setResname(resnames)
       self.o.setElement(elements)
@@ -135,7 +135,7 @@ class Test_unit_file_io_Files_element_filter(MockerTestCase):
             resnames.append(resname)
             elements.append('  ')
             expected_elements.append(element) 
-      print 'names\n',names
+      print('names\n',names)
       if len(names)>0:
          self.o.setName(names)
          self.o.setResname(resnames)
@@ -157,7 +157,7 @@ class Test_unit_file_io_Files_element_filter(MockerTestCase):
             resnames.append(resname)
             elements.append('  ')
             expected_elements.append(element) 
-      print 'names\n',names
+      print('names\n',names)
       self.o.setName(names)
       if len(names)>0:
          self.o.setResname(resnames)
@@ -186,7 +186,7 @@ class Test_unit_file_io_Files_element_filter(MockerTestCase):
             resnames.append(resname)
             elements.append('  ')
             expected_elements.append(element) 
-      print 'names\n',names
+      print('names\n',names)
       if len(names)>0:
          self.o.setName(names)
          self.o.setResname(resnames)
@@ -208,7 +208,7 @@ class Test_unit_file_io_Files_element_filter(MockerTestCase):
             resnames.append(resname)
             elements.append('  ')
             expected_elements.append(element) 
-      print 'names\n',names
+      print('names\n',names)
       self.o.setName(names)
       if len(names)>0:
          self.o.setResname(resnames)
@@ -237,7 +237,7 @@ class Test_unit_file_io_Files_element_filter(MockerTestCase):
             resnames.append(resname)
             elements.append('  ')
             expected_elements.append(element) 
-      print 'names\n',names
+      print('names\n',names)
       if len(names)>0:
          self.o.setName(names)
          self.o.setResname(resnames)
@@ -259,7 +259,7 @@ class Test_unit_file_io_Files_element_filter(MockerTestCase):
             resnames.append(resname)
             elements.append('  ')
             expected_elements.append(element) 
-      print 'names\n',names
+      print('names\n',names)
       self.o.setName(names)
       if len(names)>0:
          self.o.setResname(resnames)
@@ -289,7 +289,7 @@ class Test_unit_file_io_Files_element_filter(MockerTestCase):
             resnames.append(resname)
             elements.append('  ')
             expected_elements.append(element) 
-      print 'names\n',names
+      print('names\n',names)
       if len(names)>0:
          self.o.setName(names)
          self.o.setResname(resnames)
@@ -311,7 +311,7 @@ class Test_unit_file_io_Files_element_filter(MockerTestCase):
             resnames.append(resname)
             elements.append('  ')
             expected_elements.append(element) 
-      print 'names\n',names
+      print('names\n',names)
       self.o.setName(names)
       if len(names)>0:
          self.o.setResname(resnames)
@@ -340,7 +340,7 @@ class Test_unit_file_io_Files_element_filter(MockerTestCase):
             resnames.append(resname)
             elements.append('  ')
             expected_elements.append(element) 
-      print 'names\n',names
+      print('names\n',names)
       if len(names)>0:
          self.o.setName(names)
          self.o.setResname(resnames)
@@ -362,7 +362,7 @@ class Test_unit_file_io_Files_element_filter(MockerTestCase):
             resnames.append(resname)
             elements.append('  ')
             expected_elements.append(element) 
-      print 'names\n',names
+      print('names\n',names)
       self.o.setName(names)
       if len(names)>0:
          self.o.setResname(resnames)
@@ -391,7 +391,7 @@ class Test_unit_file_io_Files_element_filter(MockerTestCase):
             resnames.append(resname)
             elements.append('  ')
             expected_elements.append(element) 
-      print 'names\n',names
+      print('names\n',names)
       if len(names)>0:
          self.o.setName(names)
          self.o.setResname(resnames)
@@ -413,7 +413,7 @@ class Test_unit_file_io_Files_element_filter(MockerTestCase):
             resnames.append(resname)
             elements.append('  ')
             expected_elements.append(element) 
-      print 'names\n',names
+      print('names\n',names)
       self.o.setName(names)
       if len(names)>0:
          self.o.setResname(resnames)
@@ -472,14 +472,14 @@ class Test_unit_file_io_Files_element_filter(MockerTestCase):
          resnames.append(resname)
          elements.append('  ')
          expected_elements.append(element)
-      print 'names\n',names
+      print('names\n',names)
       self.o.setName(names)
       self.o.setResname(resnames)
       self.o.setElement(elements)
       self.o.element_filter()
       result_elements = self.o.element()
-      print '\nexpected_elements:\n',expected_elements
-      print '\nresult_elements:\n',result_elements
+      print('\nexpected_elements:\n',expected_elements)
+      print('\nresult_elements:\n',result_elements)
       self.assertTrue(expected_elements==result_elements)
 
    

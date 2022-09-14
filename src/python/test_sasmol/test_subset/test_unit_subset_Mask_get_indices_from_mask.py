@@ -89,7 +89,7 @@ class Test_unit_subset_Mask_get_indices_from_mask(MockerTestCase):
       self.mock_up_get_indices_from_mask(self.o, self.m, natoms)
       result_indices = self.o.get_indices_from_mask(mask)
       #
-      print 'expected_indices:\n', expected_indices, '\nresult_indices:\n',result_indices
+      print('expected_indices:\n', expected_indices, '\nresult_indices:\n',result_indices)
       self.assert_list_almost_equal(expected_indices, result_indices)
 
 
@@ -105,7 +105,7 @@ class Test_unit_subset_Mask_get_indices_from_mask(MockerTestCase):
       self.mock_up_get_indices_from_mask(self.o, self.m, natoms)
       result_indices = self.o.get_indices_from_mask(mask)
       #
-      print 'expected_indices:\n', expected_indices, '\nresult_indices:\n',result_indices
+      print('expected_indices:\n', expected_indices, '\nresult_indices:\n',result_indices)
       self.assert_list_almost_equal(expected_indices, result_indices)
 
 
@@ -121,7 +121,7 @@ class Test_unit_subset_Mask_get_indices_from_mask(MockerTestCase):
       self.mock_up_get_indices_from_mask(self.o, self.m, natoms)
       result_indices = self.o.get_indices_from_mask(mask)
       #
-      print 'expected_indices:\n', expected_indices, '\nresult_indices:\n',result_indices
+      print('expected_indices:\n', expected_indices, '\nresult_indices:\n',result_indices)
       self.assert_list_almost_equal(expected_indices, result_indices)
 
 
@@ -137,7 +137,7 @@ class Test_unit_subset_Mask_get_indices_from_mask(MockerTestCase):
       self.mock_up_get_indices_from_mask(self.o, self.m, natoms)
       result_indices = self.o.get_indices_from_mask(mask)
       #
-      print 'expected_indices:\n', expected_indices, '\nresult_indices:\n',result_indices
+      print('expected_indices:\n', expected_indices, '\nresult_indices:\n',result_indices)
       self.assert_list_almost_equal(expected_indices, result_indices)
 
 
@@ -153,7 +153,7 @@ class Test_unit_subset_Mask_get_indices_from_mask(MockerTestCase):
       self.mock_up_get_indices_from_mask(self.o, self.m, natoms)
       result_indices = self.o.get_indices_from_mask(mask)
       #
-      print 'expected_indices:\n', expected_indices, '\nresult_indices:\n',result_indices
+      print('expected_indices:\n', expected_indices, '\nresult_indices:\n',result_indices)
       self.assert_list_almost_equal(expected_indices, result_indices)
 
 
@@ -169,7 +169,7 @@ class Test_unit_subset_Mask_get_indices_from_mask(MockerTestCase):
       self.mock_up_get_indices_from_mask(self.o, self.m, natoms)
       result_indices = self.o.get_indices_from_mask(mask)
       #
-      print 'expected_indices:\n', expected_indices, '\nresult_indices:\n',result_indices
+      print('expected_indices:\n', expected_indices, '\nresult_indices:\n',result_indices)
       self.assert_list_almost_equal(expected_indices, result_indices)
 
 
@@ -185,7 +185,7 @@ class Test_unit_subset_Mask_get_indices_from_mask(MockerTestCase):
       self.mock_up_get_indices_from_mask(self.o, self.m, natoms)
       result_indices = self.o.get_indices_from_mask(mask)
       #
-      print 'expected_indices:\n', expected_indices, '\nresult_indices:\n',result_indices
+      print('expected_indices:\n', expected_indices, '\nresult_indices:\n',result_indices)
       self.assert_list_almost_equal(expected_indices, result_indices)
 
 
@@ -201,7 +201,7 @@ class Test_unit_subset_Mask_get_indices_from_mask(MockerTestCase):
       self.mock_up_get_indices_from_mask(self.o, self.m, natoms)
       result_indices = self.o.get_indices_from_mask(mask)
       #
-      print 'expected_indices:\n', expected_indices, '\nresult_indices:\n',result_indices
+      print('expected_indices:\n', expected_indices, '\nresult_indices:\n',result_indices)
       self.assert_list_almost_equal(expected_indices, result_indices)
 
 
@@ -212,12 +212,12 @@ class Test_unit_subset_Mask_get_indices_from_mask(MockerTestCase):
       natoms=1000
       mask=[1,0]*(natoms/2)
       #
-      expected_indices = range(0,natoms,2)
+      expected_indices = list(range(0,natoms,2))
       #
       self.mock_up_get_indices_from_mask(self.o, self.m, natoms)
       result_indices = self.o.get_indices_from_mask(mask)
       #
-      print 'expected_indices:\n', expected_indices, '\nresult_indices:\n',result_indices
+      print('expected_indices:\n', expected_indices, '\nresult_indices:\n',result_indices)
       self.assert_list_almost_equal(expected_indices, result_indices)
 
 
@@ -228,12 +228,12 @@ class Test_unit_subset_Mask_get_indices_from_mask(MockerTestCase):
       natoms=1000
       mask=[1]*natoms
       #
-      expected_indices = range(natoms)
+      expected_indices = list(range(natoms))
       #
       self.mock_up_get_indices_from_mask(self.o, self.m, natoms)
       result_indices = self.o.get_indices_from_mask(mask)
       #
-      print 'expected_indices:\n', expected_indices, '\nresult_indices:\n',result_indices
+      print('expected_indices:\n', expected_indices, '\nresult_indices:\n',result_indices)
       self.assert_list_almost_equal(expected_indices, result_indices)
 
 
@@ -244,7 +244,7 @@ class Test_unit_subset_Mask_get_indices_from_mask(MockerTestCase):
       natoms=10
       mask=[1]*natoms*2
       #
-      expected_indices = range(natoms)
+      expected_indices = list(range(natoms))
       #
       self.mock_up_get_indices_from_mask(self.o, self.m, natoms)
       with self.assertRaises(Exception):
@@ -258,7 +258,7 @@ class Test_unit_subset_Mask_get_indices_from_mask(MockerTestCase):
       natoms=10
       mask=[1]*(natoms/2)
       #
-      expected_indices = range(natoms)
+      expected_indices = list(range(natoms))
       #
       self.mock_up_get_indices_from_mask(self.o, self.m, natoms)
       with self.assertRaises(Exception):
@@ -271,7 +271,7 @@ class Test_unit_subset_Mask_get_indices_from_mask(MockerTestCase):
       natoms=10
       mask=[1]*(natoms/2)
       #
-      expected_indices = range(natoms)
+      expected_indices = list(range(natoms))
       #
       self.mock_up_get_indices_from_mask(self.o, self.m, natoms)
       with self.assertRaises(Exception):

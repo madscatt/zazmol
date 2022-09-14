@@ -21,16 +21,16 @@ def old_way():
 
 	flexible_residues=numpy.arange(2,8).tolist()
 
-	print 'getting rotation indices for molecule'
+	print('getting rotation indices for molecule')
 
 	residue_rotation_indices={}
 	residue_rotation_mask={}
 	
-	print 'number of flexible residues = ',len(flexible_residues)
+	print('number of flexible residues = ',len(flexible_residues))
 	
-	for q0 in xrange(2,nresidues):
+	for q0 in range(2,nresidues):
 		if q0 in flexible_residues:
-        		print q0,
+        		print(q0, end=' ')
 			sys.stdout.flush()
 			previous_amino_acid=q0-1
 			this_amino_acid=q0
@@ -64,18 +64,18 @@ def list_way():
 
 	flexible_residues=numpy.arange(2,8).tolist()
 
-	print 'getting rotation indices for molecule'
+	print('getting rotation indices for molecule')
 
 	residue_rotation_indices={}
 	residue_rotation_mask={}
 	
-	print 'number of flexible residues = ',len(flexible_residues)
+	print('number of flexible residues = ',len(flexible_residues))
 
 	atomlist=numpy.arange(0,natoms).tolist()
 	
-	for q0 in xrange(2,nresidues):
+	for q0 in range(2,nresidues):
 		if q0 in flexible_residues:
-        		print q0,
+        		print(q0, end=' ')
 			sys.stdout.flush()
 			previous_amino_acid=q0-1
 			this_amino_acid=q0
@@ -132,18 +132,18 @@ def new_way():
 
 	flexible_residues=numpy.arange(2,8).tolist()
 
-	print 'getting rotation indices for molecule'
+	print('getting rotation indices for molecule')
 
 	residue_rotation_indices={}
 	residue_rotation_mask={}
 	
-	print 'number of flexible residues = ',len(flexible_residues)
+	print('number of flexible residues = ',len(flexible_residues))
 
 	atomlist=numpy.arange(0,natoms).tolist()
 
-	for q0 in xrange(2,nresidues):
+	for q0 in range(2,nresidues):
 		if q0 in flexible_residues:
-        		print q0,
+        		print(q0, end=' ')
 			sys.stdout.flush()
 			previous_amino_acid=q0-1
 			this_amino_acid=q0
@@ -162,7 +162,7 @@ def new_way():
 			refatm += ' or (resid == '+str(next_amino_acid)+' and name == "N")'
 
 			preliminary_mask_array=[]
-			for i in xrange(natoms):
+			for i in range(natoms):
 				name=aname[i] ; resid=aresid[i]
 				ans=StringFunction_0(refatm,name=name,resid=resid)
 				if(ans(name,resid)==1):
@@ -201,14 +201,14 @@ def lam_way():
 	aresid=m1.resid() ; aname=m1.name()
 	nresidues=m1.resid()[-1] - m1.resid()[0]+1
 	flexible_residues=numpy.arange(2,8).tolist()
-	print 'getting rotation indices for molecule'
+	print('getting rotation indices for molecule')
 	residue_rotation_indices={} ; residue_rotation_mask={}
-	print 'number of flexible residues = ',len(flexible_residues)
+	print('number of flexible residues = ',len(flexible_residues))
 	atomlist=numpy.arange(0,natoms).tolist()
 
-	for q0 in xrange(2,nresidues):
+	for q0 in range(2,nresidues):
 		if q0 in flexible_residues:
-        		print q0,
+        		print(q0, end=' ')
 			sys.stdout.flush()
 			previous_amino_acid=q0-1
 			this_amino_acid=q0
@@ -221,7 +221,7 @@ def lam_way():
 			refatm += ' or (resid == '+str(next_amino_acid)+' and name == "N")'
 
 			preliminary_mask_array=[]
-			for i in xrange(natoms):
+			for i in range(natoms):
 				name=aname[i] ; resid=aresid[i]
 #				ans=StringFunction.StringFunction(refatm, independent_variables=('name','resid'))
 				if(ans(name,resid)==1):
@@ -248,7 +248,7 @@ def cee_way():
 	atomlist=numpy.arange(0,natoms).tolist()
 	
 	#import cee_mask
-	import mask
+	from . import mask
 	
 	farray=numpy.zeros((nflexible,natoms),numpy.int32)
 
@@ -256,10 +256,10 @@ def cee_way():
 
 	mask.get_mask_array(farray,name,resid,flexible_residues,nresidues)
 
-	for i in xrange(nflexible):
-		for j in xrange(natoms):
+	for i in range(nflexible):
+		for j in range(natoms):
 			if(farray[i][j]!=0):
-				print farray[i][j],
+				print(farray[i][j], end=' ')
 
 #void get_mask_array(int **farray, char **name,int *resid,int *flexible_residues,int nresidues,int natoms,int nflexible){
 
@@ -272,13 +272,13 @@ if __name__=='__main__':
 # 	print '\n\nNEW WAY'
 # 	nt=Timer('new_way()', 'from __main__ import new_way')
 # 	print '\n',nt.timeit(number=1)
- 	print '\n\nOLD WAY'
+ 	print('\n\nOLD WAY')
  	t=Timer('old_way()', 'from __main__ import old_way')
  	old_time=t.timeit(number=9)
- 	print '\n',old_time
-	print '\n\nCEE WAY'
+ 	print('\n',old_time)
+	print('\n\nCEE WAY')
 	t=Timer('cee_way()', 'from __main__ import cee_way')
 	cee_time=t.timeit(number=9)
-	print '\n',cee_time
- 	print '\nratio = ',old_time/cee_time	
+	print('\n',cee_time)
+ 	print('\nratio = ',old_time/cee_time)	
 		

@@ -1,4 +1,4 @@
-import config as config
+import sasmol.config as config
 
 #global __sasmol_id__ 
 #__sasmol_id__ = 0

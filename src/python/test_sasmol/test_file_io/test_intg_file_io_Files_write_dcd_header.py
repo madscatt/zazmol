@@ -58,7 +58,7 @@ class Test_intg_file_io_Files_write_dcd_header(MockerTestCase):
       self.o.write_dcd_header(fp, nset)
       dcdio.close_dcd_write(fp)
       fsize = os.path.getsize(dcdFileName)
-      print fsize
+      print(fsize)
       self.assertTrue(fsize>0)
       os.remove(dcdFileName)
 
@@ -77,7 +77,7 @@ class Test_intg_file_io_Files_write_dcd_header(MockerTestCase):
       self.o.write_dcd_header(fp, nset)
       dcdio.close_dcd_write(fp)
       fsize = os.path.getsize(dcdFileName)
-      print fsize
+      print(fsize)
       self.assertTrue(fsize>0)
       os.remove(dcdFileName)
 
@@ -96,7 +96,7 @@ class Test_intg_file_io_Files_write_dcd_header(MockerTestCase):
       self.o.write_dcd_header(fp, nset)
       dcdio.close_dcd_write(fp)
       fsize = os.path.getsize(dcdFileName)
-      print fsize
+      print(fsize)
       self.assertTrue(fsize>0)
       os.remove(dcdFileName)
 
@@ -116,7 +116,7 @@ class Test_intg_file_io_Files_write_dcd_header(MockerTestCase):
       self.o.write_dcd_header(fp, nset)
       dcdio.close_dcd_write(fp)
       fsize = os.path.getsize(dcdFileName)
-      print fsize
+      print(fsize)
       self.assertTrue(fsize>0)
       os.remove(dcdFileName)
 
@@ -135,7 +135,7 @@ class Test_intg_file_io_Files_write_dcd_header(MockerTestCase):
       self.o.write_dcd_header(fp, nset)
       dcdio.close_dcd_write(fp)
       fsize = os.path.getsize(dcdFileName)
-      print fsize
+      print(fsize)
       self.assertTrue(fsize>0)
       os.remove(dcdFileName)
 

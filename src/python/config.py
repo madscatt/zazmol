@@ -4,8 +4,8 @@ import os
 ###     BEGIN SYSADMIN EDIT ###
 ###     BEGIN SYSADMIN EDIT ###
 
-#arch = "cluster"
-arch = "mac"
+arch = "cluster"
+#arch = "mac"
 
 __cuda__ = True
 __cuda__ = False

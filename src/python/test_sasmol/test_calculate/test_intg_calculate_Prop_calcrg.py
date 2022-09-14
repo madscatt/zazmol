@@ -65,7 +65,7 @@ class Test_sascalc_Prop_calccom(MockerTestCase):
         self.o.setNatoms(len(self.o._element))
         result_rg  = self.o.calculate_radius_of_gyration(0)
         expected_rg = self.calc_exp()
-        print result_rg, expected_rg
+        print(result_rg, expected_rg)
         self.assertAlmostEqual(expected_rg, result_rg, 3)
 
     def test_1CRN_pdb(self):
@@ -74,7 +74,7 @@ class Test_sascalc_Prop_calccom(MockerTestCase):
         self.o.setNatoms(len(self.o._element))
         result_rg  = self.o.calculate_radius_of_gyration(0)
         expected_rg = self.calc_exp()
-        print result_rg, expected_rg
+        print(result_rg, expected_rg)
         self.assertAlmostEqual(expected_rg, result_rg, 3)
 
     @skipIf(os.environ['SASMOL_LARGETEST']=='n',"I am not testing large files")
@@ -84,7 +84,7 @@ class Test_sascalc_Prop_calccom(MockerTestCase):
         self.o.setNatoms(len(self.o._element))
         result_rg  = self.o.calculate_radius_of_gyration(0)
         expected_rg = self.calc_exp()
-        print result_rg, expected_rg
+        print(result_rg, expected_rg)
         self.assertAlmostEqual(expected_rg, result_rg, 3)
 
     def tearDown(self):

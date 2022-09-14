@@ -1,6 +1,6 @@
-from __future__ import absolute_import
-from __future__ import division
-from __future__ import print_function
+
+
+
 #from __future__ import unicode_literals
 #
 '''
@@ -318,7 +318,7 @@ class PDB(object):
 
         nresid = 0
 
-        for i in xrange(natoms):
+        for i in range(natoms):
 
             names_mask[unique_names.index(name[i])][i] = 1
             resnames_mask[unique_resnames.index(resname[i])][i] = 1
@@ -418,29 +418,31 @@ class PDB(object):
         modelON = False # Flag to indicate that a "MODEL" frame is being read
         for i in range(len(infile)):
             lin=infile[i]
-            lins=string.split(infile[i])
+            #lins=string.split(infile[i])
+            lins=infile[i].split()
             if (len(lins)==0):
                 if ((i+1)==len(infile)):
                     lins=['']
                     if modelON:
-                        raise Exception, 'There should be an ENDMDL pairing with MODEL'
+                        raise Exception('There should be an ENDMDL pairing with MODEL')
                     else:
                         continue
 
-            record_name = string.strip(lin[0:6])
+            #record_name = string.strip(lin[0:6])
+            record_name = lin[0:6].strip()
 #
 ### 	OPEN 	need to re-factor the exception statements to a uniform reporting mechanism
 #
             try:
                 if(lins[0]=='MODEL'):
                     if modelON:
-                        raise Exception, 'Encountered two consecutive MODEL lines' 
+                        raise Exception('Encountered two consecutive MODEL lines') 
                     if (num_counts_this_model != 0):
-                        raise Exception, 'There should not be atoms after ENDMDL and before MODEL lines'
+                        raise Exception('There should not be atoms after ENDMDL and before MODEL lines')
                     modelON = True
                 elif(lins[0]=='ENDMDL'):
                     if not modelON:
-                        raise Exception, 'Encountered two consecutive ENDMDL lines'
+                        raise Exception('Encountered two consecutive ENDMDL lines')
                     modelON = False
                     num_counts_per_model.append(num_counts_this_model)
                     num_counts_this_model = 0
@@ -458,26 +460,26 @@ class PDB(object):
 		#
 
         if ( (len(num_counts_per_end)==0) and (len(num_counts_per_model)!=0) ):
-            raise Exception, 'According to Protein Data Bank Contents Guide, END line must appear in each coor entry'
+            raise Exception('According to Protein Data Bank Contents Guide, END line must appear in each coor entry')
         if (len(num_counts_per_model)!=0 and (len(num_counts_per_end)>1 or sum(num_counts_per_model)!=sum(num_counts_per_end))):
             if(printme): print(num_counts_per_model,num_counts_per_end)
-            raise Exception, 'Only one terminating END line is allowed for pdb entries with multiple MODEL'
+            raise Exception('Only one terminating END line is allowed for pdb entries with multiple MODEL')
 		#
         if (len(num_counts_per_model)>0):
             num_frames = len(num_counts_per_model)
             num_atoms = num_counts_per_model[0]
             if not all(x == num_atoms for x in num_counts_per_model):
-                raise Exception, 'number of atoms per frame is not equal'
+                raise Exception('number of atoms per frame is not equal')
         elif (len(num_counts_per_end)>0):
             num_frames = len(num_counts_per_end)
             num_atoms = num_counts_per_end[0]
             if not all(x == num_atoms for x in num_counts_per_end):
-                raise Exception, 'number of atoms per frame is not equal'
+                raise Exception('number of atoms per frame is not equal')
         elif ( (len(num_counts_per_model)==0) and (len(num_counts_per_end)==0) ):
             num_frames = 1
             num_atoms = num_counts_this_model
         else:
-            raise Exception, 'unexpected error!'
+            raise Exception('unexpected error!')
 
         if(printme): print('num_atoms = ',num_atoms)
 
@@ -493,23 +495,29 @@ class PDB(object):
 
         for i in range(len(infile)):
             lin=infile[i]
-            lins=string.split(infile[i])
+            #lins=string.split(infile[i])
+            lins=infile[i].split()
 
-            record_name = string.strip(lin[0:6])
+            #record_name = string.strip(lin[0:6])
+            record_name = lin[0:6].strip()
 
             if((record_name == 'ATOM' or record_name == 'HETATM') and this_frame == 1):
                 true_index += 1
-                atom.append(string.strip(lin[0:6]))		#	1-6		record name	
+                #atom.append(string.strip(lin[0:6]))		#	1-6		record name	
+                atom.append(lin[0:6].strip())		#	1-6		record name	
                 original_index.append(lin[6:11])				#	7-11		atom serial number
                 index.append(str(true_index))   	        #   set index so that > 99,999 atoms can be read and counted
-                this_name = string.strip(lin[12:16])		#	13-16		atom name
-                name.append(string.strip(lin[12:16]))		#	13-16		atom name
+                #this_name = string.strip(lin[12:16])		#	13-16		atom name
+                this_name = lin[12:16].strip()
+                #name.append(string.strip(lin[12:16]))		#	13-16		atom name
+                name.append(lin[12:16].strip())		#	13-16		atom name
                 if pdbscan:
                     loc.append(lin[16])
                 else:
                     loc.append(' ')
-                this_resname = string.strip(lin[17:21])	#	18-20		residue name
-                resname.append(string.strip(lin[17:21]))	#	18-20		residue name
+                #this_resname = string.strip(lin[17:21])	#	18-20		residue name
+                this_resname = lin[17:21].strip()	#	18-20		residue name
+                resname.append(lin[17:21].strip())	#	18-20		residue name
                 this_chain = lin[21]				#	22		chain identifier
                 chain.append(lin[21])				#	22		chain identifier
                 this_resid = locale.atoi(lin[22:26])			#	23-26		residue sequence number
@@ -525,8 +533,10 @@ class PDB(object):
                 if not pdbscan:
 
                     try:	
-                        occupancy.append(string.strip(lin[54:60]))      #	55-60		occupancy
-                        this_occupancy =string.strip(lin[54:60])      #	55-60		occupancy
+                        #occupancy.append(string.strip(lin[54:60]))      #	55-60		occupancy
+                        occupancy.append(lin[54:60].strip())      #	55-60		occupancy
+                        #this_occupancy =string.strip(lin[54:60])      #	55-60		occupancy
+                        this_occupancy =lin[54:60].strip()      #	55-60		occupancy
                         if(occupancy[-1] == ''):
                             occupancy[-1] = "  1.00"
                             this_occupancy[-1] = "  1.00"
@@ -534,16 +544,20 @@ class PDB(object):
                         occupancy.append("  0.00")
                         this_occupancy = "  0.00"
                     try:
-                        beta.append(string.strip(lin[60:66]))		#	61-66		temperature factor
-                        this_beta = string.strip(lin[60:66])		#	61-66		temperature factor
+                        #beta.append(string.strip(lin[60:66]))		#	61-66		temperature factor
+                        beta.append(lin[60:66].strip())		#	61-66		temperature factor
+                        #this_beta = string.strip(lin[60:66])		#	61-66		temperature factor
+                        this_beta = lin[60:66].strip()		#	61-66		temperature factor
                         if(beta[-1] == ''):
                             beta[-1] = "  0.00"
                     except:
                         beta.append("  0.00")
                         this_beta = "  0.00"
                     try:
-                        segname.append(string.strip(lin[72:76]))	#	73-76		segment identifier
-                        this_segname = string.strip(lin[72:76])	#	73-76		segment identifier
+                        #segname.append(string.strip(lin[72:76]))	#	73-76		segment identifier
+                        segname.append(lin[72:76].strip())	#	73-76		segment identifier
+                        #this_segname = string.strip(lin[72:76])	#	73-76		segment identifier
+                        this_segname = lin[72:76].strip()	#	73-76		segment identifier
                         if(segname[-1] == '' and this_chain !=''):
                             segname[-1] = this_chain
                             this_segname = this_chain
@@ -551,27 +565,37 @@ class PDB(object):
                         this_segname = ""
                         segname.append("")
                     try:
-                        element.append(string.strip(lin[76:78]))	#	77-78		element symbol
+                        #element.append(string.strip(lin[76:78]))	#	77-78		element symbol
+                        element.append(lin[76:78].strip())	#	77-78		element symbol
                         if(element[-1] == ''):
                             element[-1] = "  "
                     except:
                         element.append("  ")
                     try:
-                        charge.append(string.strip(lin[78:80]))		#	79-80		charge on the atom
+                        #charge.append(string.strip(lin[78:80]))		#	79-80		charge on the atom
+                        charge.append(lin[78:80].strip())		#	79-80		charge on the atom
                         if(charge[-1] == ''):
                             charge[-1] = "  "
                     except:
                         charge.append("  ")
 
                 else:
-                    occupancy.append(string.strip(lin[54:60]))      #	55-60		occupancy
-                    this_occupancy =string.strip(lin[54:60])      #	55-60		occupancy
-                    beta.append(string.strip(lin[60:66]))		#	61-66		temperature factor
-                    this_beta = string.strip(lin[60:66])		#	61-66		temperature factor
-                    segname.append(string.strip(lin[72:76]))	#	73-76		segment identifier
-                    this_segname = string.strip(lin[72:76])	#	73-76		segment identifier
-                    element.append(string.strip(lin[76:78]))	#	77-78		element symbol
-                    charge.append(string.strip(lin[78:80]))		#	79-80		charge on the atom
+                    #occupancy.append(string.strip(lin[54:60]))      #	55-60		occupancy
+                    occupancy.append(lin[54:60].strip())      #	55-60		occupancy
+                    #this_occupancy =string.strip(lin[54:60])      #	55-60		occupancy
+                    this_occupancy =lin[54:60].strip()      #	55-60		occupancy
+                    #beta.append(string.strip(lin[60:66]))		#	61-66		temperature factor
+                    beta.append(lin[60:66].strip())		#	61-66		temperature factor
+                    #this_beta = string.strip(lin[60:66])		#	61-66		temperature factor
+                    this_beta = lin[60:66].strip()		#	61-66		temperature factor
+                    #segname.append(string.strip(lin[72:76]))	#	73-76		segment identifier
+                    segname.append(lin[72:76].strip())	#	73-76		segment identifier
+                    #this_segname = string.strip(lin[72:76])	#	73-76		segment identifier
+                    this_segname = lin[72:76].strip()	#	73-76		segment identifier
+                    #element.append(string.strip(lin[76:78]))	#	77-78		element symbol
+                    element.append(lin[76:78].strip())	#	77-78		element symbol
+                    #charge.append(string.strip(lin[78:80]))		#	79-80		charge on the atom
+                    charge.append(lin[78:80].strip())		#	79-80		charge on the atom
 
                 if(this_name not in unique_names): unique_names.append(this_name)
                 if(this_resname not in unique_resnames): unique_resnames.append(this_resname)
@@ -581,7 +605,8 @@ class PDB(object):
                 if(this_occupancy not in unique_occupancies): unique_occupancies.append(this_occupancy)
                 if(this_beta not in unique_betas): unique_betas.append(this_beta)
 	
-                this_resname=(string.strip(lin[17:21]))
+                #this_resname=(string.strip(lin[17:21]))
+                this_resname=(lin[17:21].strip())
                 if this_resname in protein_resnames:
                     moltype.append('protein')
                     this_moltype = 'protein'
@@ -703,11 +728,11 @@ class PDB(object):
         indexs = self.index()
             
         # Convert from original to current indexing
-        convert_index = dict(zip(original_indexs, indexs))
+        convert_index = dict(list(zip(original_indexs, indexs)))
 
         new_conect = {}
 
-        for base, linked in original_conect.iteritems():
+        for base, linked in original_conect.items():
 
             new_base = convert_index[base]
             new_linked = []

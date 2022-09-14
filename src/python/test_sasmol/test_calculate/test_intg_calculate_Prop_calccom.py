@@ -80,7 +80,7 @@ class Test_sascalc_Prop_calccom(MockerTestCase):
         self.o.read_pdb(DataPath+'1KP8.pdb')
         self.o.setTotal_mass(0.0)
         result_com  = self.o.calculate_center_of_mass(0)
-        print result_com
+        print(result_com)
         expected_com = [83.286,  0.251, 26.234]
         self.assert_list_almost_equal(expected_com, result_com, self.tol)
 

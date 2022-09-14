@@ -50,8 +50,8 @@ class Test_unit_properties_Atomic_amino_acid_sld(MockerTestCase):
       make sure the keys are unique
       '''
       #
-      amino_acid_sld_unique = self.unique(self.amino_acid_sld.keys())
-      self.assertEqual(self.amino_acid_sld.keys(), amino_acid_sld_unique)
+      amino_acid_sld_unique = self.unique(list(self.amino_acid_sld.keys()))
+      self.assertEqual(list(self.amino_acid_sld.keys()), amino_acid_sld_unique)
 
 
    def test_all(self):
