@@ -23,6 +23,7 @@ import sys
 import string
 import locale
 import numpy
+import io
 
 #	PDB_IO
 #
@@ -392,7 +393,8 @@ class PDB(object):
         if 'pdbscan' in kwargs:
             pdbscan = kwargs['pdbscan']
 	
-        infile=open(filename,'r').readlines()
+        with io.open(filename, 'r') as temp_infile:
+            infile = temp_infile.readlines()
 
         if(printme): print('reading filename: ',filename)
 		

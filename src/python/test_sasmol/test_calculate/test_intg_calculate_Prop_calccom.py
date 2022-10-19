@@ -18,16 +18,16 @@
 from sasmol.test_sasmol.utilities import env
 
 from unittest import main, skipIf
-from mocker import Mocker, MockerTestCase
+import unittest
 import sasmol.system as system
 
 import numpy
-
 import os
+import io
 
 DataPath = os.path.join(os.path.dirname(os.path.realpath(__file__)),'..','data','pdb_common')+os.path.sep
 
-class Test_sascalc_Prop_calccom(MockerTestCase): 
+class Test_sascalc_Prop_calccom(unittest.TestCase): 
 
     def setUp(self):
         self.o=system.Molecule(0)
@@ -45,7 +45,6 @@ class Test_sascalc_Prop_calccom(MockerTestCase):
     def test_null(self):
         with self.assertRaises(Exception):
           self.o.calculate_center_of_mass(0)
-
 
     def test_one_atom_pdb(self):
         self.o.read_pdb(DataPath+'1ATM.pdb')
