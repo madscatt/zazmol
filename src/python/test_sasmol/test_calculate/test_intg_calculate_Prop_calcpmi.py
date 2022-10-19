@@ -18,7 +18,7 @@
 from sasmol.test_sasmol.utilities import env
 
 from unittest import main, skipIf
-from mocker import Mocker, MockerTestCase
+import unittest
 import sasmol.system as system
 
 import numpy
@@ -28,7 +28,7 @@ floattype=os.environ['SASMOL_FLOATTYPE']
 
 PdbPath = os.path.join(os.path.dirname(os.path.realpath(__file__)),'..','data','pdb_common')+os.path.sep
 
-class Test_sascalc_Prop_calcpmi(MockerTestCase): 
+class Test_sascalc_Prop_calcpmi(unittest.TestCase): 
 
     def setUp(self):
         self.o=system.Molecule(0)
@@ -67,7 +67,7 @@ class Test_sascalc_Prop_calcpmi(MockerTestCase):
         with self.assertRaises(Exception):
             self.o.read_pdb(PdbPath+'NULL.pdb')
         with self.assertRaises(Exception):
-           result_pmi  = self.o.calculate_principle_moments_of_inertia(0)
+           result_pmi  = self.o.calculate_principal_moments_of_inertia(0)
 
     def test_one_atom_pdb(self):
         return
@@ -75,12 +75,11 @@ class Test_sascalc_Prop_calcpmi(MockerTestCase):
          
         self.o.read_pdb(PdbPath+'1ATM.pdb')
         self.o.calculate_mass()
-        result = self.o.calculate_principle_moments_of_inertia(0)
+        result = self.o.calculate_principal_moments_of_inertia(0)
         result_eigenvalues = result[0]
         result_eigenvectors = result[1].T
         result_I = result[2]
         result_eigenvalues, result_eigenvectors = self.reorder_eigens(result_eigenvalues, result_eigenvectors)
-        print list(result_I), '\n',list(result_eigenvalues), '\n', list(result_eigenvectors)
         expected_I = numpy.zeros((3,3),floattype)
         expected_eigenvalues = numpy.zeros(3,floattype)
         expected_eigenvectors = numpy.array([[0.0, 0.0, 1.0], [0.0, 1.0, 0.0], [-1.0, 0.0, 0.0]],floattype)
@@ -93,12 +92,11 @@ class Test_sascalc_Prop_calcpmi(MockerTestCase):
     def test_two_aa_pdb(self):
         self.o.read_pdb(PdbPath+'2AAD.pdb')
         self.o.calculate_mass()
-        result = self.o.calculate_principle_moments_of_inertia(0)
+        result = self.o.calculate_principal_moments_of_inertia(0)
         result_eigenvalues = result[0]
         result_eigenvectors = result[1].T
         result_I = result[2]
         result_eigenvalues, result_eigenvectors = self.reorder_eigens(result_eigenvalues, result_eigenvectors)
-        print(list(result_I), '\n',list(result_eigenvalues), '\n', list(result_eigenvectors))
         expected_I = numpy.array([numpy.array([ 589.53374631,  -64.32846157, -439.3753857 ]), numpy.array([  -64.32846157,  1532.13560848,   -65.3989943 ]), numpy.array([ -439.3753857 ,   -65.3989943 ,  1407.58300946])], floattype)
         expected_eigenvalues = numpy.array([1614.281458830048, 1523.0603348786992, 391.91057054356725], floattype)
         expected_eigenvectors = numpy.array([numpy.array([ 0.33751536,  0.41020629, -0.84723915]), numpy.array([ 0.22717091, -0.90894656, -0.3495848 ]), numpy.array([-0.913497  , -0.07447786, -0.39997036])],floattype)
@@ -110,12 +108,11 @@ class Test_sascalc_Prop_calcpmi(MockerTestCase):
     def test_rna_pdb(self):
         self.o.read_pdb(PdbPath+'rna.pdb')
         self.o.calculate_mass()
-        result = self.o.calculate_principle_moments_of_inertia(0)
+        result = self.o.calculate_principal_moments_of_inertia(0)
         result_eigenvalues = result[0]
         result_eigenvectors = result[1].T
         result_I = result[2]
         result_eigenvalues, result_eigenvectors = self.reorder_eigens(result_eigenvalues, result_eigenvectors)
-        print(list(result_I), '\n',list(result_eigenvalues), '\n', list(result_eigenvectors))
         expected_I = numpy.array([numpy.array([  3.04411898e+08,   4.04333713e+07,   4.06520707e+07]), numpy.array([  4.04333713e+07,   3.08529104e+08,  -4.59336765e+07]), numpy.array([  4.06520707e+07,  -4.59336765e+07,   3.02196582e+08])], floattype)
         expected_eigenvalues = numpy.array([351687532.76625204, 343174952.58514869, 220275098.79483908], floattype)
         expected_eigenvectors = numpy.array([numpy.array([-0.1525973 , -0.78373478,  0.60205802]), numpy.array([ 0.8122177 ,  0.24761209,  0.52819567]), numpy.array([ 0.56304216, -0.56960341, -0.59877832])],floattype)
@@ -126,12 +123,11 @@ class Test_sascalc_Prop_calcpmi(MockerTestCase):
     def test_1CRN_pdb(self):
         self.o.read_pdb(PdbPath+'1CRN.pdb')
         self.o.calculate_mass()
-        result = self.o.calculate_principle_moments_of_inertia(0)
+        result = self.o.calculate_principal_moments_of_inertia(0)
         result_eigenvalues = result[0]
         result_eigenvectors = result[1].T
         result_I = result[2]
         result_eigenvalues, result_eigenvectors = self.reorder_eigens(result_eigenvalues, result_eigenvectors)
-        print(list(result_I), '\n',list(result_eigenvalues), '\n', list(result_eigenvectors))
         expected_I = numpy.array([numpy.array([ 258450.06343405,  -45258.19954399,  -67627.06498969]), numpy.array([ -45258.19954399,  311061.10234081,   -3089.06334182]), numpy.array([ -67627.06498969,   -3089.06334182,  244380.69561839])], floattype)
         expected_eigenvalues = numpy.array([349987.99722910166, 288718.59037127224, 175185.27379287069], floattype)
         expected_eigenvectors = numpy.array([numpy.array([ 0.61882991, -0.68963421, -0.37610398]), numpy.array([-0.37918551, -0.68156978,  0.62584422]), numpy.array([-0.68794469, -0.24467794, -0.68327506])],floattype)
@@ -143,12 +139,11 @@ class Test_sascalc_Prop_calcpmi(MockerTestCase):
     def test_1KP8_pdb(self):
         self.o.read_pdb(PdbPath+'1KP8.pdb')
         self.o.calculate_mass()
-        result = self.o.calculate_principle_moments_of_inertia(0)
+        result = self.o.calculate_principal_moments_of_inertia(0)
         result_eigenvalues = result[0]
         result_eigenvectors = result[1].T
         result_I = result[2]
         result_eigenvalues, result_eigenvectors = self.reorder_eigens(result_eigenvalues, result_eigenvectors)
-        print(list(result_I), '\n',list(result_eigenvalues), '\n', list(result_eigenvectors))
         expected_I = numpy.array([numpy.array([  2.11885718e+09,  -5.07311719e+06,  -6.58159781e+06]), numpy.array([ -5.07311719e+06,   2.11848735e+09,   7.27900160e+06]), numpy.array([ -6.58159781e+06,   7.27900160e+06,   1.90342505e+09])], floattype)
         expected_eigenvalues = numpy.array([2124183018.8505797, 2113597829.3673213, 1902988729.7621682], floattype)
         expected_eigenvectors = numpy.array([numpy.array([ 0.71720897, -0.69544778, -0.04431345]), numpy.array([-0.69622572, -0.71781641, -0.003058  ]), numpy.array([-0.02968224,  0.03304539, -0.999013  ])],floattype)
@@ -161,7 +156,7 @@ class Test_sascalc_Prop_calcpmi(MockerTestCase):
         with self.assertRaises(Exception):
            self.o.read_pdb(PdbPath+'1PSI.pdb')
         with self.assertRaises(Exception):
-           result_pmi  = self.o.calculate_principle_moments_of_inertia(0)
+           result_pmi  = self.o.calculate_principal_moments_of_inertia(0)
 
 
     def tearDown(self):

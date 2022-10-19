@@ -360,7 +360,7 @@ class Calculate(object):
         try:
             frames = kwargs['frames']
         except:
-            frames = [x for x in xrange(self.number_of_frames())]
+            frames = [x for x in range(self.number_of_frames())]
 
         first_flag = True
 
@@ -439,7 +439,7 @@ class Calculate(object):
         charge_residue_sum = []
         last_resid = resid[0]
 
-        for i in xrange(natoms):
+        for i in range(natoms):
             this_resid = resid[i]
             this_charge = atom_charge[i]
 
@@ -453,9 +453,9 @@ class Calculate(object):
         last_resid = resid[0]
         charge_residue = []
 
-        for i in xrange(natoms):
+        for i in range(natoms):
             this_resid = resid[i]
-            for j in xrange(len(charge_residue_sum)):
+            for j in range(len(charge_residue_sum)):
                 if(this_resid == charge_residue_sum[j][0]):
                     charge_residue.append(charge_residue_sum[j][1])
                     continue

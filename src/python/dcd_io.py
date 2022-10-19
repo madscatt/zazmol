@@ -284,7 +284,7 @@ class DCD(object):
         result=1
 
         sum=0.0
-        for i in xrange(nset):
+        for i in range(nset):
             print('.',)
             sys.stdout.flush()
             read_start_time=time.time()

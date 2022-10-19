@@ -18,8 +18,8 @@
 from sasmol.test_sasmol.utilities import env
 
 from unittest import main, skipIf
-from mocker import Mocker, MockerTestCase
 import sasmol.system as system
+import unittest
 
 import numpy
 
@@ -27,7 +27,7 @@ import os
 
 PdbPath = os.path.join(os.path.dirname(os.path.realpath(__file__)),'..','data','pdb_common')+os.path.sep
 
-class Test_sascalc_Prop_calcminmax(MockerTestCase): 
+class Test_sascalc_Prop_calcminmax(unittest.TestCase): 
 
     def setUp(self):
         self.o=system.Molecule(0)
@@ -57,7 +57,6 @@ class Test_sascalc_Prop_calcminmax(MockerTestCase):
     def test_two_aa_pdb(self):
         self.o.read_pdb(PdbPath+'2AAD.pdb')
         result_minmax  = self.o.calculate_minimum_and_maximum()
-        print(result_minmax)
         expected_minmax = [ [70.721,  41.799,  39.354],[ 79.712,  46.273,  43.910]]
         self.assert_list_almost_equal(expected_minmax[0], result_minmax[0])
         self.assert_list_almost_equal(expected_minmax[1], result_minmax[1])
@@ -72,7 +71,6 @@ class Test_sascalc_Prop_calcminmax(MockerTestCase):
     def test_1CRN_pdb(self):
         self.o.read_pdb(PdbPath+'1CRN.pdb')
         result_minmax  = self.o.calculate_minimum_and_maximum()
-        print(result_minmax)
         expected_minmax = [[-3.097, -0.516, -7.422],[24.284, 20.937, 19.580]]
         self.assert_list_almost_equal(expected_minmax[0], result_minmax[0])
         self.assert_list_almost_equal(expected_minmax[1], result_minmax[1])
@@ -81,7 +79,6 @@ class Test_sascalc_Prop_calcminmax(MockerTestCase):
     def test_1KP8_pdb(self):
         self.o.read_pdb(PdbPath+'1KP8.pdb')
         result_minmax  = self.o.calculate_minimum_and_maximum()
-        print(result_minmax)
         expected_minmax = [[8.043, -73.261, -48.819], [156.999, 75.260, 101.562]]
         self.assert_list_almost_equal(expected_minmax[0], result_minmax[0],3)
         self.assert_list_almost_equal(expected_minmax[1], result_minmax[1],3)
