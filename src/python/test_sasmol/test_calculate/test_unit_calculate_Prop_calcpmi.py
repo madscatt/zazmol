@@ -22,6 +22,8 @@ import unittest
 import sasmol.system as system
 import sasmol.operate as operate
 
+from unittest.mock import MagicMock
+
 import numpy
 
 import warnings; warnings.filterwarnings('ignore')
@@ -34,9 +36,10 @@ class Test_sascalc_Prop_calcpmi(unittest.TestCase):
     def setUp(self):
         self.centertmp = operate.Move.center
 
-        self.m = Mocker()
+        self.m = MagicMock()
         operate.Move.center = self.m.mock()
-        operate.Move.center(ARGS)
+        #operate.Move.center(ARGS)
+        operate.Move.center
         self.m.result(None)
         self.m.count(0,None)
 
@@ -78,7 +81,6 @@ class Test_sascalc_Prop_calcpmi(unittest.TestCase):
         result_eigenvectors = result[1].T
         result_I = result[2]
         result_eigenvalues, result_eigenvectors = self.reorder_eigens(result_eigenvalues, result_eigenvectors)
-        print list(result_I), '\n',list(result_eigenvalues), '\n', list(result_eigenvectors)
         expected_I = numpy.array([[156.14, 24.022, 36.032], [24.022, 120.108, -72.065], [36.032, -72.065, 60.054]], floattype)
         expected_eigenvalues = numpy.array([168.151, 168.151, -5.329e-15], floattype)
         expected_eigenvectors = numpy.array([[0.103, -0.812, 0.575], [0.964, 0.148, 0.222], [-0.267, 0.535, 0.802]], floattype)
@@ -98,7 +100,6 @@ class Test_sascalc_Prop_calcpmi(unittest.TestCase):
         result_eigenvectors = result[1].T
         result_I = result[2]
         result_eigenvalues, result_eigenvectors = self.reorder_eigens(result_eigenvalues, result_eigenvectors)
-        print list(result_eigenvalues), '\n', list(result_eigenvectors)
         expected_I = numpy.array([[26.,  -4.,  -6.], [-4.,  20., -12.], [-6., -12.,  10.]], floattype)     
         expected_eigenvalues = numpy.array([336.302, 336.302, -7.105e-15], floattype)
         expected_eigenvectors = numpy.array([[-0.103, -0.812, 0.575], [0.964, -0.148, -0.222], [0.267, 0.535, 0.802]],floattype)
@@ -117,7 +118,6 @@ class Test_sascalc_Prop_calcpmi(unittest.TestCase):
         result_eigenvectors = result[1].T
         result_I = result[2]
         result_eigenvalues, result_eigenvectors = self.reorder_eigens(result_eigenvalues, result_eigenvectors)
-        print(result_I, '\n', result_eigenvalues, '\n',result_eigenvectors)
         expected_eigenvalues = numpy.array([400.277, 394.737, 5.54], floattype)
         expected_eigenvectors = numpy.array([[-6.274e-15, -8.321e-01, 5.547e-01], [9.246e-01, -2.114e-01, -3.170e-01], [3.810e-01, 5.129e-01, 7.693e-01]], floattype)
         self.assert_list_almost_equal_flip_sign_allowed(expected_eigenvalues, result_eigenvalues,3)
@@ -132,7 +132,6 @@ class Test_sascalc_Prop_calcpmi(unittest.TestCase):
         result_eigenvectors = result[1].T
         result_I = result[2]
         result_eigenvalues, result_eigenvectors = self.reorder_eigens(result_eigenvalues, result_eigenvectors)
-        print(result_I, '\n',result_eigenvalues, '\n',  result_eigenvectors)
         expected_eigenvalues = numpy.array([5761.418, 5625.53, 139.66], floattype)
         expected_eigenvectors = numpy.array([[0.351, -0.821, 0.451], [-0.837, -0.059, 0.544],[0.42, 0.568, 0.708]],floattype);
         self.assert_list_almost_equal_flip_sign_allowed(expected_eigenvalues, result_eigenvalues,2)
@@ -172,7 +171,6 @@ class Test_sascalc_Prop_calcpmi(unittest.TestCase):
         result_eigenvectors = result[1].T
         result_I = result[2]
         result_eigenvalues, result_eigenvectors = self.reorder_eigens(result_eigenvalues, result_eigenvectors)
-        print(list(result_I), '\n', list(result_eigenvalues), '\n', list(result_eigenvectors))
         expected_I = numpy.array([[4675.176, -1324.189, -1572.26 ], [-1324.189,  3932.916, -2256.545], [-1572.26 , -2256.545,  2894.494]], floattype)
         expected_eigenvalues = numpy.array([5748.699, 5591.441, 162.447], floattype)
         expected_eigenvectors = numpy.array([[0.321, -0.821, 0.472], [-0.852, -0.032, 0.523], [0.414, 0.57, 0.709]], floattype)
@@ -190,7 +188,6 @@ class Test_sascalc_Prop_calcpmi(unittest.TestCase):
         result_eigenvectors = result[1].T
         result_I = result[2]
         result_eigenvalues, result_eigenvectors = self.reorder_eigens(result_eigenvalues, result_eigenvectors)
-        print(list(result_I), '\n',list(result_eigenvalues), '\n', list(result_eigenvectors))
         expected_I = numpy.array([[4675.176, -1324.189, -1572.26 ], [-1324.189,  3932.916, -2256.545], [-1572.26 , -2256.545,  2894.494]], floattype)
         expected_eigenvalues = numpy.array([5748.699, 5591.441, 162.447], floattype)
         expected_eigenvectors = numpy.array([[ 0.321, -0.821,  0.472], [-0.852, -0.032,  0.523], [ 0.414,  0.57 ,  0.709]], floattype)
