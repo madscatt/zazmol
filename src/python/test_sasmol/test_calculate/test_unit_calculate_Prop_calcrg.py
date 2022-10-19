@@ -18,21 +18,24 @@
 from sasmol.test_sasmol.utilities import env, util
 
 from unittest import main 
-from mocker import Mocker, MockerTestCase
+import unittest
 import sasmol.system as system
 
 import numpy
 
-import warnings; warnings.filterwarnings('ignore')
+import warnings
 
 import os
 floattype=os.environ['SASMOL_FLOATTYPE']
 
-class Test_sascalc_Prop_calcrg(MockerTestCase): 
+class Test_sascalc_Prop_calcrg(unittest.TestCase): 
+
+    
 
     def setUp(self):
         self.o=system.Molecule(0)
         self.tol = 3
+        warnings.filterwarnings('ignore')
 
     def calc_exp(self):
         self.o.calculate_center_of_mass(0)

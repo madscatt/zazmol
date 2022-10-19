@@ -18,7 +18,7 @@
 from sasmol.test_sasmol.utilities import env, util
 
 from unittest import main 
-from mocker import Mocker, MockerTestCase, ANY, ARGS, KWARGS
+import unittest
 import sasmol.system as system
 import sasmol.operate as operate
 
@@ -29,7 +29,7 @@ import warnings; warnings.filterwarnings('ignore')
 import os
 floattype=os.environ['SASMOL_FLOATTYPE']
 
-class Test_sascalc_Prop_calcpmi(MockerTestCase): 
+class Test_sascalc_Prop_calcpmi(unittest.TestCase): 
 
     def setUp(self):
         self.centertmp = operate.Move.center
@@ -73,7 +73,7 @@ class Test_sascalc_Prop_calcpmi(MockerTestCase):
         self.o.setCoor(numpy.array([[[-1.0, 2.0, 3.0]]],floattype))
         self.o.setElement(['C'])
         self.o.setNatoms(len(self.o.element()))
-        result = self.o.calculate_principle_moments_of_inertia(0)
+        result = self.o.calculate_principal_moments_of_inertia(0)
         result_eigenvalues = result[0]
         result_eigenvectors = result[1].T
         result_I = result[2]
@@ -93,7 +93,7 @@ class Test_sascalc_Prop_calcpmi(MockerTestCase):
         self.o.setCoor(numpy.array([[[-1.0, -2.0, -3.0],[1.0, 2.0, 3.0]]],floattype))
         self.o.setElement(['C','C'])
         self.o.setNatoms(len(self.o.element()))
-        result = self.o.calculate_principle_moments_of_inertia(0)
+        result = self.o.calculate_principal_moments_of_inertia(0)
         result_eigenvalues = result[0]
         result_eigenvectors = result[1].T
         result_I = result[2]
@@ -112,7 +112,7 @@ class Test_sascalc_Prop_calcpmi(MockerTestCase):
         self.o.setCoor(numpy.array([[[-2.0, -2.0, -3.0],[1.0, 2.0, 3.0]]],floattype))
         self.o.setElement(['C','N'])
         self.o.setNatoms(len(self.o.element()))
-        result = self.o.calculate_principle_moments_of_inertia(0)
+        result = self.o.calculate_principal_moments_of_inertia(0)
         result_eigenvalues = result[0]
         result_eigenvectors = result[1].T
         result_I = result[2]
@@ -127,7 +127,7 @@ class Test_sascalc_Prop_calcpmi(MockerTestCase):
         self.o.setCoor(numpy.array([[[1.0, 2.0, 3.0],[4.0, 5.0, 6.0],[7.0, 8.0, 9.0],[1.0, 3.0, 5.0],[2.0, 4.0, 6.0],[0.0, 2.0, 3.0]]],floattype))
         self.o.setElement(['C','N','O','C','N','O'])
         self.o.setNatoms(len(self.o.element()))
-        result = self.o.calculate_principle_moments_of_inertia(0)
+        result = self.o.calculate_principal_moments_of_inertia(0)
         result_eigenvalues = result[0]
         result_eigenvectors = result[1].T
         result_I = result[2]
@@ -144,7 +144,7 @@ class Test_sascalc_Prop_calcpmi(MockerTestCase):
         self.o.setMass([1.0, 2.0, 3.2, 3.6, 5.2, 2.8])
         self.o.setNatoms(len(self.o.mass()))
         with self.assertRaises(Exception):
-            result = self.o.calculate_principle_moments_of_inertia(0)
+            result = self.o.calculate_principal_moments_of_inertia(0)
 
 
     def test_six_uncentered_atoms_inf2(self):
@@ -152,7 +152,7 @@ class Test_sascalc_Prop_calcpmi(MockerTestCase):
         self.o.setMass([1.0, 2.0, 3.2, 3.6, 5.2, 2.8])
         self.o.setNatoms(len(self.o.mass()))
         with self.assertRaises(Exception):
-            result = self.o.calculate_principle_moments_of_inertia(0)
+            result = self.o.calculate_principal_moments_of_inertia(0)
 
 
     def test_six_uncentered_atoms_nan(self):
@@ -160,14 +160,14 @@ class Test_sascalc_Prop_calcpmi(MockerTestCase):
         self.o.setMass([1.0, 2.0, 3.2, 3.6, 5.2, 2.8])
         self.o.setNatoms(len(self.o.mass()))
         with self.assertRaises(Exception):
-            result = self.o.calculate_principle_moments_of_inertia(0)
+            result = self.o.calculate_principal_moments_of_inertia(0)
 
 
     def test_six_uncentered_atoms_tiny(self):
         self.o.setCoor(numpy.array([[[util.TINY, 2.0, 3.0],[4.0, 5.0, 6.0],[7.0, 8.0, 9.0],[1.0, 3.0, 5.0],[2.0, 4.0, 6.0],[0.0, 2.0, 3.0]]],floattype))
         self.o.setElement(['C','N','O','C','N','O'])
         self.o.setNatoms(len(self.o.element()))
-        result = self.o.calculate_principle_moments_of_inertia(0)
+        result = self.o.calculate_principal_moments_of_inertia(0)
         result_eigenvalues = result[0]
         result_eigenvectors = result[1].T
         result_I = result[2]
@@ -185,7 +185,7 @@ class Test_sascalc_Prop_calcpmi(MockerTestCase):
         self.o.setCoor(numpy.array([[[util.ZERO, 2.0, 3.0],[4.0, 5.0, 6.0],[7.0, 8.0, 9.0],[1.0, 3.0, 5.0],[2.0, 4.0, 6.0],[0.0, 2.0, 3.0]]],floattype))
         self.o.setElement(['C','N','O','C','N','O'])
         self.o.setNatoms(len(self.o.element()))
-        result = self.o.calculate_principle_moments_of_inertia(0)
+        result = self.o.calculate_principal_moments_of_inertia(0)
         result_eigenvalues = result[0]
         result_eigenvectors = result[1].T
         result_I = result[2]
