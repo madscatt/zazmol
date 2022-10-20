@@ -20,59 +20,60 @@ make sure the keys are unique
 make sure the right amu list was generated
 '''
 
-from unittest import main 
-from mocker import Mocker, MockerTestCase
+from unittest import main
+import unittest
+
+import warnings
 
 import sasmol.system as system
 
 import os
 
-DataPath = os.path.join(os.path.dirname(os.path.realpath(__file__)),'..','data','sasmol','properties')+os.path.sep
-
-class Test_unit_properties_Atomic_amino_acid_sld(MockerTestCase):
-
-   def setUp(self):
-      self.o=system.Molecule(0)
-      self.amino_acid_sld  = self.o.amino_acid_sld()
+DataPath = os.path.join(os.path.dirname(os.path.realpath(
+    __file__)), '..', 'data', 'sasmol', 'properties')+os.path.sep
 
 
-   def unique(self,seq):
-      '''
-      remove the duplicate elements
-      '''
-      seen = set()
-      seen_add = seen.add
-      return [ x for x in seq if x not in seen and not seen_add(x)]
+class Test_unit_properties_Atomic_amino_acid_sld(unittest.TestCase):
+
+    def setUp(self):
+        warnings.filterwarnings('ignore')
+        self.o = system.Molecule(0)
+        self.amino_acid_sld = self.o.amino_acid_sld()
+
+    def unique(self, seq):
+        '''
+        remove the duplicate elements
+        '''
+        seen = set()
+        seen_add = seen.add
+        return [x for x in seq if x not in seen and not seen_add(x)]
+
+    def test_uniqe(self):
+        '''
+        make sure the keys are unique
+        '''
+        #
+        amino_acid_sld_unique = self.unique(list(self.amino_acid_sld.keys()))
+        self.assertEqual(list(self.amino_acid_sld.keys()),
+                         amino_acid_sld_unique)
+
+    def test_all(self):
+        '''
+        make sure the right amino_acid_sld list was generated
+        '''
+        #
+        datafile = DataPath+'amino_acid_sld.txt'
+        fp = open(datafile, 'r')
+        ele = {}
+        for line in fp.readlines():
+            aa = line[0:3]
+            value = eval(line[4:])
+            ele[aa] = value
+        self.assertEqual(ele, self.amino_acid_sld)
+
+    def tearDown(self):
+        pass
 
 
-   def test_uniqe(self):
-      '''
-      make sure the keys are unique
-      '''
-      #
-      amino_acid_sld_unique = self.unique(list(self.amino_acid_sld.keys()))
-      self.assertEqual(list(self.amino_acid_sld.keys()), amino_acid_sld_unique)
-
-
-   def test_all(self):
-      '''
-      make sure the right amino_acid_sld list was generated
-      '''
-      #
-      datafile = DataPath+'amino_acid_sld.txt'
-      fp = open(datafile,'r')
-      ele = {}
-      for line in fp.readlines():
-         aa = line[0:3]
-         value = eval(line[4:])
-         ele[aa]=value
-      self.assertEqual(ele,self.amino_acid_sld)
-
-   def tearDown(self):
-      pass
-        
-   
-   
-if __name__ == '__main__': 
-   main() 
-
+if __name__ == '__main__':
+    main()
