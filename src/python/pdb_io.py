@@ -308,14 +308,14 @@ class PDB(object):
         names = [] ; resnames = [] ; resids = [] ; chains = [] 
         occupancies = [] ; betas = [] ; elements = [] ; segments = []
 
-        names_mask = numpy.zeros((number_of_names,natoms),numpy.int)
-        resnames_mask = numpy.zeros((number_of_resnames,natoms),numpy.int)
-        resids_mask = numpy.zeros((number_of_resids,natoms),numpy.int)
-        chains_mask = numpy.zeros((number_of_chains,natoms),numpy.int)
-        occupancies_mask = numpy.zeros((number_of_occupancies,natoms),numpy.int)
-        betas_mask = numpy.zeros((number_of_betas,natoms),numpy.int)
-        elements_mask = numpy.zeros((number_of_elements,natoms),numpy.int)
-        segnames_mask = numpy.zeros((number_of_segnames,natoms),numpy.int)
+        names_mask = numpy.zeros((number_of_names,natoms),int)
+        resnames_mask = numpy.zeros((number_of_resnames,natoms),int)
+        resids_mask = numpy.zeros((number_of_resids,natoms),int)
+        chains_mask = numpy.zeros((number_of_chains,natoms),int)
+        occupancies_mask = numpy.zeros((number_of_occupancies,natoms),int)
+        betas_mask = numpy.zeros((number_of_betas,natoms),int)
+        elements_mask = numpy.zeros((number_of_elements,natoms),int)
+        segnames_mask = numpy.zeros((number_of_segnames,natoms),int)
 
         nresid = 0
 
@@ -490,7 +490,7 @@ class PDB(object):
 
         true_index = 0
 	
-        coor=numpy.zeros((num_frames,num_atoms,3),numpy.float)	
+        coor=numpy.zeros((num_frames,num_atoms,3),float)	
 
         unique_names = [] ; unique_resnames = [] ; unique_resids = [] ; unique_chains = [] 
         unique_occupancies = [] ; unique_betas = [] ; unique_segnames = [] ; unique_moltypes = []
@@ -629,15 +629,15 @@ class PDB(object):
 					
                 if(true_index == num_atoms):				
                     if(printme): print('finished reading frame = ',this_frame)
-                    index=numpy.array(index,numpy.int)
-                    original_index=numpy.array(original_index,numpy.int)
-                    resid=numpy.array(resid,numpy.int)
-                    original_resid=numpy.array(original_resid,numpy.int)
+                    index=numpy.array(index,int)
+                    original_index=numpy.array(original_index,int)
+                    resid=numpy.array(resid,int)
+                    original_resid=numpy.array(original_resid,int)
 
-                    x=numpy.array(x,numpy.float32)
-                    y=numpy.array(y,numpy.float32)
-                    z=numpy.array(z,numpy.float32)
-                    coor[0,:,0]=x.astype(numpy.float) ; coor[0,:,1]=y.astype(numpy.float) ; coor[0,:,2]=z.astype(numpy.float)
+                    x=numpy.array(x,float)
+                    y=numpy.array(y,float)
+                    z=numpy.array(z,float)
+                    coor[0,:,0]=x.astype(float) ; coor[0,:,1]=y.astype(float) ; coor[0,:,2]=z.astype(float)
                     true_index = 0
                     x=[] ; y=[] ; z=[]
                     if(this_frame == 1):
@@ -670,9 +670,9 @@ class PDB(object):
 		
                 if(true_index == num_atoms):
                     if(printme): print('finished reading frame = ',this_frame)
-                    x=numpy.array(x,numpy.float32)
-                    y=numpy.array(y,numpy.float32)
-                    z=numpy.array(z,numpy.float32)
+                    x=numpy.array(x,float)
+                    y=numpy.array(y,float)
+                    z=numpy.array(z,float)
                     coor[this_frame-1,:,0]=x ; coor[this_frame-1,:,1]=y ; coor[this_frame-1,:,2]=z
                     true_index = 0
                     this_frame += 1		

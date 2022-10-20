@@ -107,7 +107,7 @@ class Calculate(object):
 
         standard_atomic_weight = self.amu()
         self._total_mass = 0.0
-        self._mass = numpy.zeros(len(self._element), numpy.float)
+        self._mass = numpy.zeros(len(self._element), float)
 
         count = 0
 
@@ -163,7 +163,7 @@ class Calculate(object):
         comy = numpy.sum(self._mass * y) / self._total_mass
         comz = numpy.sum(self._mass * z) / self._total_mass
 
-        self._com = numpy.array([comx, comy, comz], numpy.float)
+        self._com = numpy.array([comx, comy, comz], float)
 
         return self._com
 
@@ -460,7 +460,7 @@ class Calculate(object):
                     charge_residue.append(charge_residue_sum[j][1])
                     continue
 
-        self.setResidue_charge(numpy.array(charge_residue, numpy.float32))
+        self.setResidue_charge(numpy.array(charge_residue, float32))
 
         return
 
