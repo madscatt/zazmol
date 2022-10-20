@@ -18,22 +18,23 @@
 from sasmol.test_sasmol.utilities import env, util
 
 from unittest import main, skipIf
-from mocker import Mocker, MockerTestCase, ANY, ARGS
+import unittest
 import sasmol.system as system
 import sasmol.operate as operate
 
 import numpy
 
-import warnings; warnings.filterwarnings('ignore')
+import warnings
 
 import os
 floattype=os.environ['SASMOL_FLOATTYPE']
 
 DataPath = os.path.join(os.path.dirname(os.path.realpath(__file__)),'..','data','pdb_common')+os.path.sep
 
-class Test_intg_operate_rotate_general_axis(MockerTestCase): 
+class Test_intg_operate_rotate_general_axis(unittest.TestCase): 
 
     def setUp(self):
+        warnings.filterwarnings('ignore')
         self.o=system.Molecule(0)
 
     def assert_list_almost_equal(self,a,b,places=5):
@@ -56,7 +57,6 @@ class Test_intg_operate_rotate_general_axis(MockerTestCase):
         self.o.rotate_general_axis(frame,theta,[0.2,1.3,-3.5])
         result_coor = self.o.coor()
         result_com  = self.o.calculate_center_of_mass(0)
-        print('\nresult_coor:\n'); util.printfl([result_coor]); print('\nresult_com:\n',util.printfl([result_com]))
         #
         expected_coor = numpy.array([[[73.944, 41.799, 41.652]]], floattype)
         expected_com = numpy.array([73.944, 41.799, 41.652], floattype)
@@ -73,7 +73,6 @@ class Test_intg_operate_rotate_general_axis(MockerTestCase):
         self.o.rotate_general_axis(frame,theta,[0.2,1.3,-3.5])
         result_coor = self.o.coor()
         result_com  = self.o.calculate_center_of_mass(0)
-        print('\nresult_coor:\n'); util.printfl([result_coor]); print('\nresult_com:\n',util.printfl([result_com]))
         #
         expected_coor = numpy.array([[[-215.775, 167.484, 356.058]]], floattype)
         expected_com = numpy.array([-215.775, 167.484, 356.058], floattype)
@@ -88,7 +87,6 @@ class Test_intg_operate_rotate_general_axis(MockerTestCase):
         #
         self.o.rotate_general_axis(frame,theta,[0.2,1.3,-3.5])
         result_com  = self.o.calculate_center_of_mass(0)
-        print('\nresult_com:\n',util.printfl([result_com]))
         #
         expected_com = numpy.array([-221.139, 178.873, 343.429], floattype)
         self.assert_list_almost_equal(expected_com, result_com,2)
@@ -101,7 +99,6 @@ class Test_intg_operate_rotate_general_axis(MockerTestCase):
         #
         self.o.rotate_general_axis(frame,theta,[0.2,1.3,-3.5])
         result_com  = self.o.calculate_center_of_mass(0)
-        print('\nresult_com:\n',util.printfl([result_com]))
         #
         expected_com = numpy.array([-30.425, -38.942, 44.267], floattype)
         self.assert_list_almost_equal(expected_com, result_com,2)
@@ -114,7 +111,6 @@ class Test_intg_operate_rotate_general_axis(MockerTestCase):
         #
         self.o.rotate_general_axis(frame,theta,[0,1,0])
         result_com  = self.o.calculate_center_of_mass(0)
-        print('\nresult_com:\n',util.printfl([result_com]))
         #
         expected_com = numpy.array([-6.978, 9.775, 9.300], floattype)
         self.assert_list_almost_equal(expected_com, result_com,2)
@@ -128,7 +124,6 @@ class Test_intg_operate_rotate_general_axis(MockerTestCase):
         #
         self.o.rotate_general_axis(frame,theta,[0,1,0])
         result_com  = self.o.calculate_center_of_mass(0)
-        print('\nresult_com:\n',util.printfl([result_com]))
         #
         expected_com = numpy.array([84.358, 0.251, -22.552], floattype)
         self.assert_list_almost_equal(expected_com, result_com,2)

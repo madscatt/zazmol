@@ -18,7 +18,7 @@
 from sasmol.test_sasmol.utilities import env, util
 
 from unittest import main, skipIf
-from mocker import Mocker, MockerTestCase, ANY, ARGS
+import unittest
 import sasmol.system as system
 import sasmol.operate as operate
 
@@ -31,9 +31,10 @@ floattype=os.environ['SASMOL_FLOATTYPE']
 
 DataPath = os.path.join(os.path.dirname(os.path.realpath(__file__)),'..','data','pdb_common')+os.path.sep
 
-class Test_intg_operate_rotate_euler(MockerTestCase): 
+class Test_intg_operate_rotate_euler(unittest.TestCase): 
 
     def setUp(self):
+        warnings.filterwarnings('ignore')
         self.o=system.Molecule(0)
 
     def assert_list_almost_equal(self,a,b,places=5):
@@ -58,7 +59,6 @@ class Test_intg_operate_rotate_euler(MockerTestCase):
         self.o.rotate_euler(frame,phi,theta,psi)
         result_coor = self.o.coor()
         result_com  = self.o.calculate_center_of_mass(0)
-        print('\nresult_coor:\n'); util.printfl([result_coor]); print('\nresult_com:\n',util.printfl([result_com]))
         #
         expected_coor = numpy.array([[[73.944, 41.799, 41.652]]], floattype)
         expected_com = numpy.array([73.944, 41.799, 41.652], floattype)
@@ -77,7 +77,6 @@ class Test_intg_operate_rotate_euler(MockerTestCase):
         self.o.rotate_euler(frame,phi,theta,psi)
         result_coor = self.o.coor()
         result_com  = self.o.calculate_center_of_mass(0)
-        print('\nresult_coor:\n'); util.printfl([result_coor]); print('\nresult_com:\n',util.printfl([result_com]))
         #
         expected_coor = numpy.array([[[41.652, 41.799, -73.944]]], floattype)
         expected_com = numpy.array([41.652, 41.799, -73.944], floattype)
@@ -95,7 +94,6 @@ class Test_intg_operate_rotate_euler(MockerTestCase):
         self.o.rotate_euler(frame,phi,theta,psi)
         result_coor = self.o.coor()
         result_com  = self.o.calculate_center_of_mass(0)
-        print('\nresult_coor:\n'); util.printfl([result_coor]); print('\nresult_com:\n',util.printfl([result_com]))
         #
         expected_coor = numpy.array([[[41.652, 41.799, -73.944], [40.456, 42.563, -74.229], [40.463, 43.093, -75.667], [39.401, 43.279, -76.264], [40.336, 43.734, -73.210], [39.926, 43.168, -71.856], [39.354, 44.782, -73.67], [39.946, 44.177, -70.721], [41.647, 43.330, -76.231], [41.730, 43.852, -77.592], [42.184, 42.820, -78.617], [42.656, 43.169, -79.712], [42.648, 45.097, -77.671], [43.910, 44.816, -77.054], [42.000, 46.273, -76.970]]], floattype)
         expected_com = numpy.array([41.276, 43.708, -75.680], floattype)
@@ -112,7 +110,6 @@ class Test_intg_operate_rotate_euler(MockerTestCase):
         #
         self.o.rotate_euler(frame,phi,theta,psi)
         result_com  = self.o.calculate_center_of_mass(0)
-        print('\nresult_com:\n',util.printfl([result_com]))
         #
         expected_com = numpy.array([-4.352, -8.033, 9.231], floattype)
         self.assert_list_almost_equal(expected_com, result_com,2)
@@ -125,7 +122,6 @@ class Test_intg_operate_rotate_euler(MockerTestCase):
         #
         self.o.rotate_euler(frame,theta,theta,theta)
         result_com  = self.o.calculate_center_of_mass(0)
-        print('\nresult_com:\n',util.printfl([result_com]))
         #
         expected_com = numpy.array([6.978, -9.775, 9.300], floattype)
         self.assert_list_almost_equal(expected_com, result_com,2)
@@ -141,7 +137,6 @@ class Test_intg_operate_rotate_euler(MockerTestCase):
         #
         self.o.rotate_euler(frame,phi,theta,psi)
         result_com  = self.o.calculate_center_of_mass(0)
-        print('\nresult_com:\n',util.printfl([result_com]))
         #
         expected_com = numpy.array([47.025, 47.438, 56.242], floattype)
         self.assert_list_almost_equal(expected_com, result_com,2)
