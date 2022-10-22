@@ -17,7 +17,7 @@
 '''
 
 from unittest import main 
-from mocker import Mocker, MockerTestCase
+import unittest
 
 import sasmol.system as system
 
@@ -25,7 +25,7 @@ import os
 
 DataPath = os.path.join(os.path.dirname(os.path.realpath(__file__)),'..','data','sasmol','system')+os.path.sep
 
-class Test_intg_system_Atom_element(MockerTestCase):
+class Test_intg_system_Atom_element(unittest.TestCase):
 
    def setUp(self):
       self.o=system.Atom(3,'1CRN-3frames.pdb')
@@ -40,7 +40,7 @@ class Test_intg_system_Atom_element(MockerTestCase):
       self.o.read_pdb(DataPath+'1CRN-3frames.pdb')
       #
       result = self.o.element()
-      print(result)
+      #print(result)
       #
       self.assertEqual(expected, result)
 
