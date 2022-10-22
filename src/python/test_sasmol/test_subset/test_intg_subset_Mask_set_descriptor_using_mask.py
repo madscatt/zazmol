@@ -51,7 +51,7 @@ a bad pdb, assertRaises (some problem)
 """
 
 from unittest import main,skipIf 
-from mocker import Mocker, MockerTestCase, ARGS
+import unittest
 
 import sasmol.system as system
 import sasmol.subset as subset
@@ -62,7 +62,7 @@ import os, copy
 
 PdbDataPath = os.path.join(os.path.dirname(os.path.realpath(__file__)),'..','data','pdb_common')+os.path.sep
 
-class Test_subset_Mask_set_descriptor_using_mask(MockerTestCase): 
+class Test_subset_Mask_set_descriptor_using_mask(unittest.TestCase): 
  
 
    def setUp(self):
@@ -170,7 +170,7 @@ class Test_subset_Mask_set_descriptor_using_mask(MockerTestCase):
       #
       error = self.o.set_descriptor_using_mask(mask, descriptor, value)
       #
-      print('\nexpected_descriptor:\n',expected_descriptor,'\ndescriptor\n',descriptor)
+      #print('\nexpected_descriptor:\n',expected_descriptor,'\ndescriptor\n',descriptor)
       self.assertEqual(len(error)>0, expecting_error)
       self.assertEqual(expected_descriptor, descriptor)
 
@@ -190,7 +190,7 @@ class Test_subset_Mask_set_descriptor_using_mask(MockerTestCase):
       #
       error = self.o.set_descriptor_using_mask(mask, descriptor, value)
       #
-      print('\nexpected_descriptor:\n',expected_descriptor,'\ndescriptor\n',descriptor)
+      #print('\nexpected_descriptor:\n',expected_descriptor,'\ndescriptor\n',descriptor)
       self.assertEqual(len(error)>0, expecting_error)
       self.assertEqual(expected_descriptor, descriptor)
 
@@ -210,7 +210,7 @@ class Test_subset_Mask_set_descriptor_using_mask(MockerTestCase):
       #
       error = self.o.set_descriptor_using_mask(mask, descriptor, value)
       #
-      print('\nexpected_descriptor:\n',expected_descriptor,'\ndescriptor\n',descriptor)
+      #print('\nexpected_descriptor:\n',expected_descriptor,'\ndescriptor\n',descriptor)
       self.assertEqual(len(error)>0, expecting_error)
       self.assertEqual(expected_descriptor, descriptor)
 
@@ -232,7 +232,7 @@ class Test_subset_Mask_set_descriptor_using_mask(MockerTestCase):
       #
       error = self.o.set_descriptor_using_mask(mask, descriptor, value)
       #
-      print('\nexpected_descriptor:\n',expected_descriptor,'\ndescriptor\n',descriptor)
+      #print('\nexpected_descriptor:\n',expected_descriptor,'\ndescriptor\n',descriptor)
       self.assertEqual(len(error)>0, expecting_error)
       self.assert_list_almost_equal(expected_descriptor, descriptor)
 
@@ -254,7 +254,7 @@ class Test_subset_Mask_set_descriptor_using_mask(MockerTestCase):
       #
       error = self.o.set_descriptor_using_mask(mask, descriptor, value)
       #
-      print('\nexpected_descriptor:\n',expected_descriptor,'\ndescriptor\n',descriptor)
+      #print('\nexpected_descriptor:\n',expected_descriptor,'\ndescriptor\n',descriptor)
       self.assertEqual(len(error)>0, expecting_error)
       self.assert_list_almost_equal(expected_descriptor, descriptor)
 
@@ -276,7 +276,7 @@ class Test_subset_Mask_set_descriptor_using_mask(MockerTestCase):
       #
       error = self.o.set_descriptor_using_mask(mask, descriptor, value)
       #
-      print('\nexpected_descriptor:\n',expected_descriptor,'\ndescriptor\n',descriptor)
+      #print('\nexpected_descriptor:\n',expected_descriptor,'\ndescriptor\n',descriptor)
       self.assertEqual(len(error)>0, expecting_error)
       self.assert_list_almost_equal(expected_descriptor, descriptor)
 
@@ -298,7 +298,7 @@ class Test_subset_Mask_set_descriptor_using_mask(MockerTestCase):
       #
       error = self.o.set_descriptor_using_mask(mask, descriptor, value)
       #
-      print('\nexpected_descriptor:\n',expected_descriptor,'\ndescriptor\n',descriptor)
+      #print('\nexpected_descriptor:\n',expected_descriptor,'\ndescriptor\n',descriptor)
       self.assertEqual(len(error)>0, expecting_error)
       self.assert_list_almost_equal(expected_descriptor, descriptor)
 
@@ -321,7 +321,7 @@ class Test_subset_Mask_set_descriptor_using_mask(MockerTestCase):
       #
       error = self.o.set_descriptor_using_mask(mask, descriptor, value)
       #
-      print('\nexpected_descriptor:\n',expected_descriptor,'\ndescriptor\n',descriptor)
+      #print('\nexpected_descriptor:\n',expected_descriptor,'\ndescriptor\n',descriptor)
       self.assertEqual(len(error)>0, expecting_error)
       self.assertEqual(expected_descriptor, descriptor)
 
@@ -344,7 +344,7 @@ class Test_subset_Mask_set_descriptor_using_mask(MockerTestCase):
       #
       error = self.o.set_descriptor_using_mask(mask, descriptor, value)
       #
-      print('\nexpected_descriptor:\n',expected_descriptor,'\ndescriptor\n',descriptor)
+      #print('\nexpected_descriptor:\n',expected_descriptor,'\ndescriptor\n',descriptor)
       self.assertEqual(len(error)>0, expecting_error)
       self.assertEqual(expected_descriptor, descriptor)
 
@@ -367,7 +367,7 @@ class Test_subset_Mask_set_descriptor_using_mask(MockerTestCase):
       #
       error = self.o.set_descriptor_using_mask(mask, descriptor, value)
       #
-      print('\nexpected_descriptor:\n',expected_descriptor,'\ndescriptor\n',descriptor)
+      #print('\nexpected_descriptor:\n',expected_descriptor,'\ndescriptor\n',descriptor)
       self.assertEqual(len(error)>0, expecting_error)
       self.assertEqual(expected_descriptor, descriptor)
       
@@ -390,7 +390,7 @@ class Test_subset_Mask_set_descriptor_using_mask(MockerTestCase):
       #
       error = self.o.set_descriptor_using_mask(mask, descriptor, value)
       #
-      print('\nexpected_descriptor:\n',expected_descriptor,'\ndescriptor\n',descriptor)
+      #print('\nexpected_descriptor:\n',expected_descriptor,'\ndescriptor\n',descriptor)
       self.assertEqual(len(error)>0, expecting_error)
       self.assertEqual(expected_descriptor, descriptor)
 
@@ -414,7 +414,7 @@ class Test_subset_Mask_set_descriptor_using_mask(MockerTestCase):
       #
       error = self.o.set_descriptor_using_mask(mask, descriptor, value)
       #
-      print('\nexpected_descriptor:\n',expected_descriptor,'\ndescriptor\n',descriptor)
+      #print('\nexpected_descriptor:\n',expected_descriptor,'\ndescriptor\n',descriptor)
       self.assertEqual(len(error)>0, expecting_error)
       self.assertEqual(expected_descriptor, descriptor)
 
@@ -438,7 +438,7 @@ class Test_subset_Mask_set_descriptor_using_mask(MockerTestCase):
       #
       error = self.o.set_descriptor_using_mask(mask, descriptor, value)
       #
-      print('\nexpected_descriptor:\n',expected_descriptor,'\ndescriptor\n',descriptor)
+      #print('\nexpected_descriptor:\n',expected_descriptor,'\ndescriptor\n',descriptor)
       self.assertEqual(len(error)>0, expecting_error)
       self.assertEqual(expected_descriptor, descriptor)
 
@@ -462,7 +462,7 @@ class Test_subset_Mask_set_descriptor_using_mask(MockerTestCase):
       #
       error = self.o.set_descriptor_using_mask(mask, descriptor, value)
       #
-      print('\nexpected_descriptor:\n',expected_descriptor,'\ndescriptor\n',descriptor)
+      #print('\nexpected_descriptor:\n',expected_descriptor,'\ndescriptor\n',descriptor)
       self.assertEqual(len(error)>0, expecting_error)
       self.assert_list_almost_equal(expected_descriptor, descriptor)
 
@@ -486,7 +486,7 @@ class Test_subset_Mask_set_descriptor_using_mask(MockerTestCase):
       #
       error = self.o.set_descriptor_using_mask(mask, descriptor, value)
       #
-      print('\nexpected_descriptor:\n',expected_descriptor,'\ndescriptor\n',descriptor)
+      #print('\nexpected_descriptor:\n',expected_descriptor,'\ndescriptor\n',descriptor)
       self.assertEqual(len(error)>0, expecting_error)
       self.assertEqual(expected_descriptor, descriptor)
 

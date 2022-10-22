@@ -99,8 +99,7 @@ class Mask(object):
 
         farray = numpy.zeros((nflexible, natoms), numpy.long)
 
-        sasmol.mask.get_mask_array(farray, name, resid,
-                                   flexible_residues, nresidues, mtype)
+        sasmol.mask.get_mask_array(farray, name, resid, flexible_residues, nresidues, mtype)
 
         return farray
 
@@ -172,7 +171,7 @@ class Mask(object):
 
                 residue_molecules = m1.init_child('resids')
 
-                for i in xrange(m1.number_of_resids()):
+                for i in range(m1.number_of_resids()):
                         print(residue_molecules[i].calccom(0))
 
                 NOTE: coordinates will have to be updated separately using
@@ -189,7 +188,7 @@ class Mask(object):
         frame = 0
         object_list = []
 
-        for i in xrange(number_of_objects):
+        for i in range(number_of_objects):
 
             new_object = system.Molecule(0)
             at = 'self.' + descriptor + '_mask()[' + str(i) + ']'
@@ -298,7 +297,7 @@ class Mask(object):
 
         natoms = self.natoms()
 
-        for i in xrange(natoms):
+        for i in range(natoms):
 
             try:
                 if(eval(basis_filter)):
@@ -324,7 +323,7 @@ class Mask(object):
 		natoms = self.natoms()
 		mask_array = numpy.zeros(natoms,numpy.int32)
 
-		for i in xrange(natoms):
+		for i in range(natoms):
 			try:
 				if(eval(basis_filter)):
 					mask_array[i]=1
@@ -387,12 +386,12 @@ class Mask(object):
         natoms1 = mol1.natoms()
         natoms2 = mol2.natoms()
 
-        print('natoms1 = ', natoms1)
-        print('natoms2 = ', natoms2)
+        #print('natoms1 = ', natoms1)
+        #print('natoms2 = ', natoms2)
 
         frame = 0
 
-        for i in xrange(natoms1):
+        for i in range(natoms1):
             try:
                 # if True:
                 atom.append(mol1._atom[i])
@@ -424,7 +423,7 @@ class Mask(object):
         last_index_mol1 = mol1._index[-1]
         this_index = last_index_mol1 + 1
 
-        for i in xrange(natoms2):
+        for i in range(natoms2):
             try:
                 # if True:
                 atom.append(mol2._atom[i])
@@ -576,7 +575,7 @@ class Mask(object):
         conect = {}
         natoms = self.natoms()
 
-        for i in xrange(natoms):
+        for i in range(natoms):
             if(mask[i] == 1):
                 try:
                     # if True:
@@ -890,7 +889,7 @@ class Mask(object):
             mask * numpy.arange(1, natoms_self + 1))[0]
 
         three_indicies_self = []
-        for i in xrange(len(indicies_self)):
+        for i in range(len(indicies_self)):
             this_index = indicies_self[i] * 3
             three_indicies_self.append(
                 [this_index, this_index + 1, this_index + 2])
@@ -969,7 +968,7 @@ class Mask(object):
         error = []
 
         natoms = self.natoms()
-        for i in xrange(natoms):
+        for i in range(natoms):
             if(mask[i] == 1):
                 try:
                     descriptor[i] = value

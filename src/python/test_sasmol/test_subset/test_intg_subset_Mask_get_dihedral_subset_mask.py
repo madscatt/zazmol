@@ -49,7 +49,7 @@ problemetic pdb (1PSI wih unpaird MODEL/ENDMDL)
 """
 
 from unittest import main,skipIf 
-from mocker import Mocker, MockerTestCase, ARGS
+import unittest
 
 import sasmol.system as system
 import sasmol.subset as subset
@@ -59,7 +59,7 @@ import os
 
 PdbDataPath = os.path.join(os.path.dirname(os.path.realpath(__file__)),'..','data','pdb_common')+os.path.sep
 
-class Test_intg_subset_Mask_get_dihedral_subset_mask(MockerTestCase): 
+class Test_intg_subset_Mask_get_dihedral_subset_mask(unittest.TestCase): 
  
    def setUp(self):
       self.o=system.Molecule(0)
