@@ -42,6 +42,7 @@ rna with 50 residue, mask all
 """
 
 from unittest import main,skipIf 
+import unittest
 from mocker import Mocker, MockerTestCase, ARGS
 
 import sasmol.system as system
@@ -51,7 +52,7 @@ import numpy
 
 import os
 
-class Test_unit_subset_Mask_get_dihedral_subset_mask(MockerTestCase): 
+class Test_unit_subset_Mask_get_dihedral_subset_mask(unittest.TestCase): 
 
    def mock_up(self, Cls_ptch, mthd, mocker, result=None, mmin=0, mmax=None):
       methodToCall = getattr(Cls_ptch,mthd)

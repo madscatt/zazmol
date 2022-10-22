@@ -35,7 +35,7 @@ contract
 '''
 
 from unittest import main,skipIf 
-from mocker import Mocker, MockerTestCase, ARGS
+import unittest
 
 import sasmol.system as system
 import sasmol.subset as subset
@@ -43,7 +43,7 @@ import numpy
 
 import os
 
-class Test_subset_Mask_get_subset_mask(MockerTestCase): 
+class Test_subset_Mask_get_subset_mask(unittest.TestCase): 
 
    """
    #NOT SURE WHY DOESNT WORK
@@ -421,7 +421,7 @@ class Test_subset_Mask_get_subset_mask(MockerTestCase):
       natoms=500
       aasize=5
       index=list(range(1,natoms+1))
-      name=['N','CA','C','O','CB']*(natoms/aasize)
+      name=['N','CA','C','O','CB']*int(natoms/aasize)
       loc=[' ']*natoms
       resname=['ALA']*natoms
       chain=['A']*natoms
@@ -430,14 +430,14 @@ class Test_subset_Mask_get_subset_mask(MockerTestCase):
       occupancy=[1.0]*natoms
       beta=[10.00]*natoms
       segname=[' ']*natoms
-      element=['C','N','C','O','C']*(natoms/aasize)
+      element=['C','N','C','O','C']*int(natoms/aasize)
       charge=[1.0]*natoms
       moltype=['protein']*natoms
       #
       basis_filter = 'name[i]=="CA"'
       #
       expecting_error = False      
-      expected_mask = [0,1,0,0,0]*(natoms/aasize)
+      expected_mask = [0,1,0,0,0]*int(natoms/aasize)
       #
       self.set_parameters(index, name, loc, resname, chain, resid, rescode, occupancy, beta, segname, element, charge, moltype, natoms)
       error, mask = self.o.get_subset_mask(basis_filter)

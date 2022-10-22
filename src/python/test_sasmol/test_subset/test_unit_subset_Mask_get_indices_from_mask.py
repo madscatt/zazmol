@@ -39,7 +39,8 @@ negative test, with mask length shorter than natoms
 """
 
 from unittest import main,skipIf 
-from mocker import Mocker, MockerTestCase, ARGS
+import unittest
+from unittest.mock import MagicMock, patch
 
 import sasmol.system as system
 import sasmol.subset as subset
@@ -48,11 +49,11 @@ import numpy
 
 import os
 
-class Test_unit_subset_Mask_get_indices_from_mask(MockerTestCase): 
+class Test_unit_subset_Mask_get_indices_from_mask(unittest.TestCase): 
 
    def mock_up(self, Cls_ptch, mthd, mocker, result=None, mmin=0, mmax=None):
       methodToCall = getattr(Cls_ptch,mthd)
-      methodToCall(ARGS)
+      methodToCall()
       mocker.result(result)
       mocker.count(mmin, mmax)
 
@@ -74,7 +75,7 @@ class Test_unit_subset_Mask_get_indices_from_mask(MockerTestCase):
  
 
    def setUp(self):
-      self.m = Mocker()
+      self.m = MagicMock()
       self.o=system.Molecule(0)
 
    def test_null(self):
