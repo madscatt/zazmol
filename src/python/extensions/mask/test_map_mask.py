@@ -7,14 +7,15 @@
 import os
 import sys
 import numpy
-import sasmol
+import sasmol.system as system
+
 
 
 def old_way():
 
-    m1 = sasmol.SasMol(0)
+    m1 = system.Molecule(0)
 
-    m1.read_pdb('min3.pdb')
+    m1.read_pdb('../../test_sasmol/data/pdb_common/hiv1_gag.pdb')
 
     moltype = m1.moltype()
 
@@ -59,9 +60,9 @@ def old_way():
 
 def list_way():
 
-    m1 = sasmol.SasMol(0)
+    m1 = system.Molecule(0)
 
-    m1.read_pdb('min3.pdb')
+    m1.read_pdb('../../test_sasmol/data/pdb_common/hiv1_gag.pdb')
 
     moltype = m1.moltype()
 
@@ -133,9 +134,9 @@ class StringFunction_0:
 
 def new_way():
 
-    m1 = sasmol.SasMol(0)
+    m1 = system.Molecule(0)
 
-    m1.read_pdb('min3.pdb')
+    m1.read_pdb('../../test_sasmol/data/pdb_common/hiv1_gag.pdb')
 
     moltype = m1.moltype()
 
@@ -215,8 +216,8 @@ def lam_way():
 
     #	import StringFunction
 
-    m1 = sasmol.SasMol(0)
-    m1.read_pdb('min3.pdb')
+    m1 = system.Molecule(0)
+    m1.read_pdb('../../test_sasmol/data/pdb_common/hiv1_gag.pdb')
     natoms = m1.natoms()
     aresid = m1.resid()
     aname = m1.name()
@@ -262,8 +263,8 @@ def lam_way():
 
 def cee_way():
 
-    m1 = sasmol.SasMol(0)
-    m1.read_pdb('min3.pdb')
+    m1 = system.Molecule(0)
+    m1.read_pdb('../../test_sasmol/data/pdb_common/hiv1_gag.pdb')
     natoms = m1.natoms()
     resid = m1.resid()
     name = m1.name()
@@ -277,13 +278,16 @@ def cee_way():
     atomlist = numpy.arange(0, natoms).tolist()
 
     #import cee_mask
-    from . import mask
+    import sasmol.mask as mask
 
-    farray = numpy.zeros((nflexible, natoms), numpy.int32)
+    #farray = numpy.zeros((nflexible, natoms), numpy.int32)
+    farray = numpy.zeros((nflexible, natoms), numpy.longlong)
 
     nresidues = int(nresidues)
+    mtype = 0 
 
-    mask.get_mask_array(farray, name, resid, flexible_residues, nresidues)
+    #mask.get_mask_array(farray, b"name", resid, flexible_residues, nresidues, mtype)
+    mask.get_mask_array(farray, name, resid, flexible_residues, nresidues, mtype)
 
     for i in range(nflexible):
         for j in range(natoms):
@@ -302,12 +306,12 @@ if __name__ == '__main__':
 # 	print '\n\nNEW WAY'
 # 	nt=Timer('new_way()', 'from __main__ import new_way')
 # 	print '\n',nt.timeit(number=1)
-    print('\n\nOLD WAY')
-    t = Timer('old_way()', 'from __main__ import old_way')
-    old_time = t.timeit(number=9)
-    print('\n', old_time)
+    #print('\n\nOLD WAY')
+    #t = Timer('old_way()', 'from __main__ import old_way')
+    #old_time = t.timeit(number=9)
+    #print('\n', old_time)
     print('\n\nCEE WAY')
     t = Timer('cee_way()', 'from __main__ import cee_way')
     cee_time = t.timeit(number=9)
     print('\n', cee_time)
-    print('\nratio = ', old_time/cee_time)
+    #print('\nratio = ', old_time/cee_time)

@@ -92,14 +92,16 @@ class Mask(object):
         '''
         natoms = self.natoms()
         name = self.name()
-        resid = self.resid().astype(numpy.long)
+        resid = self.resid().astype(numpy.longlong)
         nflexible = len(flexible_residues)
 
         nresidues = int(self.resid()[-1] - self.resid()[0] + 1)
 
-        farray = numpy.zeros((nflexible, natoms), numpy.long)
+        farray = numpy.zeros((nflexible, natoms), numpy.longlong)
 
+        print('pre farray = ', farray)
         sasmol.mask.get_mask_array(farray, name, resid, flexible_residues, nresidues, mtype)
+        print('post farray = ', farray)
 
         return farray
 
@@ -314,14 +316,14 @@ class Mask(object):
                 'found no atoms using filter selection ' + basis_filter)
             return error, preliminary_mask_array
         else:
-            mask_array = numpy.array(preliminary_mask_array, numpy.int32)
+            mask_array = numpy.array(preliminary_mask_array, int)
 
         return error, mask_array
         '''
 
 
 		natoms = self.natoms()
-		mask_array = numpy.zeros(natoms,numpy.int32)
+		mask_array = numpy.zeros(natoms,int)
 
 		for i in range(natoms):
 			try:
@@ -453,11 +455,11 @@ class Mask(object):
                     'failed in copy_molecule when attempting to assign descriptors to atom ' + str(i) + ' from mol2')
                 return error
         
-        x = numpy.array(x, numpy.float)
-        y = numpy.array(y, numpy.float)
-        z = numpy.array(z, numpy.float)
+        x = numpy.array(x, float)
+        y = numpy.array(y, float)
+        z = numpy.array(z, float)
 
-        coor = numpy.zeros((1, natoms1 + natoms2, 3), numpy.float)
+        coor = numpy.zeros((1, natoms1 + natoms2, 3), float)
 
         try:
             coor[frame, :, 0] = x
@@ -636,17 +638,17 @@ class Mask(object):
                     return error
 
         other.setAtom(atom)
-        other.setIndex(numpy.array(index, numpy.int))
+        other.setIndex(numpy.array(index, int))
 
-        original_index = numpy.array(original_index, numpy.int)
+        original_index = numpy.array(original_index, int)
         other.setOriginal_index(original_index)
 
         other.setName(name)
         other.setLoc(loc)
         other.setResname(resname)
         other.setChain(chain)
-        other.setResid(numpy.array(resid, numpy.int))
-        other.setOriginal_resid(numpy.array(original_resid, numpy.int))
+        other.setResid(numpy.array(resid, int))
+        other.setOriginal_resid(numpy.array(original_resid, int))
         other.setRescode(rescode)
         other.setOccupancy(occupancy)
         other.setBeta(beta)
@@ -660,8 +662,8 @@ class Mask(object):
         other.setNatoms(len(index))
         other.setResidue_flag(residue_flag)
 
-        other.setAtom_charge(numpy.array(atom_charge, numpy.float32))
-        other.setAtom_vdw(numpy.array(atom_vdw, numpy.float32))
+        other.setAtom_charge(numpy.array(atom_charge, float))
+        other.setAtom_vdw(numpy.array(atom_vdw, float))
 
         other._number_of_names = len(unique_names)
         other._names = unique_names
@@ -748,7 +750,7 @@ class Mask(object):
         Parameters
         ----------
         mask 
-            numpy integer array : mask array of length of the number of atoms
+            integer array : mask array of length of the number of atoms
                                   with 1 or 0 for each atom depending on the selection
                                   used to create the mask
 
@@ -758,7 +760,7 @@ class Mask(object):
         Returns
         -------
         indices
-            numpy integer array : indices of atoms determined by the input mask
+            integer array : indices of atoms determined by the input mask
 
 
         Examples
@@ -792,7 +794,7 @@ class Mask(object):
             integer : trajectory frame number to use
         
         mask 
-            numpy integer array : mask array of length of the number of atoms
+            integer array : mask array of length of the number of atoms
                                   with 1 or 0 for each atom depending on the selection
                                   used to create the mask
 
@@ -817,7 +819,7 @@ class Mask(object):
         >>> frame = 0
         >>> error, coor = molecule.get_coor_using_mask(frame, mask)
         >>> coor[0][0]
-        array([-21.72500038, -66.91000366,  85.45700073], dtype=float32)
+        array([-21.72500038, -66.91000366,  85.45700073], dtype=float)
 
         '''
         error = []
@@ -828,7 +830,7 @@ class Mask(object):
 
         this_frame_coor = self._coor[frame, :, :]
 
-        coor = numpy.zeros((1, len(indicies), 3), numpy.float32)
+        coor = numpy.zeros((1, len(indicies), 3), float)
 
         try:
             coor[0] = numpy.take(this_frame_coor[:, :], indicies, 0)
@@ -852,7 +854,7 @@ class Mask(object):
             integer : trajectory frame number to use
         
         mask 
-            numpy integer array : mask array of length of the number of atoms
+            integer array : mask array of length of the number of atoms
                                   with 1 or 0 for each atom depending on the selection
                                   used to create the mask
 
@@ -918,7 +920,7 @@ class Mask(object):
         Parameters
         ----------
         mask 
-            numpy integer array : mask array of length of the number of atoms
+            integer array : mask array of length of the number of atoms
                                   with 1 or 0 for each atom depending on the selection
                                   used to create the mask
 

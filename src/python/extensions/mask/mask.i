@@ -16,8 +16,10 @@ extern void get_mask_array(long long *farray, int nflexible, int natoms, char **
     $1 = (char **) malloc((size+1)*sizeof(char *));
     for (i = 0; i < size; i++) {
       PyObject *o = PyList_GetItem($input,i);
+      //if (PyString_Check(o))
+      //  $1[i] = PyString_AsString(PyList_GetItem($input,i));
       if (PyString_Check(o))
-        $1[i] = PyString_AsString(PyList_GetItem($input,i));
+        $1[i] = PyUnicode_AsUTF8(PyList_GetItem($input,i));
       else {
         PyErr_SetString(PyExc_TypeError,"list must contain strings");
         free($1);

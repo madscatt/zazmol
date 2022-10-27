@@ -57,6 +57,10 @@ import numpy
 
 import os
 
+
+import sys
+
+
 PdbDataPath = os.path.join(os.path.dirname(os.path.realpath(__file__)),'..','data','pdb_common')+os.path.sep
 
 class Test_intg_subset_Mask_get_dihedral_subset_mask(unittest.TestCase): 
@@ -328,6 +332,9 @@ class Test_intg_subset_Mask_get_dihedral_subset_mask(unittest.TestCase):
       #
       flexible_residues = list(range(1,46))
       mtype=0
+      print("flexible residues = ", flexible_residues)
+      sys.exit()
+
       result_farray = self.o.get_dihedral_subset_mask(flexible_residues,mtype)
       #
       expected_farray =  self.hard_wired_get_all_dihedral_subset_mask(self.o, flexible_residues, mtype)
