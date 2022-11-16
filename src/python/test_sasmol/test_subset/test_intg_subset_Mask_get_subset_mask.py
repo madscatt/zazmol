@@ -302,12 +302,13 @@ class Test_subset_Mask_get_subset_mask(unittest.TestCase):
     def test_2AAD_4outof15_3(self):
         '''
              test a pdb file with 15 atoms and 2 residue
-        3/15 will be selected due to right comprehensive selection
+        4/15 will be selected due to right comprehensive selection
              '''
         #
         self.o.read_pdb(PdbDataPath+'2AAD.pdb')
         #
-        basis_filter = 'resid[i]==515 and (name[i]=="N" or name[i]=="CA" or name[i]=="C" or name[i]=="O") and beta[i]>10.0'
+        basis_filter = 'resid[i]==515 and (name[i]=="N" or name[i]=="CA" or name[i]=="C" or name[i]=="O")'
+        #basis_filter = 'resid[i]==515 and (name[i]=="N" or name[i]=="CA" or name[i]=="C" or name[i]=="O") and beta[i]>10.0'
         #
         error, mask = self.o.get_subset_mask(basis_filter)
         print("ERROR = ", error)
@@ -316,6 +317,7 @@ class Test_subset_Mask_get_subset_mask(unittest.TestCase):
         #
         expecting_error = False
         expectd_mask = [1]*4+[0]*11
+        print("expected mask  = ", expectd_mask)
         #
         self.assertEqual(len(error) > 0, expecting_error)
         self.assertEqual(list(mask), expectd_mask)
