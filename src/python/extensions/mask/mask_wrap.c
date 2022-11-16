@@ -3360,10 +3360,11 @@ SWIGINTERN PyObject *_wrap_get_mask_array(PyObject *SWIGUNUSEDPARM(self), PyObje
         PyObject *o = PyList_GetItem(swig_obj[1],i);
         //if (PyString_Check(o))
         //  arg4[i] = PyString_AsString(PyList_GetItem(swig_obj[1],i));
-        if (PyString_Check(o))
+        if (PyUnicode_Check(o))
         arg4[i] = PyUnicode_AsUTF8(PyList_GetItem(swig_obj[1],i));
+        //  arg4[i] = PyBytes_AsString(PyList_GetItem(swig_obj[1],i));
         else {
-          PyErr_SetString(PyExc_TypeError,"list must contain strings");
+          PyErr_SetString(PyExc_TypeError,"list must contain strings: bozo");
           free(arg4);
           return NULL;
         }
