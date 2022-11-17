@@ -16,7 +16,7 @@
 '''
 
 from unittest import main 
-from mocker import Mocker, MockerTestCase
+import unittest
 
 import sasmol.system as system
 
@@ -24,7 +24,7 @@ import os
 
 DataPath = os.path.join(os.path.dirname(os.path.realpath(__file__)),'..','data','sasmol','system')+os.path.sep
 
-class Test_intg_system_Atom_setRescode(MockerTestCase):
+class Test_intg_system_Atom_setRescode(unittest.TestCase):
 
    def setUp(self):
       self.o=system.Atom(3,'1CRN-3frames.pdb')
@@ -39,7 +39,6 @@ class Test_intg_system_Atom_setRescode(MockerTestCase):
       self.o.setRescode(expected)
       #
       result = self.o.rescode()
-      print(result)
       #
       self.assertEqual(expected, result)
 
@@ -50,5 +49,5 @@ class Test_intg_system_Atom_setRescode(MockerTestCase):
    
    
 if __name__ == '__main__': 
-   main() 
+   unittest.main() 
 

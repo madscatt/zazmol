@@ -21,7 +21,7 @@ from sasmol.test_sasmol.utilities import env
 sasio.Files.read_pdb seems not getting the moltype right
 '''
 from unittest import main 
-from mocker import Mocker, MockerTestCase, ANY, ARGS, KWARGS
+import unittest
 import sasmol.system as system
 
 import numpy, os, copy
@@ -32,7 +32,7 @@ floattype=os.environ['SASMOL_FLOATTYPE']
 
 DataPath = os.path.join(os.path.dirname(os.path.realpath(__file__)),'..','data','pdb_common')+os.path.sep
 
-class Test_intg_system_Molecule_Type(MockerTestCase):
+class Test_intg_system_Molecule_Type(unittest.TestCase):
 
    def setUp(self):
       self.o=system.Molecule(3,'1CRN-3frames.pdb')
@@ -249,5 +249,5 @@ class Test_intg_system_Molecule_Type(MockerTestCase):
    
    
 if __name__ == '__main__': 
-   main() 
+   unittest.main() 
 

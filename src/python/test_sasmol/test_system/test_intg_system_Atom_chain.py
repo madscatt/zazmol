@@ -51,5 +51,5 @@ class Test_intg_sasmol_Atom_chain(unittest.TestCase):
    
    
 if __name__ == '__main__': 
-   main() 
+   unittest.main() 
 

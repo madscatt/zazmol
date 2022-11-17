@@ -51,5 +51,5 @@ class Test_intg_system_Atom_element(unittest.TestCase):
    
    
 if __name__ == '__main__': 
-   main() 
+   unittest.main() 
 

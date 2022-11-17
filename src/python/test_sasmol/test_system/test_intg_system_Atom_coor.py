@@ -15,8 +15,7 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 '''
 
-from unittest import main 
-import unittest
+import unittest 
 
 import sasmol.system as system
 
@@ -50,5 +49,5 @@ class Test_intg_system_Atom_coor(unittest.TestCase):
    
    
 if __name__ == '__main__': 
-   main() 
+   unittest.main() 
 

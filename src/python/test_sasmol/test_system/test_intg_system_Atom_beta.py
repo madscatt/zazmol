@@ -50,5 +50,5 @@ class Test_intg_system_SasAtm_beta(unittest.TestCase):
    
    
 if __name__ == '__main__': 
-   main() 
+   unittest.main() 
 

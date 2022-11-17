@@ -17,7 +17,7 @@
 
 
 from unittest import main 
-from mocker import Mocker, MockerTestCase, ANY, ARGS, KWARGS
+import unittest
 import numpy,copy
 
 from sasmol.test_sasmol.utilities import env
@@ -31,7 +31,7 @@ DataPath = os.path.join(os.path.dirname(os.path.realpath(__file__)),'..','data',
 floattype=os.environ['SASMOL_FLOATTYPE']
 import warnings; warnings.filterwarnings('ignore')
 
-class Test_intg_system_Atom_load(MockerTestCase):
+class Test_intg_system_Atom_load(unittest.TestCase):
 
    def setUp(self):
       self.o=system.Atom(3,'1CRN-3frames.pdb')
@@ -60,5 +60,5 @@ class Test_intg_system_Atom_load(MockerTestCase):
    
    
 if __name__ == '__main__': 
-   main() 
+   unittest.main() 
 

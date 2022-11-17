@@ -49,6 +49,6 @@ class Test_intg_system_SasAtm_atom(unittest.TestCase):
         
    
    
-if __name__ == '__main__': 
-   main() 
+if __name__ == '__main__':  
+    unittest.main() 
 

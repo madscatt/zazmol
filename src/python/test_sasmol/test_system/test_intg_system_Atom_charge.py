@@ -50,5 +50,5 @@ class Test_intg_system_Atom_charge(unittest.TestCase):
    
    
 if __name__ == '__main__': 
-   main() 
+   unittest.main() 
 

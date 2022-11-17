@@ -62,5 +62,5 @@ class Test_intg_system_Atom_delete(unittest.TestCase):
    
    
 if __name__ == '__main__': 
-   main() 
+   unittest.main() 
 
