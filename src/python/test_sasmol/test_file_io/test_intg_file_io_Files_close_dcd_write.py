@@ -20,8 +20,12 @@ from sasmol.test_sasmol.utilities import env
 from unittest import main, skipIf
 import unittest
 
+
+
 import sasmol.system as system
 import sasmol.dcdio as dcdio
+
+import warnings
 
 import os, sys, string, shutil
 
@@ -33,7 +37,8 @@ class Test_intg_sasio_Files_close_dcd_write(unittest.TestCase):
 
    def setUp(self):
       self.o=system.Molecule(0)
-
+      warnings.filterwarnings('ignore')
+      
    def test_file_doesnt_exist(self):
       '''
 	   test a dcd which doent exist

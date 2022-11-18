@@ -131,7 +131,7 @@ class DCD(object):
         headerresult=dcdio.write_dcdheader(outfile,filename,natoms,nset,istart,nsavc,delta)
 
         i = 0
-        for frame in xrange(start,end):
+        for frame in range(start,end):
             print(".",)
             sys.stdout.flush()
 
@@ -178,7 +178,7 @@ class DCD(object):
 		
         headerresult=dcdio.write_dcdheader(outfile,filename,natoms,nset,istart,nsavc,delta)
 
-        for frame in xrange(nset):
+        for frame in range(nset):
             print(".",)
             sys.stdout.flush()
 
@@ -205,13 +205,13 @@ class DCD(object):
         num_fixed=0
         result = 1
 
-        print('calling read dcd header')
+        #print('calling read dcd header')
         readheaderresult,nnatoms,nset,istart,nsavc,delta,namnf,reverseEndian,charmm=dcdio.read_dcdheader(infile)
         if(readheaderresult!=0):
             print('failed to read header')
             print('readheaderresult = ',readheaderresult)	
 
-        print('done with read dcd header')
+        #print('done with read dcd header')
 
         coor=numpy.zeros((1,nnatoms,3),numpy.float)	
 	
@@ -221,10 +221,11 @@ class DCD(object):
 
         first = 1  # since num_fixed = 0 ; the "first" variable is inconsequential
 		
-        for i in xrange(frame):	
+        for i in range(frame):	
             result=dcdio.read_dcdstep(infile,tx,ty,tz,num_fixed,first,reverseEndian,charmm)
 
-        print('result = ',result)
+
+        #print('result = ',result)
 
         coor[0,:,0]=tx.astype(numpy.float) ; coor[0,:,1]=ty.astype(numpy.float) ; coor[0,:,2]=tz.astype(numpy.float)
 		

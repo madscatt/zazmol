@@ -5,6 +5,15 @@ working on resource error warnings in:
 
 test_intg_file_io_Files_close_dcd_write.py
 
+import warnings
+
+and in setup
+
+warnings.filterwarnings('ignore')
+
+will remove the stale open() file warnings that could be also removed by using with open () etc.
+
+
 
 
 

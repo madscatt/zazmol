@@ -18,7 +18,7 @@
 from sasmol.test_sasmol.utilities import env
 
 from unittest import main, skipIf 
-from mocker import Mocker, MockerTestCase
+import unittest
 
 import sasmol.system as system
 import sasmol.dcdio as dcdio
@@ -28,7 +28,7 @@ import os
 DataPath = os.path.join(os.path.dirname(os.path.realpath(__file__)),'..','data','pdb_common')+os.path.sep
 moduleDataPath = os.path.join(os.path.dirname(os.path.realpath(__file__)),'..','data','sasmol','file_io')+os.path.sep
 
-class Test_intg_file_io_Files_write_dcd_header(MockerTestCase):
+class Test_intg_file_io_Files_write_dcd_header(unittest.TestCase):
 
    def setUp(self):
       self.o=system.Molecule(0)
@@ -58,7 +58,7 @@ class Test_intg_file_io_Files_write_dcd_header(MockerTestCase):
       self.o.write_dcd_header(fp, nset)
       dcdio.close_dcd_write(fp)
       fsize = os.path.getsize(dcdFileName)
-      print(fsize)
+      #print(fsize)
       self.assertTrue(fsize>0)
       os.remove(dcdFileName)
 
@@ -77,7 +77,7 @@ class Test_intg_file_io_Files_write_dcd_header(MockerTestCase):
       self.o.write_dcd_header(fp, nset)
       dcdio.close_dcd_write(fp)
       fsize = os.path.getsize(dcdFileName)
-      print(fsize)
+      #print(fsize)
       self.assertTrue(fsize>0)
       os.remove(dcdFileName)
 
@@ -96,7 +96,7 @@ class Test_intg_file_io_Files_write_dcd_header(MockerTestCase):
       self.o.write_dcd_header(fp, nset)
       dcdio.close_dcd_write(fp)
       fsize = os.path.getsize(dcdFileName)
-      print(fsize)
+      #print(fsize)
       self.assertTrue(fsize>0)
       os.remove(dcdFileName)
 
@@ -116,7 +116,7 @@ class Test_intg_file_io_Files_write_dcd_header(MockerTestCase):
       self.o.write_dcd_header(fp, nset)
       dcdio.close_dcd_write(fp)
       fsize = os.path.getsize(dcdFileName)
-      print(fsize)
+      #print(fsize)
       self.assertTrue(fsize>0)
       os.remove(dcdFileName)
 
@@ -135,7 +135,7 @@ class Test_intg_file_io_Files_write_dcd_header(MockerTestCase):
       self.o.write_dcd_header(fp, nset)
       dcdio.close_dcd_write(fp)
       fsize = os.path.getsize(dcdFileName)
-      print(fsize)
+      #print(fsize)
       self.assertTrue(fsize>0)
       os.remove(dcdFileName)
 
@@ -148,5 +148,5 @@ class Test_intg_file_io_Files_write_dcd_header(MockerTestCase):
    
    
 if __name__ == '__main__': 
-   main() 
+   unittest.main() 
 
