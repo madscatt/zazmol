@@ -18,7 +18,7 @@
 from sasmol.test_sasmol.utilities import env
 
 from unittest import main,skipIf 
-from mocker import Mocker, MockerTestCase, ANY, ARGS, KWARGS
+import unittest
 import sasmol.system as system
 
 import numpy, os, copy
@@ -31,7 +31,7 @@ DataPath = os.path.join(os.path.dirname(os.path.realpath(__file__)),'..','data',
 moduleDataPath = os.path.join(os.path.dirname(os.path.realpath(__file__)),'..','data','sasmol','file_io')+os.path.sep
 
 
-class Test_intg_file_io_Files_write_pdb(MockerTestCase):
+class Test_intg_file_io_Files_write_pdb(unittest.TestCase):
 
    def setUp(self):
       self.o=system.Molecule(0)
@@ -139,5 +139,5 @@ class Test_intg_file_io_Files_write_pdb(MockerTestCase):
    
    
 if __name__ == '__main__': 
-   main() 
+   unittest.main() 
 

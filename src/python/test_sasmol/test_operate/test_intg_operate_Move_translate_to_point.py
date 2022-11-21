@@ -18,23 +18,24 @@
 from sasmol.test_sasmol.utilities import env,util
 
 from unittest import main, skipIf
-from mocker import Mocker, MockerTestCase, ANY, ARGS
+import unittest
 
 import sasmol.system as system
 import sasmol.operate as operate
 
 import numpy
 
-import warnings; warnings.filterwarnings('ignore')
+import warnings
 
 import os
 floattype=os.environ['SASMOL_FLOATTYPE']
 
 DataPath = os.path.join(os.path.dirname(os.path.realpath(__file__)),'..','data','pdb_common')+os.path.sep
 
-class Test_intg_operate_Move_translate_to_point(MockerTestCase): 
+class Test_intg_operate_Move_translate_to_point(unittest.TestCase): 
 
     def setUp(self):
+        warnings.filterwarnings('ignore')
         self.o=system.Molecule(0)
 
     def assert_list_almost_equal(self,a,b,places=5):

@@ -17,8 +17,8 @@
 from sasmol.test_sasmol.utilities import env
 
 from unittest import main, skipIf
-from mocker import Mocker, MockerTestCase, ANY, ARGS, KWARGS
 import sasmol.system as system
+import unittest
 
 import numpy
 
@@ -27,7 +27,7 @@ import os
 DataPath = os.path.join(os.path.dirname(os.path.realpath(__file__)),'..','data','pdb_common')+os.path.sep
 dcdDataPath = os.path.join(os.path.dirname(os.path.realpath(__file__)),'..','data','dcd_common')+os.path.sep
 
-class Test_sascalc_Prop_calc_minmax_all_steps(MockerTestCase): 
+class Test_sascalc_Prop_calc_minmax_all_steps(unittest.TestCase): 
 
     def setUp(self):
         self.o=system.Molecule(0)
@@ -57,7 +57,6 @@ class Test_sascalc_Prop_calc_minmax_all_steps(MockerTestCase):
         self.o.read_pdb(DataPath+'2AAD.pdb')
         self.o.read_dcd(dcdDataPath+'2AAD.dcd')
         result_minmax  = self.o.calculate_minimum_and_maximum()
-	print(result_minmax)
         expected_minmax = [[-79.712, -46.273,  39.354], [79.712,  46.273,  43.910]]
         self.assert_list_almost_equal(expected_minmax[0], result_minmax[0])
         self.assert_list_almost_equal(expected_minmax[1], result_minmax[1])
@@ -68,8 +67,6 @@ class Test_sascalc_Prop_calc_minmax_all_steps(MockerTestCase):
         self.o.read_pdb(DataPath+'rna.pdb')
         self.o.read_dcd(dcdDataPath+'rna-1to10.dcd')
         result_minmax  = self.o.calculate_minimum_and_maximum()
-	numpy.set_printoptions(precision=3)
-	print(result_minmax)
         expected_minmax = [[-43.801, -44.888, -42.605], [ 41.234,  39.706,  41.903]]
         self.assert_list_almost_equal(expected_minmax[0], result_minmax[0])
         self.assert_list_almost_equal(expected_minmax[1], result_minmax[1])
@@ -80,8 +77,6 @@ class Test_sascalc_Prop_calc_minmax_all_steps(MockerTestCase):
         self.o.read_pdb(DataPath+'rna.pdb')
         self.o.read_dcd(dcdDataPath+'rna-0.8g.dcd')
         result_minmax  = self.o.calculate_minimum_and_maximum()
-	numpy.set_printoptions(precision=3)
-	print(result_minmax)
         expected_minmax = [[-45.714, -45.643, -42.868], [ 41.65 ,  41.087,  45.362]]
         self.assert_list_almost_equal(expected_minmax[0], result_minmax[0],3)
         self.assert_list_almost_equal(expected_minmax[1], result_minmax[1],3)
@@ -92,8 +87,6 @@ class Test_sascalc_Prop_calc_minmax_all_steps(MockerTestCase):
         self.o.read_pdb(DataPath+'rna.pdb')
         self.o.read_dcd(dcdDataPath+'rna-1.0g.dcd')
         result_minmax  = self.o.calculate_minimum_and_maximum()
-	numpy.set_printoptions(precision=3)
-	print(result_minmax)
         expected_minmax = [[-46.369, -45.643, -42.868], [ 41.65 ,  41.087,  45.362]]
         self.assert_list_almost_equal(expected_minmax[0], result_minmax[0],3)
         self.assert_list_almost_equal(expected_minmax[1], result_minmax[1],3)
@@ -104,8 +97,6 @@ class Test_sascalc_Prop_calc_minmax_all_steps(MockerTestCase):
         self.o.read_pdb(DataPath+'rna.pdb')
         self.o.read_dcd(dcdDataPath+'rna-2.0g.dcd')
         result_minmax  = self.o.calculate_minimum_and_maximum()
-	numpy.set_printoptions(precision=3)
-	print(result_minmax)
         expected_minmax = [[-48.253, -45.643, -42.868], [ 41.65 ,  41.087,  45.362]]
         self.assert_list_almost_equal(expected_minmax[0], result_minmax[0],3)
         self.assert_list_almost_equal(expected_minmax[1], result_minmax[1],3)
@@ -116,8 +107,6 @@ class Test_sascalc_Prop_calc_minmax_all_steps(MockerTestCase):
         self.o.read_pdb(DataPath+'rna.pdb')
         self.o.read_dcd(dcdDataPath+'rna-3.2g.dcd')
         result_minmax  = self.o.calculate_minimum_and_maximum()
-	numpy.set_printoptions(precision=3)
-	print(result_minmax)
         expected_minmax = [[-48.253, -45.643, -42.868], [ 41.65 ,  41.087,  45.362]]
         self.assert_list_almost_equal(expected_minmax[0], result_minmax[0],3)
         self.assert_list_almost_equal(expected_minmax[1], result_minmax[1],3)
@@ -128,8 +117,6 @@ class Test_sascalc_Prop_calc_minmax_all_steps(MockerTestCase):
         self.o.read_pdb(DataPath+'rna.pdb')
         self.o.read_dcd(dcdDataPath+'rna-6.4g.dcd')
         result_minmax  = self.o.calculate_minimum_and_maximum()
-	numpy.set_printoptions(precision=3)
-	print(result_minmax)
         expected_minmax = [[-48.253, -45.643, -42.868], [ 41.65 ,  41.332,  45.362]]
         self.assert_list_almost_equal(expected_minmax[0], result_minmax[0],3)
         self.assert_list_almost_equal(expected_minmax[1], result_minmax[1],3)

@@ -18,21 +18,27 @@
 from sasmol.test_sasmol.utilities import env, util
 
 from unittest import main 
-from mocker import Mocker, MockerTestCase, ANY, ARGS, KWARGS
+#from mocker import Mocker, MockerTestCase, ANY, ARGS, KWARGS
+import unittest
+from unittest.mock import MagicMock
+import warnings
+
 import sasmol.linear_algebra as linear_algebra
 import numpy
 
 import os
 floattype=os.environ['SASMOL_FLOATTYPE']
 
-class Test_linear_algebra_cross_product(MockerTestCase): 
+class Test_linear_algebra_cross_product(unittest.TestCase): 
 
     def setUp(self):
-        self.m = Mocker()
+        self.m = MagicMock()
+
+        warnings.filterwarnings('ignore')
 
         """
         linear_algebra.Math.__init__ = self.m.mock()
-        linear_algebra.Math.__init__(ARGS)
+        linear_algebra.Math.__init__()
         self.m.result(None)
         self.m.count(0,None)
         """
@@ -98,7 +104,6 @@ class Test_linear_algebra_cross_product(MockerTestCase):
         x=numpy.array([util.HUGE, 3.0, -100.2],floattype)
         y=numpy.array([2.0, 0.9, -2.2],floattype)
         result=linear_algebra.cross_product(x,y)
-        print(result)
         resultnp = numpy.cross(x,y)
         self.assert_list_almost_equal(result,resultnp)
 

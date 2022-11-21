@@ -18,17 +18,18 @@
 from sasmol.test_sasmol.utilities import env, util
 
 from unittest import main 
-from mocker import Mocker, MockerTestCase
+import unittest
 import sasmol.linear_algebra as linear_algebra
 import numpy
+import warnings
 
 import os
 floattype=os.environ['SASMOL_FLOATTYPE']
 
-class Test_linear_algebra_signed_angle(MockerTestCase): 
+class Test_linear_algebra_signed_angle(unittest.TestCase): 
 
     def setUp(self):
-        pass 
+        warnings.filterwarnings('ignore')
 
     def calc_expected(self,a,b,c):
         ada = sum([e*e for e in a])
@@ -38,7 +39,7 @@ class Test_linear_algebra_signed_angle(MockerTestCase):
            return util.num_to_floattype(180.0, floattype)
         else:
            angle = (180.0/util.num_to_floattype(numpy.pi,floattype)) * numpy.arccos(numpy.dot(a,b)/numpy.sqrt(numpy.dot(a,a)*numpy.dot(b,b)))
-        sign = cmp(numpy.dot(numpy.cross(a,b),c), 0.0)
+        sign = linear_algebra.cmp(numpy.dot(numpy.cross(a,b),c), 0.0)
         if sign==0: sign=1
         return util.num_to_floattype(sign*angle, floattype)
 
@@ -83,9 +84,6 @@ class Test_linear_algebra_signed_angle(MockerTestCase):
         result = linear_algebra.signed_angle(a,b,c)
         expected = self.calc_expected(a,b,c)
         self.assertAlmostEqual(result,expected)
-        print('numpy.dot(a,a) ',numpy.dot(a,a))
-        print('numpy.dot(b,b) ',numpy.dot(b,b))
-        print('numpy.dot(a,b) ',numpy.dot(a,b))
 
 
     def test_inf_1(self):
@@ -100,7 +98,6 @@ class Test_linear_algebra_signed_angle(MockerTestCase):
         b=numpy.array([util.INF, 1.2, 2.3],floattype)
         c=numpy.array([0.3, util.INF, 29.02],floattype)
         result = linear_algebra.signed_angle(a,b,c)
-        print(result)
         self.assertTrue(numpy.isnan(result) or numpy.isinf(result))
 
     def test_nan(self):

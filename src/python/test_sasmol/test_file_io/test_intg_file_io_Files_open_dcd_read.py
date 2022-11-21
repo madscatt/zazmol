@@ -18,7 +18,7 @@
 from sasmol.test_sasmol.utilities import env
 
 from unittest import main, skipIf
-from mocker import Mocker, MockerTestCase
+import unittest
 
 import sasmol.system as system
 
@@ -26,7 +26,7 @@ import os
 
 DataPath = os.path.join(os.path.dirname(os.path.realpath(__file__)),'..','data','dcd_common')+os.path.sep
 
-class Test_intg_file_io_Files_open_dcd_read(MockerTestCase):
+class Test_intg_file_io_Files_open_dcd_read(unittest.TestCase):
 
    def setUp(self):
       self.o=system.Molecule(0)
@@ -38,7 +38,7 @@ class Test_intg_file_io_Files_open_dcd_read(MockerTestCase):
       #
       dcdFileName = DataPath+'1ATM.dcd'
       fp = self.o.open_dcd_read(dcdFileName)
-      self.assertEqual(str(type(fp[0])),"<type 'SwigPyObject'>")
+      self.assertEqual(str(type(fp[0])),"<class 'SwigPyObject'>")
       self.assertEqual(fp[1],1)
       self.assertEqual(fp[2],2)
       self.assertEqual(fp[3],0)
@@ -51,7 +51,7 @@ class Test_intg_file_io_Files_open_dcd_read(MockerTestCase):
       #
       dcdFileName = DataPath+'2AAD.dcd'
       fp = self.o.open_dcd_read(dcdFileName)
-      self.assertEqual(str(type(fp[0])),"<type 'SwigPyObject'>")
+      self.assertEqual(str(type(fp[0])),"<class 'SwigPyObject'>")
       self.assertEqual(fp[1],15)
       self.assertEqual(fp[2],3)
       self.assertEqual(fp[3],0)
@@ -65,7 +65,7 @@ class Test_intg_file_io_Files_open_dcd_read(MockerTestCase):
       #
       dcdFileName = DataPath+'rna-1to10.dcd'
       fp = self.o.open_dcd_read(dcdFileName)
-      self.assertEqual(str(type(fp[0])),"<type 'SwigPyObject'>")
+      self.assertEqual(str(type(fp[0])),"<class 'SwigPyObject'>")
       self.assertEqual(fp[1],10632)
       self.assertEqual(fp[2],10)
       self.assertEqual(fp[3],0)
@@ -137,5 +137,5 @@ class Test_intg_file_io_Files_open_dcd_read(MockerTestCase):
    
    
 if __name__ == '__main__': 
-   main() 
+   unittest.main() 
 

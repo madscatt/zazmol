@@ -16,9 +16,10 @@
 '''
 
 from unittest import main 
-from mocker import Mocker, MockerTestCase
+import unittest
 
 import numpy
+import warnings
 
 import sasmol.system as system
 
@@ -26,10 +27,11 @@ import os
 
 DataPath = os.path.join(os.path.dirname(os.path.realpath(__file__)),'..','data','sasmol','system')+os.path.sep
 
-class Test_intg_system_Atom_setResid(MockerTestCase):
+class Test_intg_system_Atom_setResid(unittest.TestCase):
 
    def setUp(self):
       self.o=system.Atom(3,'1CRN-3frames.pdb')
+      warnings.filterwarnings('ignore')
 
    def test_1CRN_3frames(self):
       '''
@@ -42,7 +44,6 @@ class Test_intg_system_Atom_setResid(MockerTestCase):
       self.o.setResid(expected)
       #
       result = self.o.resid()
-      print(result)
       #
       self.assertEqual(list(expected), list(result))
 
@@ -53,5 +54,5 @@ class Test_intg_system_Atom_setResid(MockerTestCase):
    
    
 if __name__ == '__main__': 
-   main() 
+   unittest.main() 
 

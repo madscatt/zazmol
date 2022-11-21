@@ -21,6 +21,7 @@ except AttributeError:
 _mask = Extension("_mask",
                    ["mask.i","mask.c"],
                    include_dirs = [numpy_include],
+                   swig_opts=['-py3'],
                    )
 
 # NumyTypemapTests setup

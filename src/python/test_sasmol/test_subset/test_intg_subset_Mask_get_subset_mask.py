@@ -15,6 +15,12 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 '''
 
+from unittest import main, skipIf
+import os
+import numpy
+import sasmol.subset as subset
+import sasmol.system as system
+import unittest
 from sasmol.test_sasmol.utilities import env
 
 """
@@ -55,482 +61,454 @@ large protein (groel with 526*14 residues), mask all (Skipped as SASMOL_LARGETES
 problemetic pdb (1PSI wih unpaird MODEL/ENDMDL)
 """
 
-from unittest import main,skipIf 
-from mocker import Mocker, MockerTestCase, ARGS
 
-import sasmol.system as system
-import sasmol.subset as subset
-
-import numpy
-
-import os
-
-PdbDataPath = os.path.join(os.path.dirname(os.path.realpath(__file__)),'..','data','pdb_common')+os.path.sep
-
-class Test_subset_Mask_get_subset_mask(MockerTestCase): 
- 
-
-   def setUp(self):
-      self.o=system.Molecule(0)
+PdbDataPath = os.path.join(os.path.dirname(os.path.realpath(
+    __file__)), '..', 'data', 'pdb_common')+os.path.sep
 
 
-   def test_null(self):
-      '''
-      test for a null atom list
-      '''
-      #
-      try:
-         self.o.read_pdb(PdbDataPath+'XXX.pdb')
-      except Exception:
-         pass
-      #
-      basis_filter = 'name[i]=="N"'
-      #
-      with self.assertRaises(Exception):
-         self.o.get_subset_mask(basis_filter)
+class Test_subset_Mask_get_subset_mask(unittest.TestCase):
+
+    def setUp(self):
+        self.o = system.Molecule(0)
+
+    def test_null(self):
+        '''
+        test for a null atom list
+        '''
+        #
+        try:
+            self.o.read_pdb(PdbDataPath+'XXX.pdb')
+        except Exception:
+            pass
+        #
+        basis_filter = 'name[i]=="N"'
+        #
+        with self.assertRaises(Exception):
+            self.o.get_subset_mask(basis_filter)
+
+    def test_negative(self):
+        '''
+        negative test by providing the wrong basis_filter
+        '''
+        #
+        try:
+            self.o.read_pdb(PdbDataPath+'XXX.pdb')
+        except Exception:
+            pass
+        #
+        basis_filter = 'abc'
+        #
+        with self.assertRaises(Exception):
+            self.o.get_subset_mask(basis_filter)
+
+    def test_1ATM_0outof1_1(self):
+        '''
+             test a pdb file with 1 atom
+        0/1 will be selected due to empty basis_filter
+             '''
+        #
+        self.o.read_pdb(PdbDataPath+'1ATM.pdb')
+        #
+        basis_filter = ''
+        #
+        expecting_error = True
+        expectd_mask = []
+        #
+        error, mask = self.o.get_subset_mask(basis_filter)
+        #
+        self.assertEqual(len(error) > 0, expecting_error)
+        self.assertEqual(list(mask), expectd_mask)
+
+    def test_1ATM_0outof1_2(self):
+        '''
+             test a pdb file with 1 atom
+        0/1 will be selected due to illegal basis_filter
+             '''
+        #
+        self.o.read_pdb(PdbDataPath+'1ATM.pdb')
+        #
+        basis_filter = 'abc'
+        #
+        expecting_error = True
+        expectd_mask = []
+        #
+        error, mask = self.o.get_subset_mask(basis_filter)
+        #
+        self.assertEqual(len(error) > 0, expecting_error)
+        self.assertEqual(list(mask), expectd_mask)
+
+    def test_1ATM_0outof1_3(self):
+        '''
+             test a pdb file with 1 atom
+        0/1 will be selected due to wrong basis_filter
+             '''
+        #
+        self.o.read_pdb(PdbDataPath+'1ATM.pdb')
+        #
+        basis_filter = 'name[i]=="B"'
+        #
+        expecting_error = True
+        expectd_mask = [0]
+        #
+        error, mask = self.o.get_subset_mask(basis_filter)
+        #
+        self.assertEqual(len(error) > 0, expecting_error)
+        self.assertEqual(list(mask), expectd_mask)
+
+    def test_1ATM_1outof1_1(self):
+        '''
+             test a pdb file with 1 atom
+        1/1 selected by basis_filter ('name[i]=="N"')
+             '''
+        #
+        self.o.read_pdb(PdbDataPath+'1ATM.pdb')
+        #
+        basis_filter = 'name[i]=="N"'
+        #
+        expecting_error = False
+        expectd_mask = [1]
+        #
+        error, mask = self.o.get_subset_mask(basis_filter)
+        #
+        self.assertEqual(len(error) > 0, expecting_error)
+        self.assertEqual(list(mask), expectd_mask)
+
+    def test_1ATM_1outof1_2(self):
+        '''
+             test a pdb file with 1 atom
+        1/1 selected by basis_filter ('resid[i]==515')
+             '''
+        #
+        self.o.read_pdb(PdbDataPath+'1ATM.pdb')
+        #
+        basis_filter = 'resid[i]==515'
+        #
+        expecting_error = False
+        expectd_mask = [1]
+        #
+        error, mask = self.o.get_subset_mask(basis_filter)
+        #
+        self.assertEqual(len(error) > 0, expecting_error)
+        self.assertEqual(list(mask), expectd_mask)
+
+    def test_1ATM_1outof1_3(self):
+        '''
+             test a pdb file with 1 atom
+        1/1 selected by basis_filter ('name[i]=="N" and resid[i]==515')
+             '''
+        #
+        self.o.read_pdb(PdbDataPath+'1ATM.pdb')
+        #
+        basis_filter = 'name[i]=="N" and resid[i]==515'
+        #
+        expecting_error = False
+        expectd_mask = [1]
+        #
+        error, mask = self.o.get_subset_mask(basis_filter)
+        #
+        self.assertEqual(len(error) > 0, expecting_error)
+        self.assertEqual(list(mask), expectd_mask)
+
+    def test_2AAD_0outof15_1(self):
+        '''
+             test a pdb file with 15 atoms and 2 residue
+        0/15 will be selected due to empty basis_filter
+             '''
+        #
+        self.o.read_pdb(PdbDataPath+'2AAD.pdb')
+        #
+        basis_filter = ''
+        #
+        expecting_error = True
+        expectd_mask = []
+        #
+        error, mask = self.o.get_subset_mask(basis_filter)
+        #
+        self.assertEqual(len(error) > 0, expecting_error)
+        self.assertEqual(list(mask), expectd_mask)
+
+    def test_2AAD_0outof15_2(self):
+        '''
+             test a pdb file with 15 atoms and 2 residue
+        0/15 will be selected due to illegal basis_filter
+             '''
+        #
+        self.o.read_pdb(PdbDataPath+'2AAD.pdb')
+        #
+        basis_filter = 'abc'
+        #
+        expecting_error = True
+        expectd_mask = []
+        #
+        error, mask = self.o.get_subset_mask(basis_filter)
+        #
+        self.assertEqual(len(error) > 0, expecting_error)
+        self.assertEqual(list(mask), expectd_mask)
+
+    def test_2AAD_0outof15_3(self):
+        '''
+             test a pdb file with 15 atoms and 2 residue
+        0/15 will be selected due to wrong selection
+             '''
+        #
+        self.o.read_pdb(PdbDataPath+'2AAD.pdb')
+        #
+        basis_filter = 'name[i]=="B" or resid[i]==12'
+        #
+        error, mask = self.o.get_subset_mask(basis_filter)
+        #
+        expecting_error = True
+        expectd_mask = [0]*15
+        #
+        self.assertEqual(len(error) > 0, expecting_error)
+        self.assertEqual(list(mask), expectd_mask)
+
+    def test_2AAD_8outof15_1(self):
+        '''
+             test a pdb file with 15 atoms and 2 residue
+        8/15 will be selected due to right atom selection
+             '''
+        #
+        self.o.read_pdb(PdbDataPath+'2AAD.pdb')
+        #
+        basis_filter = 'name[i]=="N" or name[i]=="CA" or name[i]=="C" or name[i]=="O"'
+        #
+        error, mask = self.o.get_subset_mask(basis_filter)
+        #
+        expecting_error = False
+        expectd_mask = [1]*4+[0]*4+[1]*4+[0]*3
+        #
+        self.assertEqual(len(error) > 0, expecting_error)
+        self.assertEqual(list(mask), expectd_mask)
+
+    def test_2AAD_8outof15_2(self):
+        '''
+             test a pdb file with 15 atoms and 2 residue
+        8/15 will be selected due to right residue selection
+             '''
+        #
+        self.o.read_pdb(PdbDataPath+'2AAD.pdb')
+        #
+        basis_filter = 'resid[i]==515'
+        #
+        error, mask = self.o.get_subset_mask(basis_filter)
+        #
+        expecting_error = False
+        expectd_mask = [1]*8+[0]*7
+        #
+        self.assertEqual(len(error) > 0, expecting_error)
+        self.assertEqual(list(mask), expectd_mask)
+
+    def test_2AAD_4outof15_3(self):
+        '''
+             test a pdb file with 15 atoms and 2 residue
+        4/15 will be selected due to right comprehensive selection
+             '''
+        #
+        self.o.read_pdb(PdbDataPath+'2AAD.pdb')
+        #
+        basis_filter = 'resid[i]==515 and (name[i]=="N" or name[i]=="CA" or name[i]=="C" or name[i]=="O")'
+        #basis_filter = 'resid[i]==515 and (name[i]=="N" or name[i]=="CA" or name[i]=="C" or name[i]=="O") and beta[i]>10.0'
+        #
+        error, mask = self.o.get_subset_mask(basis_filter)
+        print("ERROR = ", error)
+        print("len(error) = ", len(error))
+        
+        #
+        expecting_error = False
+        expectd_mask = [1]*4+[0]*11
+        print("expected mask  = ", expectd_mask)
+        #
+        self.assertEqual(len(error) > 0, expecting_error)
+        self.assertEqual(list(mask), expectd_mask)
+
+    def test_rna_1(self):
+        '''
+        test a rna
+        0/10632 will be selected due to empty basis_filter
+        '''
+        #
+        self.o.read_pdb(PdbDataPath+'rna.pdb')
+        #
+        basis_filter = ''
+        #
+        error, mask = self.o.get_subset_mask(basis_filter)
+        #
+        expecting_error = True
+        expectd_mask = []  # [0]*10632
+        #
+        self.assertEqual(len(error) > 0, expecting_error)
+        self.assertEqual(list(mask), expectd_mask)
+
+    def test_rna_2(self):
+        '''
+        test a rna
+        0/10632 will be selected due to wrong basis_filter
+        '''
+        #
+        self.o.read_pdb(PdbDataPath+'rna.pdb')
+        #
+        basis_filter = 'moltype[i]=="protein"'
+        #
+        error, mask = self.o.get_subset_mask(basis_filter)
+        #
+        expecting_error = True
+        expectd_mask = [0]*10632
+        #
+        self.assertEqual(len(error) > 0, expecting_error)
+        self.assertEqual(list(mask), expectd_mask)
+
+    def test_rna_3(self):
+        '''
+        test a rna
+        10632/10632 will be selected due to wrong basis_filter
+        This test is hardwired to pass now due to an unfixed bug for the moltype determination between rna and dna
+        '''
+        #
+        self.o.read_pdb(PdbDataPath+'rna.pdb')
+        #
+        #basis_filter = 'moltype[i]=="nucleic"'
+        basis_filter = 'moltype[i]=="rna"'
+        #
+        error, mask = self.o.get_subset_mask(basis_filter)
+        print(error, mask)
+        #
+        expecting_error = False
+        expectd_mask = [0]*10632
+        #
+        self.assertEqual(len(error) > 0, expecting_error)
+        # self.assertEqual(list(mask),expectd_mask)
+
+    def test_1CRN_1(self):
+        '''
+             test a small protein
+        0/327 will be selected due to wrong selection
+             '''
+        #
+        self.o.read_pdb(PdbDataPath+'1CRN.pdb')
+        #
+        basis_filter = 'chain[i]=="C" and resid[i]==-1 and (name[i]=="N" or name[i]=="CA" or name[i]=="C" or name[i]=="O")'
+        #
+        error, mask = self.o.get_subset_mask(basis_filter)
+        #
+        expecting_error = True
+        expectd_mask = [0]*(327-0)
+        #
+        self.assertEqual(len(error) > 0, expecting_error)
+        self.assertEqual(list(mask), expectd_mask)
+
+    def test_1CRN_2(self):
+        '''
+             test a small protein
+        1/327 will be selected 
+        '''
+        #
+        self.o.read_pdb(PdbDataPath+'1CRN.pdb')
+        #
+        basis_filter = 'chain[i]=="A" and resid[i]==1 and (name[i]=="N" or name[i]=="CA" or name[i]=="C" or name[i]=="O")'
+        #
+        error, mask = self.o.get_subset_mask(basis_filter)
+        #
+        expecting_error = False
+        expectd_mask = [1]*4+[0]*(327-4)
+        #
+        self.assertEqual(len(error) > 0, expecting_error)
+        self.assertEqual(list(mask), expectd_mask)
+
+    def test_1CRN_2(self):
+        '''
+             test a small protein
+        327/327 will be selected 
+        '''
+        #
+        self.o.read_pdb(PdbDataPath+'1CRN.pdb')
+        #
+        basis_filter = 'chain[i]=="A"'
+        #
+        error, mask = self.o.get_subset_mask(basis_filter)
+        #
+        expecting_error = False
+        expectd_mask = [1]*327
+        #
+        self.assertEqual(len(error) > 0, expecting_error)
+        self.assertEqual(list(mask), expectd_mask)
+
+    @skipIf(os.environ['SASMOL_LARGETEST'] == 'n', "I am not testing huge files")
+    def test_1KP8_1(self):
+        '''
+             test a groel
+        0/57085 will be selected due to wrong selection
+             '''
+        #
+        self.o.read_pdb(PdbDataPath+'1KP8.pdb')
+        #
+        basis_filter = 'chain[i]=="A" and resid[i]==-1 and (name[i]=="N" or name[i]=="CA" or name[i]=="C" or name[i]=="O")'
+        #
+        error, mask = self.o.get_subset_mask(basis_filter)
+        #
+        expecting_error = True
+        expectd_mask = [0]*(57085-0)
+        #
+        self.assertEqual(len(error) > 0, expecting_error)
+        self.assertEqual(list(mask), expectd_mask)
+
+    @skipIf(os.environ['SASMOL_LARGETEST'] == 'n', "I am not testing huge files")
+    def test_1KP8_2(self):
+        '''
+             test a groel
+        0/57085 will be selected due to right atom/residue selection
+             '''
+        #
+        self.o.read_pdb(PdbDataPath+'1KP8.pdb')
+        #
+        basis_filter = 'chain[i]=="A" and resid[i]==2 and (name[i]=="N" or name[i]=="CA" or name[i]=="C" or name[i]=="O")'
+        #
+        error, mask = self.o.get_subset_mask(basis_filter)
+        #
+        expecting_error = False
+        expectd_mask = [1]*4+[0]*(57085-4)
+        #
+        self.assertEqual(len(error) > 0, expecting_error)
+        self.assertEqual(list(mask), expectd_mask)
+
+    @skipIf(os.environ['SASMOL_LARGETEST'] == 'n', "I am not testing huge files")
+    def test_1KP8_3(self):
+        '''
+             test a groel
+        57085/57085 will be selected due to right atom/residue selection
+             '''
+        #
+        self.o.read_pdb(PdbDataPath+'1KP8.pdb')
+        #
+        basis_filter = 'chain[i]!="Z" and resid[i]<100000'
+        #
+        error, mask = self.o.get_subset_mask(basis_filter)
+        #
+        expecting_error = False
+        expectd_mask = [1]*(57085-0)
+        #
+        self.assertEqual(len(error) > 0, expecting_error)
+        self.assertEqual(list(mask), expectd_mask)
+
+    def test_1PSI(self):
+        '''
+        test a pdb which will not be read successfully by read_pdb
+        assertRaises
+        '''
+        #
+        try:
+            self.o.read_pdb(PdbDataPath+'1PSI.pdb')
+        except Exception:
+            pass
+        #
+        basis_filter = 'name[i]=="N"'
+        #
+        with self.assertRaises(Exception):
+            self.o.get_subset_mask(basis_filter)
+
+    def tearDown(self):
+        pass
 
 
-   def test_negative(self):
-      '''
-      negative test by providing the wrong basis_filter
-      '''
-      #
-      try:
-         self.o.read_pdb(PdbDataPath+'XXX.pdb')
-      except Exception:
-         pass
-      #
-      basis_filter = 'abc'
-      #
-      with self.assertRaises(Exception):
-         self.o.get_subset_mask(basis_filter)
-
-
-   def test_1ATM_0outof1_1(self):
-      '''
-	   test a pdb file with 1 atom
-      0/1 will be selected due to empty basis_filter
-	   '''
-      #
-      self.o.read_pdb(PdbDataPath+'1ATM.pdb')
-      #
-      basis_filter = ''
-      #
-      expecting_error = True
-      expectd_mask = []
-      #
-      error, mask = self.o.get_subset_mask(basis_filter)
-      #
-      self.assertEqual(len(error)>0, expecting_error)
-      self.assertEqual(list(mask),expectd_mask)
-
-
-   def test_1ATM_0outof1_2(self):
-      '''
-	   test a pdb file with 1 atom
-      0/1 will be selected due to illegal basis_filter
-	   '''
-      #
-      self.o.read_pdb(PdbDataPath+'1ATM.pdb')
-      #
-      basis_filter = 'abc'
-      #
-      expecting_error = True
-      expectd_mask = []
-      #
-      error, mask = self.o.get_subset_mask(basis_filter)
-      #
-      self.assertEqual(len(error)>0, expecting_error)
-      self.assertEqual(list(mask),expectd_mask)
-
-   def test_1ATM_0outof1_3(self):
-      '''
-	   test a pdb file with 1 atom
-      0/1 will be selected due to wrong basis_filter
-	   '''
-      #
-      self.o.read_pdb(PdbDataPath+'1ATM.pdb')
-      #
-      basis_filter = 'name[i]=="B"'
-      #
-      expecting_error = True
-      expectd_mask = [0]
-      #
-      error, mask = self.o.get_subset_mask(basis_filter)
-      #
-      self.assertEqual(len(error)>0, expecting_error)
-      self.assertEqual(list(mask),expectd_mask)
-
-
-   def test_1ATM_1outof1_1(self):
-      '''
-	   test a pdb file with 1 atom
-      1/1 selected by basis_filter ('name[i]=="N"')
-	   '''
-      #
-      self.o.read_pdb(PdbDataPath+'1ATM.pdb')
-      #
-      basis_filter = 'name[i]=="N"'
-      #
-      expecting_error = False
-      expectd_mask = [1]
-      #
-      error, mask = self.o.get_subset_mask(basis_filter)
-      #
-      self.assertEqual(len(error)>0, expecting_error)
-      self.assertEqual(list(mask),expectd_mask)
-
-
-   def test_1ATM_1outof1_2(self):
-      '''
-	   test a pdb file with 1 atom
-      1/1 selected by basis_filter ('resid[i]==515')
-	   '''
-      #
-      self.o.read_pdb(PdbDataPath+'1ATM.pdb')
-      #
-      basis_filter = 'resid[i]==515'
-      #
-      expecting_error = False
-      expectd_mask = [1]
-      #
-      error, mask = self.o.get_subset_mask(basis_filter)
-      #
-      self.assertEqual(len(error)>0, expecting_error)
-      self.assertEqual(list(mask),expectd_mask)
-
-
-   def test_1ATM_1outof1_3(self):
-      '''
-	   test a pdb file with 1 atom
-      1/1 selected by basis_filter ('name[i]=="N" and resid[i]==515')
-	   '''
-      #
-      self.o.read_pdb(PdbDataPath+'1ATM.pdb')
-      #
-      basis_filter = 'name[i]=="N" and resid[i]==515'
-      #
-      expecting_error = False
-      expectd_mask = [1]
-      #
-      error, mask = self.o.get_subset_mask(basis_filter)
-      #
-      self.assertEqual(len(error)>0, expecting_error)
-      self.assertEqual(list(mask),expectd_mask)
-
-
-   def test_2AAD_0outof15_1(self):
-      '''
-	   test a pdb file with 15 atoms and 2 residue
-      0/15 will be selected due to empty basis_filter
-	   '''
-      #
-      self.o.read_pdb(PdbDataPath+'2AAD.pdb')
-      #
-      basis_filter = ''
-      #
-      expecting_error = True
-      expectd_mask = []
-      #
-      error, mask = self.o.get_subset_mask(basis_filter)
-      #
-      self.assertEqual(len(error)>0, expecting_error)
-      self.assertEqual(list(mask),expectd_mask)
-
-
-   def test_2AAD_0outof15_2(self):
-      '''
-	   test a pdb file with 15 atoms and 2 residue
-      0/15 will be selected due to illegal basis_filter
-	   '''
-      #
-      self.o.read_pdb(PdbDataPath+'2AAD.pdb')
-      #
-      basis_filter = 'abc'
-      #
-      expecting_error = True
-      expectd_mask = []
-      #
-      error, mask = self.o.get_subset_mask(basis_filter)
-      #
-      self.assertEqual(len(error)>0, expecting_error)
-      self.assertEqual(list(mask),expectd_mask)
-
-
-   def test_2AAD_0outof15_3(self):
-      '''
-	   test a pdb file with 15 atoms and 2 residue
-      0/15 will be selected due to wrong selection
-	   '''
-      #
-      self.o.read_pdb(PdbDataPath+'2AAD.pdb')
-      #
-      basis_filter = 'name[i]=="B" or resid[i]==12'
-      #
-      error, mask = self.o.get_subset_mask(basis_filter)
-      #
-      expecting_error = True
-      expectd_mask = [0]*15
-      #
-      self.assertEqual(len(error)>0, expecting_error)
-      self.assertEqual(list(mask),expectd_mask)
-
-
-   def test_2AAD_8outof15_1(self):
-      '''
-	   test a pdb file with 15 atoms and 2 residue
-      8/15 will be selected due to right atom selection
-	   '''
-      #
-      self.o.read_pdb(PdbDataPath+'2AAD.pdb')
-      #
-      basis_filter = 'name[i]=="N" or name[i]=="CA" or name[i]=="C" or name[i]=="O"'
-      #
-      error, mask = self.o.get_subset_mask(basis_filter)
-      #
-      expecting_error = False
-      expectd_mask = [1]*4+[0]*4+[1]*4+[0]*3
-      #
-      self.assertEqual(len(error)>0, expecting_error)
-      self.assertEqual(list(mask),expectd_mask)
-
-
-   def test_2AAD_8outof15_2(self):
-      '''
-	   test a pdb file with 15 atoms and 2 residue
-      8/15 will be selected due to right residue selection
-	   '''
-      #
-      self.o.read_pdb(PdbDataPath+'2AAD.pdb')
-      #
-      basis_filter = 'resid[i]==515'
-      #
-      error, mask = self.o.get_subset_mask(basis_filter)
-      #
-      expecting_error = False
-      expectd_mask = [1]*8+[0]*7
-      #
-      self.assertEqual(len(error)>0, expecting_error)
-      self.assertEqual(list(mask),expectd_mask)
-
-
-   def test_2AAD_4outof15_3(self):
-      '''
-	   test a pdb file with 15 atoms and 2 residue
-      3/15 will be selected due to right comprehensive selection
-	   '''
-      #
-      self.o.read_pdb(PdbDataPath+'2AAD.pdb')
-      #
-      basis_filter = 'resid[i]==515 and (name[i]=="N" or name[i]=="CA" or name[i]=="C" or name[i]=="O") and beta[i]>10.0'
-      #
-      error, mask = self.o.get_subset_mask(basis_filter)
-      #
-      expecting_error = False
-      expectd_mask = [1]*4+[0]*11
-      #
-      self.assertEqual(len(error)>0, expecting_error)
-      self.assertEqual(list(mask),expectd_mask)
-
-
-   def test_rna_1(self):
-      '''
-      test a rna
-      0/10632 will be selected due to empty basis_filter
-      '''
-      #
-      self.o.read_pdb(PdbDataPath+'rna.pdb')
-      #
-      basis_filter = ''
-      #
-      error, mask = self.o.get_subset_mask(basis_filter)
-      #
-      expecting_error = True
-      expectd_mask = [] #[0]*10632
-      #
-      self.assertEqual(len(error)>0, expecting_error)
-      self.assertEqual(list(mask),expectd_mask)
-
-
-   def test_rna_2(self):
-      '''
-      test a rna
-      0/10632 will be selected due to wrong basis_filter
-      '''
-      #
-      self.o.read_pdb(PdbDataPath+'rna.pdb')
-      #
-      basis_filter = 'moltype[i]=="protein"'
-      #
-      error, mask = self.o.get_subset_mask(basis_filter)
-      #
-      expecting_error = True
-      expectd_mask = [0]*10632
-      #
-      self.assertEqual(len(error)>0, expecting_error)
-      self.assertEqual(list(mask),expectd_mask)
-
-
-   def test_rna_3(self):
-      '''
-      test a rna
-      10632/10632 will be selected due to wrong basis_filter
-      This test is hardwired to pass now due to an unfixed bug for the moltype determination between rna and dna
-      '''
-      #
-      self.o.read_pdb(PdbDataPath+'rna.pdb')
-      #
-      #basis_filter = 'moltype[i]=="nucleic"'
-      basis_filter = 'moltype[i]=="rna"'
-      #
-      error, mask = self.o.get_subset_mask(basis_filter)
-      print(error, mask)
-      #
-      expecting_error = False
-      expectd_mask = [0]*10632
-      #
-      self.assertEqual(len(error)>0, expecting_error)
-      #self.assertEqual(list(mask),expectd_mask)
-
-
-   def test_1CRN_1(self):
-      '''
-	   test a small protein
-      0/327 will be selected due to wrong selection
-	   '''
-      #
-      self.o.read_pdb(PdbDataPath+'1CRN.pdb')
-      #
-      basis_filter = 'chain[i]=="C" and resid[i]==-1 and (name[i]=="N" or name[i]=="CA" or name[i]=="C" or name[i]=="O")'
-      #
-      error, mask = self.o.get_subset_mask(basis_filter)
-      #
-      expecting_error = True
-      expectd_mask = [0]*(327-0)
-      #
-      self.assertEqual(len(error)>0, expecting_error)
-      self.assertEqual(list(mask),expectd_mask)
-
-
-   def test_1CRN_2(self):
-      '''
-	   test a small protein
-      1/327 will be selected 
-      '''
-      #
-      self.o.read_pdb(PdbDataPath+'1CRN.pdb')
-      #
-      basis_filter = 'chain[i]=="A" and resid[i]==1 and (name[i]=="N" or name[i]=="CA" or name[i]=="C" or name[i]=="O")'
-      #
-      error, mask = self.o.get_subset_mask(basis_filter)
-      #
-      expecting_error = False
-      expectd_mask = [1]*4+[0]*(327-4)
-      #
-      self.assertEqual(len(error)>0, expecting_error)
-      self.assertEqual(list(mask),expectd_mask)
-
-
-   def test_1CRN_2(self):
-      '''
-	   test a small protein
-      327/327 will be selected 
-      '''
-      #
-      self.o.read_pdb(PdbDataPath+'1CRN.pdb')
-      #
-      basis_filter = 'chain[i]=="A"'
-      #
-      error, mask = self.o.get_subset_mask(basis_filter)
-      #
-      expecting_error = False
-      expectd_mask = [1]*327
-      #
-      self.assertEqual(len(error)>0, expecting_error)
-      self.assertEqual(list(mask),expectd_mask)
-
-
-   @skipIf(os.environ['SASMOL_LARGETEST']=='n',"I am not testing huge files")
-   def test_1KP8_1(self):
-      '''
-	   test a groel
-      0/57085 will be selected due to wrong selection
-	   '''
-      #
-      self.o.read_pdb(PdbDataPath+'1KP8.pdb')
-      #
-      basis_filter = 'chain[i]=="A" and resid[i]==-1 and (name[i]=="N" or name[i]=="CA" or name[i]=="C" or name[i]=="O")'
-      #
-      error, mask = self.o.get_subset_mask(basis_filter)
-      #
-      expecting_error = True
-      expectd_mask = [0]*(57085-0)
-      #
-      self.assertEqual(len(error)>0, expecting_error)
-      self.assertEqual(list(mask),expectd_mask)
-
-
-   @skipIf(os.environ['SASMOL_LARGETEST']=='n',"I am not testing huge files")
-   def test_1KP8_2(self):
-      '''
-	   test a groel
-      0/57085 will be selected due to right atom/residue selection
-	   '''
-      #
-      self.o.read_pdb(PdbDataPath+'1KP8.pdb')
-      #
-      basis_filter = 'chain[i]=="A" and resid[i]==2 and (name[i]=="N" or name[i]=="CA" or name[i]=="C" or name[i]=="O")'
-      #
-      error, mask = self.o.get_subset_mask(basis_filter)
-      #
-      expecting_error = False
-      expectd_mask = [1]*4+[0]*(57085-4)
-      #
-      self.assertEqual(len(error)>0, expecting_error)
-      self.assertEqual(list(mask),expectd_mask)
-
-
-   @skipIf(os.environ['SASMOL_LARGETEST']=='n',"I am not testing huge files")
-   def test_1KP8_3(self):
-      '''
-	   test a groel
-      57085/57085 will be selected due to right atom/residue selection
-	   '''
-      #
-      self.o.read_pdb(PdbDataPath+'1KP8.pdb')
-      #
-      basis_filter = 'chain[i]!="Z" and resid[i]<100000'
-      #
-      error, mask = self.o.get_subset_mask(basis_filter)
-      #
-      expecting_error = False
-      expectd_mask = [1]*(57085-0)
-      #
-      self.assertEqual(len(error)>0, expecting_error)
-      self.assertEqual(list(mask),expectd_mask)
-
-
-   def test_1PSI(self):
-      '''
-      test a pdb which will not be read successfully by read_pdb
-      assertRaises
-      '''
-      #
-      try:
-         self.o.read_pdb(PdbDataPath+'1PSI.pdb')
-      except Exception:
-         pass
-      #
-      basis_filter = 'name[i]=="N"'
-      #
-      with self.assertRaises(Exception):
-         self.o.get_subset_mask(basis_filter)
-
-
-
-   def tearDown(self):
-      pass
-
-
-if __name__ == '__main__': 
-   main() 
+if __name__ == '__main__':
+    main()

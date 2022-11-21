@@ -18,7 +18,7 @@
 from sasmol.test_sasmol.utilities import env
 
 from unittest import main 
-from mocker import Mocker, MockerTestCase
+import unittest
 
 import numpy
 
@@ -30,7 +30,7 @@ import sasmol.system as system
 
 DataPath = os.path.join(os.path.dirname(os.path.realpath(__file__)),'..','data','sasmol','system')+os.path.sep
 
-class Test_intg_system_Atom_setCoor(MockerTestCase):
+class Test_intg_system_Atom_setCoor(unittest.TestCase):
 
    def setUp(self):
       self.o=system.Atom(3,'1CRN-3frames.pdb')
@@ -58,7 +58,6 @@ class Test_intg_system_Atom_setCoor(MockerTestCase):
       self.o.setAtom(expected)
       #
       result = self.o.atom()
-      print(result)
       #
       self.assert_list_almost_equal(expected, result)
 
@@ -69,5 +68,5 @@ class Test_intg_system_Atom_setCoor(MockerTestCase):
    
    
 if __name__ == '__main__': 
-   main() 
+   unittest.main() 
 

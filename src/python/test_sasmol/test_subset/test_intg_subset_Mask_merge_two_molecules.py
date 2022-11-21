@@ -60,7 +60,7 @@ merge a problem pdb (1PSI) with a large protein complex (groel) (Skipped as SASM
 """
 
 from unittest import main,skipIf 
-from mocker import Mocker, MockerTestCase, ARGS
+import unittest
 
 import sasmol.system as system
 import sasmol.subset as subset
@@ -70,11 +70,11 @@ import numpy
 import os
 
 PdbDataPath = os.path.join(os.path.dirname(os.path.realpath(__file__)),'..','data','pdb_common')+os.path.sep
-print('PdbDataPath = ', PdbDataPath)
-print('PdbDataPath = ', PdbDataPath)
-print('PdbDataPath = ', PdbDataPath)
+#print('PdbDataPath = ', PdbDataPath)
+#print('PdbDataPath = ', PdbDataPath)
+#print('PdbDataPath = ', PdbDataPath)
 
-class Test_subset_Mask_merge_two_molecules(MockerTestCase): 
+class Test_subset_Mask_merge_two_molecules(unittest.TestCase): 
  
 
    def setUp(self):

@@ -18,7 +18,7 @@
 from sasmol.test_sasmol.utilities import env
 
 from unittest import main, skipIf
-from mocker import Mocker, MockerTestCase, ANY, ARGS
+import unittest
 import sasmol.system as system
 import sasmol.operate as operate
 
@@ -31,9 +31,10 @@ floattype=os.environ['SASMOL_FLOATTYPE']
 
 DataPath = os.path.join(os.path.dirname(os.path.realpath(__file__)),'..','data','pdb_common')+os.path.sep
 
-class Test_intg_operate_Move_center(MockerTestCase): 
+class Test_intg_operate_Move_center(unittest.TestCase): 
 
     def setUp(self):
+        warnings.filterwarnings('ignore')
         self.o=system.Molecule(0)
 
     def assert_list_almost_equal(self,a,b,places=5):
@@ -55,7 +56,6 @@ class Test_intg_operate_Move_center(MockerTestCase):
         self.o.read_pdb(DataPath+'1ATM.pdb')
         self.o.center(0)
         result_coor = self.o.coor()[0]
-        print(result_coor)
         expected_coor = numpy.array([[0.0, 0.0, 0.0]], floattype)
         self.assert_list_almost_equal(expected_coor, result_coor,3)
 
@@ -63,27 +63,21 @@ class Test_intg_operate_Move_center(MockerTestCase):
         self.o.read_pdb(DataPath+'2AAD.pdb')
         self.o.center(0)
         result_coor = self.o.coor()[0]
-        print(result_coor)
         expected_coor = self.o.coor()[0]-self.o.com()
-        print(expected_coor)
         self.assert_list_almost_equal(expected_coor, result_coor,3)
 
     def test_rna_pdb(self):
         self.o.read_pdb(DataPath+'rna.pdb')
         self.o.center(0)
         result_coor = self.o.coor()[0]
-        print(result_coor)
         expected_coor = self.o.coor()[0]-self.o.com()
-        print(expected_coor)
         self.assert_list_almost_equal(expected_coor, result_coor,3)
 
     def test_1CRN_pdb(self):
         self.o.read_pdb(DataPath+'1CRN.pdb')
         self.o.center(0)
         result_coor = self.o.coor()[0]
-        print(result_coor)
         expected_coor = self.o.coor()[0]-self.o.com()
-        print(expected_coor)
         self.assert_list_almost_equal(expected_coor, result_coor,3)
 
     @skipIf(os.environ['SASMOL_LARGETEST']=='n',"I am not testing large files")
@@ -91,9 +85,7 @@ class Test_intg_operate_Move_center(MockerTestCase):
         self.o.read_pdb(DataPath+'1KP8.pdb')
         self.o.center(0)
         result_coor = self.o.coor()[0]
-        print(result_coor)
         expected_coor = self.o.coor()[0]-self.o.com()
-        print(expected_coor)
         self.assert_list_almost_equal(expected_coor, result_coor,3)
 
     def tearDown(self):

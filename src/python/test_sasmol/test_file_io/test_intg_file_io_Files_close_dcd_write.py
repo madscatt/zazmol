@@ -18,10 +18,14 @@
 from sasmol.test_sasmol.utilities import env
 
 from unittest import main, skipIf
-from mocker import Mocker, MockerTestCase
+import unittest
+
+
 
 import sasmol.system as system
 import sasmol.dcdio as dcdio
+
+import warnings
 
 import os, sys, string, shutil
 
@@ -29,11 +33,12 @@ commonDcdDataPath = os.path.join(os.path.dirname(os.path.realpath(__file__)),'..
 moduleDataPath = os.path.join(os.path.dirname(os.path.realpath(__file__)),'..','data','sasmol','file_io')+os.path.sep
 
 
-class Test_intg_sasio_Files_close_dcd_write(MockerTestCase):
+class Test_intg_sasio_Files_close_dcd_write(unittest.TestCase):
 
    def setUp(self):
       self.o=system.Molecule(0)
-
+      warnings.filterwarnings('ignore')
+      
    def test_file_doesnt_exist(self):
       '''
 	   test a dcd which doent exist
@@ -42,10 +47,12 @@ class Test_intg_sasio_Files_close_dcd_write(MockerTestCase):
       dcdFile = moduleDataPath+'test-results/'+filename
       stdoutFile = filename+'.stdiout'
       pf = dcdio.open_dcd_write(dcdFile)
-      sys.stdout = open(stdoutFile,'w')
-      self.o.close_dcd_write(pf)
+      #sys.stdout = open(stdoutFile,'w')
+      with open(stdoutFile,'w') as sys.stdout:
+        self.o.close_dcd_write(pf)
+
       sys.stdout = sys.__stdout__
-      code=string.split(open(stdoutFile).read())[2]
+      code=open(stdoutFile).read().split()[2]
       self.assertEqual(int(code), 0)
       os.remove(stdoutFile)
       os.remove(dcdFile)
@@ -63,10 +70,11 @@ class Test_intg_sasio_Files_close_dcd_write(MockerTestCase):
       shutil.copy(dcdFile, tmpDcdFile)
       stdoutFile = filename+'.stdiout'
       pf = dcdio.open_dcd_write(tmpDcdFile)
-      sys.stdout = open(stdoutFile,'w')
-      self.o.close_dcd_write(pf)
+      with open(stdoutFile,'w') as sys.stdout:
+        self.o.close_dcd_write(pf)
+        
       sys.stdout = sys.__stdout__
-      code=string.split(open(stdoutFile).read())[2]
+      code=open(stdoutFile).read().split()[2]
       self.assertEqual(int(code), 0)
       os.remove(stdoutFile)
       os.remove(tmpDcdFile)
@@ -88,7 +96,7 @@ class Test_intg_sasio_Files_close_dcd_write(MockerTestCase):
       sys.stdout = open(stdoutFile,'w')
       self.o.close_dcd_write(pf)
       sys.stdout = sys.__stdout__
-      code=string.split(open(stdoutFile).read())[2]
+      code=open(stdoutFile).read().split()[2]
       self.assertEqual(int(code), 0)
       os.remove(stdoutFile)
       os.remove(tmpDcdFile)
@@ -109,7 +117,7 @@ class Test_intg_sasio_Files_close_dcd_write(MockerTestCase):
       sys.stdout = open(stdoutFile,'w')
       self.o.close_dcd_write(pf)
       sys.stdout = sys.__stdout__
-      code=string.split(open(stdoutFile).read())[2]
+      code=open(stdoutFile).read().split()[2]
       self.assertEqual(int(code), 0)
       os.remove(stdoutFile)
       os.remove(tmpDcdFile)
@@ -130,7 +138,7 @@ class Test_intg_sasio_Files_close_dcd_write(MockerTestCase):
       sys.stdout = open(stdoutFile,'w')
       self.o.close_dcd_write(pf)
       sys.stdout = sys.__stdout__
-      code=string.split(open(stdoutFile).read())[2]
+      code=open(stdoutFile).read().split()[2]
       self.assertEqual(int(code), 0)
       os.remove(stdoutFile)
       os.remove(tmpDcdFile)
@@ -151,7 +159,7 @@ class Test_intg_sasio_Files_close_dcd_write(MockerTestCase):
       sys.stdout = open(stdoutFile,'w')
       self.o.close_dcd_write(pf)
       sys.stdout = sys.__stdout__
-      code=string.split(open(stdoutFile).read())[2]
+      code=open(stdoutFile).read().split()[2]
       self.assertEqual(int(code), 0)
       os.remove(stdoutFile)
       os.remove(tmpDcdFile)
@@ -173,7 +181,7 @@ class Test_intg_sasio_Files_close_dcd_write(MockerTestCase):
       sys.stdout = open(stdoutFile,'w')
       self.o.close_dcd_write(pf)
       sys.stdout = sys.__stdout__
-      code=string.split(open(stdoutFile).read())[2]
+      code=open(stdoutFile).read().split()[2]
       self.assertEqual(int(code), 0)
       os.remove(stdoutFile)
       os.remove(tmpDcdFile)
@@ -195,7 +203,7 @@ class Test_intg_sasio_Files_close_dcd_write(MockerTestCase):
       sys.stdout = open(stdoutFile,'w')
       self.o.close_dcd_write(pf)
       sys.stdout = sys.__stdout__
-      code=string.split(open(stdoutFile).read())[2]
+      code=open(stdoutFile).read().split()[2]
       self.assertEqual(int(code), 0)
       os.remove(stdoutFile)
       os.remove(tmpDcdFile)
@@ -217,7 +225,7 @@ class Test_intg_sasio_Files_close_dcd_write(MockerTestCase):
       sys.stdout = open(stdoutFile,'w')
       self.o.close_dcd_write(pf)
       sys.stdout = sys.__stdout__
-      code=string.split(open(stdoutFile).read())[2]
+      code=open(stdoutFile).read().split()[2]
       self.assertEqual(int(code), 0)
       os.remove(stdoutFile)
       os.remove(tmpDcdFile)
@@ -230,5 +238,5 @@ class Test_intg_sasio_Files_close_dcd_write(MockerTestCase):
    
    
 if __name__ == '__main__': 
-   main() 
+   unittest.main() 
 

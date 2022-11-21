@@ -16,7 +16,7 @@
 '''
 
 from unittest import main 
-from mocker import Mocker, MockerTestCase
+import unittest
 
 import sasmol.system as system
 
@@ -24,7 +24,7 @@ import os
 
 DataPath = os.path.join(os.path.dirname(os.path.realpath(__file__)),'..','data','sasmol','system')+os.path.sep
 
-class Test_intg_system_Atom_setOccupancy(MockerTestCase):
+class Test_intg_system_Atom_setOccupancy(unittest.TestCase):
 
    def setUp(self):
       self.o=system.Atom(3,'1CRN-3frames.pdb')
@@ -39,7 +39,6 @@ class Test_intg_system_Atom_setOccupancy(MockerTestCase):
       self.o.setOccupancy(expected)
       #
       result = self.o.occupancy()
-      print(result)
       #
       self.assertEqual(expected, result)
 
@@ -50,5 +49,5 @@ class Test_intg_system_Atom_setOccupancy(MockerTestCase):
    
    
 if __name__ == '__main__': 
-   main() 
+   unittest.main() 
 

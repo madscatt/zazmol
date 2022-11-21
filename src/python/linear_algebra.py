@@ -216,6 +216,13 @@ def find_u(x, y):
     return u
 
 
+def cmp(a, b):
+    '''
+    python 3 does not provide the cmp function from python 2.7
+    '''
+    return bool(a > b) - bool(a < b)
+
+
 def signed_angle(a, b, c):
     '''
     This method calcultes the sign of the angle which is used in the calculation of a dihedral angle.

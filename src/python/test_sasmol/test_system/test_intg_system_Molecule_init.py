@@ -17,11 +17,11 @@
 '''
 
 from unittest import main 
-from mocker import Mocker, MockerTestCase
+import unittest
 
 import sasmol.system as system
 
-class Test_intg_system_Molecule_init(MockerTestCase):
+class Test_intg_system_Molecule_init(unittest.TestCase):
 
    def setUp(self):
       pass
@@ -47,5 +47,5 @@ class Test_intg_system_Molecule_init(MockerTestCase):
    
    
 if __name__ == '__main__': 
-   main() 
+   unittest.main() 
 

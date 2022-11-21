@@ -107,7 +107,7 @@ class Calculate(object):
 
         standard_atomic_weight = self.amu()
         self._total_mass = 0.0
-        self._mass = numpy.zeros(len(self._element), numpy.float)
+        self._mass = numpy.zeros(len(self._element), float)
 
         count = 0
 
@@ -163,7 +163,7 @@ class Calculate(object):
         comy = numpy.sum(self._mass * y) / self._total_mass
         comz = numpy.sum(self._mass * z) / self._total_mass
 
-        self._com = numpy.array([comx, comy, comz], numpy.float)
+        self._com = numpy.array([comx, comy, comz], float)
 
         return self._com
 
@@ -360,7 +360,7 @@ class Calculate(object):
         try:
             frames = kwargs['frames']
         except:
-            frames = [x for x in xrange(self.number_of_frames())]
+            frames = [x for x in range(self.number_of_frames())]
 
         first_flag = True
 
@@ -439,7 +439,7 @@ class Calculate(object):
         charge_residue_sum = []
         last_resid = resid[0]
 
-        for i in xrange(natoms):
+        for i in range(natoms):
             this_resid = resid[i]
             this_charge = atom_charge[i]
 
@@ -453,14 +453,14 @@ class Calculate(object):
         last_resid = resid[0]
         charge_residue = []
 
-        for i in xrange(natoms):
+        for i in range(natoms):
             this_resid = resid[i]
-            for j in xrange(len(charge_residue_sum)):
+            for j in range(len(charge_residue_sum)):
                 if(this_resid == charge_residue_sum[j][0]):
                     charge_residue.append(charge_residue_sum[j][1])
                     continue
 
-        self.setResidue_charge(numpy.array(charge_residue, numpy.float32))
+        self.setResidue_charge(numpy.array(charge_residue, float32))
 
         return
 

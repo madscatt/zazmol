@@ -22,60 +22,60 @@ make sure the keys are unique
 make sure the right amu list was generated
 '''
 
-from unittest import main 
-from mocker import Mocker, MockerTestCase
+from unittest import main
+import unittest
+
+import warnings
 
 import sasmol.system as system
 
 import os
 
-DataPath = os.path.join(os.path.dirname(os.path.realpath(__file__)),'..','data','sasmol','properties')+os.path.sep
-
-class Test_unit_properties_Atomic_charmm_names(MockerTestCase):
-
-   def setUp(self):
-      self.o=system.Molecule(0)
-      self.standard_atomic_weight  = self.o.amu()
+DataPath = os.path.join(os.path.dirname(os.path.realpath(
+    __file__)), '..', 'data', 'sasmol', 'properties')+os.path.sep
 
 
-   def unique(self,seq):
-      '''
-      remove the duplicate elements
-      '''
-      seen = set()
-      seen_add = seen.add
-      return [ x for x in seq if x not in seen and not seen_add(x)]
+class Test_unit_properties_Atomic_charmm_names(unittest.TestCase):
+
+    def setUp(self):
+        warnings.filterwarnings('ignore')
+        self.o = system.Molecule(0)
+        self.standard_atomic_weight = self.o.amu()
+
+    def unique(self, seq):
+        '''
+        remove the duplicate elements
+        '''
+        seen = set()
+        seen_add = seen.add
+        return [x for x in seq if x not in seen and not seen_add(x)]
+
+    def test_uniqe(self):
+        '''
+             make sure the keys are unique
+        '''
+        #
+        standard_atomic_weight_unique = self.unique(
+            list(self.standard_atomic_weight.keys()))
+        self.assertEqual(list(self.standard_atomic_weight.keys()),
+                         standard_atomic_weight_unique)
+
+    def test_all(self):
+        '''
+        make sure the right amu list was generated
+        '''
+        #
+        datafile = DataPath+'standard_atomic_weight.txt'
+        fp = open(datafile, 'r')
+        ele = {}
+        for line in fp.readlines():
+            amu = line.split()
+            ele[amu[0]] = float(amu[1])
+        self.assertEqual(ele, self.standard_atomic_weight)
+
+    def tearDown(self):
+        pass
 
 
-   def test_uniqe(self):
-      '''
-	   make sure the keys are unique
-      '''
-      #
-      standard_atomic_weight_unique = self.unique(list(self.standard_atomic_weight.keys()))
-      self.assertEqual(list(self.standard_atomic_weight.keys()), standard_atomic_weight_unique)
-
-
-
-   def test_all(self):
-      '''
-      make sure the right amu list was generated
-      '''
-      #
-      datafile = DataPath+'standard_atomic_weight.txt'
-      fp = open(datafile,'r')
-      ele = {}
-      for line in fp.readlines():
-         amu = line.split()
-         ele[amu[0]]=float(amu[1])
-      self.assertEqual(ele,self.standard_atomic_weight)
-
-
-   def tearDown(self):
-      pass
-        
-   
-   
-if __name__ == '__main__': 
-   main() 
-
+if __name__ == '__main__':
+    main()

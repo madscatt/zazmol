@@ -18,20 +18,21 @@
 from sasmol.test_sasmol.utilities import env, util
 
 from unittest import main 
-from mocker import Mocker, MockerTestCase, ANY, ARGS, KWARGS
+import unittest
 import sasmol.system as system
 import numpy
 
-import warnings; warnings.filterwarnings('ignore')
+import warnings
 
 import os
 floattype=os.environ['SASMOL_FLOATTYPE']
 
-class Test_sascalc_Prop_calccom(MockerTestCase): 
+class Test_sascalc_Prop_calccom(unittest.TestCase): 
 
     def setUp(self):
         self.o=system.Molecule(0)
         self.tol = 3
+        warnings.filterwarnings('ignore')
 
     def assert_list_almost_equal(self,a,b,places=5):
         if (len(a)!=len(b)):
@@ -43,7 +44,7 @@ class Test_sascalc_Prop_calccom(MockerTestCase):
 
     def test_null(self):
         self.o.setElement([])
-        self.o.setCoor(numpy.zeros((1.0, 0.0, 3.0),floattype))
+        self.o.setCoor(numpy.zeros((1, 0, 3),floattype))
         self.o.setTotal_mass(0.0)
         result_com  = self.o.calculate_center_of_mass(0)
         expected_com = [util.NAN, util.NAN, util.NAN]
@@ -71,8 +72,6 @@ class Test_sascalc_Prop_calccom(MockerTestCase):
         self.o.setTotal_mass(0.0)
         result_com  = self.o.calculate_center_of_mass(0)
         expected_com = [1.41253, 3.24053, 4.60498]
-        print('\nresult_com \n',result_com)
-        print('\nexpected_com \n',expected_com)
         self.assert_list_almost_equal(expected_com, result_com, self.tol)
 
     def test_six_atoms_duplicate_inf_1(self):
@@ -122,7 +121,6 @@ class Test_sascalc_Prop_calccom(MockerTestCase):
         result_com  = self.o.calculate_center_of_mass(0)
         expected_com = [util.NAN, util.NAN, util.NAN]
         self.assert_list_almost_equal(expected_com, result_com, self.tol)
-
 
     def tearDown(self):
         pass

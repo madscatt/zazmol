@@ -2,3 +2,9 @@ test_intg_sasio_SasAtm_type.py: sasio.Files.readpdb seems not getting the right 
 test_intg_sasio_SasAtm_number_of_frames.py: number_of_frames should have a consistent setter and getter
 
 NOT DONE YET: Finished up to all the sasio setter/getter (setCharge)
+
+
+
+starting conversion to python 3 .... edited what was here through "*Atom_element*".  Note as stated above many tests aren't written yet.
+
+

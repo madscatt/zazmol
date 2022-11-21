@@ -18,7 +18,7 @@
 from sasmol.test_sasmol.utilities import env
 
 from unittest import main, skipIf
-from mocker import Mocker, MockerTestCase, ANY, ARGS
+import unittest
 import sasmol.system as system
 
 import numpy
@@ -32,7 +32,7 @@ PdbPath = os.path.join(os.path.dirname(os.path.realpath(__file__)),'..','data','
 modulePdbPath = os.path.join(os.path.dirname(os.path.realpath(__file__)),'..','data','sasmol','calculate')+os.path.sep
 
 
-class test_sascalc_Prop_calcrmsd(MockerTestCase): 
+class test_sascalc_Prop_calcrmsd(unittest.TestCase): 
 
     def setUp(self):
         self.o1=system.Molecule(0)
