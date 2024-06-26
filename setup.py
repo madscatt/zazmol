@@ -56,7 +56,7 @@ setup(name='sasmol',
     Extension('sasmol._dcdio',[os.path.join('src','python','extensions','dcdio','dcdio.i'),os.path.join('src','python','extensions','dcdio','dcdio.c')],include_dirs=[NUMPY_INCLUDE]),
     Extension('sasmol._view_vmd',[os.path.join('src','python','extensions','view','view_vmd.i'),os.path.join('src','python','extensions','view','view_vmd.c'),os.path.join('src','python','extensions','view','imd.c'),os.path.join('src','python','extensions','view','vmdsock.c')],include_dirs=[NUMPY_INCLUDE]),
     Extension('sasmol._mask',[os.path.join('src','python','extensions','mask','mask.i'),os.path.join('src','python','extensions','mask','mask.c')],include_dirs=[NUMPY_INCLUDE]),
-    Extension('sasmol.foverlap',[os.path.join('src','python','extensions','overlap','foverlap.f')],include_dirs=[NUMPY_INCLUDE]),
+    Extension('sasmol.overlap',[os.path.join('src','python','extensions','overlap','overlap.c')],include_dirs=[NUMPY_INCLUDE]),
     Extension('sasmol.matrix_math',[os.path.join('src','python','extensions','matrix_math','matrix_math.f')],include_dirs=[NUMPY_INCLUDE])],
 
     data_files = [ 
