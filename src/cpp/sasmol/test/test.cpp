@@ -272,9 +272,9 @@ int main(){
 	const std::string rotated_filename = "rotated_min3.pdb" ;
 	mol7.write_pdb(rotated_filename,frame);
 
-	std::cout << "atom 1(xyz) = " << mol7.x(0,0) << " " << mol7.y(0.0) << " " << mol7.z(0.0) << std::endl ;
-	std::cout << "atom 2(xyz) = " << mol7.x(1,0) << " " << mol7.y(1.0) << " " << mol7.z(1.0) << std::endl ;
-	std::cout << "atom 3(xyz) = " << mol7.x(2,0) << " " << mol7.y(2.0) << " " << mol7.z(2.0) << std::endl ;
+	//std::cout << "atom 1(xyz) = " << mol7.x(0,0) << " " << mol7.y(0.0) << " " << mol7.z(0.0) << std::endl ;
+	//std::cout << "atom 2(xyz) = " << mol7.x(1,0) << " " << mol7.y(1.0) << " " << mol7.z(1.0) << std::endl ;
+	//std::cout << "atom 3(xyz) = " << mol7.x(2,0) << " " << mol7.y(2.0) << " " << mol7.z(2.0) << std::endl ;
 
 	std::cout << "SHOULD BE : \n" ;
 

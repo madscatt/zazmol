@@ -1,41 +1,28 @@
+
+
 DIRINC=include/
 DIRSRC=src/
 DIRLIB=lib/
 DIRTESTS=test/
 
-INSTALLDIRINC=../../include/
-INSTALLDIRLIB=../../lib/
+INSTALLDIRINC=/usr/local/include
+INSTALLDIRLIB=/usr/local/lib
 
 DIRINC_PTEROS=$(DIRINC)SasPteros/
 
-#mac
-
-DIRINC_BOOST=/usr/local/include/
+DIRINC_BOOST=/usr/local/include/boost
 DIRLIB_BOOST=/usr/local/lib/
 
-#DIRINC_BOOST=/usr/local/boost_1_57_0/
-#DIRLIB_BOOST=/usr/local/boost_1_57_0/stage/lib/
-
-SYSINSTALLDIRINC=/usr/local/core_libraries/include/
-SYSINSTALLDIRLIB=/usr/local/core_libraries/lib/
 CC=g++
-
-#cluster
-DIRINC_BOOST=/share/apps/local/boost_1_57_0/
-DIRLIB_BOOST=/share/apps/local/boost_1_57_0/libs/
-DIRLIB_BOOST=/share/apps/local/boost_1_57_0/stage/lib/
-CC=/share/apps/local/bin/g++
-
-#SYSINSTALLDIRINC=/share/apps/local/core_libraries/include/
-#SYSINSTALLDIRLIB=/share/apps/local/core_libraries/lib/
+CC=clang++
 
 CCFLAGS=-std=c++11 -c -fPIC -w -g -I$(DIRINC) -I$(DIRINC_BOOST) -I$(DIRINC_PTEROS)
-LDFLAGS=-std=c++11 -g -w -I$(DIRINC) -I$(DIRINC_BOOST) -I$(DIRINC_PTEROS) -Wl,-R/share/apps/local/boost_1_57_0/stage/lib
-
-#LDFLAGS=-std=c++11 -g -w -I$(DIRINC) -I$(DIRINC_BOOST) -I$(DIRINC_PTEROS) -Wl,-R/share/apps/local/boost_1_58_0/stage/lib
+#LDFLAGS=-std=c++11 -rpath "@loader_path"  -g -w -I$(DIRINC) -I$(DIRINC_BOOST) -I$(DIRINC_PTEROS) -Wl, -R/usr/local/lib
+LDFLAGS=-std=c++11 -rpath "@loader_path/../../../../../../../../usr/local/lib" -g -w -I$(DIRINC) -I$(DIRINC_BOOST) -I$(DIRINC_PTEROS) -Wl, -R/usr/local/lib
 
 SRC=dcdio.cpp sasmol.cpp sasmath.cpp sasop.cpp sascalc.cpp sasio.cpp sassubset.cpp util.cpp
 LIB=sasmol
+
 HEADERS=$(addprefix $(DIRINC),$(SRC:.cpp=.h))
 SOURCES=$(addprefix $(DIRSRC),$(SRC))
 OBJECTS=$(addprefix $(DIRLIB),$(SRC:.cpp=.o))
@@ -66,14 +53,12 @@ $(OBJECTS): $(DIRLIB)%.o: $(DIRSRC)%.cpp $(DIRINC)%.h
 
 $(PTEROS_OBJECTS): $(PTEROS_DIRLIB)%.o: $(PTEROS_DIRSRC)%.cpp $(PTEROS_DIRINC)%.h
 	$(CC) $(CCFLAGS) -I$(DIRINC_BOOST) $< -o $@
+
 install: all
 	cp -f $(DIRINC)*.h $(INSTALLDIRINC)
-	cp -f $(DIRINC)*.h $(SYSINSTALLDIRINC) 
 	cp -f $(DIRLIB)*.o $(INSTALLDIRLIB)
 	cp -f $(DIRLIB)*.a $(INSTALLDIRLIB)
-	cp -f $(DIRLIB)*.o $(SYSINSTALLDIRLIB)
-	cp -f $(DIRLIB)*.a $(SYSINSTALLDIRLIB)
-	cp -Rf $(DIRINC)Eigen $(SYSINSTALLDIRINC)
+	cp -Rf $(DIRINC)Eigen $(INSTALLDIRINC)
 
 .PHONY: clean
 clean:
