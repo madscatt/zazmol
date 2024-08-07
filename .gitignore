@@ -78,3 +78,21 @@ run_*
 
 *src_2.7/sassie/calculate/sascalc/sascalc_library/extensions/lib/
 
+
+src/cpp/distribution/boost_1_57_0/
+src/cpp/distribution/boost_1_85_0.tar.bz2
+src/cpp/distribution/boost_1_85_0/
+src/cpp/sasmol/dum.cpp
+#src/cpp/sasmol/include/Eigen/
+src/cpp/sasmol/not_working_full-ish_Makefile_July_2024
+src/cpp/sasmol/test/aligned_10_min3.pdb
+src/cpp/sasmol/test/aligned_11_min3.pdb
+src/cpp/sasmol/test/did_it_work.pdb
+src/cpp/sasmol/test/mol2_new_min3.pdb
+src/cpp/sasmol/test/new_min3.dcd
+src/cpp/sasmol/test/new_min3.pdb
+src/cpp/sasmol/test/rotated_min3.pdb
+src/cpp/sasmol/test/second_new_min3.dcd
+src/cpp/sasmol/test/t_min3.pdb
+src/cpp/sasmol/test/test.out
+src/cpp/sasmol/test/test_pteros.out
