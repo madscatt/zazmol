@@ -384,7 +384,6 @@ class Move():
         com_subset_other = subset_other.calculate_center_of_mass(frame)
         subset_other.center(frame)
         coor_subset_other = subset_other.coor()[frame]
-       
 
         ### self = molecule_2 (to be aligned to other / molecule_1)
 
@@ -396,7 +395,6 @@ class Move():
         com_subset_self = subset_self.calculate_center_of_mass(frame)
         subset_self.center(frame)
         coor_subset_self = subset_self.coor()[frame]
-       
         
         u = linear_algebra.find_u(coor_subset_self, coor_subset_other)
 
@@ -447,6 +445,8 @@ class Move():
     def align_trajectory(self, other, self_basis, other_basis, subset_self=None, subset_other=None, frame=0, **kwargs):
         """
         Alignment of one object on top of another.
+
+        this is a stub for the align method for trajectory frames
 
         Parameters
         ----------
