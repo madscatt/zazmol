@@ -290,8 +290,85 @@ class Move():
         ----
         mass_check determines if mass is defined for the object so that
         center of mass can be calculated
-         
-        
+    
+        ##### ORIGINAL CODE FROM SASMOL sassie_1.0 sasmol
+
+        def align(self,frame,coor_sub_2,com_sub_2,coor_sub_1,com_sub_1):
+
+        Alignment of one object on top of another
+        "self" is aligned onto "other" using the basis
+        of molecule 2 to align onto the basis of molecule 1
+        and the transformation is then done to all the atoms of
+        molecule 2
+       
+        self.masscheck(frame)
+        self.calccom(frame)
+
+        u = sasmath.find_u(coor_sub_1, coor_sub_2)
+
+        tao = numpy.transpose(self.coor()[frame] - com_sub_2)
+
+        error,nat2 = sasmath.matrix_multiply(u,tao)
+
+        ncoor = numpy.transpose(nat2) + com_sub_1
+
+        self._coor[frame,:] = ncoor
+
+        return
+
+        ##### ORIGINAL USAGE FROM WITHIN align.py
+
+        mass1 = m1.mass()
+        mass2 = m2.mass()
+
+        name1 = m1.name()
+        name2 = m2.name()
+
+        error, mask1 = m1.get_subset_mask(basis_filter_1)
+        error, mask2 = m2.get_subset_mask(basis_filter_2)
+
+        sub_m1 = sasmol.SasMol(2)
+        error = m1.copy_molecule_using_mask(sub_m1, mask1, 0)
+
+        sub_m2 = sasmol.SasMol(3)
+        error = m2.copy_molecule_using_mask(sub_m2, mask2, 0)
+
+        com_sub_m1 = sub_m1.calccom(0)
+        sub_m1.center(0)
+        coor_sub_m1 = sub_m1.coor()[0]
+
+        saved = 0
+        for i in xrange(nf2):
+            if(intype == 'dcd'):
+                m2.read_dcd_step(dcdfile, i)
+                m2.center(0)
+                minmax = m2.calcminmax_frame(0)
+                error, sub_m2.coor = m2.get_coor_using_mask(0, mask2)
+                sub_m2.setCoor(sub_m2.coor)
+                com_sub_m2 = sub_m2.calccom(0)
+                sub_m2.center(0)
+
+                # next line calls sasmol method shown above
+                # next line calls sasmol method shown above
+                # next line calls sasmol method shown above
+
+                coor_sub_m2 = sub_m2.coor[0]
+                m2.align(0, coor_sub_m2, com_sub_m2, coor_sub_m1, com_sub_m1)
+            elif(intype == 'pdb'):
+                m2.center(i)
+                minmax = m2.calcminmax_frame(i)
+                error, sub_m2.coor = m2.get_coor_using_mask(i, mask2)
+                sub_m2.setCoor(sub_m2.coor)
+                com_sub_m2 = sub_m2.calccom(0)
+                sub_m2.center(0)
+                coor_sub_m2 = sub_m2.coor[0]
+
+                # next line calls sasmol method shown above
+                # next line calls sasmol method shown above
+                # next line calls sasmol method shown above
+
+                m2.align(i, coor_sub_m2, com_sub_m2, coor_sub_m1, com_sub_m1)
+
         '''
 
         frame = 0
