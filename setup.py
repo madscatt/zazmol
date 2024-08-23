@@ -57,7 +57,7 @@ setup(name='sasmol',
     Extension('sasmol._view_vmd',[os.path.join('src','python','extensions','view','view_vmd.i'),os.path.join('src','python','extensions','view','view_vmd.c'),os.path.join('src','python','extensions','view','imd.c'),os.path.join('src','python','extensions','view','vmdsock.c')],include_dirs=[NUMPY_INCLUDE]),
     Extension('sasmol._mask',[os.path.join('src','python','extensions','mask','mask.i'),os.path.join('src','python','extensions','mask','mask.c')],include_dirs=[NUMPY_INCLUDE]),
     Extension('sasmol.overlap',[os.path.join('src','python','extensions','overlap','overlap.c')],include_dirs=[NUMPY_INCLUDE]),
-    Extension('sasmol.matrix_math',[os.path.join('src','python','extensions','matrix_math','matrix_math.f')],include_dirs=[NUMPY_INCLUDE])],
+    Extension('sasmol.matrix_math',[os.path.join('src','python','extensions','matrix_math','matrix_math.c')],include_dirs=[NUMPY_INCLUDE])],
 
     data_files = [ 
         ( os.path.join('sasmol','test_sasmol','manual_tests') , [os.path.join('src','python','test_sasmol','manual_tests','hiv1_gag.pdb')]),
