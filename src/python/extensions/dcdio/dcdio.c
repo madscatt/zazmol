@@ -116,9 +116,9 @@ int write_dcdheader(FILE * fd, char *filename, int N, int NSET,
 int write_dcdstep(FILE * fd, int N, float *X, float *Y, float *Z, int curframe)
 {
       int out_integer;
-      int curstep ;
+      //int curstep ;
 
-      curstep=curframe ;
+      //curstep=curframe ;
 
       out_integer = N*4;
       WRITE(fd, (char *) &out_integer, sizeof(int));
@@ -232,16 +232,18 @@ double* reverseEightByteWord(double* N)
                         return(DCD_BADEOF); \
                        }
 
-int read_dcdheader(FILE * fd, int *N, int *NSET, int *ISTART,
-               int *NSAVC, double *DELTA, int *NAMNF,
-               int *reverseEndian, int *charmm)
+//int read_dcdheader(FILE * fd, int *N, int *NSET, int *ISTART,
+//               int *NSAVC, double *DELTA, int *NAMNF,
+//               int *reverseEndian, int *charmm)
+
+int read_dcdheader(FILE* fd, int* N, int* NSET, int* ISTART, int* NSAVC, int* NAMNF, double* DELTA, float* data, int* extra_arg, int* reverseEndian, int* charmm) 
 {
   int input_integer;    /*  Integer buffer space      */
   int ret_val;          /*  Return value from read    */
   int i;          /*  Loop counter        */
   char hdrbuf[84];      /*  Char buffer used to store header      */
   int NTITLE;
-  int **FREEINDEXES;
+  int **FREEINDEXES = NULL;
 
 /*  (*FREEINDEXES) = *((int *) (hdrbuf + 12)); */
 
@@ -250,6 +252,9 @@ int read_dcdheader(FILE * fd, int *N, int *NSET, int *ISTART,
   ret_val = READ(fd, &input_integer, sizeof(int));
   CHECK_FREAD(ret_val, "reading first int from dcd file");
   CHECK_FEOF(ret_val, "reading first int from dcd file");
+
+  // by jec
+  //*reverseEndian=1;
 
   /* Check magic number in file header and determine byte order*/
   if (input_integer != 84) {
@@ -444,9 +449,9 @@ int read_dcdstep(FILE * fd, int N, float *X, float *Y, float *Z, int num_fixed,
 {
   int ret_val;          /*  Return value from read          */
   int input_integer;    /*  Integer buffer space            */
-  int i,j;                /*  Loop counter              */
+  int i;                /*  Loop counter              */
 /*  int indexes;
-
+  int j;
   indexes = (int *) malloc(N*sizeof(int)) ;
    for (j=0;j<N;j++) {
         indexes[j]=1 ;
