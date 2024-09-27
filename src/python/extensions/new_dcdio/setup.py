@@ -1,6 +1,6 @@
 from setuptools import setup, Extension
 
-module = Extension('dcdio_module', sources=['dcdio_module.c'])
+module = Extension('dcdio_module', sources=['dcdio_module.c','dcdio.c'])
 
 setup(
     name='dcdio_module',
