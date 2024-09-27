@@ -3,18 +3,53 @@
 #include <Python.h>
 #include <numpy/arrayobject.h>
 #include "dcdio.c"
+#include "dcdio.h"
+
 
 // Wrapper for open_dcd_write
 static PyObject* py_open_dcd_write(PyObject* self, PyObject* args) {
     const char* filename;
-    if (!PyArg_ParseTuple(args, "s", &filename)) {
+    PyArrayObject *x_array, *y_array, *z_array;
+
+    // Parse the input tuple
+    if (!PyArg_ParseTuple(args, "sO!O!O!", &filename,
+                          &PyArray_Type, &x_array,
+                          &PyArray_Type, &y_array,
+                          &PyArray_Type, &z_array)) {
         return NULL;
     }
-    FILE* fd = open_dcd_write((char*)filename);  // Cast to char*
+
+    // Ensure the arrays are of type float32
+    if (PyArray_TYPE(x_array) != NPY_FLOAT32 ||
+        PyArray_TYPE(y_array) != NPY_FLOAT32 ||
+        PyArray_TYPE(z_array) != NPY_FLOAT32) {
+        PyErr_SetString(PyExc_TypeError, "Arrays must be of type float32");
+        return NULL;
+    }
+
+    // Ensure the arrays are 1-dimensional
+    if (PyArray_NDIM(x_array) != 1 ||
+        PyArray_NDIM(y_array) != 1 ||
+        PyArray_NDIM(z_array) != 1) {
+        PyErr_SetString(PyExc_TypeError, "Arrays must be 1-dimensional");
+        return NULL;
+    }
+
+    // Access the data
+    float* x_data = (float*)PyArray_DATA(x_array);
+    float* y_data = (float*)PyArray_DATA(y_array);
+    float* z_data = (float*)PyArray_DATA(z_array);
+
+    // Get the number of atoms (length of the arrays)
+    int num_atoms = (int)PyArray_DIM(x_array, 0);
+
+    // Call the open_dcd_write function with the correct arguments
+    FILE* fd = open_dcd_write(filename) ; //, x_data, y_data, z_data, num_atoms);
     if (fd == NULL) {
         PyErr_SetString(PyExc_IOError, "Failed to open file for writing");
         return NULL;
     }
+
     return PyCapsule_New(fd, "FILE*", NULL);
 }
 
@@ -46,21 +81,34 @@ static PyObject* py_pad(PyObject* self, PyObject* args) {
 
 // Wrapper for write_dcdheader
 static PyObject* py_write_dcdheader(PyObject* self, PyObject* args) {
-    PyObject* capsule;
-    char* filename;
-    int N, NSET, ISTART, NSAVC;
-    double DELTA;
-    if (!PyArg_ParseTuple(args, "Osiiiid", &capsule, &filename, &N, &NSET, &ISTART, &NSAVC, &DELTA)) {
+    PyObject* py_fd;
+    const char* filename;
+    int natoms, nset, istart, nsavc;
+    float delta;
+
+    // Parse the input tuple
+    if (!PyArg_ParseTuple(args, "Osiiif", &py_fd, &filename, &natoms, &nset, &istart, &nsavc, &delta)) {
         return NULL;
     }
-    FILE* fd = (FILE*)PyCapsule_GetPointer(capsule, "FILE*");
+
+    // Extract the FILE* from the PyCapsule
+    FILE* fd = (FILE*)PyCapsule_GetPointer(py_fd, "FILE*");
     if (fd == NULL) {
-        PyErr_SetString(PyExc_TypeError, "Invalid file descriptor");
+        PyErr_SetString(PyExc_TypeError, "Invalid file pointer");
         return NULL;
     }
-    int result = write_dcdheader(fd, filename, N, NSET, ISTART, NSAVC, DELTA);
-    return Py_BuildValue("i", result);
+
+    // Call the write_dcdheader function
+    int result = write_dcdheader(fd, filename, natoms, nset, istart, nsavc, delta);
+    if (result != 0) {
+        PyErr_SetString(PyExc_IOError, "Failed to write DCD header");
+        return NULL;
+    }
+
+    Py_RETURN_NONE;
 }
+
+
 
 // Wrapper for write_dcdstep
 static PyObject* py_write_dcdstep(PyObject* self, PyObject* args) {
@@ -218,6 +266,10 @@ static struct PyModuleDef dcdio_module = {
 
 // Module initialization function
 PyMODINIT_FUNC PyInit_dcdio(void) {
-    import_array();  // Initialize NumPy
-    return PyModule_Create(&dcdio_module);
+    PyObject* m;
+    m = PyModule_Create(&dcdio_module);
+    if (m == NULL)
+        return NULL;
+    import_array();  // Initialize the NumPy API
+    return m;
 }

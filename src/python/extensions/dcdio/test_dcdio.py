@@ -10,7 +10,7 @@ import dcdio
 import sys
 import numpy
 import time
-sys.path.append('./')
+#sys.path.append('./')
 
 A = system.Molecule(0)
 A.read_pdb('min3.pdb')
