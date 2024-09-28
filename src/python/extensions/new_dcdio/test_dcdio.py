@@ -6,7 +6,7 @@
 '''
 import sasmol.system as system
 #from . import dcdio
-import dcdio
+import dcdio_module as dcdio
 import sys
 import numpy
 import time
@@ -28,7 +28,7 @@ y = numpy.array(y, numpy.float32)
 z = numpy.array(z, numpy.float32)
 
 filename = 'hiv1_gag_200_frames.dcd'
-
+'''
 fp = dcdio.open_dcd_write(filename)
 
 nset = 200
@@ -63,7 +63,9 @@ dcdio.close_dcd_write(fp)
 filename = '200c.dcd'
 filename = 'c7.dcd'
 
-ifp = dcdio.open_dcd_read(filename)
+'''
+filename = 'hiv1_gag_200_frames.dcd'
+fd = dcdio.open_dcd_read(filename)
 
 nnatoms = 0
 nset = 0
@@ -79,11 +81,23 @@ print('nnatoms = ', nnatoms)
 print('nset = ', nset)
 print('freeindexes = ', freeindexes)
 
-readheaderresult, nnatoms, nset, istart, nsavc, delta, namnf, reverseEndian, charmm = dcdio.read_dcdheader(
-    ifp)
+#readheaderresult, nnatoms, nset, istart, nsavc, delta, namnf, reverseEndian, charmm = dcdio.read_dcdheader(fd, 0, 0, 0, 0, 0, 0.0, 0.0, 0, 0, 0)
+result = dcdio.read_dcdheader(fd, 0, 0, 0, 0, 0, 0.0, 0.0, 0, 0, 0)
 
+# Print the results
+print("N:", result[0])
+print("NSET:", result[1])
+print("ISTART:", result[2])
+print("NSAVC:", result[3])
+print("NAMNF:", result[4])
+print("DELTA:", result[5])
+print("Data:", result[6])
+print("Extra Arg:", result[7])
+print("Reverse Endian:", result[8])
+print("Charmm:", result[9])
+
+'''
 print('read header result = ', readheaderresult)
-
 print('nnatoms = ', nnatoms)
 print('nset = ', nset)
 print('istart = ', istart)
@@ -92,6 +106,17 @@ print('delta = ', delta)
 print('namnf = ', namnf)
 print('reverseEndian = ', reverseEndian)
 print('charmm = ', charmm)
+'''
+nnatoms = result[0] 
+nset = result[1]
+istart = result[2]
+nsavc = result[3]
+namnf = result[4]
+delta = result[5]   
+data = result[6]
+reverseEndian = result[8]
+charmm = result[9]
+
 
 x = numpy.zeros((nset, nnatoms), dtype=numpy.float32)
 y = numpy.zeros((nset, nnatoms), dtype=numpy.float32)
@@ -115,8 +140,13 @@ for i in range(nset):
     ty = numpy.zeros(nnatoms, dtype=numpy.float32)
     tz = numpy.zeros(nnatoms, dtype=numpy.float32)
 
-    result = dcdio.read_dcdstep(
-        ifp, tx, ty, tz, num_fixed, i, reverseEndian, charmm)
+    #result = dcdio.read_dcdstep(
+    #final_result = dcdio.read_dcdstep(
+    #    fd, tx, ty, tz, num_fixed, i, reverseEndian, charmm)
+    
+    final_result = dcdio.read_dcdstep(fd, nnatoms, num_fixed, first, reverseEndian, charmm, tx, ty, tz)
+
+    print("Final Result:", final_result)
     read_end_time = time.time()
 
     sum += read_end_time-read_start_time

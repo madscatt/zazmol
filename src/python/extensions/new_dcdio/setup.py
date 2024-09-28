@@ -1,6 +1,8 @@
 from setuptools import setup, Extension
+import numpy
 
-module = Extension('dcdio_module', sources=['dcdio_module.c','dcdio.c'])
+module = Extension('dcdio_module', sources=['dcdio_module.c','dcdio.c'],
+                   include_dirs=[numpy.get_include()])
 
 setup(
     name='dcdio_module',
