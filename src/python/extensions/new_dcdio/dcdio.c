@@ -232,11 +232,11 @@ double* reverseEightByteWord(double* N)
                         return(DCD_BADEOF); \
                        }
 
-//int read_dcdheader(FILE * fd, int *N, int *NSET, int *ISTART,
-//               int *NSAVC, double *DELTA, int *NAMNF,
-//               int *reverseEndian, int *charmm)
+int read_dcdheader(FILE * fd, int *N, int *NSET, int *ISTART,\
+               int *NSAVC, double *DELTA, int *NAMNF,\
+               int *reverseEndian, int *charmm)
 
-int read_dcdheader(FILE* fd, int* N, int* NSET, int* ISTART, int* NSAVC, int* NAMNF, double* DELTA, float* data, int* extra_arg, int* reverseEndian, int* charmm) 
+//int read_dcdheader(FILE* fd, int* N, int* NSET, int* ISTART, int* NSAVC, int* NAMNF, double* DELTA, float* data, int* extra_arg, int* reverseEndian, int* charmm) 
 {
   int input_integer;    /*  Integer buffer space      */
   int ret_val;          /*  Return value from read    */

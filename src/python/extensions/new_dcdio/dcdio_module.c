@@ -2,8 +2,10 @@
 #include <numpy/arrayobject.h>
 #include "dcdio.h"  
 
-static PyObject* py_open_dcd_read(PyObject* self, PyObject* args) {
+static PyObject* py_open_dcd_file(PyObject* self, PyObject* args) {
     const char* filename;
+
+    // Parse the input tuple
     if (!PyArg_ParseTuple(args, "s", &filename)) {
         return NULL;
     }
@@ -17,14 +19,14 @@ static PyObject* py_open_dcd_read(PyObject* self, PyObject* args) {
     return PyCapsule_New(fd, "dcdio_module.FILE", NULL);
 }
 
+
 static PyObject* py_read_dcdheader(PyObject* self, PyObject* args) {
     PyObject* py_fd;
-    int N, NSET, ISTART, NSAVC, NAMNF, reverseEndian, charmm, extra_arg;
+    int N, NSET, ISTART, NSAVC, NAMNF, reverseEndian, charmm;
     double DELTA;
-    float data;
 
     // Parse the input tuple
-    if (!PyArg_ParseTuple(args, "Oiiiiidfiii", &py_fd, &N, &NSET, &ISTART, &NSAVC, &NAMNF, &DELTA, &data, &extra_arg, &reverseEndian, &charmm)) {
+    if (!PyArg_ParseTuple(args, "O", &py_fd)) {
         return NULL;
     }
 
@@ -35,16 +37,15 @@ static PyObject* py_read_dcdheader(PyObject* self, PyObject* args) {
     }
 
     // Call the actual read_dcdheader function from dcdio.h
-    int result = read_dcdheader(fd, &N, &NSET, &ISTART, &NSAVC, &NAMNF, &DELTA, &data, &extra_arg, &reverseEndian, &charmm);
+    int result = read_dcdheader(fd, &N, &NSET, &ISTART, &NSAVC, &NAMNF, &DELTA, &reverseEndian, &charmm);
     if (result != 0) {
         PyErr_SetString(PyExc_RuntimeError, "Failed to read DCD header");
         return NULL;
     }
 
     // Return the results as a tuple
-    return Py_BuildValue("iiiiidfiii", N, NSET, ISTART, NSAVC, NAMNF, DELTA, data, extra_arg, reverseEndian, charmm);
+    return Py_BuildValue("iOiiiiidii", result, py_fd, N, NSET, ISTART, NSAVC, NAMNF, DELTA, reverseEndian, charmm);
 }
-
 
 // Function to read a DCD step
 
@@ -101,7 +102,7 @@ static PyObject* py_read_dcdstep(PyObject *self, PyObject *args) {
 
 // Module method definitions
 static PyMethodDef DCDIOModuleMethods[] = {
-    {"open_dcd_read", py_open_dcd_read, METH_VARARGS, "Open a DCD file for reading"},
+    {"open_dcd_file", py_open_dcd_file, METH_VARARGS, "Open DCD file and return file pointer capsule"},
     {"read_dcdheader", py_read_dcdheader, METH_VARARGS, "Read the header of a DCD file"},
     {"read_dcdstep", py_read_dcdstep, METH_VARARGS, "Read a step from a DCD file"},
     {NULL, NULL, 0, NULL}

@@ -1,11 +1,14 @@
 
 
-import dcdio_module
+import dcdio_module as dcdio
+#import ctypes
 
 filename = 'hiv1_gag_200_frames.dcd'
 
-file_ptr = dcdio_module.open_dcd_read(filename)
-if file_ptr:
+filepointer_capsule = dcdio.open_dcd_file(filename)
+
+
+if filepointer_capsule:
     print(f"Successfully opened {filename}")
 else:
     print(f"Failed to open {filename}")
@@ -22,17 +25,9 @@ reverseEndian = 0
 charmm = 0
 
 # Call the read_dcdheader function
-result = dcdio_module.read_dcdheader(file_ptr, N, NSET, ISTART, NSAVC, NAMNF, DELTA, data, extra_arg, reverseEndian, charmm)
+#result = dcdio_module.read_dcdheader(file_ptr, N, NSET, ISTART, NSAVC, NAMNF, DELTA, data, extra_arg, reverseEndian, charmm)
+readheaderresult, filepointer_capsule, nnatoms, nset, istart, nsavc, delta, namnf, reverseEndian, charmm = dcdio.read_dcdheader(filepointer_capsule)
 
 # Print the results
-print("Result:", result[0])
-print("N:", result[1])
-print("NSET:", result[2])
-print("ISTART:", result[3])
-print("NSAVC:", result[4])
-print("NAMNF:", result[5])
-print("DELTA:", result[6])
-print("Data:", result[7])
-print("Extra Arg:", result[8])
-print("Reverse Endian:", result[9])
-print("Charmm:", result[10])
+print("readheaderresult, filepointer, nnatoms, nset, istart, nsavc, delta, namnf, reverseEndian, charmm")
+print(readheaderresult, filepointer_capsule, nnatoms, nset, istart, nsavc, delta, namnf, reverseEndian, charmm)
