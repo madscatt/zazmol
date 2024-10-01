@@ -1,33 +1,44 @@
-
-
 import dcdio_module as dcdio
-#import ctypes
+import sys
+import os
 
-filename = 'hiv1_gag_200_frames.dcd'
+def main():
+    # Redirect stderr to a file
+    stderr_file = "stderr_output.txt"
+    sys.stderr = open(stderr_file, "w")
 
-filepointer_capsule = dcdio.open_dcd_file(filename)
+    try:
+        # Open the DCD file
+        file_capsule = dcdio.open_dcd_file("h200.dcd")
 
+        # Read the DCD header
+        readheaderresult, nnatoms, nset, istart, nsavc, namnf, delta, reverseEndian, charmm = dcdio.read_dcdheader(file_capsule)
+        print("DCD Header Information:")
+        print(f"Number of atoms: {nnatoms}")
+        print(f"Number of sets: {nset}")
+        print(f"Starting timestep: {istart}")
+        print(f"Timesteps between saves: {nsavc}")
+        print(f"Number of atoms with fixed coordinates: {namnf}")
+        print(f"Time step size: {delta}")
+        print(f"Reverse endian: {reverseEndian}")
+        print(f"CHARMM version: {charmm}")
 
-if filepointer_capsule:
-    print(f"Successfully opened {filename}")
-else:
-    print(f"Failed to open {filename}")
+    except Exception as e:
+        print(f"An error occurred: {e}")
 
-N = 0
-NSET = 0
-ISTART = 0
-NSAVC = 0
-NAMNF = 0
-DELTA = 0.0
-data = 0.0
-extra_arg = 0
-reverseEndian = 0
-charmm = 0
+    finally:
+        # Close the redirected stderr
+        sys.stderr.close()
+        sys.stderr = sys.__stderr__
 
-# Call the read_dcdheader function
-#result = dcdio_module.read_dcdheader(file_ptr, N, NSET, ISTART, NSAVC, NAMNF, DELTA, data, extra_arg, reverseEndian, charmm)
-readheaderresult, filepointer_capsule, nnatoms, nset, istart, nsavc, delta, namnf, reverseEndian, charmm = dcdio.read_dcdheader(filepointer_capsule)
+        # Print the contents of the stderr file
+        if os.path.exists(stderr_file):
+            with open(stderr_file, "r") as f:
+                stderr_contents = f.read()
+                if stderr_contents:
+                    print("Captured stderr output from C code:")
+                    print(stderr_contents)
+            os.remove(stderr_file)
 
-# Print the results
-print("readheaderresult, filepointer, nnatoms, nset, istart, nsavc, delta, namnf, reverseEndian, charmm")
-print(readheaderresult, filepointer_capsule, nnatoms, nset, istart, nsavc, delta, namnf, reverseEndian, charmm)
+if __name__ == "__main__":
+    main()

@@ -235,7 +235,6 @@ double* reverseEightByteWord(double* N)
 int read_dcdheader(FILE * fd, int *N, int *NSET, int *ISTART,\
                int *NSAVC, double *DELTA, int *NAMNF,\
                int *reverseEndian, int *charmm)
-
 //int read_dcdheader(FILE* fd, int* N, int* NSET, int* ISTART, int* NSAVC, int* NAMNF, double* DELTA, float* data, int* extra_arg, int* reverseEndian, int* charmm) 
 {
   int input_integer;    /*  Integer buffer space      */
@@ -248,6 +247,21 @@ int read_dcdheader(FILE * fd, int *N, int *NSET, int *ISTART,\
 /*  (*FREEINDEXES) = *((int *) (hdrbuf + 12)); */
 
 
+  // Add detailed debugging statements
+  fprintf(stderr, "Inside read_dcdheader\n");
+  fprintf(stderr, "File pointer: %p\n", fd);
+  fflush(stderr);
+
+  // Check if the file pointer is valid
+  if (fd == NULL) {
+        fprintf(stderr, "Invalid file pointer\n");
+        fflush(stderr);
+        return DCD_BADFORMAT;
+  }else{
+        fprintf(stderr, "Valid file pointer\n");
+        fflush(stderr);
+  } 
+
   /*  First thing in the file should be an 84         */
   ret_val = READ(fd, &input_integer, sizeof(int));
   CHECK_FREAD(ret_val, "reading first int from dcd file");
@@ -255,6 +269,37 @@ int read_dcdheader(FILE * fd, int *N, int *NSET, int *ISTART,\
 
   // by jec
   //*reverseEndian=1;
+
+  // Ensure the file pointer is at the beginning of the file
+  fseek(fd, 0, SEEK_SET);
+
+  // Read the magic number from the file header
+  ret_val = fread(&input_integer, sizeof(int), 1, fd);
+  if (ret_val != 1) {
+        fprintf(stderr, "Error reading first int from DCD file\n");
+        fflush(stderr);
+        return DCD_BADFORMAT;
+  }
+  fprintf(stderr, "read_dcdheader: input_integer = %d\n", input_integer);
+  fflush(stderr);
+
+
+  /* Check magic number in file header and determine byte order*/
+  if (input_integer != 84) {
+    // Reverse the byte order
+    input_integer = ((input_integer >> 24) & 0x000000FF) |
+                    ((input_integer >> 8)  & 0x0000FF00) |
+                    ((input_integer << 8)  & 0x00FF0000) |
+                    ((input_integer << 24) & 0xFF000000);
+
+    if (input_integer != 84) {
+        fprintf(stderr, "Invalid magic number in file header: %d\n", input_integer);
+        fflush(stderr);
+        return DCD_BADFORMAT;
+    }
+  }
+
+
 
   /* Check magic number in file header and determine byte order*/
   if (input_integer != 84) {
@@ -264,9 +309,11 @@ int read_dcdheader(FILE * fd, int *N, int *NSET, int *ISTART,\
 
     if (input_integer == 84) {
       *reverseEndian=1;
-    }
-    else {
-      return(DCD_BADFORMAT);
+      fprintf(stderr, "Reversed endian detected\n");
+      } else {
+            fprintf(stderr, "Invalid magic number in file header: %d\n", input_integer);
+            fflush(stderr);
+            return DCD_BADFORMAT;
     }
   }
   else {
