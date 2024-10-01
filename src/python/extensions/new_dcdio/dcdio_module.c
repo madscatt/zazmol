@@ -3,24 +3,9 @@
 #include "dcdio.h"  
 #include <stdio.h>
 
-int dum_read_dcdheader(FILE *fd, int *N, int *NSET, int *ISTART, int *NSAVC, double *DELTA, int *NAMNF, int *reverseEndian, int *charmm) ;
+// Uncomment the following line to enable debugging
+// #define DEBUG
 
-static PyObject* py_open_dcd_file(PyObject* self, PyObject* args) {
-    const char* filename;
-
-    // Parse the input tuple
-    if (!PyArg_ParseTuple(args, "s", &filename)) {
-        return NULL;
-    }
-
-    FILE* fd = fopen(filename, "rb");
-    if (!fd) {
-        PyErr_SetString(PyExc_IOError, "Failed to open file");
-        return NULL;
-    }
-
-    return PyCapsule_New(fd, "dcdio_module.FILE", NULL);
-}
 
 // Function to open a DCD file for reading and return a capsule containing the file pointer
 static PyObject* py_open_dcd_read(PyObject* self, PyObject* args) {
@@ -36,16 +21,6 @@ static PyObject* py_open_dcd_read(PyObject* self, PyObject* args) {
     }
 
     return PyCapsule_New(fd, "dcdio_module.FILE", NULL);
-}
-
-
-#define DCD_BADFORMAT -6
-
-int my_reverseFourByteWord(int input) {
-    return ((input >> 24) & 0x000000FF) |
-           ((input >> 8)  & 0x0000FF00) |
-           ((input << 8)  & 0x00FF0000) |
-           ((input << 24) & 0xFF000000);
 }
 
 // Function to read the header of a DCD file
@@ -64,86 +39,43 @@ static PyObject* py_read_dcdheader(PyObject* self, PyObject* args) {
     FILE* fd = (FILE*)PyCapsule_GetPointer(py_fd, "dcdio_module.FILE");
     if (!fd) {
         PyErr_SetString(PyExc_ValueError, "Invalid file pointer");
+#ifdef DEBUG
         fprintf(stderr, "Invalid file pointer\n");
         fflush(stderr);
+#endif       
         return NULL;
     }
 
     // Ensure the file pointer is at the beginning of the file
     fseek(fd, 0, SEEK_SET);
-
-    /*
-    int input_integer;
-    size_t ret_val = fread(&input_integer, sizeof(int), 1, fd);
-
-    if (ret_val != 1) {
-        PyErr_SetString(PyExc_IOError, "Error reading first int from DCD file");
-        return NULL;
-    }
-    fprintf(stderr, "read_dcdheader: input_integer = %d\n", input_integer);
-    fflush(stderr);
-
-    // Check magic number in file header and determine byte order
-    if (input_integer != 84) {
-        // Reverse the byte order
-        input_integer = my_reverseFourByteWord(input_integer);
-        //input_integer= *reverseFourByteWord(&input_integer);
-
-        if (input_integer != 84) {
-            fprintf(stderr, "Invalid magic number in file header: %d\n", input_integer);
-            fflush(stderr);
-            PyErr_SetString(PyExc_ValueError, "Invalid magic number in file header");
-            return NULL;
-        }
-    }
-
-    fprintf(stderr, "Valid DCD file header\n");
-    fflush(stderr);
-
-    // Ensure the file pointer is at the beginning of the file
-    fseek(fd, 0, SEEK_SET);
-    */
 
     // Print debugging information before calling read_dcdheader
+#ifdef DEBUG
     fprintf(stderr, "Calling read_dcdheader with file pointer: %p\n", fd);
     fflush(stderr);
+#endif
 
     // Call the actual read_dcdheader function from dcdio.h
     int result = read_dcdheader(fd, &N, &NSET, &ISTART, &NSAVC, &DELTA, &NAMNF, &reverseEndian, &charmm);
     if (result != 0) {
         PyErr_SetString(PyExc_RuntimeError, "Failed to read DCD header");
+#ifdef DEBUG
         fprintf(stderr, "read_dcdheader failed with result: %d\n", result);
         fflush(stderr);
+#endif
         return NULL;
     }
 
     // Print debugging information to stderr
+#ifdef DEBUG
     fprintf(stderr, "read_dcdheader result: %d\n", result);
     fprintf(stderr, "N: %d, NSET: %d, ISTART: %d, NSAVC: %d, NAMNF: %d, DELTA: %f, reverseEndian: %d, charmm: %d\n",
             N, NSET, ISTART, NSAVC, NAMNF, DELTA, reverseEndian, charmm);
     fflush(stderr);  // Flush the output buffer
+#endif
 
     // Return the results as a tuple
     return Py_BuildValue("iOiiiiidii", result, py_fd, N, NSET, ISTART, NSAVC, NAMNF, DELTA, reverseEndian, charmm);
-}
-
-// Example implementation of read_dcdheader function
-int dum_read_dcdheader(FILE *fd, int *N, int *NSET, int *ISTART, int *NSAVC, double *DELTA, int *NAMNF, int *reverseEndian, int *charmm) {
-    // Example implementation
-    // Read the header from the DCD file and populate the provided pointers
-    // Return 0 on success, non-zero on failure
-
-    // For demonstration purposes, let's assume the header is read successfully
-    *N = 1000;
-    *NSET = 200;
-    *ISTART = 0;
-    *NSAVC = 1;
-    *NAMNF = 0;
-    *DELTA = 0.02;
-    *reverseEndian = 0;
-    *charmm = 1;
-
-    return 0; // Success
 }
 
 // Function to read a DCD step
@@ -202,7 +134,6 @@ static PyObject* py_read_dcdstep(PyObject *self, PyObject *args) {
 // Module method definitions
 static PyMethodDef DCDIOModuleMethods[] = {
     {"open_dcd_read", py_open_dcd_read, METH_VARARGS, "Open a DCD file for reading"},
-    {"open_dcd_file", py_open_dcd_file, METH_VARARGS, "Open DCD file and return file pointer capsule"},
     {"read_dcdheader", py_read_dcdheader, METH_VARARGS, "Read the header of a DCD file"},
     {"read_dcdstep", py_read_dcdstep, METH_VARARGS, "Read a step from a DCD file"},
     {NULL, NULL, 0, NULL}

@@ -9,10 +9,10 @@ def main():
 
     try:
         # Open the DCD file
-        file_capsule = dcdio.open_dcd_file("h200.dcd")
+        file_capsule = dcdio.open_dcd_read("h200.dcd")
 
         # Read the DCD header
-        readheaderresult, nnatoms, nset, istart, nsavc, namnf, delta, reverseEndian, charmm = dcdio.read_dcdheader(file_capsule)
+        readheaderresult, pyfd, nnatoms, nset, istart, nsavc, namnf, delta, reverseEndian, charmm = dcdio.read_dcdheader(file_capsule)
         print("DCD Header Information:")
         print(f"Number of atoms: {nnatoms}")
         print(f"Number of sets: {nset}")
@@ -39,6 +39,14 @@ def main():
                     print("Captured stderr output from C code:")
                     print(stderr_contents)
             os.remove(stderr_file)
+
+
+        # Determine and print the endianness
+        if reverseEndian == 0:
+            print("Endianness: Little-endian")
+        else:
+            print("Endianness: Big-endian")
+
 
 if __name__ == "__main__":
     main()
