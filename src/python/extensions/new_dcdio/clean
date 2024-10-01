@@ -1,0 +1,1 @@
+rm -Rf *.so ; rm -Rf build ; python setup.py build ; python setup.py install

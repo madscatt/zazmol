@@ -497,22 +497,9 @@ int read_dcdstep(FILE * fd, int N, float *X, float *Y, float *Z, int num_fixed,
   int ret_val;          /*  Return value from read          */
   int input_integer;    /*  Integer buffer space            */
   int i;                /*  Loop counter              */
-/*  int indexes;
-  int j;
-  indexes = (int *) malloc(N*sizeof(int)) ;
-   for (j=0;j<N;j++) {
-        indexes[j]=1 ;
-   } */
-/*  printf("number of atoms = %d\n",N);
-  printf("num_fixed = %d\n",num_fixed) ;
-  printf("first = %d\n",first) ;
-  if(num_fixed==0) printf("nf = true\n") ;
-  if(first==0) printf("f0 = true\n") ;
-  if(first==1) printf("f1 = true\n") ;
-  if(first) printf("first = true\n") ;
-*/
+
   if ( (num_fixed==0) || first) {
-//    printf("\n\n>>> in first loop\n\n") ;
+    printf("\n\n>>> in first loop\n\n") ;
     /* If this is a CHARMm file and contains an extra data block,
        we must skip it to avoid problems */
     if ((charmm & DCD_IS_CHARMM) &&
@@ -524,14 +511,11 @@ int read_dcdstep(FILE * fd, int N, float *X, float *Y, float *Z, int num_fixed,
         fseeko(fd, input_integer, SEEK_CUR);
         ret_val = READ(fd, &input_integer, sizeof(int));
         CHECK_FREAD(ret_val, "reading extra charmm block");
-        //printf("zhl now %d\n",input_integer);
+        printf("zhl now %d\n",input_integer);
    }
 
     /*  Get the first size from the file                          */
-    /*printf(">>> ret_val = %d\n",ret_val) ;*/
     ret_val = READ(fd, &input_integer, sizeof(int));
- //     printf("> input_integer = %d\n",input_integer) ;
-//    printf(">>> ret_val = %d\n",ret_val) ;
     CHECK_FREAD(ret_val, "reading number of atoms at begining of step");
     if (reverseEndian) input_integer= *reverseFourByteWord(&input_integer);
 
@@ -541,16 +525,13 @@ int read_dcdstep(FILE * fd, int N, float *X, float *Y, float *Z, int num_fixed,
       return(-1);
     }
 
-
-    /*printf("> input_integer = %d\n",input_integer) ;*/
-
     if (input_integer != 4*N){
       printf(">>> input_integer != 4*N (1)\n\n") ;
       return(DCD_BADFORMAT);
     }
-    /*printf(">>> ret_val = %d\n",ret_val) ;*/
+    printf(">>> ret_val = %d\n",ret_val) ;
     ret_val = READ(fd, X, 4*N);
-      //printf("ZHL %8.3f %8.3f %8.3f %8.3f\n",X[0],X[1],X[N-2],X[N-1]);
+    printf("ZHL %8.3f %8.3f %8.3f %8.3f\n",X[0],X[1],X[N-2],X[N-1]);
     /*printf(">>> just before reading X array: ret_val = %d\n",ret_val) ;*/
     CHECK_FREAD(ret_val, "reading X array");
     CHECK_FEOF(ret_val, "reading X array");
@@ -560,7 +541,7 @@ int read_dcdstep(FILE * fd, int N, float *X, float *Y, float *Z, int num_fixed,
         printf("X[i] = %f\n",X[i]) ;
       }
     }
-    /*printf(">>> just after reading X array: ret_val = %d\n",ret_val) ;*/
+    printf(">>> just after reading X array: ret_val = %d\n",ret_val) ;
     ret_val = READ(fd, &input_integer, sizeof(int));
     CHECK_FREAD(ret_val, "reading number of atoms after X array");
     CHECK_FEOF(ret_val, "reading number of atoms after X array");
@@ -626,7 +607,6 @@ int read_dcdstep(FILE * fd, int N, float *X, float *Y, float *Z, int num_fixed,
       printf(">>> input_integer != 4*N (6)\n\n") ;
       return(DCD_BADFORMAT);
     }
-
 
     /* If this is a CHARMm file and contains a 4th dimension block,
        we must skip it to avoid problems */
@@ -741,7 +721,7 @@ int read_dcdstep(FILE * fd, int N, float *X, float *Y, float *Z, int num_fixed,
         CHECK_FREAD(ret_val, "reading extra charmm block");
     }
   }
-  /*printf(" I got to the end, jeepers\n");*/
+  printf(" I got to the end, jeepers\n");
   return(0);
 }
 

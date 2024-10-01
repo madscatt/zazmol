@@ -98,6 +98,13 @@ static PyObject* py_read_dcdstep(PyObject *self, PyObject *args) {
         return NULL;
     }
 
+        // Ensure the arrays are contiguous
+    if (!PyArray_ISCONTIGUOUS(x_array) || !PyArray_ISCONTIGUOUS(y_array) || !PyArray_ISCONTIGUOUS(z_array)) {
+        PyErr_SetString(PyExc_ValueError, "Arrays must be contiguous");
+        return NULL;
+    }
+
+
     // Check if the arrays are NULL
     if (x_array == NULL || y_array == NULL || z_array == NULL) {
         Py_XDECREF(x_array);
@@ -126,6 +133,23 @@ static PyObject* py_read_dcdstep(PyObject *self, PyObject *args) {
     Py_DECREF(x_array);
     Py_DECREF(y_array);
     Py_DECREF(z_array);
+
+// TEMPORARY
+
+    if (result != 0) {
+        printf("Error in read_dcdstep\n");
+        close_dcd_read(fp);
+        //return;
+    }
+
+    // Continue with other operations
+    printf("Continuing after read_dcdstep\n");
+
+    // Ensure the file is closed
+    close_dcd_read(fp);
+
+
+
 
     // Return the result
     return Py_BuildValue("i", result);
