@@ -531,14 +531,14 @@ int read_dcdstep(FILE * fd, int N, float *X, float *Y, float *Z, int num_fixed,
     }
     printf(">>> ret_val = %d\n",ret_val) ;
     ret_val = READ(fd, X, 4*N);
-    printf("ZHL %8.3f %8.3f %8.3f %8.3f\n",X[0],X[1],X[N-2],X[N-1]);
+    printf("ZHL %8.3f %8.3f %8.3f %8.3f %8.3f %8.3f\n",X[0],X[1],X[2],X[3],X[N-2],X[N-1]);
     /*printf(">>> just before reading X array: ret_val = %d\n",ret_val) ;*/
     CHECK_FREAD(ret_val, "reading X array");
     CHECK_FEOF(ret_val, "reading X array");
     if (reverseEndian) {
       for (i=0; i<N; i++) {
         X[i]=*((float*)(reverseFourByteWord((int*)&X[i])));
-        printf("X[i] = %f\n",X[i]) ;
+        //printf("X[i] = %f\n",X[i]) ;
       }
     }
     printf(">>> just after reading X array: ret_val = %d\n",ret_val) ;
@@ -571,6 +571,7 @@ int read_dcdstep(FILE * fd, int N, float *X, float *Y, float *Z, int num_fixed,
     }
 
     ret_val = READ(fd, &input_integer, sizeof(int));
+    printf("ZHL Y: %8.3f %8.3f %8.3f %8.3f %8.3f %8.3f\n",Y[0],Y[1],Y[2],Y[3],Y[N-2],Y[N-1]);
     CHECK_FREAD(ret_val, "reading number of atoms after Y array");
     CHECK_FEOF(ret_val, "reading number of atoms after Y array");
     if (reverseEndian) input_integer= *reverseFourByteWord(&input_integer);
@@ -590,6 +591,7 @@ int read_dcdstep(FILE * fd, int N, float *X, float *Y, float *Z, int num_fixed,
       return(DCD_BADFORMAT);
     }
     ret_val = READ(fd, Z, 4*N);
+    printf("ZHL Z: %8.3f %8.3f %8.3f %8.3f %8.3f %8.3f\n",Z[0],Z[1],Z[2],Z[3],Z[N-2],Z[N-1]);
     CHECK_FREAD(ret_val, "reading Z array");
     CHECK_FEOF(ret_val, "reading Z array");
     if (reverseEndian) {

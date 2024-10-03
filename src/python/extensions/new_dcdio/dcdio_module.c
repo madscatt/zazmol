@@ -85,10 +85,10 @@ static PyObject* py_read_dcdstep(PyObject *self, PyObject *args) {
     int natoms, num_fixed, first, reverseEndian, charmm;
     PyArrayObject *x_array, *y_array, *z_array;
 
-    // Parse the arguments from Python
-    if (!PyArg_ParseTuple(args, "OiiiiiO!O!O!", &py_fp, &natoms, &num_fixed, &first, &reverseEndian, &charmm,
-                          &PyArray_Type, &x_array, &PyArray_Type, &y_array, &PyArray_Type, &z_array)) {
-        return NULL;
+    if (!PyArg_ParseTuple(args, "OiO!O!O!iiii", &py_fp, &natoms, 
+                      &PyArray_Type, &x_array, &PyArray_Type, &y_array, 
+                      &PyArray_Type, &z_array, &num_fixed, &first, &reverseEndian, &charmm)) {
+    return NULL;
     }
 
     // Ensure the file pointer is a PyCapsule and extract the FILE* pointer
@@ -113,26 +113,44 @@ static PyObject* py_read_dcdstep(PyObject *self, PyObject *args) {
         return NULL;
     }
 
-    // Get pointers to the data as C-types
-    float *x = (float*) PyArray_DATA(x_array);
-    float *y = (float*) PyArray_DATA(y_array);
-    float *z = (float*) PyArray_DATA(z_array);
+    float *x = (float*) PyArray_DATA((PyArrayObject*) x_array);
+    float *y = (float*) PyArray_DATA((PyArrayObject*) y_array);
+    float *z = (float*) PyArray_DATA((PyArrayObject*) z_array);// Get pointers to the data as C-types
+
+    // Print addresses and values before the call
+    printf("Before read_dcdstep:\n");
+    printf("x address: %p, y address: %p, z address: %p\n", x, y, z);
+    printf("x[0]: %f, y[0]: %f, z[0]: %f\n", x[0], y[0], z[0]);
+    printf("x[1]: %f, y[1]: %f, z[1]: %f\n", x[1], y[1], z[1]);
+    printf("x[2]: %f, y[2]: %f, z[2]: %f\n", x[2], y[2], z[2]);
 
     // Call the existing read_dcdstep function
     int result = read_dcdstep(fp, natoms, x, y, z, num_fixed, first, reverseEndian, charmm);
+
+    // Print addresses and values after the call
+    printf("After read_dcdstep:\n");
+    printf("x address: %p, y address: %p, z address: %p\n", x, y, z);
+    printf("x[0]: %f, y[0]: %f, z[0]: %f\n", x[0], y[0], z[0]);
+    printf("x[1]: %f, y[1]: %f, z[1]: %f\n", x[1], y[1], z[1]);
+    printf("x[2]: %f, y[2]: %f, z[2]: %f\n", x[2], y[2], z[2]);
 
     if (result != 0) {  
         PyErr_SetString(PyExc_RuntimeError, "Failed to read DCD step");
         return NULL;
     }
+
+
+    // Additional debugging: Print the last element to ensure the entire array is accessible
+    printf("x[natoms-1]: %f, y[natoms-1]: %f, z[natoms-1]: %f\n", x[natoms-1], y[natoms-1], z[natoms-1]);
+
     // Print the result to the screen
-    printf("Result: %d\n", result);
+    printf("Result of calling read_dcdstep: %d\n", result);
     fflush(stdout);  // Flush the output buffer
 
     // Clean up
-    Py_DECREF(x_array);
-    Py_DECREF(y_array);
-    Py_DECREF(z_array);
+    //Py_DECREF(x_array);
+    //Py_DECREF(y_array);
+    //Py_DECREF(z_array);
 
 // TEMPORARY
 
@@ -146,7 +164,7 @@ static PyObject* py_read_dcdstep(PyObject *self, PyObject *args) {
     printf("Continuing after read_dcdstep\n");
 
     // Ensure the file is closed
-    close_dcd_read(fp);
+//    close_dcd_read(fp);
 
 
 
