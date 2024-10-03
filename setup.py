@@ -53,10 +53,10 @@ setup(name='sasmol',
       packages=['sasmol','sasmol.test_sasmol','sasmol.test_sasmol.utilities','sasmol.test_sasmol.manual_tests','sasmol.test_sasmol.data','sasmol.test_sasmol.data.pdb_common','sasmol.test_sasmol.data.dcd_common','sasmol.test_sasmol.data.sasmol','sasmol.test_sasmol.data.sasmol.calculate','sasmol.test_sasmol.data.sasmol.file_io','sasmol.test_sasmol.data.sasmol.file_io.test-results','sasmol.test_sasmol.data.sasmol.linear_algebra','sasmol.test_sasmol.data.sasmol.system','sasmol.test_sasmol.data.sasmol.operate','sasmol.test_sasmol.data.sasmol.properties','sasmol.test_sasmol.test_calculate','sasmol.test_sasmol.test_file_io','sasmol.test_sasmol.test_linear_algebra','sasmol.test_sasmol.test_operate','sasmol.test_sasmol.test_properties','sasmol.test_sasmol.test_subset','sasmol.extensions','sasmol.extensions.dcdio','sasmol.extensions.view','sasmol.extensions.mask','sasmol.extensions.matrix_math'],
 
     ext_modules=[
-    Extension('sasmol._dcdio',[os.path.join('src','python','extensions','dcdio','dcdio.i'),os.path.join('src','python','extensions','dcdio','dcdio.c')],include_dirs=[NUMPY_INCLUDE]),
-#    Extension('dcdio',
-#                   sources=['dcdio_module.c', 'dcdio.c'],
-#                   include_dirs=[numpy.get_include()]),
+    Extension('sasmol._dcdio',
+                   sources=[os.path.join('src','python','extensions','dcdio','dcdio.c'),
+                            os.path.join('src','python','extensions','dcdio','dcdio_module.c')],
+                   include_dirs=[numpy.get_include()]),
 
     Extension('sasmol._view_vmd',[os.path.join('src','python','extensions','view','view_vmd.i'),os.path.join('src','python','extensions','view','view_vmd.c'),os.path.join('src','python','extensions','view','imd.c'),os.path.join('src','python','extensions','view','vmdsock.c')],include_dirs=[NUMPY_INCLUDE]),
     Extension('sasmol._mask',[os.path.join('src','python','extensions','mask','mask.i'),os.path.join('src','python','extensions','mask','mask.c')],include_dirs=[NUMPY_INCLUDE]),

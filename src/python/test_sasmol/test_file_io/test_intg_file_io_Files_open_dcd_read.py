@@ -38,7 +38,7 @@ class Test_intg_file_io_Files_open_dcd_read(unittest.TestCase):
       #
       dcdFileName = DataPath+'1ATM.dcd'
       fp = self.o.open_dcd_read(dcdFileName)
-      self.assertEqual(str(type(fp[0])),"<class 'SwigPyObject'>")
+      self.assertEqual(str(type(fp[0])),"<class 'PyCapsule'>")
       self.assertEqual(fp[1],1)
       self.assertEqual(fp[2],2)
       self.assertEqual(fp[3],0)
@@ -51,7 +51,7 @@ class Test_intg_file_io_Files_open_dcd_read(unittest.TestCase):
       #
       dcdFileName = DataPath+'2AAD.dcd'
       fp = self.o.open_dcd_read(dcdFileName)
-      self.assertEqual(str(type(fp[0])),"<class 'SwigPyObject'>")
+      self.assertEqual(str(type(fp[0])),"<class 'PyCapsule'>")
       self.assertEqual(fp[1],15)
       self.assertEqual(fp[2],3)
       self.assertEqual(fp[3],0)
@@ -65,7 +65,7 @@ class Test_intg_file_io_Files_open_dcd_read(unittest.TestCase):
       #
       dcdFileName = DataPath+'rna-1to10.dcd'
       fp = self.o.open_dcd_read(dcdFileName)
-      self.assertEqual(str(type(fp[0])),"<class 'SwigPyObject'>")
+      self.assertEqual(str(type(fp[0])),"<class 'PyCapsule'>")
       self.assertEqual(fp[1],10632)
       self.assertEqual(fp[2],10)
       self.assertEqual(fp[3],0)
@@ -80,7 +80,7 @@ class Test_intg_file_io_Files_open_dcd_read(unittest.TestCase):
       #
       dcdFileName = '/tmp/rna-1.0g.dcd'
       fp = self.o.open_dcd_read(dcdFileName)
-      self.assertEqual(str(type(fp[0])),"<type 'SwigPyObject'>")
+      self.assertEqual(str(type(fp[0])),"<class 'PyCapsule'>")
       self.assertEqual(fp[1],10632)
       self.assertEqual(fp[2],7813)
       self.assertEqual(fp[3],0)
@@ -95,7 +95,7 @@ class Test_intg_file_io_Files_open_dcd_read(unittest.TestCase):
       #
       dcdFileName = '/tmp/rna-2.0g.dcd'
       fp = self.o.open_dcd_read(dcdFileName)
-      self.assertEqual(str(type(fp[0])),"<type 'SwigPyObject'>")
+      self.assertEqual(str(type(fp[0])),"<class 'PyCapsule'>")
       self.assertEqual(fp[1],10632)
       self.assertEqual(fp[2],15625)
       self.assertEqual(fp[3],0)
@@ -110,7 +110,7 @@ class Test_intg_file_io_Files_open_dcd_read(unittest.TestCase):
       #
       dcdFileName = '/tmp/rna-3.2g.dcd'
       fp = self.o.open_dcd_read(dcdFileName)
-      self.assertEqual(str(type(fp[0])),"<type 'SwigPyObject'>")
+      self.assertEqual(str(type(fp[0])),"<class 'PyCapsule'>")
       self.assertEqual(fp[1],10632)
       self.assertEqual(fp[2],25000)
       self.assertEqual(fp[3],0)
@@ -125,7 +125,7 @@ class Test_intg_file_io_Files_open_dcd_read(unittest.TestCase):
       #
       dcdFileName = '/tmp/rna-6.4g.dcd'
       fp = self.o.open_dcd_read(dcdFileName)
-      self.assertEqual(str(type(fp[0])),"<type 'SwigPyObject'>")
+      self.assertEqual(str(type(fp[0])),"<class 'PyCapsule'>")
       self.assertEqual(fp[1],10632)
       self.assertEqual(fp[2],50000)
       self.assertEqual(fp[3],0)

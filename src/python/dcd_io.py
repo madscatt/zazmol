@@ -68,7 +68,7 @@ class DCD(object):
         num_fixed=0
         result = 1
 
-        readheaderresult,nnatoms,nset,istart,nsavc,delta,namnf,reverseEndian,charmm=dcdio.read_dcdheader(filepointer)
+        readheaderresult,filepointer,nnatoms,nset,istart,nsavc,delta,namnf,reverseEndian,charmm=dcdio.read_dcdheader(filepointer)
         if(readheaderresult!=0):
             print('failed to read header')
             print('readheaderresult = ',readheaderresult)	
