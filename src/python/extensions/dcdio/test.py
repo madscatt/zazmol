@@ -1,6 +1,15 @@
-import dcdio_module as dcdio
+
+
 import sys
 import os
+
+# for local build testing:
+# python setup.py build_ext --inplace
+# Add the directory containing the locally built extension module to PYTHONPATH
+#sys.path.append(os.path.dirname(os.path.abspath(__file__)))
+
+import sasmol._dcdio as dcdio
+
 
 def main():
     # Redirect stderr to a file

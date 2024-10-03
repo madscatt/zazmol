@@ -5,8 +5,8 @@
     conditions; see http://www.gnu.org/licenses/gpl-3.0.html for details.
 '''
 import sasmol.system as system
-#from . import dcdio
-import dcdio
+#from . import dcdio_module as dcdio
+import dcdio_module as dcdio
 import sys
 import numpy
 import time

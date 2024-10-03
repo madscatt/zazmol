@@ -1,4 +1,15 @@
-import dcdio_module as dcdio
+import sys
+import os
+
+# for local build testing:  
+# python setup.py build_ext --inplace
+# Add the directory containing the locally built extension module to PYTHONPATH
+#sys.path.append(os.path.dirname(os.path.abspath(__file__)))
+#otherwise, comment out the line above this line
+
+import sasmol._dcdio as dcdio
+
+
 import numpy as np
 
 def main():
@@ -40,11 +51,7 @@ def main():
         # Read all 200 steps
         for step in range(nset):
             print('CALLING DCDIO.READ_DCDSTEP FOR STEP = ', step)
-            #result = dcdio.read_dcdstep(file_capsule, nnatoms, namnf, step, reverseEndian, charmm, x_array, y_array, z_array)
-            #result = dcdio.read_dcdstep(file_capsule, nnatoms, x_array, y_array, z_array, namnf,  reverseEndian, charmm)
-            #result = read_dcdstep(fp, natoms, (float*)PyArray_DATA(x_array), (float*)PyArray_DATA(y_array), (float*)PyArray_DATA(z_array), num_fixed, first, reverseEndian, charmm)
             result = dcdio.read_dcdstep(file_capsule, nnatoms, x_array, y_array, z_array, namnf, step, reverseEndian, charmm)
-
             if result != 0:
                 print(f"Failed to read DCD step {step}")
                 return

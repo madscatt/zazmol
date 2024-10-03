@@ -24,7 +24,8 @@ import sys
 import string
 import time
 import numpy
-import sasmol.dcdio as dcdio
+#import sasmol.dcdio as dcdio
+import sasmol._dcdio as dcdio
 
 #	DCD_IO
 #

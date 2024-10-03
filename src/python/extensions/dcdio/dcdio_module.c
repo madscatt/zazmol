@@ -166,9 +166,6 @@ static PyObject* py_read_dcdstep(PyObject *self, PyObject *args) {
     // Ensure the file is closed
 //    close_dcd_read(fp);
 
-
-
-
     // Return the result
     return Py_BuildValue("i", result);
 }
@@ -184,14 +181,14 @@ static PyMethodDef DCDIOModuleMethods[] = {
 // Module definition
 static struct PyModuleDef dcdio_module = {
     PyModuleDef_HEAD_INIT,
-    "dcdio_module",
+    "_dcdio",
     NULL,
     -1,
     DCDIOModuleMethods
 };
 
 // Module initialization function
-PyMODINIT_FUNC PyInit_dcdio_module(void) {
+PyMODINIT_FUNC PyInit__dcdio(void) {
     import_array();  // Initialize the NumPy API
     return PyModule_Create(&dcdio_module);
 }

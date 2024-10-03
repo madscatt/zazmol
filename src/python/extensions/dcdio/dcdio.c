@@ -248,19 +248,19 @@ int read_dcdheader(FILE * fd, int *N, int *NSET, int *ISTART,\
 
 
   // Add detailed debugging statements
-  fprintf(stderr, "Inside read_dcdheader\n");
-  fprintf(stderr, "File pointer: %p\n", fd);
-  fflush(stderr);
+  //fprintf(stderr, "Inside read_dcdheader\n");
+  //fprintf(stderr, "File pointer: %p\n", fd);
+  //fflush(stderr);
 
   // Check if the file pointer is valid
-  if (fd == NULL) {
-        fprintf(stderr, "Invalid file pointer\n");
-        fflush(stderr);
-        return DCD_BADFORMAT;
-  }else{
-        fprintf(stderr, "Valid file pointer\n");
-        fflush(stderr);
-  } 
+  //if (fd == NULL) {
+  //      fprintf(stderr, "Invalid file pointer\n");
+  //      fflush(stderr);
+  //      return DCD_BADFORMAT;
+  //}else{
+  //      fprintf(stderr, "Valid file pointer\n");
+  //      fflush(stderr);
+  //} 
 
   /*  First thing in the file should be an 84         */
   ret_val = READ(fd, &input_integer, sizeof(int));
@@ -280,8 +280,8 @@ int read_dcdheader(FILE * fd, int *N, int *NSET, int *ISTART,\
         fflush(stderr);
         return DCD_BADFORMAT;
   }
-  fprintf(stderr, "read_dcdheader: input_integer = %d\n", input_integer);
-  fflush(stderr);
+  //fprintf(stderr, "read_dcdheader: input_integer = %d\n", input_integer);
+  //fflush(stderr);
 
 
   /* Check magic number in file header and determine byte order*/
@@ -309,7 +309,7 @@ int read_dcdheader(FILE * fd, int *N, int *NSET, int *ISTART,\
 
     if (input_integer == 84) {
       *reverseEndian=1;
-      fprintf(stderr, "Reversed endian detected\n");
+      //fprintf(stderr, "Reversed endian detected\n");
       } else {
             fprintf(stderr, "Invalid magic number in file header: %d\n", input_integer);
             fflush(stderr);
@@ -499,7 +499,7 @@ int read_dcdstep(FILE * fd, int N, float *X, float *Y, float *Z, int num_fixed,
   int i;                /*  Loop counter              */
 
   if ( (num_fixed==0) || first) {
-    printf("\n\n>>> in first loop\n\n") ;
+    //printf("\n\n>>> in first loop\n\n") ;
     /* If this is a CHARMm file and contains an extra data block,
        we must skip it to avoid problems */
     if ((charmm & DCD_IS_CHARMM) &&
@@ -511,7 +511,7 @@ int read_dcdstep(FILE * fd, int N, float *X, float *Y, float *Z, int num_fixed,
         fseeko(fd, input_integer, SEEK_CUR);
         ret_val = READ(fd, &input_integer, sizeof(int));
         CHECK_FREAD(ret_val, "reading extra charmm block");
-        printf("zhl now %d\n",input_integer);
+        //printf("zhl now %d\n",input_integer);
    }
 
     /*  Get the first size from the file                          */
@@ -529,9 +529,9 @@ int read_dcdstep(FILE * fd, int N, float *X, float *Y, float *Z, int num_fixed,
       printf(">>> input_integer != 4*N (1)\n\n") ;
       return(DCD_BADFORMAT);
     }
-    printf(">>> ret_val = %d\n",ret_val) ;
+    //printf(">>> ret_val = %d\n",ret_val) ;
     ret_val = READ(fd, X, 4*N);
-    printf("ZHL %8.3f %8.3f %8.3f %8.3f %8.3f %8.3f\n",X[0],X[1],X[2],X[3],X[N-2],X[N-1]);
+    //printf("ZHL %8.3f %8.3f %8.3f %8.3f %8.3f %8.3f\n",X[0],X[1],X[2],X[3],X[N-2],X[N-1]);
     /*printf(">>> just before reading X array: ret_val = %d\n",ret_val) ;*/
     CHECK_FREAD(ret_val, "reading X array");
     CHECK_FEOF(ret_val, "reading X array");
@@ -541,7 +541,7 @@ int read_dcdstep(FILE * fd, int N, float *X, float *Y, float *Z, int num_fixed,
         //printf("X[i] = %f\n",X[i]) ;
       }
     }
-    printf(">>> just after reading X array: ret_val = %d\n",ret_val) ;
+    //printf(">>> just after reading X array: ret_val = %d\n",ret_val) ;
     ret_val = READ(fd, &input_integer, sizeof(int));
     CHECK_FREAD(ret_val, "reading number of atoms after X array");
     CHECK_FEOF(ret_val, "reading number of atoms after X array");
@@ -571,7 +571,7 @@ int read_dcdstep(FILE * fd, int N, float *X, float *Y, float *Z, int num_fixed,
     }
 
     ret_val = READ(fd, &input_integer, sizeof(int));
-    printf("ZHL Y: %8.3f %8.3f %8.3f %8.3f %8.3f %8.3f\n",Y[0],Y[1],Y[2],Y[3],Y[N-2],Y[N-1]);
+    //printf("ZHL Y: %8.3f %8.3f %8.3f %8.3f %8.3f %8.3f\n",Y[0],Y[1],Y[2],Y[3],Y[N-2],Y[N-1]);
     CHECK_FREAD(ret_val, "reading number of atoms after Y array");
     CHECK_FEOF(ret_val, "reading number of atoms after Y array");
     if (reverseEndian) input_integer= *reverseFourByteWord(&input_integer);
@@ -591,7 +591,7 @@ int read_dcdstep(FILE * fd, int N, float *X, float *Y, float *Z, int num_fixed,
       return(DCD_BADFORMAT);
     }
     ret_val = READ(fd, Z, 4*N);
-    printf("ZHL Z: %8.3f %8.3f %8.3f %8.3f %8.3f %8.3f\n",Z[0],Z[1],Z[2],Z[3],Z[N-2],Z[N-1]);
+    //printf("ZHL Z: %8.3f %8.3f %8.3f %8.3f %8.3f %8.3f\n",Z[0],Z[1],Z[2],Z[3],Z[N-2],Z[N-1]);
     CHECK_FREAD(ret_val, "reading Z array");
     CHECK_FEOF(ret_val, "reading Z array");
     if (reverseEndian) {
@@ -723,7 +723,7 @@ int read_dcdstep(FILE * fd, int N, float *X, float *Y, float *Z, int num_fixed,
         CHECK_FREAD(ret_val, "reading extra charmm block");
     }
   }
-  printf(" I got to the end, jeepers\n");
+  //printf(" I got to the end, jeepers\n");
   return(0);
 }
 
