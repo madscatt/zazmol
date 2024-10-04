@@ -109,13 +109,9 @@ class DCD(object):
         by calling a pre-compiled C module (dcdio).
         '''
 
-        #tx=self._coor[frame,:,0].astype(numpy.float32)	
-        #ty=self._coor[frame,:,1].astype(numpy.float32)	
-        #tz=self._coor[frame,:,2].astype(numpy.float32)	
-
-        tx=self._coor[frame,:,0].astype(float)	
-        ty=self._coor[frame,:,1].astype(float)	
-        tz=self._coor[frame,:,2].astype(float)	
+        tx=self._coor[frame,:,0].astype(numpy.float32)	
+        ty=self._coor[frame,:,1].astype(numpy.float32)	
+        tz=self._coor[frame,:,2].astype(numpy.float32)	
 
         stepresult=dcdio.write_dcdstep(filepointer,tx,ty,tz,step)
 
@@ -140,13 +136,9 @@ class DCD(object):
             print(".",)
             sys.stdout.flush()
 
-            #tx=self._coor[frame,:,0].astype(numpy.float32)	
-            #ty=self._coor[frame,:,1].astype(numpy.float32)	
-            #tz=self._coor[frame,:,2].astype(numpy.float32)	
-
-            tx=self._coor[frame,:,0].astype(float)	
-            ty=self._coor[frame,:,1].astype(float)	
-            tz=self._coor[frame,:,2].astype(float)	
+            tx=self._coor[frame,:,0].astype(numpy.float32)	
+            ty=self._coor[frame,:,1].astype(numpy.float32)	
+            tz=self._coor[frame,:,2].astype(numpy.float32)	
 
             stepresult=dcdio.write_dcdstep(outfile,tx,ty,tz,i+1)
             i += 1
@@ -191,13 +183,9 @@ class DCD(object):
             print(".",)
             sys.stdout.flush()
 
-            #tx=self._coor[frame,:,0].astype(numpy.float32)	
-            #ty=self._coor[frame,:,1].astype(numpy.float32)	
-            #tz=self._coor[frame,:,2].astype(numpy.float32)	
-
-            tx=self._coor[frame,:,0].astype(float)	
-            ty=self._coor[frame,:,1].astype(float)	
-            tz=self._coor[frame,:,2].astype(float)	
+            tx=self._coor[frame,:,0].astype(numpy.float32)	
+            ty=self._coor[frame,:,1].astype(numpy.float32)	
+            tz=self._coor[frame,:,2].astype(numpy.float32)	
 
             stepresult=dcdio.write_dcdstep(outfile,tx,ty,tz,frame+1)
 
@@ -226,8 +214,8 @@ class DCD(object):
 
         #print('done with read dcd header')
 
-        #coor=numpy.zeros((1,nnatoms,3),numpy.float)	
-        coor=numpy.zeros((1,nnatoms,3),float)	
+        coor=numpy.zeros((1,nnatoms,3),numpy.float32)	
+        #coor=numpy.zeros((1,nnatoms,3),float)	
 	
         tx=numpy.zeros(nnatoms,dtype=numpy.float32)
         ty=numpy.zeros(nnatoms,dtype=numpy.float32)
@@ -305,6 +293,7 @@ class DCD(object):
             print('.',)
             sys.stdout.flush()
             read_start_time=time.time()
+
             tx=numpy.zeros(nnatoms,dtype=numpy.float32)
             ty=numpy.zeros(nnatoms,dtype=numpy.float32)
             tz=numpy.zeros(nnatoms,dtype=numpy.float32)

@@ -21,7 +21,7 @@ from unittest import main, skipIf
 import unittest
 
 import sasmol.system as system
-import sasmol.dcdio as dcdio
+import sasmol._dcdio as dcdio
 
 import os, sys, string, shutil
 
@@ -43,7 +43,7 @@ class Test_intg_file_io_Files_open_dcd_write(unittest.TestCase):
       dcdFile = moduleDataPath+'test-results/'+filename
       self.o.read_pdb(pdbFile)
       fp = self.o.open_dcd_write(dcdFile)
-      self.assertEqual(str(type(fp)),"<class 'SwigPyObject'>")
+      self.assertEqual(str(type(fp)),"<class 'PyCapsule'>")
       os.remove(dcdFile)
 
 
@@ -59,7 +59,7 @@ class Test_intg_file_io_Files_open_dcd_write(unittest.TestCase):
       shutil.copy(dcdFile, tmpDcdFile)
       self.o.read_pdb(pdbFile)
       fp = self.o.open_dcd_write(tmpDcdFile)
-      self.assertEqual(str(type(fp)),"<class 'SwigPyObject'>")
+      self.assertEqual(str(type(fp)),"<class 'PyCapsule'>")
       os.remove(tmpDcdFile)
 
 
@@ -76,7 +76,7 @@ class Test_intg_file_io_Files_open_dcd_write(unittest.TestCase):
       shutil.copy(dcdFile, tmpDcdFile)
       self.o.read_pdb(pdbFile)
       fp = self.o.open_dcd_write(tmpDcdFile)
-      self.assertEqual(str(type(fp)),"<class 'SwigPyObject'>")
+      self.assertEqual(str(type(fp)),"<class 'PyCapsule'>")
       os.remove(tmpDcdFile)
 
 
@@ -93,7 +93,7 @@ class Test_intg_file_io_Files_open_dcd_write(unittest.TestCase):
       shutil.copy(dcdFile, tmpDcdFile)
       self.o.read_pdb(pdbFile)
       fp = self.o.open_dcd_write(tmpDcdFile)
-      self.assertEqual(str(type(fp)),"<class 'SwigPyObject'>")
+      self.assertEqual(str(type(fp)),"<class 'PyCapsule'>")
       os.remove(tmpDcdFile)
 
 
@@ -110,7 +110,7 @@ class Test_intg_file_io_Files_open_dcd_write(unittest.TestCase):
       shutil.copy(dcdFile, tmpDcdFile)
       self.o.read_pdb(pdbFile)
       fp = self.o.open_dcd_write(tmpDcdFile)
-      self.assertEqual(str(type(fp)),"<class 'SwigPyObject'>")
+      self.assertEqual(str(type(fp)),"<class 'PyCapsule'>")
       os.remove(tmpDcdFile)
 
 
@@ -127,7 +127,7 @@ class Test_intg_file_io_Files_open_dcd_write(unittest.TestCase):
       shutil.copy(dcdFile, tmpDcdFile)
       self.o.read_pdb(pdbFile)
       fp = self.o.open_dcd_write(tmpDcdFile)
-      self.assertEqual(str(type(fp)),"<class 'SwigPyObject'>")
+      self.assertEqual(str(type(fp)),"<class 'PyCapsule'>")
       os.remove(tmpDcdFile)
 
 
@@ -145,7 +145,7 @@ class Test_intg_file_io_Files_open_dcd_write(unittest.TestCase):
       shutil.copy(dcdFile, tmpDcdFile)
       self.o.read_pdb(pdbFile)
       fp = self.o.open_dcd_write(tmpDcdFile)
-      self.assertEqual(str(type(fp)),"<class 'SwigPyObject'>")
+      self.assertEqual(str(type(fp)),"<class 'PyCapsule'>")
       os.remove(tmpDcdFile)
 
 
@@ -163,7 +163,7 @@ class Test_intg_file_io_Files_open_dcd_write(unittest.TestCase):
       shutil.copy(dcdFile, tmpDcdFile)
       self.o.read_pdb(pdbFile)
       fp = self.o.open_dcd_write(tmpDcdFile)
-      self.assertEqual(str(type(fp)),"<class 'SwigPyObject'>")
+      self.assertEqual(str(type(fp)),"<class 'PyCapsule'>")
       os.remove(tmpDcdFile)
    
    @skipIf(os.environ['SASMOL_HUGETEST']=='n',"I am not testing huge files")   
@@ -179,7 +179,7 @@ class Test_intg_file_io_Files_open_dcd_write(unittest.TestCase):
       shutil.copy(dcdFile, tmpDcdFile)
       self.o.read_pdb(pdbFile)
       fp = self.o.open_dcd_write(tmpDcdFile)
-      self.assertEqual(str(type(fp)),"<class 'SwigPyObject'>")
+      self.assertEqual(str(type(fp)),"<class 'PyCapsule'>")
       os.remove(tmpDcdFile)
 
    def tearDown(self):

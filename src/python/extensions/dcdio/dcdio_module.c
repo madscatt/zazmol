@@ -152,6 +152,73 @@ static PyObject* py_close_dcd_read(PyObject* self, PyObject* args) {
     return PyLong_FromLong(result);
 }
 
+// Function to open a DCD file for writing and return a capsule containing the file pointer
+static PyObject* py_open_dcd_write(PyObject* self, PyObject* args) {
+    const char* filename;
+    if (!PyArg_ParseTuple(args, "s", &filename)) {
+        return NULL;
+    }
+
+    FILE* fd = fopen(filename, "wb");
+    if (!fd) {
+        PyErr_SetString(PyExc_IOError, "Failed to open file");
+        return NULL;
+    }
+
+    return PyCapsule_New(fd, "dcdio_module.FILE", NULL);
+}
+
+// Function to write DCD header
+static PyObject* py_write_dcdheader(PyObject* self, PyObject* args) {
+    PyObject* py_fd;
+    const char* filename;
+    int N, NSET, ISTART, NSAVC;
+    double DELTA;
+
+    // Parse the input tuple
+    if (!PyArg_ParseTuple(args, "Osiiiid", &py_fd, &filename, &N, &NSET, &ISTART, &NSAVC, &DELTA)) {
+        fprintf(stderr, "Failed to parse arguments\n");
+        fflush(stderr);
+        return NULL;
+    }
+
+    FILE* fd = (FILE*)PyCapsule_GetPointer(py_fd, "dcdio_module.FILE");
+    if (!fd) {
+        PyErr_SetString(PyExc_ValueError, "Invalid file pointer");
+#ifdef DEBUG
+        fprintf(stderr, "Invalid file pointer\n");
+        fflush(stderr);
+#endif       
+        return NULL;
+    }
+
+    // Print debugging information before calling write_dcdheader
+#ifdef DEBUG
+    fprintf(stderr, "Calling write_dcdheader with file pointer: %p\n", fd);
+    fflush(stderr);
+#endif
+
+    // Call the actual write_dcdheader function
+    int result = write_dcdheader(fd, (char*)filename, N, NSET, ISTART, NSAVC, DELTA);
+    if (result != 1) {
+        PyErr_SetString(PyExc_RuntimeError, "Failed to write DCD header");
+#ifdef DEBUG
+        fprintf(stderr, "write_dcdheader failed with result: %d\n", result);
+        fflush(stderr);
+#endif
+        return NULL;
+    }
+
+    // Print debugging information to stderr
+#ifdef DEBUG
+    fprintf(stderr, "write_dcdheader result: %d\n", result);
+    fflush(stderr);  // Flush the output buffer
+#endif
+
+    // Return the result
+    Py_RETURN_NONE;
+}
+
 
 // Module method definitions
 static PyMethodDef DCDIOModuleMethods[] = {
@@ -159,6 +226,8 @@ static PyMethodDef DCDIOModuleMethods[] = {
     {"read_dcdheader", py_read_dcdheader, METH_VARARGS, "Read the header of a DCD file"},
     {"read_dcdstep", py_read_dcdstep, METH_VARARGS, "Read a step from a DCD file"},
     {"close_dcd_read", py_close_dcd_read, METH_VARARGS, "Close a DCD file"},
+    {"open_dcd_write", py_open_dcd_write, METH_VARARGS, "Open a DCD file for reading"},
+    {"write_dcdheader", py_write_dcdheader, METH_VARARGS, "Write DCD header"},
     {NULL, NULL, 0, NULL}
 };
 
