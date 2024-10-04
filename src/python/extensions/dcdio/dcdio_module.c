@@ -219,6 +219,64 @@ static PyObject* py_write_dcdheader(PyObject* self, PyObject* args) {
     Py_RETURN_NONE;
 }
 
+static PyObject* py_write_dcdstep(PyObject* self, PyObject* args) {
+    PyObject *py_fd, *x_array, *y_array, *z_array;
+    int natoms, curframe;
+
+    // Parse the input tuple
+    if (!PyArg_ParseTuple(args, "OiOOOi", &py_fd, &natoms, &x_array, &y_array, &z_array, &curframe)) {
+        return NULL;
+    }
+
+    // Extract the file pointer from the capsule
+    FILE* fp = (FILE*) PyCapsule_GetPointer(py_fd, "dcdio_module.FILE");
+    if (fp == NULL) {
+        PyErr_SetString(PyExc_ValueError, "PyCapsule_GetPointer called with incorrect name");
+        return NULL;
+    }
+
+    // Check if the arrays are NULL
+    if (x_array == NULL || y_array == NULL || z_array == NULL) {
+        Py_XDECREF(x_array);
+        Py_XDECREF(y_array);
+        Py_XDECREF(z_array);
+        return NULL;
+    }
+
+    // Get pointers to the data as C-types
+    float *x = (float*) PyArray_DATA((PyArrayObject*) x_array);
+    float *y = (float*) PyArray_DATA((PyArrayObject*) y_array);
+    float *z = (float*) PyArray_DATA((PyArrayObject*) z_array);
+
+    // Call the existing write_dcdstep function
+    int result = write_dcdstep(fp, natoms, x, y, z, curframe);
+
+    if (result != 1) {  
+        PyErr_SetString(PyExc_RuntimeError, "Failed to write DCD step");
+        return NULL;
+    }
+
+    Py_RETURN_NONE;
+}
+
+// Wrapper function for close_dcd_read
+static PyObject* py_close_dcd_write(PyObject* self, PyObject* args) {
+    PyObject* py_fp;
+    if (!PyArg_ParseTuple(args, "O", &py_fp)) {
+        return NULL;
+    }
+
+    FILE* fp = (FILE*) PyCapsule_GetPointer(py_fp, "dcdio_module.FILE");
+    if (fp == NULL) {
+        PyErr_SetString(PyExc_ValueError, "Invalid file pointer");
+        return NULL;
+    }
+
+    int result = close_dcd_write(fp);
+    return PyLong_FromLong(result);
+}
+
+
 
 // Module method definitions
 static PyMethodDef DCDIOModuleMethods[] = {
@@ -228,6 +286,8 @@ static PyMethodDef DCDIOModuleMethods[] = {
     {"close_dcd_read", py_close_dcd_read, METH_VARARGS, "Close a DCD file"},
     {"open_dcd_write", py_open_dcd_write, METH_VARARGS, "Open a DCD file for reading"},
     {"write_dcdheader", py_write_dcdheader, METH_VARARGS, "Write DCD header"},
+    {"write_dcdstep", py_write_dcdstep, METH_VARARGS, "Write a DCD step"},
+    {"close_dcd_write", py_close_dcd_write, METH_VARARGS, "Close a DCD file"},
     {NULL, NULL, 0, NULL}
 };
 

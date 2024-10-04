@@ -20,10 +20,8 @@ from sasmol.test_sasmol.utilities import env
 from unittest import main, skipIf
 import unittest
 
-
-
 import sasmol.system as system
-import sasmol.dcdio as dcdio
+import sasmol._dcdio as dcdio
 
 import warnings
 

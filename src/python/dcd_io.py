@@ -109,11 +109,13 @@ class DCD(object):
         by calling a pre-compiled C module (dcdio).
         '''
 
+        natoms = self._coor[0,:,0].shape[0]
+
         tx=self._coor[frame,:,0].astype(numpy.float32)	
         ty=self._coor[frame,:,1].astype(numpy.float32)	
         tz=self._coor[frame,:,2].astype(numpy.float32)	
 
-        stepresult=dcdio.write_dcdstep(filepointer,tx,ty,tz,step)
+        stepresult=dcdio.write_dcdstep(filepointer,natoms,tx,ty,tz,step)
 
         return
 
@@ -140,7 +142,7 @@ class DCD(object):
             ty=self._coor[frame,:,1].astype(numpy.float32)	
             tz=self._coor[frame,:,2].astype(numpy.float32)	
 
-            stepresult=dcdio.write_dcdstep(outfile,tx,ty,tz,i+1)
+            stepresult=dcdio.write_dcdstep(outfile,natoms,tx,ty,tz,i+1)
             i += 1
 
         result = dcdio.close_dcd_write(outfile)
@@ -187,7 +189,7 @@ class DCD(object):
             ty=self._coor[frame,:,1].astype(numpy.float32)	
             tz=self._coor[frame,:,2].astype(numpy.float32)	
 
-            stepresult=dcdio.write_dcdstep(outfile,tx,ty,tz,frame+1)
+            stepresult=dcdio.write_dcdstep(outfile,natoms,tx,ty,tz,frame+1)
 
         result = dcdio.close_dcd_write(outfile)
 
