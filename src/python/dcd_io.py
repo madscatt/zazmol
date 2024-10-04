@@ -294,7 +294,7 @@ class DCD(object):
         nnatoms=0 ; nset=0 ; istart=0 ; nsavc=0 ; delta=0.0
         namnf=0 ; freeindexes=[] ; reverseEndian=0 ; charmm=0
 
-        readheaderresult,nnatoms,nset,istart,nsavc,delta,namnf,reverseEndian,charmm=dcdio.read_dcdheader(infile)
+        readheaderresult,filepointer,nnatoms,nset,istart,nsavc,delta,namnf,reverseEndian,charmm=dcdio.read_dcdheader(infile)
         coor=numpy.zeros((nset,nnatoms,3),float)	
 	
         num_fixed=0 
@@ -309,7 +309,7 @@ class DCD(object):
             ty=numpy.zeros(nnatoms,dtype=numpy.float32)
             tz=numpy.zeros(nnatoms,dtype=numpy.float32)
 		
-            result=dcdio.read_dcdstep(infile,tx,ty,tz,num_fixed,i,reverseEndian,charmm)
+            result=dcdio.read_dcdstep(infile,nnatoms,tx,ty,tz,num_fixed,i,reverseEndian,charmm)
             read_end_time=time.time()
 	
             sum+=read_end_time-read_start_time

@@ -2,7 +2,7 @@ import os
 
 import numpy as np
 import sasmol.system as system
-import sasmol.dcdio as dcdio
+import sasmol._dcdio as dcdio
 
 def generate(fin='rna.pdb', fout='rna.dcd', frames=1000):
   path = os.path.dirname(os.path.realpath(__file__))
