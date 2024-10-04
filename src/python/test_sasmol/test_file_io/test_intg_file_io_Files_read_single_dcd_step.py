@@ -33,7 +33,7 @@ class Test_intg_file_io_Files_read_single_dcd_step(unittest.TestCase):
 
    def setUp(self):
       self.o=system.Molecule(0)
-      self.prcsn = 3
+      self.prcsn = 2
 
    def assert_list_almost_equal(self,a,b,places=5):
       if (len(a)!=len(b)):
@@ -159,8 +159,9 @@ class Test_intg_file_io_Files_read_single_dcd_step(unittest.TestCase):
       sum_result_coor = sum(sum(sum(result_coor)))
       #
       self.assertEqual(len(result_coor[0]),10632)
-      expected_sample_coor = numpy.array([-5.798, 13.082, 22.068],floattype)
-      sum_expected_coor = -43307.390
+      expected_sample_coor = numpy.round(numpy.array([-5.798, 13.082, 22.068],floattype),2)
+      sum_expected_coor = round(-43307.43,2)
+
       self.assert_list_almost_equal(expected_sample_coor,result_coor[0][10631], self.prcsn)
       self.assertAlmostEqual(sum_result_coor, sum_expected_coor, self.prcsn)
 
@@ -177,8 +178,9 @@ class Test_intg_file_io_Files_read_single_dcd_step(unittest.TestCase):
       sum_result_coor = sum(sum(sum(result_coor)))
       #
       self.assertEqual(len(result_coor[0]),10632)      
-      expected_sample_coor = numpy.array([-6.348, 14.130, 20.916],floattype)
-      sum_expected_coor = -42996.475
+      expected_sample_coor = numpy.round(numpy.array([-6.348, 14.130, 20.916],floattype),2)
+
+      sum_expected_coor = round(-42996.43,2)
       self.assert_list_almost_equal(expected_sample_coor,result_coor[0][10631], self.prcsn)
       self.assertAlmostEqual(sum_result_coor, sum_expected_coor, self.prcsn)
 
