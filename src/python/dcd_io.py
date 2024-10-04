@@ -219,7 +219,7 @@ class DCD(object):
         result = 1
 
         #print('calling read dcd header')
-        readheaderresult,nnatoms,nset,istart,nsavc,delta,namnf,reverseEndian,charmm=dcdio.read_dcdheader(infile)
+        readheaderresult,filepointer,nnatoms,nset,istart,nsavc,delta,namnf,reverseEndian,charmm=dcdio.read_dcdheader(infile)
         if(readheaderresult!=0):
             print('failed to read header')
             print('readheaderresult = ',readheaderresult)	
@@ -229,19 +229,14 @@ class DCD(object):
         #coor=numpy.zeros((1,nnatoms,3),numpy.float)	
         coor=numpy.zeros((1,nnatoms,3),float)	
 	
-        #tx=numpy.zeros(nnatoms,dtype=numpy.float32)
-        #ty=numpy.zeros(nnatoms,dtype=numpy.float32)
-        #tz=numpy.zeros(nnatoms,dtype=numpy.float32)
-
-        tx=numpy.zeros(nnatoms,dtype=float)
-        ty=numpy.zeros(nnatoms,dtype=float)
-        tz=numpy.zeros(nnatoms,dtype=float)
-
+        tx=numpy.zeros(nnatoms,dtype=numpy.float32)
+        ty=numpy.zeros(nnatoms,dtype=numpy.float32)
+        tz=numpy.zeros(nnatoms,dtype=numpy.float32)
 
         first = 1  # since num_fixed = 0 ; the "first" variable is inconsequential
 		
         for i in range(frame):	
-            result=dcdio.read_dcdstep(infile,tx,ty,tz,num_fixed,first,reverseEndian,charmm)
+            result=dcdio.read_dcdstep(infile,nnatoms,tx,ty,tz,num_fixed,first,reverseEndian,charmm)
 
 
         #print('result = ',result)
@@ -269,15 +264,11 @@ class DCD(object):
         reverseEndian = dcdfile[3]
         charmm = dcdfile[4]
 
-        #tx=numpy.zeros(nnatoms,dtype=numpy.float32)
-        #ty=numpy.zeros(nnatoms,dtype=numpy.float32)
-        #tz=numpy.zeros(nnatoms,dtype=numpy.float32)
+        tx=numpy.zeros(nnatoms,dtype=numpy.float32)
+        ty=numpy.zeros(nnatoms,dtype=numpy.float32)
+        tz=numpy.zeros(nnatoms,dtype=numpy.float32)
 
-        tx=numpy.zeros(nnatoms,dtype=float)
-        ty=numpy.zeros(nnatoms,dtype=float)
-        tz=numpy.zeros(nnatoms,dtype=float)
-
-        result=dcdio.read_dcdstep(filepointer,tx,ty,tz,num_fixed,frame,reverseEndian,charmm)
+        result=dcdio.read_dcdstep(filepointer,nnatoms,tx,ty,tz,num_fixed,frame,reverseEndian,charmm)
 
         #self._coor[0,:,0]=tx.astype(numpy.float) ; self._coor[0,:,1]=ty.astype(numpy.float) ; self._coor[0,:,2]=tz.astype(numpy.float)
         self._coor[0,:,0]=tx.astype(float) ; self._coor[0,:,1]=ty.astype(float) ; self._coor[0,:,2]=tz.astype(float)
@@ -314,14 +305,10 @@ class DCD(object):
             print('.',)
             sys.stdout.flush()
             read_start_time=time.time()
-            #tx=numpy.zeros(nnatoms,dtype=numpy.float32)
-            #ty=numpy.zeros(nnatoms,dtype=numpy.float32)
-            #tz=numpy.zeros(nnatoms,dtype=numpy.float32)
+            tx=numpy.zeros(nnatoms,dtype=numpy.float32)
+            ty=numpy.zeros(nnatoms,dtype=numpy.float32)
+            tz=numpy.zeros(nnatoms,dtype=numpy.float32)
 		
-            tx=numpy.zeros(nnatoms,dtype=float)
-            ty=numpy.zeros(nnatoms,dtype=float)
-            tz=numpy.zeros(nnatoms,dtype=float)
-
             result=dcdio.read_dcdstep(infile,tx,ty,tz,num_fixed,i,reverseEndian,charmm)
             read_end_time=time.time()
 	
