@@ -62,14 +62,14 @@ class Test_intg_file_io_Files_initialize_children(unittest.TestCase):
       #
       self.o.read_pdb(DataPath+'1ATM.pdb')
       self.o.initialize_children()
-      self.assert_list_almost_equal(self.o.names_mask(), numpy.array([[1]],numpy.int),3)
-      self.assert_list_almost_equal(self.o.resnames_mask(), numpy.array([[1]],numpy.int),3)
-      self.assert_list_almost_equal(self.o.resids_mask(), numpy.array([[1]],numpy.int),3)
-      self.assert_list_almost_equal(self.o.chains_mask(), numpy.array([[1]],numpy.int),3)
-      self.assert_list_almost_equal(self.o.occupancies_mask(), numpy.array([[1]],numpy.int),3)
-      self.assert_list_almost_equal(self.o.betas_mask(), numpy.array([[1]],numpy.int),3)
-      self.assert_list_almost_equal(self.o.elements_mask(), numpy.array([[1]],numpy.int),3)
-      self.assert_list_almost_equal(self.o.segnames_mask(), numpy.array([[1]],numpy.int),3)
+      self.assert_list_almost_equal(self.o.names_mask(), numpy.array([[1]], dtype=numpy.int_),3)
+      self.assert_list_almost_equal(self.o.resnames_mask(), numpy.array([[1]], dtype=numpy.int_),3)
+      self.assert_list_almost_equal(self.o.resids_mask(), numpy.array([[1]], dtype=numpy.int_),3)
+      self.assert_list_almost_equal(self.o.chains_mask(), numpy.array([[1]], dtype=numpy.int_),3)
+      self.assert_list_almost_equal(self.o.occupancies_mask(), numpy.array([[1]], dtype=numpy.int_),3)
+      self.assert_list_almost_equal(self.o.betas_mask(), numpy.array([[1]], dtype=numpy.int_),3)
+      self.assert_list_almost_equal(self.o.elements_mask(), numpy.array([[1]], dtype=numpy.int_),3)
+      self.assert_list_almost_equal(self.o.segnames_mask(), numpy.array([[1]], dtype=numpy.int_),3)
 
    def test_2AAD_names(self):
       '''
@@ -81,7 +81,7 @@ class Test_intg_file_io_Files_initialize_children(unittest.TestCase):
       result_names_mask = self.o.names_mask()
       #print('\nresult_names_mask \n',result_names_mask.tolist())
       #
-      expected_names_mask = numpy.array([[1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0], [0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0], [0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0], [0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0], [0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0], [0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1], [0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0]],numpy.int)
+      expected_names_mask = numpy.array([[1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0], [0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0], [0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0], [0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0], [0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0], [0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1], [0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0]], dtype=numpy.int_)
 
       #print('\nexpected_names_mask \n',expected_names_mask)
       #
@@ -97,7 +97,7 @@ class Test_intg_file_io_Files_initialize_children(unittest.TestCase):
       result_mask = self.o.resnames_mask()
       #print('\nresult_names_mask \n',result_mask.tolist())
       #
-      expected_mask = numpy.array([[1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1]],numpy.int)
+      expected_mask = numpy.array([[1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1]], dtype=numpy.int_)
 
       #print('\nexpected_mask \n',expected_mask)
       #
@@ -113,7 +113,7 @@ class Test_intg_file_io_Files_initialize_children(unittest.TestCase):
       result_mask = self.o.resids_mask()
       #print('\nresult_names_mask \n',result_mask.tolist())
       #
-      expected_mask = numpy.array([[1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1]],numpy.int)
+      expected_mask = numpy.array([[1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1]], dtype=numpy.int_)
 
       #print('\nexpected_mask \n',expected_mask)
       #
@@ -129,7 +129,7 @@ class Test_intg_file_io_Files_initialize_children(unittest.TestCase):
       result_mask = self.o.chains_mask()
       #print('\nresult_names_mask \n',result_mask.tolist())
       #
-      expected_mask = numpy.array([[1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]],numpy.int)
+      expected_mask = numpy.array([[1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]], dtype=numpy.int_)
       #print('\nexpected_mask \n',expected_mask)
       #
       self.assert_list_almost_equal(expected_mask, result_mask,3)
@@ -144,7 +144,7 @@ class Test_intg_file_io_Files_initialize_children(unittest.TestCase):
       result_mask = self.o.occupancies_mask()
       #print('\nresult_names_mask \n',result_mask.tolist())
       #
-      expected_mask = numpy.array([[1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]],numpy.int)
+      expected_mask = numpy.array([[1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]], dtype=numpy.int_)
       #print('\nexpected_mask \n',expected_mask)
       #
       self.assert_list_almost_equal(expected_mask, result_mask,3)
@@ -158,7 +158,7 @@ class Test_intg_file_io_Files_initialize_children(unittest.TestCase):
       self.o.initialize_children()
       result_mask = self.o.betas_mask()
       #print('\nresult_names_mask \n',result_mask.tolist()) 
-      expected_mask = numpy.array([[1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1]],numpy.int)
+      expected_mask = numpy.array([[1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1]], dtype=numpy.int_)
       #print('\nexpected_mask \n',expected_mask)
       #
       self.assert_list_almost_equal(expected_mask, result_mask,3)
@@ -173,7 +173,7 @@ class Test_intg_file_io_Files_initialize_children(unittest.TestCase):
       result_mask = self.o.elements_mask()
       #print('\nresult_elements_mask \n',result_mask.tolist())
       #
-      expected_mask = numpy.array([[1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0], [0, 1, 1, 0, 1, 1, 1, 1, 0, 1, 1, 0, 1, 0, 1], [0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0]],numpy.int)
+      expected_mask = numpy.array([[1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0], [0, 1, 1, 0, 1, 1, 1, 1, 0, 1, 1, 0, 1, 0, 1], [0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0]], dtype=numpy.int_)
       #print('\nexpected_mask \n',expected_mask)
       #
       self.assert_list_almost_equal(expected_mask, result_mask,3)
@@ -188,7 +188,7 @@ class Test_intg_file_io_Files_initialize_children(unittest.TestCase):
       result_mask = self.o.segnames_mask()
       #print('\nresult_segnames_mask \n',result_mask.tolist())
       #
-      expected_mask = numpy.array([[1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]],numpy.int)
+      expected_mask = numpy.array([[1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]], dtype=numpy.int_)
       #print('\nexpected_mask \n',expected_mask)
       #
       self.assert_list_almost_equal(expected_mask, result_mask,3)
