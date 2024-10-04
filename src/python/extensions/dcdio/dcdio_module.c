@@ -1,3 +1,4 @@
+#define NPY_NO_DEPRECATED_API NPY_1_7_API_VERSION
 #include <Python.h>
 #include <numpy/arrayobject.h>
 #include "dcdio.h"  
@@ -5,7 +6,6 @@
 
 // Uncomment the following line to enable debugging
 // #define DEBUG
-
 
 // Function to open a DCD file for reading and return a capsule containing the file pointer
 static PyObject* py_open_dcd_read(PyObject* self, PyObject* args) {
@@ -93,17 +93,16 @@ static PyObject* py_read_dcdstep(PyObject *self, PyObject *args) {
 
     // Ensure the file pointer is a PyCapsule and extract the FILE* pointer
     FILE* fp = (FILE*) PyCapsule_GetPointer(py_fp, "dcdio_module.FILE");
+    #ifdef DEBUG
     if (!fp) {
         PyErr_SetString(PyExc_ValueError, "Invalid file pointer");
         return NULL;
     }
-
         // Ensure the arrays are contiguous
     if (!PyArray_ISCONTIGUOUS(x_array) || !PyArray_ISCONTIGUOUS(y_array) || !PyArray_ISCONTIGUOUS(z_array)) {
         PyErr_SetString(PyExc_ValueError, "Arrays must be contiguous");
         return NULL;
     }
-
 
     // Check if the arrays are NULL
     if (x_array == NULL || y_array == NULL || z_array == NULL) {
@@ -112,69 +111,54 @@ static PyObject* py_read_dcdstep(PyObject *self, PyObject *args) {
         Py_XDECREF(z_array);
         return NULL;
     }
+    #endif
 
+    // Get pointers to the data as C-types
     float *x = (float*) PyArray_DATA((PyArrayObject*) x_array);
     float *y = (float*) PyArray_DATA((PyArrayObject*) y_array);
-    float *z = (float*) PyArray_DATA((PyArrayObject*) z_array);// Get pointers to the data as C-types
-
-    // Print addresses and values before the call
-    printf("Before read_dcdstep:\n");
-    printf("x address: %p, y address: %p, z address: %p\n", x, y, z);
-    printf("x[0]: %f, y[0]: %f, z[0]: %f\n", x[0], y[0], z[0]);
-    printf("x[1]: %f, y[1]: %f, z[1]: %f\n", x[1], y[1], z[1]);
-    printf("x[2]: %f, y[2]: %f, z[2]: %f\n", x[2], y[2], z[2]);
+    float *z = (float*) PyArray_DATA((PyArrayObject*) z_array);
 
     // Call the existing read_dcdstep function
     int result = read_dcdstep(fp, natoms, x, y, z, num_fixed, first, reverseEndian, charmm);
-
-    // Print addresses and values after the call
-    printf("After read_dcdstep:\n");
-    printf("x address: %p, y address: %p, z address: %p\n", x, y, z);
-    printf("x[0]: %f, y[0]: %f, z[0]: %f\n", x[0], y[0], z[0]);
-    printf("x[1]: %f, y[1]: %f, z[1]: %f\n", x[1], y[1], z[1]);
-    printf("x[2]: %f, y[2]: %f, z[2]: %f\n", x[2], y[2], z[2]);
 
     if (result != 0) {  
         PyErr_SetString(PyExc_RuntimeError, "Failed to read DCD step");
         return NULL;
     }
 
-
-    // Additional debugging: Print the last element to ensure the entire array is accessible
-    printf("x[natoms-1]: %f, y[natoms-1]: %f, z[natoms-1]: %f\n", x[natoms-1], y[natoms-1], z[natoms-1]);
-
-    // Print the result to the screen
-    printf("Result of calling read_dcdstep: %d\n", result);
-    fflush(stdout);  // Flush the output buffer
-
     // Clean up
     //Py_DECREF(x_array);
     //Py_DECREF(y_array);
     //Py_DECREF(z_array);
 
-// TEMPORARY
-
-    if (result != 0) {
-        printf("Error in read_dcdstep\n");
-        close_dcd_read(fp);
-        //return;
-    }
-
-    // Continue with other operations
-    printf("Continuing after read_dcdstep\n");
-
-    // Ensure the file is closed
-//    close_dcd_read(fp);
-
     // Return the result
     return Py_BuildValue("i", result);
 }
+
+// Wrapper function for close_dcd_read
+static PyObject* py_close_dcd_read(PyObject* self, PyObject* args) {
+    PyObject* py_fp;
+    if (!PyArg_ParseTuple(args, "O", &py_fp)) {
+        return NULL;
+    }
+
+    FILE* fp = (FILE*) PyCapsule_GetPointer(py_fp, "dcdio_module.FILE");
+    if (fp == NULL) {
+        PyErr_SetString(PyExc_ValueError, "Invalid file pointer");
+        return NULL;
+    }
+
+    int result = close_dcd_read(fp);
+    return PyLong_FromLong(result);
+}
+
 
 // Module method definitions
 static PyMethodDef DCDIOModuleMethods[] = {
     {"open_dcd_read", py_open_dcd_read, METH_VARARGS, "Open a DCD file for reading"},
     {"read_dcdheader", py_read_dcdheader, METH_VARARGS, "Read the header of a DCD file"},
     {"read_dcdstep", py_read_dcdstep, METH_VARARGS, "Read a step from a DCD file"},
+    {"close_dcd_read", py_close_dcd_read, METH_VARARGS, "Close a DCD file"},
     {NULL, NULL, 0, NULL}
 };
 

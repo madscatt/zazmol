@@ -23,7 +23,7 @@ import unittest
 import warnings
 
 import sasmol.system as system
-import sasmol.dcdio as dcdio
+import sasmol._dcdio as dcdio
 
 import os
 import sys
