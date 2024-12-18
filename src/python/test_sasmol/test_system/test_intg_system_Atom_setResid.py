@@ -39,7 +39,7 @@ class Test_intg_system_Atom_setResid(unittest.TestCase):
 	   '''
       #
       expected = list(range(1,328))
-      expected = numpy.array(expected, numpy.int)
+      expected = numpy.array(expected, numpy.int32)
       #
       self.o.setResid(expected)
       #
