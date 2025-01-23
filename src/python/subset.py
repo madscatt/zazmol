@@ -830,7 +830,8 @@ class Mask(object):
 
         this_frame_coor = self._coor[frame, :, :]
 
-        coor = numpy.zeros((1, len(indicies), 3), float)
+        #coor = numpy.zeros((1, len(indicies), 3), float)
+        coor = numpy.zeros((1, len(indicies), 3), numpy.float32)
 
         try:
             coor[0] = numpy.take(this_frame_coor[:, :], indicies, 0)
