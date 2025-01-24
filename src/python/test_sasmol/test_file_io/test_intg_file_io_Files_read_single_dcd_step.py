@@ -66,7 +66,6 @@ class Test_intg_file_io_Files_read_single_dcd_step(unittest.TestCase):
       self.assert_list_almost_equal(expected_coor, result_coor, self.prcsn)
       self.assertAlmostEqual(sum_expected_coor, sum_result_coor, self.prcsn)
 
-
    def test_1ATM_frame2(self):
       '''
 	   test a dcd with 2 frames based on a 1-atom pdb for the second frame

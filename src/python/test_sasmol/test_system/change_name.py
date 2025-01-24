@@ -8,7 +8,7 @@ new_name = '_Atom'
 for name in glob.glob(os.path.join('test*.py')):
 
     first = True    
-    this_string = string.split(name,'_')
+    this_string = name.split('_')
     st = ''
 #    print 'this_string = ',this_string
     for word in this_string:

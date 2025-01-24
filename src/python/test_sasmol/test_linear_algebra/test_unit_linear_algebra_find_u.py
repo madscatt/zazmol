@@ -146,7 +146,7 @@ class Test_linear_algebra(unittest.TestCase):
         coor_sub_m2 = m2.coor()[0]
 
         u = linear_algebra.find_u(coor_sub_m1, coor_sub_m2)
-        result = numpy.array((numpy.matrix(u)*(numpy.matrix(coor_sub_m2).T)).T, numpy.float)
+        result = numpy.array((numpy.matrix(u)*(numpy.matrix(coor_sub_m2).T)).T, numpy.float32)
         #print numpy.dot(result.reshape(1,-1)[0],coor_sub_m1.reshape(1,-1)[0])/numpy.sqrt(numpy.dot(coor_sub_m1.reshape(1,-1)[0],coor_sub_m1.reshape(1,-1)[0])*numpy.dot(result.reshape(1,-1)[0],result.reshape(1,-1)[0]))
         #m3 = system.Molecule(2)
         #m3.read_pdb('1CRN.pdb')
