@@ -41,4 +41,5 @@ extern int* reverseFourByteWord(int* N); /* revert 4 byte word byteorder */
 extern int* reverseEightByteDouble(int* ); /* revert 8 byte word byteorder */
 
 extern void pad(char* s, int len);
+int seek_dcd(FILE *fd, long offset, int whence) ;
 #endif // DCIO_H

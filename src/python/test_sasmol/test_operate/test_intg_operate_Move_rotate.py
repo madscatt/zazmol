@@ -104,6 +104,10 @@ class Test_intg_operate_Move_rotate(unittest.TestCase):
         result_com  = self.o.calculate_center_of_mass(0)
         #
         expected_com = numpy.array([-9.775, 9.300, 6.978], floattype)
+
+        print('expected_com:', expected_com)
+        print('result_com:', result_com)
+
         self.assert_list_almost_equal(expected_com, result_com,2)
 
 

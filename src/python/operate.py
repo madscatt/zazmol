@@ -234,8 +234,121 @@ class Move():
         self._com = self.calculate_center_of_mass(frame)
 
         return
+
+    def align(self, other, self_basis=None, other_basis=None, mode='production', align_variables=None, **kwargs):
+        '''
+            Alignment of one object on top of another
+            "self" is aligned onto "other" using the basis
+            of molecule 2 to align onto the basis of molecule 1
+            and the transformation is then done to all the atoms of
+            molecule 2
+
+            self = molecule_2
+
+            other = molecule_1
+
+            self aligned to other
+
+            molecule_2 aligned to molecule_1
+
+            Parameters
+            ----------
+            frame 
+                integer : trajectory frame number to use
     
-    def align(self, other, self_basis, other_basis, **kwargs):
+            other
+                system object : molecule 1
+
+            self_basis
+                string : unique description of atoms used for alignment (only needed in initialization mode)
+
+            other_basis
+                string : unique description of atoms used for alignment (only needed in initialization mode)
+    
+            mode
+                string : 'initialization' or 'production'
+    
+            align_variables
+                dict : data from initialization mode to be used in production mode
+    
+            kwargs 
+                optional future arguments
+
+            Returns
+            -------
+            None or dict
+                updated self._coor or initialization data
+
+            Examples
+            -------
+
+            >>> import sasmol.system as system
+            >>> molecule_1 = system.Molecule('hiv1_gag.pdb')
+            >>> molecule_2 = system.Molecule('moved_and_rotated_hiv1_gag.pdb')
+            >>> frame = 0
+            >>> basis_1 = 'name[i] == "CA"'
+            >>> basis_2 = 'name[i] == "CA"'
+            >>> align_variables = molecule_2.align(molecule_1, basis_1, basis_2, mode='initialization')
+            >>> molecule_2.align(molecule_1, align_variables=align_variables)
+            >>> com_sub_2 = molecule_2.calculate_center_of_mass(frame)
+    
+            Note
+            ----
+            mass_check determines if mass is defined for the object so that
+            center of mass can be calculated
+            '''
+        frame = kwargs.get('frame', 0)
+
+        if mode == 'initialization':
+            if self_basis is None or other_basis is None:
+                raise ValueError("self_basis and other_basis must be provided in initialization mode")
+
+            ### other = molecule_1 (reference)
+            error, other_mask = other.get_subset_mask(other_basis)
+            subset_other = sasmol.system.Molecule()
+            error = other.copy_molecule_using_mask(subset_other, other_mask, frame)
+            com_subset_other = subset_other.calculate_center_of_mass(frame)
+            subset_other.center(frame)
+            coor_subset_other = subset_other.coor()[frame]
+
+            ### self = molecule_2 (to be aligned to other / molecule_1)
+            error, self_mask = self.get_subset_mask(self_basis)
+            subset_self = sasmol.system.Molecule()
+            error = self.copy_molecule_using_mask(subset_self, self_mask, frame)
+            com_subset_self = subset_self.calculate_center_of_mass(frame)
+            subset_self.center(frame)
+            coor_subset_self = subset_self.coor()[frame]
+
+            # Return initialization data as align_variables
+            align_variables = {
+                'other_mask': other_mask,
+                'self_mask': self_mask,
+                'com_subset_other': com_subset_other,
+                'coor_subset_other': coor_subset_other,
+                'com_subset_self': com_subset_self,
+                'coor_subset_self': coor_subset_self
+            }
+
+            return align_variables
+
+        else:  # Default to production mode
+            if align_variables is None:
+                raise ValueError("align_variables must be provided in production mode")
+
+            com_subset_other = align_variables['com_subset_other']
+            coor_subset_other = align_variables['coor_subset_other']
+            com_subset_self = align_variables['com_subset_self']
+            coor_subset_self = align_variables['coor_subset_self']
+    
+            u = linear_algebra.find_u(coor_subset_self, coor_subset_other)
+            tao = numpy.transpose(self.coor()[frame] - com_subset_other)
+            error, nat2 = linear_algebra.matrix_multiply(u, tao)
+            ncoor = numpy.transpose(nat2) + com_subset_other
+            self._coor[frame, :] = ncoor
+    
+            return
+
+    def old_align(self, other, self_basis, other_basis, **kwargs):
         '''
             Alignment of one object on top of another
             "self" is aligned onto "other" using the basis

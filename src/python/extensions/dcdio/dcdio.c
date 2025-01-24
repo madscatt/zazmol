@@ -262,10 +262,10 @@ int read_dcdheader(FILE * fd, int *N, int *NSET, int *ISTART,\
   //      fflush(stderr);
   //} 
 
-  /*  First thing in the file should be an 84         */
+  /*  value in file should be an 84         */
   ret_val = READ(fd, &input_integer, sizeof(int));
-  CHECK_FREAD(ret_val, "reading first int from dcd file");
-  CHECK_FEOF(ret_val, "reading first int from dcd file");
+  CHECK_FREAD(ret_val, "reading initial int from dcd file");
+  CHECK_FEOF(ret_val, "reading initial int from dcd file");
 
   // by jec
   //*reverseEndian=1;
@@ -276,7 +276,7 @@ int read_dcdheader(FILE * fd, int *N, int *NSET, int *ISTART,\
   // Read the magic number from the file header
   ret_val = fread(&input_integer, sizeof(int), 1, fd);
   if (ret_val != 1) {
-        fprintf(stderr, "Error reading first int from DCD file\n");
+        fprintf(stderr, "Error reading initial int from DCD file\n");
         fflush(stderr);
         return DCD_BADFORMAT;
   }
@@ -386,7 +386,7 @@ int read_dcdheader(FILE * fd, int *N, int *NSET, int *ISTART,\
     if (*reverseEndian) DELTA=reverseEightByteWord(DELTA);
   }
 
-  /*  Get the end size of the first block             */
+  /*  Get the end size of the initial block             */
   ret_val = READ(fd, &input_integer, sizeof(int));
   CHECK_FREAD(ret_val, "reading second 84 from dcd file");
   CHECK_FEOF(ret_val, "reading second 84 from dcd file");

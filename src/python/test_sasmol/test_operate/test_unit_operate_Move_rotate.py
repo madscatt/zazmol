@@ -31,7 +31,6 @@ import warnings
 
 floattype = os.environ['SASMOL_FLOATTYPE']
 
-
 class Test_unit_operate_Move_translate(unittest.TestCase):
 
     def setUp(self):

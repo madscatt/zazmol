@@ -1,8 +1,3 @@
-from __future__ import absolute_import
-from __future__ import division
-from __future__ import print_function
-#from __future__ import unicode_literals
-
 #    SASMOL: Copyright (C) 2011 Joseph E. Curtis, Ph.D.
 #
 #    This program is free software: you can redistribute it and/or modify
@@ -120,6 +115,7 @@ def matrix_multiply(a, b):
     if(dim_a2 != dim_b1):
         message = 'incompatible matrices'
         error.append(message)
+        c = None
         return error, c
 
     c = matrix_math.matrix_multiply(a, b, dim_a1, dim_a2, dim_b2)

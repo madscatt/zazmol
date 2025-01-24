@@ -111,7 +111,7 @@ class Atom(file_io.Files, calculate.Calculate, operate.Move, subset.Mask, proper
         >>> molecule.index()[0] 
         1 
         >>> offset = -10 
-        >>> index = [x + offset for x in xrange(molecule.natoms())]  
+        >>> index = [x + offset for x in range(molecule.natoms())]  
         >>> molecule.setIndex(index) 
         >>> molecule.index()[0] 
         -10
@@ -291,7 +291,7 @@ class Atom(file_io.Files, calculate.Calculate, operate.Move, subset.Mask, proper
                 pass
                              
             self._natoms = len(self._name)
-            self._index = numpy.array([x + 1 for x in xrange(self._natoms)], numpy.int)
+            self._index = numpy.array([x + 1 for x in range(self._natoms)], numpy.int32)
 
 
     def setId(self, newValue):
@@ -430,7 +430,7 @@ class Atom(file_io.Files, calculate.Calculate, operate.Move, subset.Mask, proper
 
     def total_mass(self):
         if(self._total_mass == None):
-            self._total_mass = calculate.Calculate.calcmass(self)
+            self._total_mass = calculate.Calculate.calculate_mass(self)
         return self._total_mass
 
     def setTotal_mass(self, newValue):
@@ -861,7 +861,7 @@ class Molecule_Maker(Atom):
         >>> molecule = system.Molecule_Maker(2048)
         >>> molecule = system.Molecule_Maker(2048, name='Ar')
         >>> molecule = system.Molecule_Maker(2048, name='Ar', segname='ARG0')
-        >>> index = [x for x in xrange(340,1000)]
+        >>> index = [x for x in range(340,1000)]
         >>> molecule = system.Molecule_Maker(660, name='Ar', index=index)
         >>> molecule.index()[0]
         340
@@ -870,37 +870,46 @@ class Molecule_Maker(Atom):
 
     def __init__(self, natoms, atom='ATOM', index=None, name='C', loc=' ',
         resname='DUM', chain='A', resid=None, rescode=' ', coor=None,
-        occupancy='0.00', beta='0.00', segname='DUM', element='C', charge=' ', **kwargs):
+        occupancy='0.00', beta='0.00', segname='DUM', element='C', charge=' ', 
+        moltype='protein', residue_flag=False, **kwargs):
 
         Atom.__init__(self)
 
-        self._atom = [atom for x in xrange(natoms)]
+        self._atom = [atom for x in range(natoms)]
         
         if index is not None:
             self._index = index
         else:
-            self._index = numpy.array([x+1 for x in xrange(natoms)],numpy.int)
+            self._index = numpy.array([x+1 for x in range(natoms)],numpy.int32)
         
-        self._name = [name for x in xrange(natoms)]
-        self._loc = [loc for x in xrange(natoms)]
-        self._resname = [resname for x in xrange(natoms)]
-        self._chain = [chain for x in xrange(natoms)]
+        self._name = [name for x in range(natoms)]
+        self._loc = [loc for x in range(natoms)]
+        self._resname = [resname for x in range(natoms)]
+        self._chain = [chain for x in range(natoms)]
 
         if resid is not None:
             self._resid = resid
         else:
-            self._resid = numpy.array([x+1 for x in xrange(natoms)],numpy.int)
+            self._resid = numpy.array([x+1 for x in range(natoms)],numpy.int32)
 
-        self._rescode = [rescode for x in xrange(natoms)]
+        self._rescode = [rescode for x in range(natoms)]
         
         if coor is not None:
             self._coor = coor
         else:
-            self._coor = numpy.zeros((1,natoms,3),numpy.float)
+            self._coor = numpy.zeros((1,natoms,3),numpy.float32)
         
-        self._occupancy = [occupancy for x in xrange(natoms)]
-        self._beta = [beta for x in xrange(natoms)]
-        self._charge = [charge for x in xrange(natoms)]
-        self._segname = [segname for x in xrange(natoms)]
-        self._element = [element for x in xrange(natoms)]
+        self._occupancy = [occupancy for x in range(natoms)]
+        self._beta = [beta for x in range(natoms)]
+        self._charge = [charge for x in range(natoms)]
+        self._segname = [segname for x in range(natoms)]
+        self._element = [element for x in range(natoms)]
+        self._moltype = [moltype for x in range(natoms)]
+        self._residue_flag = [False for x in range(natoms)]
 
+        self._total_mass = calculate.Calculate.calculate_mass(self)
+        print('self._mass = ', self._mass)
+        print('self._total_mass = ', self._total_mass)
+
+    def residue_flag(self):
+        return self._residue_flag
