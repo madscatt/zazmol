@@ -26,8 +26,10 @@ static PyObject* matrix_multiply(PyObject* self, PyObject* args) {
         for (j = 0; j < dim_b2; j++) {
             c[i * dim_b2 + j] = 0.0;
             for (k = 0; k < dim_a2; k++) {
+                printf("a[%d][%d] = %f, b[%d][%d] = %f\n", i, k, a[i * dim_a2 + k], k, j, b[k * dim_b2 + j]);
                 c[i * dim_b2 + j] += a[i * dim_a2 + k] * b[k * dim_b2 + j];
             }
+            printf("c[%d][%d] = %f\n", i, j, c[i * dim_b2 + j]);
         }
     }
 
