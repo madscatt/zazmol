@@ -1,0 +1,13 @@
+Trace Comparison Summary:
+Size 3x3: NumPy=2.3061113357543945, C extension=2.3061113357543945, C function via ctypes=2.3061113357543945, linear_algebra=2.3061113357543945
+Size 10x10: NumPy=25.167741775512695, C extension=25.167741775512695, C function via ctypes=25.167741775512695, linear_algebra=25.167741775512695
+Size 100x100: NumPy=2538.6728515625, C extension=2538.6728515625, C function via ctypes=2538.6728515625, linear_algebra=2538.6728515625
+Size 500x500: NumPy=62463.53125, C extension=62463.53125, C function via ctypes=62463.53125, linear_algebra=62463.53125
+Size 1000x1000: NumPy=250106.703125, C extension=250106.6875, C function via ctypes=250106.6875, linear_algebra=250106.6875
+
+Frobenius Norm Comparison Summary:
+Size 3x3: NumPy=2.4892513751983643, C extension=2.4892513751983643, C function via ctypes=2.4892513751983643, linear_algebra=2.4892513751983643
+Size 10x10: NumPy=26.822507858276367, C extension=26.822507858276367, C function via ctypes=26.822507858276367, linear_algebra=26.822507858276367
+Size 100x100: NumPy=2541.98681640625, C extension=2541.98681640625, C function via ctypes=2541.98681640625, linear_algebra=2541.98681640625
+Size 500x500: NumPy=62485.0234375, C extension=62485.02734375, C function via ctypes=62485.0234375, linear_algebra=62485.0234375
+Size 1000x1000: NumPy=250269.09375, C extension=250269.265625, C function via ctypes=250269.09375, linear_algebra=250269.09375
