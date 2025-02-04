@@ -4,6 +4,7 @@ import matrix_math
 import matplotlib.pyplot as plt
 import ctypes
 from sasmol.linear_algebra import matrix_multiply as linear_algebra_matrix_multiply  # Import the C extension method
+import fmatrix_math  # Import the Fortran matrix multiplication module
 
 # Load the shared library
 lib = ctypes.CDLL('./matrix_multiply.so')
@@ -53,8 +54,16 @@ def benchmark_and_compare(size):
     time4 = end_time - start_time
     print(f"linear_algebra matrix_multiply time: {time4:.6f} seconds")
 
+    # Benchmark the fifth implementation (Fortran matrix_multiply)
+    start_time = time.time()
+    result5 = fmatrix_math.matrix_multiply(a, b)
+    end_time = time.time()
+    time5 = end_time - start_time
+    print(f"Fortran matrix_multiply time: {time5:.6f} seconds")
+
     # Compare the numerical results
-    if np.allclose(result1, result2, atol=1e-6) and np.allclose(result1, result3, atol=1e-6) and np.allclose(result1, result4, atol=1e-6):
+    if (np.allclose(result1, result2, atol=1e-6) and np.allclose(result1, result3, atol=1e-6) and
+        np.allclose(result1, result4, atol=1e-6) and np.allclose(result1, result5, atol=1e-6)):
         print("Results are numerically close.")
     else:
         print("Results differ.")
@@ -64,17 +73,19 @@ def benchmark_and_compare(size):
     trace2 = np.trace(result2)
     trace3 = np.trace(result3)
     trace4 = np.trace(result4)
-    print(f"Trace comparison: NumPy={trace1}, C extension={trace2}, C function via ctypes={trace3}, linear_algebra={trace4}")
+    trace5 = np.trace(result5)
+    print(f"Trace comparison: NumPy={trace1}, C extension={trace2}, C function via ctypes={trace3}, linear_algebra={trace4}, Fortran={trace5}")
 
     # Calculate and compare the Frobenius norm of the matrices
     norm1 = np.linalg.norm(result1)
     norm2 = np.linalg.norm(result2)
     norm3 = np.linalg.norm(result3)
     norm4 = np.linalg.norm(result4)
-    print(f"Frobenius norm comparison: NumPy={norm1}, C extension={norm2}, C function via ctypes={norm3}, linear_algebra={norm4}")
+    norm5 = np.linalg.norm(result5)
+    print(f"Frobenius norm comparison: NumPy={norm1}, C extension={norm2}, C function via ctypes={norm3}, linear_algebra={norm4}, Fortran={norm5}")
 
     # Plot the numerical differences
-    fig, axs = plt.subplots(1, 4, figsize=(20, 5))
+    fig, axs = plt.subplots(1, 5, figsize=(25, 5))
     fig.suptitle(f'Matrix Multiplication Results for {size}x{size}')
     im = axs[0].imshow(result1, cmap='viridis')
     axs[0].set_title('NumPy dot result')
@@ -88,12 +99,15 @@ def benchmark_and_compare(size):
     im = axs[3].imshow(result4, cmap='viridis')
     axs[3].set_title('linear_algebra result')
     fig.colorbar(im, ax=axs[3])
+    im = axs[4].imshow(result5, cmap='viridis')
+    axs[4].set_title('Fortran result')
+    fig.colorbar(im, ax=axs[4])
     plt.tight_layout(rect=[0, 0.03, 1, 0.95])
     plt.savefig(f'matrix_results_{size}x{size}.png')
     plt.close()
 
     # Comment out the parts that plot the differences
-    # fig, axs = plt.subplots(1, 3, figsize=(15, 5))
+    # fig, axs = plt.subplots(1, 4, figsize=(20, 5))
     # fig.suptitle(f'Differences in Matrix Multiplication Results for {size}x{size}')
     # im = axs[0].imshow(result1 - result2, cmap='viridis')
     # axs[0].set_title('Difference (NumPy - C extension)')
@@ -104,6 +118,9 @@ def benchmark_and_compare(size):
     # im = axs[2].imshow(result1 - result4, cmap='viridis')
     # axs[2].set_title('Difference (NumPy - linear_algebra)')
     # fig.colorbar(im, ax=axs[2])
+    # im = axs[3].imshow(result1 - result5, cmap='viridis')
+    # axs[3].set_title('Difference (NumPy - Fortran)')
+    # fig.colorbar(im, ax=axs[3])
     # plt.tight_layout(rect=[0, 0.03, 1, 0.95])
     # plt.show()
 
@@ -111,8 +128,9 @@ def benchmark_and_compare(size):
     print("C extension result:\n", result2)
     print("C function via ctypes result:\n", result3)
     print("linear_algebra matrix_multiply result:\n", result4)
+    print("Fortran matrix_multiply result:\n", result5)
 
-    return time1, time2, time3, time4, trace1, trace2, trace3, trace4, norm1, norm2, norm3, norm4
+    return time1, time2, time3, time4, time5, trace1, trace2, trace3, trace4, trace5, norm1, norm2, norm3, norm4, norm5
 
 # List of matrix sizes to benchmark
 sizes = [3, 10, 100, 500, 1000]
@@ -122,6 +140,7 @@ numpy_times = []
 c_extension_times = []
 c_function_times = []
 linear_algebra_times = []
+fortran_times = []
 
 # Lists to store trace and norm results
 trace_results = []
@@ -129,13 +148,14 @@ norm_results = []
 
 # Run the benchmark for each size
 for size in sizes:
-    time1, time2, time3, time4, trace1, trace2, trace3, trace4, norm1, norm2, norm3, norm4 = benchmark_and_compare(size)
+    time1, time2, time3, time4, time5, trace1, trace2, trace3, trace4, trace5, norm1, norm2, norm3, norm4, norm5 = benchmark_and_compare(size)
     numpy_times.append(time1)
     c_extension_times.append(time2)
     c_function_times.append(time3)
     linear_algebra_times.append(time4)
-    trace_results.append((trace1, trace2, trace3, trace4))
-    norm_results.append((norm1, norm2, norm3, norm4))
+    fortran_times.append(time5)
+    trace_results.append((trace1, trace2, trace3, trace4, trace5))
+    norm_results.append((norm1, norm2, norm3, norm4, norm5))
 
 # Plot the timing results
 plt.figure(figsize=(10, 6))
@@ -143,6 +163,7 @@ plt.plot(sizes, numpy_times, label='NumPy dot', marker='o')
 plt.plot(sizes, c_extension_times, label='C extension', marker='o')
 plt.plot(sizes, c_function_times, label='C function via ctypes', marker='o')
 plt.plot(sizes, linear_algebra_times, label='linear_algebra matrix_multiply', marker='o')
+plt.plot(sizes, fortran_times, label='Fortran matrix_multiply', marker='o')
 plt.xlabel('Matrix Size (NxN)')
 plt.ylabel('Time (seconds)')
 plt.title('Matrix Multiplication Benchmark')
@@ -154,10 +175,10 @@ plt.close()
 # Summarize trace and norm comparisons
 print("\nTrace Comparison Summary:")
 for i, size in enumerate(sizes):
-    trace1, trace2, trace3, trace4 = trace_results[i]
-    print(f"Size {size}x{size}: NumPy={trace1}, C extension={trace2}, C function via ctypes={trace3}, linear_algebra={trace4}")
+    trace1, trace2, trace3, trace4, trace5 = trace_results[i]
+    print(f"Size {size}x{size}: NumPy={trace1}, C extension={trace2}, C function via ctypes={trace3}, linear_algebra={trace4}, Fortran={trace5}")
 
 print("\nFrobenius Norm Comparison Summary:")
 for i, size in enumerate(sizes):
-    norm1, norm2, norm3, norm4 = norm_results[i]
-    print(f"Size {size}x{size}: NumPy={norm1}, C extension={norm2}, C function via ctypes={norm3}, linear_algebra={norm4}")
+    norm1, norm2, norm3, norm4, norm5 = norm_results[i]
+    print(f"Size {size}x{size}: NumPy={norm1}, C extension={norm2}, C function via ctypes={norm3}, linear_algebra={norm4}, Fortran={norm5}")

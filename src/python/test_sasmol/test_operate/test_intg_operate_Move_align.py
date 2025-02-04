@@ -56,38 +56,35 @@ class Test_intg_operate_Move_align(unittest.TestCase):
         rotate the second molecule and 
         set a basis then align the second molecule on the first molecule
         '''
+        frame = 0
 
         print(DataPath + '1CRN.pdb')
 
         self.o1.read_pdb(DataPath + '1CRN.pdb')
         self.o2.read_pdb(DataPath + '1CRN.pdb')
         
-        axis = 'z'
-        frame = 0
-        theta = numpy.pi / 2.0
-        
         self.o2.write_pdb("test.pdb", frame, "w")
 
-        self.o2.rotate(frame, axis, theta)
-
-        self.o2.write_pdb("test_rotated.pdb", frame, "w")
-      
         basis_1 = 'name[i] == "CA" and (resid[i] >= 20 and resid[i] <= 31)'
         basis_2 = 'name[i] == "CA" and (resid[i] >= 20 and resid[i] <= 31)'
 
         # Initialization mode
         align_variables = self.o2.align(self.o1, basis_1, basis_2, mode='initialization')
 
+        axis = 'z'
+        theta = numpy.pi / 2.0
+
+        self.o2.rotate(frame, axis, theta)
+        self.o2.write_pdb("test_rotated.pdb", frame, "w")
+      
         # Production mode
         self.o2.align(self.o1, align_variables=align_variables)
 
         expected_com = self.o1.calculate_center_of_mass(frame)
         result_com = self.o2.calculate_center_of_mass(frame)
 
-        print('expected_com : calculated = ', expected_com)
-        print('result_com : of aligned mol', result_com)
-
-        expected_com = numpy.array([10.21108263, -9.38440245,  6.97775639], dtype=floattype)
+        #print('expected_com : calculated = ', expected_com)
+        #print('result_com : of aligned mol', result_com)
 
         self.o2.write_pdb("test_rotated_then_aligned.pdb", frame, "w")
 
