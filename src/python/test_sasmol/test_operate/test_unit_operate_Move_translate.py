@@ -17,7 +17,6 @@
 
 from sasmol.test_sasmol.utilities import env,util
 
-from unittest import main 
 import unittest
 from unittest.mock import MagicMock
 import sasmol.system as system
