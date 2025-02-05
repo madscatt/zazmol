@@ -30,13 +30,18 @@ import os
 floattype = os.environ['SASMOL_FLOATTYPE']
 
 DataPath = os.path.join(os.path.dirname(os.path.realpath(__file__)), '..', 'data', 'pdb_common') + os.path.sep
+moduleDataPath = os.path.join(os.path.dirname(os.path.realpath(__file__)),'..','data','sasmol','operate')+os.path.sep
 
 class Test_intg_operate_Move_align(unittest.TestCase): 
 
     def setUp(self):
         warnings.filterwarnings('ignore')
+
         self.o1 = system.Molecule(0)
         self.o2 = system.Molecule(1)
+
+        self.o1Sub = system.Molecule(0)
+        self.o2Sub = system.Molecule(1)
 
     def assert_list_almost_equal(self, a, b, places=5):
         if len(a) != len(b):
@@ -50,6 +55,94 @@ class Test_intg_operate_Move_align(unittest.TestCase):
                 else:
                     self.assert_list_almost_equal(a[i], b[i], places)
 
+    def test_null_assign(self):
+        with self.assertRaises(Exception):
+            align_variables = self.o2.align(self.o1, basis_1, basis_2, mode='initialization')
+
+    def test_null_production(self):
+        with self.assertRaises(Exception):
+            self.o2.align(self.o1, align_variables=align_variables)
+
+
+    def test_1ATM_against_1ATMRot_subset_full_pdb(self):
+        frame = 0
+        self.o1.read_pdb(DataPath+'1ATM.pdb')
+        self.o2.read_pdb(DataPath+'1ATM.pdb')
+
+        basis_1 = 'resid[i] < 100000'
+        basis_2 = 'resid[i] < 100000'
+
+        # Initialization mode
+        align_variables = self.o2.align(self.o1, basis_1, basis_2, mode='initialization')
+
+        # Production mode
+        self.o2.align(self.o1, align_variables=align_variables)
+
+        expected_coor = self.o1.coor()[frame]
+        result_coor = self.o2.coor()[frame]
+
+        self.assert_list_almost_equal(expected_coor, result_coor,places=3)
+
+    def test_2AAD_against_2AADRot_subset_full_pdb(self):
+        frame = 0
+
+        self.o1.read_pdb(DataPath+'2AAD.pdb')
+        self.o2.read_pdb(DataPath+'2AAD.pdb')
+
+        basis_1 = 'resid[i] < 100000'
+        basis_2 = 'resid[i] < 100000'
+
+        # Initialization mode
+        align_variables = self.o2.align(self.o1, basis_1, basis_2, mode='initialization')
+
+        # Production mode
+        self.o2.align(self.o1, align_variables=align_variables)
+
+        expected_coor = self.o1.coor()[frame]
+        result_coor = self.o2.coor()[frame]
+
+        self.assert_list_almost_equal(expected_coor, result_coor,places=3)
+
+    def test_1CRN_against_1CRNRot_subset_full_pdb(self):
+        frame = 0
+        self.o1.read_pdb(DataPath+'1CRN.pdb')
+        self.o2.read_pdb(moduleDataPath+'1CRN-rot.pdb')
+
+        basis_1 = 'resid[i] < 100000'
+        basis_2 = 'resid[i] < 100000'
+
+        # Initialization mode
+        align_variables = self.o2.align(self.o1, basis_1, basis_2, mode='initialization')
+
+        # Production mode
+        self.o2.align(self.o1, align_variables=align_variables)
+
+        expected_coor = self.o1.coor()[frame]
+        result_coor = self.o2.coor()[frame]
+
+        self.assert_list_almost_equal(expected_coor, result_coor,places=2)
+
+
+    def test_1CRN_against_1CRNRotShift_subset_full_pdb(self):
+        frame = 0
+        self.o1.read_pdb(DataPath+'1CRN.pdb')
+        self.o2.read_pdb(moduleDataPath+'1CRN-rot-shift.pdb')
+
+        basis_1 = 'resid[i] < 100000'
+        basis_2 = 'resid[i] < 100000'
+
+        # Initialization mode
+        align_variables = self.o2.align(self.o1, basis_1, basis_2, mode='initialization')
+
+        # Production mode
+        self.o2.align(self.o1, align_variables=align_variables)
+
+        expected_coor = self.o1.coor()[frame]
+        result_coor = self.o2.coor()[frame]
+
+        self.assert_list_almost_equal(expected_coor, result_coor,places=2)
+
+
     def test_1CRN_pdb(self):
         '''
         read in the same PDB file into two separate molecules
@@ -58,12 +151,8 @@ class Test_intg_operate_Move_align(unittest.TestCase):
         '''
         frame = 0
 
-        print(DataPath + '1CRN.pdb')
-
         self.o1.read_pdb(DataPath + '1CRN.pdb')
         self.o2.read_pdb(DataPath + '1CRN.pdb')
-        
-        self.o2.write_pdb("test.pdb", frame, "w")
 
         basis_1 = 'name[i] == "CA" and (resid[i] >= 20 and resid[i] <= 31)'
         basis_2 = 'name[i] == "CA" and (resid[i] >= 20 and resid[i] <= 31)'
@@ -75,18 +164,12 @@ class Test_intg_operate_Move_align(unittest.TestCase):
         theta = numpy.pi / 2.0
 
         self.o2.rotate(frame, axis, theta)
-        self.o2.write_pdb("test_rotated.pdb", frame, "w")
       
         # Production mode
         self.o2.align(self.o1, align_variables=align_variables)
 
         expected_com = self.o1.calculate_center_of_mass(frame)
         result_com = self.o2.calculate_center_of_mass(frame)
-
-        #print('expected_com : calculated = ', expected_com)
-        #print('result_com : of aligned mol', result_com)
-
-        self.o2.write_pdb("test_rotated_then_aligned.pdb", frame, "w")
 
         self.assert_list_almost_equal(expected_com, result_com, 2)
 
