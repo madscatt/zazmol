@@ -161,6 +161,7 @@ class PDB(object):
         debug=0
         result=1
         conect = False
+        printme = False
 	
         if(flag=='w' or flag=='W'):
             infile=open(filename,'w')
@@ -203,24 +204,25 @@ class PDB(object):
 
                 infile.write("%-6s%5s %-4s%1s%-4s%1s%4s%1s   %8s%8s%8s%6s%6s      %-4s%2s%2s\n" % (self._atom[i],this_index,self._name[i],self._loc[i],self._resname[i],self._chain[i],this_resid,self._rescode[i],sx,sy,sz,self._occupancy[i],self._beta[i],self._segname[i],self._element[i],self._charge[i]))
             except:
-                print('\n>>>> ERROR IN WRITE_PDB <<<<\n')
-                print('>> i = ',i)
-                print('atom = ',self._atom[i],' : type = ',type(self._atom[i]))
-                print('index = ',this_index,' : type = ',type(this_index))
-                print('name = ',self._name[i],' : type = ',type(self._name[i]))
-                print('loc = ',self._loc[i],' : type = ',type(self._loc[i]))
-                print('resname = ',self._resname[i],' : type = ',type(self._resname[i]))
-                print('chain = ',self._chain[i],' : type = ',type(self._chain[i]))
-                print('resid = ',self._resid[i],' : type = ',type(self._resid[i]))
-                print('rescode = ',self._rescode[i],' : type = ',type(self._rescode[i]))
-                print('coor_x = ',self._coor[frame,i,0],' : type = ',type(self._coor[frame,i,0]))
-                print('coor_y = ',self._coor[frame,i,1],' : type = ',type(self._coor[frame,i,1]))
-                print('coor_z = ',self._coor[frame,i,2],' : type = ',type(self._coor[frame,i,2]))
-                print('occupancy = ',self._occupancy[i],' : type = ',type(self._occupancy[i]))
-                print('beta = ',self._beta[i],' : type = ',type(self._beta[i]))
-                print('segname = ',self._segname[i],' : type = ',type(self._segname[i]))
-                print('element = ',self._element[i],' : type = ',type(self._element[i]))
-                print('charge = ',self._charge[i],' : type = ',type(self._charge[i]))
+                if printme:
+                    print('\n>>>> ERROR IN WRITE_PDB <<<<\n')
+                    print('>> i = ',i)
+                    print('atom = ',self._atom[i],' : type = ',type(self._atom[i]))
+                    print('index = ',this_index,' : type = ',type(this_index))
+                    print('name = ',self._name[i],' : type = ',type(self._name[i]))
+                    print('loc = ',self._loc[i],' : type = ',type(self._loc[i]))
+                    print('resname = ',self._resname[i],' : type = ',type(self._resname[i]))
+                    print('chain = ',self._chain[i],' : type = ',type(self._chain[i]))
+                    print('resid = ',self._resid[i],' : type = ',type(self._resid[i]))
+                    print('rescode = ',self._rescode[i],' : type = ',type(self._rescode[i]))
+                    print('coor_x = ',self._coor[frame,i,0],' : type = ',type(self._coor[frame,i,0]))
+                    print('coor_y = ',self._coor[frame,i,1],' : type = ',type(self._coor[frame,i,1]))
+                    print('coor_z = ',self._coor[frame,i,2],' : type = ',type(self._coor[frame,i,2]))
+                    print('occupancy = ',self._occupancy[i],' : type = ',type(self._occupancy[i]))
+                    print('beta = ',self._beta[i],' : type = ',type(self._beta[i]))
+                    print('segname = ',self._segname[i],' : type = ',type(self._segname[i]))
+                    print('element = ',self._element[i],' : type = ',type(self._element[i]))
+                    print('charge = ',self._charge[i],' : type = ',type(self._charge[i]))
 
         # TODO: Check with Joseph to see if logic acceptable -
         # i.e. is 'final' always accompanied by 'model'?
