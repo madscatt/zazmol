@@ -25,7 +25,7 @@ import numpy
 
 import os
 floattype = os.environ.get('SASMOL_FLOATTYPE', 'float32')
-floattype = numpy.float32
+#floattype = numpy.float32
 
 class TestMatrixMultiply(unittest.TestCase):
 
@@ -76,6 +76,7 @@ class TestMatrixMultiply(unittest.TestCase):
         b = numpy.array([[1.0, 0.0, 0.0], [0.0, 1.0, 0.0]], dtype=floattype).T
         result_error, result = matrix_multiply(a, b)
         expected = numpy.array([[1.0, 0.0], [0.0, 1.0]], dtype=floattype)
+
         self.assert_list_almost_equal(result.flatten(), expected.flatten())
         expected_error = []
         self.assertEqual(result_error, expected_error)

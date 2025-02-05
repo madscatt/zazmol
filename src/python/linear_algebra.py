@@ -108,7 +108,7 @@ def matrix_multiply(a, b):
 
     try:
         dim_b2 = b.shape[1]
-    except:
+    except IndexError:
         dim_b2 = 1
 
     c = numpy.zeros((dim_a1, dim_b2), numpy.float32)
@@ -118,10 +118,10 @@ def matrix_multiply(a, b):
         c = None
         return error, c
 
-    c = matrix_math.matrix_multiply(a, b, dim_a1, dim_a2, dim_b2)
+#    c = matrix_math.matrix_multiply(a, b, dim_a1, dim_a2, dim_b2)
+    c = numpy.dot(a,b)
 
     return error, c
-
 
 def find_u(x, y):
     '''
