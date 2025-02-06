@@ -21,6 +21,7 @@ from __future__ import print_function
 '''
 import sys
 import numpy
+import math
 import sasmol as sasmol
 import sasmol.linear_algebra as linear_algebra
 
@@ -544,150 +545,59 @@ class Move():
 
         return
 
-
-    def align_principal_axes_to_xyz(self, frame, **kwargs):
+    def align_pmi_on_cardinal_axes(self, frame):
         '''
-        Transform system object so that the principle axes align with
-        cardinal axes 
-
-        Parameters
-        ----------
-        frame 
-            integer : trajectory frame number to use
-
-        kwargs 
-            optional future arguments        
-       
-        Returns
-        -------
-        None
-            updated self._coor 
-
-        Examples
-        -------
-
-        >>> import sasmol.system as system 
-        >>> molecule = system.Molecule('hiv1_gag.pdb')
-        >>> frame = 0
-        >>> molecule.align_principal_axes_to_xyz(frame)
- 
-        Note 
-        ----------
-        Eigen vectors of principal mometns used to determine and use 
-        transformation matrix to align system object on
-        x, y and z-axes respectively 
-
+        aligns all principal moment eigenvectors to cardinal x, y, & z axes
         '''
-        
-        import sasmol.linear_algebra as linear_algebra
 
+        self.align_pmi_on_axis(frame, 2, 'z')
+        self.align_pmi_on_axis(frame, 1, 'y')
+
+        return
+
+    def align_pmi_on_axis(self, frame, pmi_eigenvector, alignment_vector_axis):
+        '''
+            aligns one principal moment eigenvector to the given axis
+        '''
         self.center(frame)
-        
         uk, ak, I = self.calculate_principal_moments_of_inertia(frame)
 
-        print('initial: ak = ', ak)
+        ''' right handed coordinate frame '''
+        ak = ak[pmi_eigenvector]
 
-        #ak = numpy.transpose(ak)
-        ak = ak/numpy.linalg.norm(ak)
+        if(alignment_vector_axis == 'x'):
+            axis = numpy.array([1.0, 0.0, 0.0])
+        elif(alignment_vector_axis == 'y'):
+            axis = numpy.array([0.0, 1.0, 0.0])
+        elif(alignment_vector_axis == 'z'):
+            axis = numpy.array([0.0, 0.0, 1.0])
 
+        print(f"Initial ak: {ak}")
+        print(f"Alignment axis: {axis}")
 
-        comx = numpy.sum(ak[:][0])/3
-        comy = numpy.sum(ak[:][1])/3
-        comz = numpy.sum(ak[:][2])/3
-       
-        print('ak: comx = ',comx) 
-        print('ak: comy = ',comy) 
-        print('ak: comz = ',comz) 
-        
-        ak[:][0] -= comx 
-        ak[:][1] -= comy 
-        ak[:][2] -= comz 
-        
-        ak = ak/numpy.linalg.norm(ak)
-        
-        comx = numpy.sum(ak[:][0])/3
-        comy = numpy.sum(ak[:][1])/3
-        comz = numpy.sum(ak[:][2])/3
-       
-        print('ak: comx = ',comx) 
-        print('ak: comy = ',comy) 
-        print('ak: comz = ',comz) 
-        
-        ak_x = ak[0] ; ak_y = ak[1] ; ak_z = ak[2]
+        rotvec = numpy.cross(ak, axis)
+        sine = numpy.linalg.norm(rotvec)
+        if sine != 0:
+            rotvec = rotvec / sine
+#        rotvec = rotvec / numpy.linalg.norm(rotvec)
+        cosine = numpy.dot(ak, axis)
 
-        u_x = numpy.array([1.0, 0.0, 0.0])
-        u_y = numpy.array([0.0, 1.0, 0.0])
-        u_z = numpy.array([0.0, 0.0, 1.0])
+        print(f"Rotvec: {rotvec}")
+        print(f"Sine: {sine}")
+        print(f"Cosine: {cosine}")
 
-        unit_axes = numpy.array([u_x, u_y, u_z], numpy.float)
+        if cosine == 0:
+            print('Vectors are already perpendicular, no rotation needed.')
+            return
 
-        comx = numpy.sum(unit_axes[:][0])/3
-        comy = numpy.sum(unit_axes[:][1])/3
-        comz = numpy.sum(unit_axes[:][2])/3
-       
-        print('ua: comx = ',comx) 
-        print('ua: comy = ',comy) 
-        print('ua: comz = ',comz) 
-        
-        unit_axes[:][0] -= comx 
-        unit_axes[:][1] -= comy 
-        unit_axes[:][2] -= comz 
-        
-        comx = numpy.sum(unit_axes[:][0])/3
-        comy = numpy.sum(unit_axes[:][1])/3
-        comz = numpy.sum(unit_axes[:][2])/3
-       
-        print('ua: comx = ',comx) 
-        print('ua: comy = ',comy) 
-        print('ua: comz = ',comz) 
-        
-        print('ak.shape = ', ak.shape)
-        print('unit_axes.shape = ', unit_axes.shape)
+        #theta = math.atan(sine / cosine)
+        theta = math.atan2(sine, cosine)
 
-        u = linear_algebra.find_u(ak, unit_axes)
-        #u = linear_algebra.find_u(unit_axes, ak)
-       
-    #    print(u)
-        
-        
-        tao = numpy.transpose(self.coor()[frame])
-        #tao = numpy.transpose(self.coor()[frame] - com_subset_other)
+        unit_axis = [rotvec[0], rotvec[1], rotvec[2]]
+        self.rotate_general_axis(frame, theta, unit_axis)
 
-        error, nat2 = linear_algebra.matrix_multiply(u, tao)
-
-        ncoor = numpy.transpose(nat2) 
-        #ncoor = numpy.transpose(nat2) + com_subset_other
-
-        self._coor[frame, :] = ncoor 
-
+        # Recalculate principal moments of inertia to check alignment
         uk, ak, I = self.calculate_principal_moments_of_inertia(frame)
+        print(f"Aligned ak: {ak[pmi_eigenvector]}")
 
-        print('final: ak = ', ak)
-
-
-        ak = ak/numpy.linalg.norm(ak)
-
-
-        comx = numpy.sum(ak[:][0])/3
-        comy = numpy.sum(ak[:][1])/3
-        comz = numpy.sum(ak[:][2])/3
-       
-        print('ak: comx = ',comx) 
-        print('ak: comy = ',comy) 
-        print('ak: comz = ',comz) 
-        
-        ak[:][0] -= comx 
-        ak[:][1] -= comy 
-        ak[:][2] -= comz 
-        
-        ak = ak/numpy.linalg.norm(ak)
-        
-        comx = numpy.sum(ak[:][0])/3
-        comy = numpy.sum(ak[:][1])/3
-        comz = numpy.sum(ak[:][2])/3
-       
-        print('ak: comx = ',comx) 
-        print('ak: comy = ',comy) 
-        print('ak: comz = ',comz) 
-        
-        print('final: ak = ', ak)
+        return
