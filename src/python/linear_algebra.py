@@ -166,7 +166,8 @@ def find_u(x, y):
             numpy.put(b, k, rad)
             k = k + 1
     r = numpy.reshape(b, (-1, 3))
-    r = numpy.mat(r)
+    #r = numpy.mat(r)
+    r = numpy.asmatrix(r)
     rt = r.T		# transpose of r
     rtr = rt * r  # matrix multiply rt * r
     uk, ak = numpy.linalg.eig(rtr)
