@@ -23,9 +23,11 @@ from numpy.distutils.core import Extension, setup
 
 '''
 
+import os
 import numpy
 
 NUMPY_INCLUDE = numpy.get_include()
+os.environ['NPY_DISABLE_CPU_FEATURES'] = 'AVX512FP16'
 
 def read(fname):
     ''' method to read a file name '''
