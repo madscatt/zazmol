@@ -5,8 +5,9 @@
     conditions; see http://www.gnu.org/licenses/gpl-3.0.html for details.
 '''
 import os
-#import setuptools
-from numpy.distutils.core import Extension, setup
+##import setuptools
+#from numpy.distutils.core import Extension, setup
+from setuptools import Extension, setup
 #       SETUP
 #
 #       12/01/2009      --      initial coding              :       jc
@@ -26,8 +27,9 @@ from numpy.distutils.core import Extension, setup
 import os
 import numpy
 
-NUMPY_INCLUDE = numpy.get_include()
 os.environ['NPY_DISABLE_CPU_FEATURES'] = 'AVX512FP16'
+
+NUMPY_INCLUDE = numpy.get_include()
 
 def read(fname):
     ''' method to read a file name '''
@@ -104,7 +106,7 @@ setup(name='sasmol',
         ( os.path.join('sasmol','test_sasmol','data','sasmol','properties') , [os.path.join('src','python','test_sasmol','data','sasmol','properties','Satoms.txt')]),
         ( os.path.join('sasmol','test_sasmol','data','sasmol','properties') , [os.path.join('src','python','test_sasmol','data','sasmol','properties','amino_acid_sld.txt')]),
         ( os.path.join('sasmol','test_sasmol','data','sasmol','properties') , [os.path.join('src','python','test_sasmol','data','sasmol','properties','charmm27_atoms.txt')]),
-        ( os.path.join('sasmol','test_sasmol','data','sasmol','properties') , [os.path.join('src','python','test_sasmol','data','sasmol','properties','standard_atomic_weigh.txt')]),
+        ( os.path.join('sasmol','test_sasmol','data','sasmol','properties') , [os.path.join('src','python','test_sasmol','data','sasmol','properties','standard_atomic_weight.txt')]),
    
         ( os.path.join('sasmol','test_sasmol','data','sasmol','operate') , [os.path.join('src','python','test_sasmol','data','sasmol','operate','1CRN-rot-shift.pdb')]),
         ( os.path.join('sasmol','test_sasmol','data','sasmol','operate') , [os.path.join('src','python','test_sasmol','data','sasmol','operate','1CRN-rot-sub.pdb')]),
