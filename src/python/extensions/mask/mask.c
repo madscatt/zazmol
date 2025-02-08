@@ -10,10 +10,13 @@
 void get_mask_array(long long *aptr, int nflexible, int natoms, char **name,long long *resid,long long *flexible_residues,int nresidues, int mtype){
 
 	int i, j, q0, fr, value, count ;
-	long long value_array[natoms] ;
-
-	long long (*farray)[natoms] = (long long(*)[natoms])aptr ;
-
+	//long long value_array[natoms] ;
+	long long *value_array = (long long *)malloc(natoms * sizeof(long long)); 
+	//long long (*farray)[natoms] = (long long(*)[natoms])aptr 
+	long long **farray = (long long **)malloc(nflexible * sizeof(long long *));
+	for (i = 0; i < nflexible; i++) {
+    farray[i] = (long long *)malloc(natoms * sizeof(long long));
+}
 	for(i=0;i<natoms;i++){
 		value_array[i]=0 ;
 	}
@@ -136,6 +139,12 @@ void get_mask_array(long long *aptr, int nflexible, int natoms, char **name,long
 			} 
 		} 
 	}
+
+    free(value_array);  // Free the dynamically allocated array
+	for (i = 0; i < nflexible; i++) {
+    	free(farray[i]);
+	}
+	free(farray);	
 
 	return ;
 

@@ -52,11 +52,12 @@ import sasmol.operate as operate
 import sasmol.subset as subset
 import sasmol.properties as properties
 import sasmol.topology as topology
-import sasmol.view as view
+#import sasmol.view as view
 
 import sasmol.config as config
 
-class Atom(file_io.Files, calculate.Calculate, operate.Move, subset.Mask, properties.Atomic, topology.Topology, view.View):
+#class Atom(file_io.Files, calculate.Calculate, operate.Move, subset.Mask, properties.Atomic, topology.Topology, view.View):
+class Atom(file_io.Files, calculate.Calculate, operate.Move, subset.Mask, properties.Atomic, topology.Topology):
 
     """ Base class containing methods to define system objects.
 

@@ -6,9 +6,14 @@
  */
 #include <stdio.h>
 #include <stdlib.h>
-#include <unistd.h>
 #include "vmdsock.h"
 #include "imd.h"
+
+#ifdef _WIN32
+#include <io.h>  // Windows-specific header for file operations
+#else
+#include <unistd.h>  // Unix-specific header for file operations
+#endif
 
 int send_coordinates_to_vmd(int N,float *x,float *y,float *z,int port,int flag_clear_sock){
 

@@ -508,7 +508,8 @@ int read_dcdstep(FILE * fd, int N, float *X, float *Y, float *Z, int num_fixed,
         //printf("zhl start %d\n",input_integer);
         CHECK_FREAD(ret_val, "reading extra charmm block");
         if (reverseEndian) input_integer = *reverseFourByteWord(&input_integer);
-        fseeko(fd, input_integer, SEEK_CUR);
+        //fseeko(fd, input_integer, SEEK_CUR);
+        fseek(fd, input_integer, SEEK_CUR);
         ret_val = READ(fd, &input_integer, sizeof(int));
         CHECK_FREAD(ret_val, "reading extra charmm block");
         //printf("zhl now %d\n",input_integer);
@@ -617,7 +618,8 @@ int read_dcdstep(FILE * fd, int N, float *X, float *Y, float *Z, int num_fixed,
         ret_val = READ(fd, &input_integer, sizeof(int));
         CHECK_FREAD(ret_val, "reading extra charmm block");
         if (reverseEndian) input_integer = *reverseFourByteWord(&input_integer);
-        fseeko(fd, input_integer, SEEK_CUR);
+        //fseeko(fd, input_integer, SEEK_CUR);
+        fseek(fd, input_integer, SEEK_CUR);
         ret_val = READ(fd, &input_integer, sizeof(int));
         CHECK_FREAD(ret_val, "reading extra charmm block");
     }
@@ -632,7 +634,8 @@ int read_dcdstep(FILE * fd, int N, float *X, float *Y, float *Z, int num_fixed,
         ret_val = READ(fd, &input_integer, sizeof(int));
         CHECK_FREAD(ret_val, "reading extra charmm block");
         if (reverseEndian) input_integer = *reverseFourByteWord(&input_integer);
-        fseeko(fd, input_integer, SEEK_CUR);
+        //fseeko(fd, input_integer, SEEK_CUR);
+        fseek(fd, input_integer, SEEK_CUR);
         ret_val = READ(fd, &input_integer, sizeof(int));
         CHECK_FREAD(ret_val, "reading extra charmm block");
     }
@@ -652,7 +655,8 @@ int read_dcdstep(FILE * fd, int N, float *X, float *Y, float *Z, int num_fixed,
       printf(">>> input_integer != 4*(N-num_fixed) (1)\n\n") ;
       return(DCD_BADFORMAT);
     }
-    fseeko(fd, 4*(N-num_fixed), SEEK_CUR);
+    //fseeko(fd, 4*(N-num_fixed), SEEK_CUR);
+    fseek(fd, 4*(N-num_fixed), SEEK_CUR);
     CHECK_FEOF(ret_val, "reading tmpX array");
 
     ret_val = READ(fd, &input_integer, sizeof(int));
@@ -675,7 +679,8 @@ int read_dcdstep(FILE * fd, int N, float *X, float *Y, float *Z, int num_fixed,
       return(DCD_BADFORMAT);
     }
 
-    fseeko(fd, 4*(N-num_fixed), SEEK_CUR);
+    //fseeko(fd, 4*(N-num_fixed), SEEK_CUR);
+    fseek(fd, 4*(N-num_fixed), SEEK_CUR);
     CHECK_FEOF(ret_val, "reading tmpX array");
 
     ret_val = READ(fd, &input_integer, sizeof(int));
@@ -698,7 +703,8 @@ int read_dcdstep(FILE * fd, int N, float *X, float *Y, float *Z, int num_fixed,
       return(DCD_BADFORMAT);
     }
 
-    fseeko(fd, 4*(N-num_fixed), SEEK_CUR);
+    //fseeko(fd, 4*(N-num_fixed), SEEK_CUR);
+    fseek(fd, 4*(N-num_fixed), SEEK_CUR);
     CHECK_FEOF(ret_val, "reading tmpX array");
 
     ret_val = READ(fd, &input_integer, sizeof(int));
@@ -718,7 +724,8 @@ int read_dcdstep(FILE * fd, int N, float *X, float *Y, float *Z, int num_fixed,
         ret_val = READ(fd, &input_integer, sizeof(int));
         CHECK_FREAD(ret_val, "reading extra charmm block");
         if (reverseEndian) input_integer = *reverseFourByteWord(&input_integer);
-        fseeko(fd, input_integer, SEEK_CUR);
+        //fseeko(fd, input_integer, SEEK_CUR);
+        fseek(fd, input_integer, SEEK_CUR);
         ret_val = READ(fd, &input_integer, sizeof(int));
         CHECK_FREAD(ret_val, "reading extra charmm block");
     }
