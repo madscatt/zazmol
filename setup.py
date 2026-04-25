@@ -116,7 +116,7 @@ setup(name='sasmol',
         ( os.path.join('sasmol','test_sasmol','data','sasmol','linear_algebra') , [os.path.join('src','python','test_sasmol','data','sasmol','linear_algebra','1CRN-rot-shift.pdb')]),
         ( os.path.join('sasmol','test_sasmol','data','sasmol','linear_algebra') , [os.path.join('src','python','test_sasmol','data','sasmol','linear_algebra','1CRN-rot.pdb')]),
 
-        ( os.path.join('sasmol','test_sasmol','data','sasmol','sasmol') , [os.path.join('src','python','test_sasmol','data','sasmol','sasmol','1CRN-3frames.pdb')]),
+        ( os.path.join('sasmol','test_sasmol','data','sasmol','sasmol') , [os.path.join('src','python','test_sasmol','data','sasmol','system','1CRN-3frames.pdb')]),
 
         ( os.path.join('sasmol','test_sasmol','data','sasmol','file_io') , [os.path.join('src','python','test_sasmol','data','sasmol','file_io','1AA-NoEND.pdb')]),
         ( os.path.join('sasmol','test_sasmol','data','sasmol','file_io') , [os.path.join('src','python','test_sasmol','data','sasmol','file_io','1ATM-1.pdb')]),
