@@ -311,13 +311,10 @@ class Test_subset_Mask_get_subset_mask(unittest.TestCase):
         #basis_filter = 'resid[i]==515 and (name[i]=="N" or name[i]=="CA" or name[i]=="C" or name[i]=="O") and beta[i]>10.0'
         #
         error, mask = self.o.get_subset_mask(basis_filter)
-        print("ERROR = ", error)
-        print("len(error) = ", len(error))
         
         #
         expecting_error = False
         expectd_mask = [1]*4+[0]*11
-        print("expected mask  = ", expectd_mask)
         #
         self.assertEqual(len(error) > 0, expecting_error)
         self.assertEqual(list(mask), expectd_mask)
@@ -371,7 +368,6 @@ class Test_subset_Mask_get_subset_mask(unittest.TestCase):
         basis_filter = 'moltype[i]=="rna"'
         #
         error, mask = self.o.get_subset_mask(basis_filter)
-        print(error, mask)
         #
         expecting_error = False
         expectd_mask = [0]*10632

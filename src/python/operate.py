@@ -352,7 +352,6 @@ class Move():
 
             #u = linear_algebra.find_u(coor_subset_self, coor_subset_other)
             u = linear_algebra.find_u(coor_subset_other, coor_subset_self)
-            print('u = ', u)
             tao = numpy.transpose(self.coor()[frame] - com_subset_self)
             error, nat2 = linear_algebra.matrix_multiply(u, tao)
             ncoor = numpy.transpose(nat2) + com_subset_other

@@ -51,8 +51,6 @@ class Test_intg_sasio_Files_close_dcd_read(unittest.TestCase):
         # opening a file that doesn't exist returns a Null pointer
         pf = dcdio.open_dcd_read(dcdFileName)
 
-        print('pf = ', pf, '\ttype(pf) = ', type(pf))
-
         with io.open(stdoutFileName, 'w') as temp_file:
             sys.stdout = temp_file
 

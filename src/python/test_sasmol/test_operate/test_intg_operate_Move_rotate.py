@@ -105,9 +105,6 @@ class Test_intg_operate_Move_rotate(unittest.TestCase):
         #
         expected_com = numpy.array([-9.775, 9.300, 6.978], floattype)
 
-        print('expected_com:', expected_com)
-        print('result_com:', result_com)
-
         self.assert_list_almost_equal(expected_com, result_com,2)
 
 
@@ -129,4 +126,3 @@ class Test_intg_operate_Move_rotate(unittest.TestCase):
 
 if __name__ == '__main__': 
    main() 
-

@@ -99,9 +99,7 @@ class Mask(object):
 
         farray = numpy.zeros((nflexible, natoms), numpy.longlong)
 
-        print('pre farray = ', farray)
         sasmol.mask.get_mask_array(farray, name, resid, flexible_residues, nresidues, mtype)
-        print('post farray = ', farray)
 
         return farray
 

@@ -97,7 +97,6 @@ class TestMatrixMultiply(unittest.TestCase):
         expected = numpy.array([[-1585.84, -140.0], [-24.5454, -880.8]], dtype=floattype)
         result = numpy.round(result, 3)
         expected = numpy.round(expected, 3)
-        print('result', result)
         self.assert_list_almost_equal(result.flatten(), expected.flatten())
         expected_error = []
         self.assertEqual(result_error, expected_error)
@@ -109,7 +108,6 @@ class TestMatrixMultiply(unittest.TestCase):
         expected = numpy.array([[-71.396], [52.547]], dtype=floattype)
         result = numpy.round(result, 3)
         expected = numpy.round(expected, 3)
-        print('result', result)
         self.assert_list_almost_equal(result.flatten(), expected.flatten())
         expected_error = []
         self.assertEqual(result_error, expected_error)
