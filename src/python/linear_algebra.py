@@ -13,14 +13,14 @@
 #    You should have received a copy of the GNU General Public License
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
-#	LINEAR_ALGEBRA
+# LINEAR_ALGEBRA
 #
-#	12/13/2009	--	initial coding			:	jc
-#	12/24/2015	--	refactored for release  :	jc
+# 12/13/2009	--	initial coding			:	jc
+# 12/24/2015	--	refactored for release  :	jc
 #
-#	 1         2         3         4         5         6         7
+# 1         2         3         4         5         6         7
 # LC4567890123456789012345678901234567890123456789012345678901234567890123456789
-#								       *      **
+# *      **
 '''
 	LINEAR_ALGEBRA contains methods to perform basic mathematical operations
 '''
@@ -29,6 +29,7 @@ import sys
 import numpy
 import math
 import sasmol.matrix_math as matrix_math
+
 
 def cross_product(a, b):
     ''' 
@@ -112,16 +113,17 @@ def matrix_multiply(a, b):
         dim_b2 = 1
 
     c = numpy.zeros((dim_a1, dim_b2), numpy.float32)
-    if(dim_a2 != dim_b1):
+    if (dim_a2 != dim_b1):
         message = 'incompatible matrices'
         error.append(message)
         c = None
         return error, c
 
 #    c = matrix_math.matrix_multiply(a, b, dim_a1, dim_a2, dim_b2)
-    c = numpy.dot(a,b)
+    c = numpy.dot(a, b)
 
     return error, c
+
 
 def find_u(x, y):
     '''
@@ -166,7 +168,7 @@ def find_u(x, y):
             numpy.put(b, k, rad)
             k = k + 1
     r = numpy.reshape(b, (-1, 3))
-    #r = numpy.mat(r)
+    # r = numpy.mat(r)
     r = numpy.asmatrix(r)
     rt = r.T		# transpose of r
     rtr = rt * r  # matrix multiply rt * r
@@ -184,12 +186,12 @@ def find_u(x, y):
     rak0.shape = (1, 3)
     rak1.shape = (1, 3)
 
-    if(uk[0] == 0.0):
+    if (uk[0] == 0.0):
         urak0 = (10**15) * rak0
     else:
         urak0 = (1.0 / math.sqrt(abs(uk[0]))) * rak0
 
-    if(uk[1] == 0.0):
+    if (uk[1] == 0.0):
         urak1 = (10**15) * rak1
     else:
         urak1 = (1.0 / math.sqrt(abs(uk[1]))) * rak1
@@ -211,6 +213,60 @@ def find_u(x, y):
     u = numpy.reshape(lu, (-1, 3))
 
     return u
+
+
+def vec_sub(a, b, c):
+    '''
+    Subtract vector ``c`` from vector ``b`` and store the result in ``a``.
+
+    Parameters
+    ----------
+    a
+        float list : output vector
+
+    b
+        float list : minuend vector
+
+    c
+        float list : subtrahend vector
+
+    Returns
+    -------
+    output vector ``a``
+    '''
+
+    a[0] = b[0] - c[0]
+    a[1] = b[1] - c[1]
+    a[2] = b[2] - c[2]
+
+    return a
+
+
+def vec_scale(a, b, c):
+    '''
+    Scale vector ``c`` by scalar ``b`` and store the result in ``a``.
+
+    Parameters
+    ----------
+    a
+        float list : output vector
+
+    b
+        float : scale factor
+
+    c
+        float list : vector to scale
+
+    Returns
+    -------
+    output vector ``a``
+    '''
+
+    a[0] = b * c[0]
+    a[1] = b * c[1]
+    a[2] = b * c[2]
+
+    return a
 
 
 def cmp(a, b):
@@ -257,7 +313,7 @@ def signed_angle(a, b, c):
     ada = (a[0] * a[0] + a[1] * a[1] + a[2] * a[2])
     bdb = (b[0] * b[0] + b[1] * b[1] + b[2] * b[2])
 
-    if(ada * bdb <= 0.0):
+    if (ada * bdb <= 0.0):
         return 180.0
     else:
         adb = (a[0] * b[0] + a[1] * b[1] + a[2] * b[2])
