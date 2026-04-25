@@ -55,6 +55,12 @@ class Test_Operate_Move_Align_PMI(unittest.TestCase):
                 else:
                     self.assert_list_almost_equal(a[i], b[i], places)
 
+    def assert_axis_aligned(self, result_axis, expected_axis, places=2):
+        result_axis = result_axis / numpy.linalg.norm(result_axis)
+        expected_axis = expected_axis / numpy.linalg.norm(expected_axis)
+        alignment = abs(numpy.dot(result_axis, expected_axis))
+        self.assertAlmostEqual(alignment, 1.0, places)
+
     def test_align_pmi_on_axis_x(self):
         frame = 0
         pmi_eigenvector = 0
@@ -62,8 +68,8 @@ class Test_Operate_Move_Align_PMI(unittest.TestCase):
         self.o1.align_pmi_on_axis(frame, pmi_eigenvector, alignment_vector_axis)
         expected_axis = numpy.array([1.0, 0.0, 0.0])
         uk, ak, I = self.o1.calculate_principal_moments_of_inertia(frame)
-        result_axis = ak[pmi_eigenvector]
-        self.assert_list_almost_equal(result_axis, expected_axis, places=2)
+        result_axis = ak[:, pmi_eigenvector]
+        self.assert_axis_aligned(result_axis, expected_axis, places=2)
 
     def test_align_pmi_on_axis_y(self):
         frame = 0
@@ -72,8 +78,8 @@ class Test_Operate_Move_Align_PMI(unittest.TestCase):
         self.o1.align_pmi_on_axis(frame, pmi_eigenvector, alignment_vector_axis)
         expected_axis = numpy.array([0.0, 1.0, 0.0])
         uk, ak, I = self.o1.calculate_principal_moments_of_inertia(frame)
-        result_axis = ak[pmi_eigenvector]
-        self.assert_list_almost_equal(result_axis, expected_axis, places=2)
+        result_axis = ak[:, pmi_eigenvector]
+        self.assert_axis_aligned(result_axis, expected_axis, places=2)
 
     def test_align_pmi_on_axis_z(self):
         frame = 0
@@ -82,8 +88,8 @@ class Test_Operate_Move_Align_PMI(unittest.TestCase):
         self.o1.align_pmi_on_axis(frame, pmi_eigenvector, alignment_vector_axis)
         expected_axis = numpy.array([0.0, 0.0, 1.0])
         uk, ak, I = self.o1.calculate_principal_moments_of_inertia(frame)
-        result_axis = ak[pmi_eigenvector]
-        self.assert_list_almost_equal(result_axis, expected_axis, places=2)
+        result_axis = ak[:, pmi_eigenvector]
+        self.assert_axis_aligned(result_axis, expected_axis, places=2)
 
     def tearDown(self):
         pass

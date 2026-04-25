@@ -563,41 +563,33 @@ class Move():
         uk, ak, I = self.calculate_principal_moments_of_inertia(frame)
 
         ''' right handed coordinate frame '''
-        ak = ak[pmi_eigenvector]
+        ak = ak[:, pmi_eigenvector]
 
-        if(alignment_vector_axis == 'x'):
-            axis = numpy.array([1.0, 0.0, 0.0])
-        elif(alignment_vector_axis == 'y'):
-            axis = numpy.array([0.0, 1.0, 0.0])
-        elif(alignment_vector_axis == 'z'):
-            axis = numpy.array([0.0, 0.0, 1.0])
+        axes = {
+                'x': numpy.array([1.0, 0.0, 0.0]),
+                'y': numpy.array([0.0, 1.0, 0.0]),
+                'z': numpy.array([0.0, 0.0, 1.0]),
+                }
+        axis = axes[alignment_vector_axis]
 
-        print(f"Initial ak: {ak}")
-        print(f"Alignment axis: {axis}")
-
-        rotvec = numpy.cross(ak, axis)
+        ak = ak / numpy.linalg.norm(ak)
+        rotvec = numpy.cross(axis, ak)
         sine = numpy.linalg.norm(rotvec)
-        if sine != 0:
+        cosine = numpy.clip(numpy.dot(ak, axis), -1.0, 1.0)
+
+        if sine > 1.0e-12:
             rotvec = rotvec / sine
-#        rotvec = rotvec / numpy.linalg.norm(rotvec)
-        cosine = numpy.dot(ak, axis)
-
-        print(f"Rotvec: {rotvec}")
-        print(f"Sine: {sine}")
-        print(f"Cosine: {cosine}")
-
-        if cosine == 0:
-            print('Vectors are already perpendicular, no rotation needed.')
+        elif cosine > 0.0:
             return
+        else:
+            basis = numpy.eye(3)[numpy.argmin(numpy.abs(ak))]
+            rotvec = numpy.cross(ak, basis)
+            rotvec = rotvec / numpy.linalg.norm(rotvec)
 
         #theta = math.atan(sine / cosine)
         theta = math.atan2(sine, cosine)
 
         unit_axis = [rotvec[0], rotvec[1], rotvec[2]]
         self.rotate_general_axis(frame, theta, unit_axis)
-
-        # Recalculate principal moments of inertia to check alignment
-        uk, ak, I = self.calculate_principal_moments_of_inertia(frame)
-        print(f"Aligned ak: {ak[pmi_eigenvector]}")
 
         return
