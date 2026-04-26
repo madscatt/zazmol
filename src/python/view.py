@@ -1,9 +1,9 @@
 from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
-#from __future__ import unicode_literals
+# from __future__ import unicode_literals
 #
-#   SASMOL: Copyright (C) 2011 Joseph E. Curtis, Ph.D. 
+#   SASMOL: Copyright (C) 2011 Joseph E. Curtis, Ph.D.
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -18,22 +18,22 @@ from __future__ import print_function
 #    You should have received a copy of the GNU General Public License
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
-#	VIEW
+# VIEW
 #
-#	11/27/2013	--	initial coding			:	jc
-#	12/29/2015	--	refactored for release  :   jc
-#	08/19/2016	--	added doc strings       :   jc
+# 11/27/2013	--	initial coding			:	jc
+# 12/29/2015	--	refactored for release  :   jc
+# 08/19/2016	--	added doc strings       :   jc
 #
 # LC	 1         2         3         4         5         6         7
 # LC4567890123456789012345678901234567890123456789012345678901234567890123456789
-#								       *      **
+# *      **
 '''
 	View is the main module that contains the base classes that 
 	read and write atomic information from and to external viewers
 	such as vmd and others in the future (PyMol, etc.).
 	
 	To view the coordinates the viewer needs to be open and controlled
-	external to view / sasmol.  These methods merely allow 
+	    external to view / sasmol.  These methods merely allow
 	coordinates to be passed between programs.
 
 	These classes are accessed by system objects
@@ -47,26 +47,27 @@ import locale
 import struct
 import numpy
 import time
-import sasmol.view_vmd
+import sasmol.view_vmd as view_vmd
+
 
 class View(object):
 
     """ 
 
         View is the main module that contains the base classes that 
-	    read and write atomic information from and to external viewers
-	    such as vmd and others in the future (PyMol, etc.).
-	
-	    To view the coordinates the viewer needs to be open and controlled
-	    external to view / sasmol.  These methods merely allow 
-	    coordinates to be passed between programs.
+            read and write atomic information from and to external viewers
+            such as vmd and others in the future (PyMol, etc.).
 
-	    See the following sites for the IMD format:
-    
-	    http://www.ks.uiuc.edu/Research/vmd/
-	    http://www.ks.uiuc.edu/Research/namd/
-    
-	    This class is accessed by system objects
+            To view the coordinates the viewer needs to be open and controlled
+            external to view / sasmol.  These methods merely allow
+            coordinates to be passed between programs.
+
+            See the following sites for the IMD format:
+
+            http://www.ks.uiuc.edu/Research/vmd/
+            http://www.ks.uiuc.edu/Research/namd/
+
+            This class is accessed by system objects
 
         Examples
         ========
@@ -80,17 +81,17 @@ class View(object):
 
         Note
         ----
-    
+
         `self` parameter is not shown in the ``Parameters`` section in the documentation
 
-    """ 
+    """
 
     def send_coordinates_to_vmd(self, port, flag, **kwargs):
         """
         This method opens a socket to send and receive coordinates
         by calling a pre-compiled C module (view_vmd).
 
-        
+
         Parameters
         ----------
         port 
@@ -101,7 +102,7 @@ class View(object):
 
         kwargs 
             optional future arguments
-                                                                                     
+
         Returns
         -------
         None

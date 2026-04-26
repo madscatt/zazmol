@@ -6,7 +6,7 @@
 '''
 # System imports
 from distutils.core import *
-from distutils      import sysconfig
+from distutils import sysconfig
 
 # Third-party modules - we depend on numpy for everything
 import numpy
@@ -19,15 +19,14 @@ except AttributeError:
 
 # simple extension module
 _view_vmd = Extension("_view_vmd",
-                   ["view_vmd.i","view_vmd.c","imd.c","vmdsock.c"],
-                   include_dirs = [numpy_include],
-                   )
+                      ["view_vmd_module.c", "view_vmd.c", "imd.c", "vmdsock.c"],
+                      include_dirs=[numpy_include],
+                      )
 
 # NumyTypemapTests setup
-setup(  name        = "SASVIEW VMD I/O",
-        description = "Module handles sending and receiving coordinates to VMD using numpy.i",
-        author      = "Joseph E. Curtis",
-        version     = "0.1",
-        ext_modules = [_view_vmd]
-        )
-
+setup(name="SASVIEW VMD I/O",
+      description="Module handles sending and receiving coordinates to VMD using numpy.i",
+      author="Joseph E. Curtis",
+      version="0.1",
+      ext_modules=[_view_vmd]
+      )

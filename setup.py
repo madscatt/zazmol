@@ -65,7 +65,7 @@ setup(name='sasmol',
                              os.path.join('src', 'python', 'extensions', 'dcdio', 'dcdio_module.c')],
                     include_dirs=[numpy.get_include()]),
 
-          Extension('sasmol._view_vmd', [os.path.join('src', 'python', 'extensions', 'view', 'view_vmd.i'), os.path.join('src', 'python', 'extensions', 'view', 'view_vmd.c'), os.path.join(
+          Extension('sasmol._view_vmd', [os.path.join('src', 'python', 'extensions', 'view', 'view_vmd_module.c'), os.path.join('src', 'python', 'extensions', 'view', 'view_vmd.c'), os.path.join(
               'src', 'python', 'extensions', 'view', 'imd.c'), os.path.join('src', 'python', 'extensions', 'view', 'vmdsock.c')], include_dirs=[NUMPY_INCLUDE]),
           Extension('sasmol._mask', [os.path.join('src', 'python', 'extensions', 'mask', 'mask.i'), os.path.join(
               'src', 'python', 'extensions', 'mask', 'mask.c')], include_dirs=[NUMPY_INCLUDE]),

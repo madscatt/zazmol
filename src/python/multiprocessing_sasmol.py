@@ -205,7 +205,7 @@ class Multiprocessing_SasMol():
 
         for i in range(number_of_batches):
             dum_coor = numpy.zeros(
-                (len(frames[i]), molecule.natoms(), 3), numpy.float64)
+                (len(frames[i]), molecule.natoms(), 3), numpy.float32)
             molecules[i].setCoor(dum_coor)
             count = 0
             for frame in frames[i]:
