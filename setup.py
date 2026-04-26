@@ -56,7 +56,7 @@ setup(name='sasmol',
 
       package_dir={'sasmol': os.path.join('src', 'python')},
 
-      packages=['sasmol', 'sasmol.test_sasmol', 'sasmol.test_sasmol.utilities', 'sasmol.test_sasmol.data', 'sasmol.test_sasmol.data.pdb_common', 'sasmol.test_sasmol.data.dcd_common', 'sasmol.test_sasmol.data.sasmol', 'sasmol.test_sasmol.data.sasmol.calculate', 'sasmol.test_sasmol.data.sasmol.file_io', 'sasmol.test_sasmol.data.sasmol.file_io.test-results', 'sasmol.test_sasmol.data.sasmol.linear_algebra', 'sasmol.test_sasmol.data.sasmol.system',
+      packages=['sasmol', 'sasmol.test_sasmol', 'sasmol.test_sasmol.utilities', 'sasmol.test_sasmol.data', 'sasmol.test_sasmol.data.pdb_common', 'sasmol.test_sasmol.data.dcd_common', 'sasmol.test_sasmol.data.sasmol', 'sasmol.test_sasmol.data.sasmol.calculate', 'sasmol.test_sasmol.data.sasmol.file_io', 'sasmol.test_sasmol.data.sasmol.file_io.test-results', 'sasmol.test_sasmol.data.sasmol.linear_algebra', 'sasmol.test_sasmol.test_utilities', 'sasmol.test_sasmol.data.sasmol.system',
                 'sasmol.test_sasmol.data.sasmol.operate', 'sasmol.test_sasmol.data.sasmol.properties', 'sasmol.test_sasmol.test_calculate', 'sasmol.test_sasmol.test_file_io', 'sasmol.test_sasmol.test_linear_algebra', 'sasmol.test_sasmol.test_operate', 'sasmol.test_sasmol.test_properties', 'sasmol.test_sasmol.test_subset', 'sasmol.test_sasmol.test_topology', 'sasmol.extensions', 'sasmol.extensions.dcdio', 'sasmol.extensions.view', 'sasmol.extensions.mask', 'sasmol.extensions.matrix_math'],
 
       ext_modules=[

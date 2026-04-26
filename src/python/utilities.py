@@ -1,5 +1,4 @@
 # from __future__ import absolute_import
-import sasmol.properties as properties
 
 # from __future__ import unicode_literals
 #
@@ -296,7 +295,7 @@ class Element:
 def build_dict(s):
     import string
     answer = {}
-    for line in string.split(s, "\n"):
+    for line in s.split("\n"):
         symbol, name, num, weight = eval(line)
         answer[symbol] = Element(symbol, name, num, weight)
     return answer
@@ -410,9 +409,7 @@ def parse_sequence(sym2elt):
 
 def get_chemical_formula(formula_string):
 
-    Atomic = properties.Atomic()
     # standard_atomic_weights = Atomic.amu(keep_lower_case=True)
-    amu = Atomic.amu(keep_lower_case=True)
     sym2elt = build_dict(_data)
 
 #    #sym2elt = amu
@@ -431,8 +428,7 @@ def get_chemical_formula(formula_string):
         #    print sym," :: ",count
 
     except ValueError as detail:
-        print(str(detail))
-        error.append(detail)
+        error.append(str(detail))
 
     return error, formula_dictionary
 
