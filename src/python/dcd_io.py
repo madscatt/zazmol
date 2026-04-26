@@ -24,8 +24,13 @@ import sys
 import string
 import time
 import numpy
+from . import config as config
 # import sasmol.dcdio as dcdio
 import sasmol._dcdio as dcdio
+
+DEBUG = False
+if config.__logging_level__ == "DEBUG":
+    DEBUG = True
 
 # DCD_IO
 #
@@ -143,8 +148,10 @@ class DCD(object):
 
         i = 0
         for frame in range(start, end):
-            print(".",)
-            sys.stdout.flush()
+            # Historically this printed per-frame progress during long DCD writes.
+            if DEBUG:
+                print(".",)
+                sys.stdout.flush()
 
             tx = self._coor[frame, :, 0].astype(numpy.float32)
             ty = self._coor[frame, :, 1].astype(numpy.float32)
@@ -191,8 +198,10 @@ class DCD(object):
             outfile, filename, natoms, nset, istart, nsavc, delta)
 
         for frame in range(nset):
-            print(".",)
-            sys.stdout.flush()
+            # Historically this printed per-frame progress during long DCD writes.
+            if DEBUG:
+                print(".",)
+                sys.stdout.flush()
 
             tx = self._coor[frame, :, 0].astype(numpy.float32)
             ty = self._coor[frame, :, 1].astype(numpy.float32)
@@ -279,13 +288,15 @@ class DCD(object):
         self._coor[0, :, 1] = ty.astype(float)
         self._coor[0, :, 2] = tz.astype(float)
 
-        if len(kwargs) < 1:
-            sys.stdout.write('.',)
-        elif not kwargs['no_print']:
-            try:
+        # Historically this printed per-frame progress during long DCD reads.
+        if DEBUG:
+            if len(kwargs) < 1:
                 sys.stdout.write('.',)
-            except:
-                pass
+            elif not kwargs['no_print']:
+                try:
+                    sys.stdout.write('.',)
+                except:
+                    pass
 
         return
 
@@ -315,8 +326,10 @@ class DCD(object):
 
         sum = 0.0
         for i in range(nset):
-            print('.',)
-            sys.stdout.flush()
+            # Historically this printed per-frame progress during long DCD reads.
+            if DEBUG:
+                print('.',)
+                sys.stdout.flush()
             read_start_time = time.time()
 
             tx = numpy.zeros(nnatoms, dtype=numpy.float32)
@@ -336,6 +349,7 @@ class DCD(object):
         result = dcdio.close_dcd_read(infile)
         self._coor = numpy.array(coor)
 
-        print()
+        if DEBUG:
+            print()
 
         return
