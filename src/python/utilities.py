@@ -545,3 +545,42 @@ def parse_fasta(fasta_sequence, **kwargs):
         all_sequences.append(new_sequence)
 
     return all_sequences
+
+
+def check_integrity(obj, fast_check=False):
+    import logging
+    import sasmol.config as config
+
+    logger = logging.getLogger(__name__)
+
+    natoms = obj.natoms()
+    results = {}
+    errors = []
+
+    core_keys = [
+        '_atom', '_index', '_name', '_loc', '_resname', '_chain',
+        '_resid', '_rescode', '_occupancy', '_beta',
+        '_segname', '_element', '_charge'
+    ]
+
+    for key in core_keys:
+        val = obj.__dict__.get(key, None)
+        if val is None:
+            results[key] = None
+            continue
+        try:
+            length = len(val)
+            results[key] = length
+            if length != natoms:
+                errors.append((key, length, natoms))
+        except:
+            results[key] = 'N/A'
+
+    if errors:
+        logger.warning('Integrity check mismatch: %s', errors)
+    elif config.__logging_level__ == 'DEBUG':
+        logger.debug('Integrity check passed: natoms=%s', natoms)
+
+    return results
+
+

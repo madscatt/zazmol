@@ -32,7 +32,7 @@ import sasmol.matrix_math as matrix_math
 
 
 def cross_product(a, b):
-    ''' 
+    '''
     Returns cross product (vector product) on two vectors
 
     Parameters
@@ -54,7 +54,7 @@ def cross_product(a, b):
     >>> a = [1.0, 2.0, 3.0]
     >>> b = [-1.0, 6.0, 8.0]
     >>> linear_algebra.cross_product(a, b)
-    array([ -2., -11.,   8.]) 
+    array([ -2., -11.,   8.])
 
     '''
 
@@ -67,7 +67,7 @@ def cross_product(a, b):
 
 
 def matrix_multiply(a, b):
-    ''' 
+    '''
     Returns the result of multiplying matrix a by matrix b
 
     Parameters
@@ -80,7 +80,7 @@ def matrix_multiply(a, b):
 
     Returns
     -------
-    tuple 
+    tuple
         error
             list with error code (if error occurs)
 
@@ -306,7 +306,7 @@ def signed_angle(a, b, c):
     >>> b = [-1.0, 6.0, 8.0]
     >>> c = [-4.0, -1.0, 4]
     >>> linear_algebra.signed_angle(a, b, c)
-    21.444512921997863   
+    21.444512921997863
 
     '''
 
@@ -320,7 +320,7 @@ def signed_angle(a, b, c):
         try:
             argument = adb / math.sqrt(ada * bdb)
             angle = (180.0 / math.pi) * math.acos(argument)
-        except:
+        except BaseException:
             return 180.0
 
     cp = cross_product(a, b)
@@ -332,7 +332,7 @@ def signed_angle(a, b, c):
 
 def dihedral_angle(a1, a2, a3, a4):
     '''
-    Calculates the dihedral angle between four vectors  
+    Calculates the dihedral angle between four vectors
 
 
     Parameters
@@ -363,7 +363,7 @@ def dihedral_angle(a1, a2, a3, a4):
     >>> a3 = numpy.array([-4.0, -1.0, 4.0])
     >>> a4 = numpy.array([-3.0, -41, 3.0])
     >>> linear_algebra.dihedral_angle(a1, a2, a3, a4)
-    85.950635659264 
+    85.950635659264
 
     '''
 
@@ -387,36 +387,42 @@ def dihedral_angle(a1, a2, a3, a4):
 
 def calculate_angle(a, b, c):
     '''
+        Calculates the angle at point b formed by three points a, b, and c.
 
-    Calculates the dihedral angle between three vectors  
+        The angle is defined between the vectors(a - b) and (c - b).
 
-    Parameters
+        Parameters
         ----------
-    a
-        float list : vector a
+        a
+        float list: point a
 
-    b
-        float list : vector b
+        b
+        float list: vertex point
 
-    c
-        float list : vector c
+        c
+        float list: point c
 
-    Returns
-    -------
-    float
+        Returns
+        -------
+        float
         angle in radians
 
-    Examples
-    -------
+        Notes
+        -----
+        Returns NaN or Inf if either vector has zero length.
 
-    >>> import sasmol.linear_algebra as linear_algebra
-    >>> a = numpy.array([1.0, 2.0, 3.0])
-    >>> b = numpy.array([-1.0, 6.0, 8.0])
-    >>> c = numpy.array([-4.0, -1.0, 4.0])
-    >>> linear_algebra.calculate_angle(a, b, c)
-    0.7556508878558726 
+        Examples
+        --------
 
+        >> > import numpy
+        >> > import sasmol.linear_algebra as linear_algebra
+        >> > a = numpy.array([1.0, 0.0, 0.0])
+        >> > b = numpy.array([0.0, 0.0, 0.0])
+        >> > c = numpy.array([0.0, 1.0, 0.0])
+        >> > linear_algebra.calculate_angle(a, b, c)
+        1.5707963267948966
     '''
+
     u = a - b
     v = c - b
 

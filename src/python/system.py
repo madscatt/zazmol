@@ -471,6 +471,29 @@ class Atom(
     def setMoltype(self, newValue):
         self._moltype = newValue
 
+    # --- diagnostics ---
+    def check_integrity(self, fast_check=False):
+        import sasmol.utilities as utilities
+        return utilities.check_integrity(self, fast_check=fast_check)
+
+    def record(self):
+        self._moltype = newValue
+
+    def setRecord(self, newValue):
+        self._atom = newValue
+
+    def altloc(self):
+        return self._loc
+
+    def setAltloc(self, newValue):
+        self._loc = newValue
+
+    def icode(self):
+        return self._rescode
+
+    def setIcode(self, newValue):
+        self._rescode = newValue
+
 
 class Molecule(Atom):
 
