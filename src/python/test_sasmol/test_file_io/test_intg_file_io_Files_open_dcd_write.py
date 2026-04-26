@@ -34,6 +34,19 @@ class Test_intg_file_io_Files_open_dcd_write(unittest.TestCase):
    def setUp(self):
       self.o=system.Molecule(0)
 
+   def test_bad_output_path_raises_python_exception(self):
+      '''
+      test that opening a dcd for writing fails cleanly for a bad path
+      '''
+      dcdFile = os.path.join(moduleDataPath, 'missing-directory',
+                             'file-notexist.dcd')
+
+      with self.assertRaisesRegex(OSError, 'Failed to open file'):
+         dcdio.open_dcd_write(dcdFile)
+
+      with self.assertRaisesRegex(OSError, 'Failed to open file'):
+         self.o.open_dcd_write(dcdFile)
+
    def test_file_doesnt_exist(self):
       '''
 	   test a dcd which doent exist
@@ -187,4 +200,3 @@ class Test_intg_file_io_Files_open_dcd_write(unittest.TestCase):
    
 if __name__ == '__main__': 
    unittest.main() 
-
