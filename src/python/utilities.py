@@ -31,7 +31,7 @@
 	Util holds general methods for file naming, os differences,
         chemical formula parsing, etc.
 '''
-# import system as system
+import sasmol.system as system
 import re
 import string
 import copy
@@ -44,8 +44,10 @@ def find_unique(this_list):
 
 class Copy_Using_Mask():
 
+    #@classmethod
+    #def from_sasmol(class_instance,  mask, **kwargs):
     @classmethod
-    def from_sasmol(class_instance,  mask, **kwargs):
+    def from_sasmol(cls, class_instance, mask, **kwargs):
         ''' 
 
         Parameters
