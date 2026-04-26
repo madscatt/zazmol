@@ -340,7 +340,7 @@ class Mask(object):
 		return error, mask_array
 		'''
 
-    def merge_two_molecules(self, mol1, mol2):
+    def merge_two_molecules(self, mol1, mol2, **kwargs):
         '''
         This method combines two molecules into a single, new molecule. 
         It will assign coordinates from the first frame of a molecule.
@@ -361,160 +361,176 @@ class Mask(object):
 
                 error = m3.merge_two_molecules(m1,m2) 	### sets the values that define mol3
 
+        If report_missing_descriptors=True is passed, descriptors that are not
+        present in both input molecules are listed in the returned error list.
+        These messages are informational; the merge still proceeds when the
+        structural essentials are valid.
+
+        Might do: add a caller-supplied required_descriptors keyword so
+        simulation, PDB-writing, scattering, or coarse-grain callers can define
+        their own descriptor completeness requirements without imposing a
+        global molecule schema.
+
         '''
         error = []
-        atom = []
-        index = []
-        name = []
-        loc = []
-        resname = []
-        chain = []
-        resid = []
-        rescode = []
-        x = []
-        y = []
-        z = []
-        occupancy = []
-        beta = []
-        segname = []
-        element = []
-        charge = []
-        moltype = []
-        original_index = []
-        original_resid = []
-        residue_flag = []
+        frame = 0
+        report_missing_descriptors = kwargs.get(
+            'report_missing_descriptors', False)
 
         natoms1 = mol1.natoms()
         natoms2 = mol2.natoms()
+        natoms = natoms1 + natoms2
 
-        # print('natoms1 = ', natoms1)
-        # print('natoms2 = ', natoms2)
-
-        frame = 0
-
-        for i in range(natoms1):
-            try:
-                # if True:
-                atom.append(mol1._atom[i])
-                index.append(mol1._index[i])
-                name.append(mol1._name[i])
-                loc.append(mol1._loc[i])
-                resname.append(mol1._resname[i])
-                chain.append(mol1._chain[i])
-                resid.append(mol1._resid[i])
-                rescode.append(mol1._rescode[i])
-                x.append(mol1.coor()[frame, i, 0])
-                y.append(mol1.coor()[frame, i, 1])
-                z.append(mol1.coor()[frame, i, 2])
-                occupancy.append(mol1._occupancy[i])
-                beta.append(mol1._beta[i])
-                segname.append(mol1._segname[i])
-                element.append(mol1._element[i])
-                charge.append(mol1._charge[i])
-                moltype.append(mol1._moltype[i])
-                original_index.append(mol1._original_index[i])
-                original_resid.append(mol1._original_resid[i])
-                residue_flag.append(mol1._residue_flag[i])
-
-            except:
-                error.append(
-                    'failed in copy_molecule when attempting to assign descriptors to atom ' + str(i) + ' from mol1')
-                return error
-
-        last_index_mol1 = mol1._index[-1]
-        this_index = last_index_mol1 + 1
-
-        for i in range(natoms2):
-            try:
-                # if True:
-                atom.append(mol2._atom[i])
-                index.append(this_index)
-                name.append(mol2._name[i])
-                loc.append(mol2._loc[i])
-                resname.append(mol2._resname[i])
-                chain.append(mol2._chain[i])
-                resid.append(mol2._resid[i])
-                rescode.append(mol2._rescode[i])
-                x.append(mol2.coor()[frame, i, 0])
-                y.append(mol2.coor()[frame, i, 1])
-                z.append(mol2.coor()[frame, i, 2])
-                occupancy.append(mol2._occupancy[i])
-                beta.append(mol2._beta[i])
-                segname.append(mol2._segname[i])
-                element.append(mol2._element[i])
-                charge.append(mol2._charge[i])
-                moltype.append(mol2._moltype[i])
-                original_index.append(mol2._original_index[i])
-                original_resid.append(mol2._original_resid[i])
-                residue_flag.append(mol2._residue_flag[i])
-                this_index = this_index + 1
-
-            except:
-                error.append(
-                    'failed in copy_molecule when attempting to assign descriptors to atom ' + str(i) + ' from mol2')
-                return error
-
-        x = numpy.array(x, float)
-        y = numpy.array(y, float)
-        z = numpy.array(z, float)
-
-        coor = numpy.zeros((1, natoms1 + natoms2, 3), float)
-
-        try:
-            coor[frame, :, 0] = x
-            coor[frame, :, 1] = y
-            coor[frame, :, 2] = z
-        except:
-            error.append('failed in merge molecule when assigning coordinates')
+        if natoms1 <= 0:
+            error.append('mol1 has no atoms to merge')
             return error
 
-        self._atom = atom
-        self._index = index
-        self._name = name
-        self._loc = loc
-        self._resname = resname
-        self._chain = chain
-        self._resid = resid
-        self._rescode = rescode
-        self._occupancy = occupancy
-        self._beta = beta
-        self._segname = segname
-        self._element = element
-        self._charge = charge
-        self._moltype = moltype
-        self._coor = numpy.array(coor)
-        self._natoms = len(index)
-        self._original_index = original_index
-        self._original_resid = original_resid
-        self._residue_flag = residue_flag
+        list_fields = [
+            '_atom', '_name', '_loc', '_resname', '_chain', '_rescode',
+            '_occupancy', '_beta', '_segname', '_element', '_charge',
+            '_moltype', '_residue_flag', '_resid', '_original_index',
+            '_original_resid',
+        ]
+        optional_list_fields = ['_charmm_type']
+        optional_array_fields = ['_atom_charge', '_atom_vdw']
 
-        self._unique_names = list(numpy.unique(self._name))
-        self._unique_resnames = list(numpy.unique(self._resname))
-        self._unique_resids = list(numpy.unique(self._resid))
-        self._unique_chains = list(numpy.unique(self._chain))
-        self._unique_segnames = list(numpy.unique(self._segname))
-        self._unique_occupancies = list(numpy.unique(self._occupancy))
-        self._unique_betas = list(numpy.unique(self._beta))
-        self._unique_elements = list(numpy.unique(self._element))
-        self._unique_moltypes = list(numpy.unique(self._moltype))
+        def has_compatible_descriptor(field):
+            return hasattr(mol1, field) and hasattr(mol2, field)
 
-        self._number_of_names = len(self._unique_names)
-        self._number_of_resnames = len(self._unique_resnames)
-        self._number_of_resids = len(self._unique_resids)
-        self._number_of_chains = len(self._unique_chains)
-        self._number_of_segnames = len(self._unique_segnames)
-        self._number_of_occupancies = len(self._unique_occupancies)
-        self._number_of_betas = len(self._unique_betas)
-        self._number_of_elements = len(self._unique_elements)
-        self._number_of_moltypes = len(self._unique_moltypes)
+        def report_missing_descriptor(field):
+            missing_from = []
 
-        self._conect = mol1._conect
+            if not hasattr(mol1, field):
+                missing_from.append('mol1')
+
+            if not hasattr(mol2, field):
+                missing_from.append('mol2')
+
+            if len(missing_from) > 0 and report_missing_descriptors:
+                error.append(
+                    'skipped descriptor ' + field + ' missing from ' +
+                    ', '.join(missing_from))
+
+            return len(missing_from) == 0
+
+        def merge_descriptor(field, dtype=None):
+            values = []
+
+            try:
+                for i in range(natoms1):
+                    values.append(getattr(mol1, field)[i])
+
+                for i in range(natoms2):
+                    values.append(getattr(mol2, field)[i])
+            except:
+                error.append(
+                    'failed in merge_two_molecules when attempting to assign descriptor ' + field)
+                return None
+
+            if dtype is None:
+                return values
+
+            return numpy.array(values, dtype)
 
         try:
-            for ndx, list_ndxs in mol2._conect.items():
-                self._conect[ndx] = list_ndxs
+            last_index_mol1 = mol1._index[-1]
         except:
-            pass
+            error.append('mol1 is missing atom indices')
+            return error
+
+        index = list(mol1._index) + list(range(last_index_mol1 + 1,
+                                               last_index_mol1 + natoms2 + 1))
+
+        coor = numpy.zeros((1, natoms, 3), float)
+
+        try:
+            if mol1.coor().shape[1] != natoms1:
+                error.append(
+                    'mol1 coordinate atom count does not match natoms')
+                return error
+
+            coor[frame, 0:natoms1, :] = mol1.coor()[frame, :, :]
+        except:
+            error.append('failed in merge_two_molecules when assigning coordinates')
+            return error
+
+        if natoms2 > 0:
+            try:
+                if mol2.coor().shape[1] != natoms2:
+                    error.append(
+                        'mol2 coordinate atom count does not match natoms')
+                    return error
+
+                coor[frame, natoms1:natoms, :] = mol2.coor()[frame, :, :]
+            except:
+                error.append('failed in merge_two_molecules when assigning coordinates')
+                return error
+
+        self._index = index
+        self._coor = numpy.array(coor)
+        self._natoms = natoms
+
+        for field in list_fields:
+            if report_missing_descriptor(field):
+                values = merge_descriptor(field)
+
+                if len(error) > 0:
+                    return error
+
+                setattr(self, field, values)
+
+        for field in optional_list_fields:
+            if report_missing_descriptor(field):
+                values = merge_descriptor(field)
+
+                if len(error) > 0:
+                    return error
+
+                setattr(self, field, values)
+
+        for field in optional_array_fields:
+            if report_missing_descriptor(field):
+                values = merge_descriptor(field, float)
+
+                if len(error) > 0:
+                    return error
+
+                setattr(self, field, values)
+
+        unique_field_pairs = [
+            ('_name', '_unique_names', '_number_of_names'),
+            ('_resname', '_unique_resnames', '_number_of_resnames'),
+            ('_resid', '_unique_resids', '_number_of_resids'),
+            ('_chain', '_unique_chains', '_number_of_chains'),
+            ('_segname', '_unique_segnames', '_number_of_segnames'),
+            ('_occupancy', '_unique_occupancies', '_number_of_occupancies'),
+            ('_beta', '_unique_betas', '_number_of_betas'),
+            ('_element', '_unique_elements', '_number_of_elements'),
+            ('_moltype', '_unique_moltypes', '_number_of_moltypes'),
+        ]
+
+        for field, unique_field, number_field in unique_field_pairs:
+            if hasattr(self, field):
+                unique_values = list(numpy.unique(getattr(self, field)))
+                setattr(self, unique_field, unique_values)
+                setattr(self, number_field, len(unique_values))
+
+        if hasattr(mol1, '_conect'):
+            if isinstance(mol1._conect, dict):
+                self._conect = {}
+                self._conect.update(dict(mol1._conect))
+            elif isinstance(mol1._conect, list):
+                self._conect = mol1._conect[:]
+            else:
+                self._conect = mol1._conect
+        else:
+            self._conect = []
+
+        if hasattr(mol2, '_conect'):
+            try:
+                self._conect.update(dict(mol2._conect))
+            except:
+                pass
 
         return error
 

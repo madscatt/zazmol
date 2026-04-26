@@ -130,9 +130,11 @@ class Test_subset_Mask_merge_two_molecules(unittest.TestCase):
          self.o2.read_pdb(PdbDataPath+'YYY.pdb')
       except Exception:
          pass
-      #  
-      with self.assertRaises(Exception):
-         self.o3.merge_two_molecules(self.o1, self.o2)
+      #
+      error = self.o3.merge_two_molecules(self.o1, self.o2)
+      #
+      self.assertEqual(len(error), 1)
+      self.assertTrue('mol1 has no atoms' in error[0])
 
 
    def test_null_2(self):
@@ -146,8 +148,10 @@ class Test_subset_Mask_merge_two_molecules(unittest.TestCase):
          pass
       self.o2.read_pdb(PdbDataPath+'1ATM.pdb')
       #
-      with self.assertRaises(Exception):
-         self.o3.merge_two_molecules(self.o1, self.o2)
+      error = self.o3.merge_two_molecules(self.o1, self.o2)
+      #
+      self.assertEqual(len(error), 1)
+      self.assertTrue('mol1 has no atoms' in error[0])
 
 
    def test_1ATM_1(self):
@@ -578,8 +582,10 @@ class Test_subset_Mask_merge_two_molecules(unittest.TestCase):
       except Exception:
          pass
       #
-      with self.assertRaises(Exception):
-         error = self.o3.merge_two_molecules(self.o1, self.o2)
+      error = self.o3.merge_two_molecules(self.o1, self.o2)
+      #
+      self.assertEqual(len(error), 1)
+      self.assertTrue('mol1 has no atoms' in error[0])
 
 
 
@@ -597,8 +603,10 @@ class Test_subset_Mask_merge_two_molecules(unittest.TestCase):
       except Exception:
          pass
       #
-      with self.assertRaises(Exception):
-         error = self.o3.merge_two_molecules(self.o1, self.o2)
+      error = self.o3.merge_two_molecules(self.o1, self.o2)
+      #
+      self.assertEqual(len(error), 1)
+      self.assertTrue('mol1 has no atoms' in error[0])
 
 
    @skipIf(os.environ['SASMOL_LARGETEST']=='n',"I am not testing large files")
@@ -613,8 +621,168 @@ class Test_subset_Mask_merge_two_molecules(unittest.TestCase):
          pass
       self.o2.read_pdb(PdbDataPath+'1KP8.pdb')
       #
-      with self.assertRaises(Exception):
-         error = self.o3.merge_two_molecules(self.o1, self.o2)
+      error = self.o3.merge_two_molecules(self.o1, self.o2)
+      #
+      self.assertEqual(len(error), 1)
+      self.assertTrue('mol1 has no atoms' in error[0])
+
+
+   def test_molecule_maker_objects(self):
+      '''
+      merge two Molecule_Maker objects
+      '''
+      #
+      self.o1 = system.Molecule_Maker(2, name=['N', 'CA'], resid=[10, 10])
+      self.o2 = system.Molecule_Maker(2, name=['C', 'O'], resid=[20, 20])
+      #
+      error = self.o3.merge_two_molecules(self.o1, self.o2)
+      #
+      self.assertEqual(error, [])
+      self.assertEqual(self.o3.natoms(), 4)
+      self.assertEqual(self.o3.name(), ['N', 'CA', 'C', 'O'])
+      self.assertEqual(list(self.o3.index()), [1, 2, 3, 4])
+      self.assertEqual(list(self.o3.resid()), [10, 10, 20, 20])
+      self.assertEqual(list(self.o3.original_index()), [1, 2, 1, 2])
+      self.assertEqual(list(self.o3.original_resid()), [10, 10, 20, 20])
+      self.assertEqual(self.o3.coor().shape, (1, 4, 3))
+
+
+   def test_molecule_maker_coordinate_dtype_current_behavior(self):
+      '''
+      characterize current merge coordinate dtype behavior
+      '''
+      #
+      self.o1 = system.Molecule_Maker(1)
+      self.o2 = system.Molecule_Maker(1)
+      #
+      error = self.o3.merge_two_molecules(self.o1, self.o2)
+      #
+      self.assertEqual(error, [])
+      self.assertEqual(self.o1.coor().dtype, numpy.float32)
+      self.assertEqual(self.o2.coor().dtype, numpy.float32)
+      self.assertEqual(self.o3.coor().dtype, numpy.dtype(float))
+
+
+   def test_missing_descriptor_is_skipped(self):
+      '''
+      merge skips descriptors that are not present in both molecules
+      '''
+      #
+      self.o1 = system.Molecule_Maker(1)
+      self.o2 = system.Molecule_Maker(1)
+      del self.o2._element
+      #
+      error = self.o3.merge_two_molecules(self.o1, self.o2)
+      #
+      self.assertEqual(error, [])
+      self.assertFalse(hasattr(self.o3, '_element'))
+      self.assertEqual(self.o3.natoms(), 2)
+      self.assertEqual(list(self.o3.index()), [1, 2])
+
+
+   def test_missing_descriptor_report_is_optional(self):
+      '''
+      report skipped descriptors when requested by the caller
+      '''
+      #
+      self.o1 = system.Molecule_Maker(1)
+      self.o2 = system.Molecule_Maker(1)
+      del self.o2._element
+      #
+      error = self.o3.merge_two_molecules(
+          self.o1, self.o2, report_missing_descriptors=True)
+      #
+      self.assertEqual(len(error), 1)
+      self.assertTrue('skipped descriptor _element' in error[0])
+      self.assertTrue('mol2' in error[0])
+      self.assertFalse(hasattr(self.o3, '_element'))
+      self.assertEqual(self.o3.natoms(), 2)
+
+
+   def test_missing_core_descriptor_is_skipped(self):
+      '''
+      merge keeps available descriptors when another descriptor is absent
+      '''
+      #
+      self.o1 = system.Molecule_Maker(1)
+      self.o2 = system.Molecule_Maker(1)
+      del self.o1._name
+      #
+      error = self.o3.merge_two_molecules(self.o1, self.o2)
+      #
+      self.assertEqual(error, [])
+      self.assertFalse(hasattr(self.o3, '_name'))
+      self.assertEqual(self.o3.atom(), ['ATOM', 'ATOM'])
+      self.assertEqual(self.o3.natoms(), 2)
+
+
+   def test_missing_coordinates_current_behavior(self):
+      '''
+      characterize current behavior when coordinates are missing
+      '''
+      #
+      self.o1 = system.Molecule_Maker(1)
+      self.o2 = system.Molecule_Maker(1)
+      self.o2.setCoor(None)
+      #
+      error = self.o3.merge_two_molecules(self.o1, self.o2)
+      #
+      self.assertEqual(len(error), 1)
+      self.assertTrue('coordinates' in error[0])
+
+
+   def test_coordinate_atom_count_mismatch_fails(self):
+      '''
+      merge fails when coordinate atom count disagrees with natoms
+      '''
+      #
+      self.o1 = system.Molecule_Maker(2)
+      self.o2 = system.Molecule_Maker(1)
+      self.o1.setCoor(numpy.zeros((1, 1, 3), numpy.float32))
+      #
+      error = self.o3.merge_two_molecules(self.o1, self.o2)
+      #
+      self.assertEqual(len(error), 1)
+      self.assertTrue('mol1 coordinate atom count' in error[0])
+
+
+   def test_optional_descriptors_merge_when_present(self):
+      '''
+      merge optional force-field descriptors when both molecules define them
+      '''
+      #
+      self.o1 = system.Molecule_Maker(1)
+      self.o2 = system.Molecule_Maker(1)
+      self.o1._charmm_type = ['C1']
+      self.o2._charmm_type = ['C2']
+      self.o1.setAtom_charge([0.1])
+      self.o2.setAtom_charge([0.2])
+      self.o1.setAtom_vdw([1.5])
+      self.o2.setAtom_vdw([1.6])
+      #
+      error = self.o3.merge_two_molecules(self.o1, self.o2)
+      #
+      self.assertEqual(error, [])
+      self.assertEqual(list(self.o3._charmm_type), ['C1', 'C2'])
+      self.assert_list_almost_equal(list(self.o3.atom_charge()), [0.1, 0.2])
+      self.assert_list_almost_equal(list(self.o3.atom_vdw()), [1.5, 1.6])
+
+
+   def test_connectivity_is_copied_without_aliasing_mol1(self):
+      '''
+      merge copies connectivity from mol1 without sharing its dictionary
+      '''
+      #
+      self.o1 = system.Molecule_Maker(1)
+      self.o2 = system.Molecule_Maker(1)
+      self.o1._conect = {1: [2]}
+      self.o2._conect = {2: [1]}
+      #
+      error = self.o3.merge_two_molecules(self.o1, self.o2)
+      #
+      self.assertEqual(error, [])
+      self.assertEqual(self.o3.conect(), {1: [2], 2: [1]})
+      self.assertIsNot(self.o3.conect(), self.o1._conect)
 
 
 
