@@ -172,10 +172,19 @@ class DCD(object):
 
         return
 
-    def close_dcd_read(self, filepointer):
+    def _dcd_read_filepointer(self, dcd_file):
+        if isinstance(dcd_file, (list, tuple)):
+            if len(dcd_file) < 1:
+                raise ValueError('dcd_file must contain a filepointer')
+            return dcd_file[0]
+
+        return dcd_file
+
+    def close_dcd_read(self, dcd_file):
         '''
         This method closes a dcd file.
         '''
+        filepointer = self._dcd_read_filepointer(dcd_file)
         result = dcdio.close_dcd_read(filepointer)
 
         return

@@ -21,6 +21,7 @@ from unittest import main, skipIf
 
 import unittest
 import warnings
+import numpy
 
 import sasmol.system as system
 import sasmol._dcdio as dcdio
@@ -70,6 +71,35 @@ class Test_intg_sasio_Files_close_dcd_read(unittest.TestCase):
             code = temp_file.read()
         self.assertEqual(code, '')
         os.remove(stdoutFileName)
+
+    def test_1ATM_dcd_file_list(self):
+        '''
+        test close_dcd_read accepts the open_dcd_read return list
+        '''
+        filename = '1ATM.dcd'
+        dcdFileName = DataPath+filename
+        dcdFile = self.o.open_dcd_read(dcdFileName)
+
+        self.o.close_dcd_read(dcdFile)
+
+    def test_1ATM_read_step_then_close_dcd_file_list(self):
+        '''
+        test read_dcd_step and close_dcd_read accept the same dcd file list
+        '''
+        filename = '1ATM.dcd'
+        dcdFileName = DataPath+filename
+        dcdFile = self.o.open_dcd_read(dcdFileName)
+        self.o._coor = numpy.zeros((1, dcdFile[1], 3), numpy.float32)
+
+        self.o.read_dcd_step(dcdFile, 0, no_print=True)
+        self.o.close_dcd_read(dcdFile)
+
+    def test_empty_dcd_file_list_raises_value_error(self):
+        '''
+        test close_dcd_read rejects an empty dcd file list
+        '''
+        with self.assertRaisesRegex(ValueError, 'filepointer'):
+            self.o.close_dcd_read([])
 
     def test_2AAD(self):
         '''
