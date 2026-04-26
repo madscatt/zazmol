@@ -476,6 +476,28 @@ class Atom(
         import sasmol.utilities as utilities
         return utilities.check_integrity(self, fast_check=fast_check)
 
+    def validate_integrity(self, fast_check=False):
+        import sasmol.utilities as utilities
+
+        results = utilities.check_integrity(
+            self, fast_check=fast_check, warn=False)
+        natoms = self.natoms()
+        errors = []
+
+        for key, length in results.items():
+            if length is None:
+                errors.append('%s is missing' % key)
+            elif length == 'N/A':
+                errors.append('%s has no length' % key)
+            elif length != natoms:
+                errors.append('%s has length %s, expected %s' %
+                              (key, length, natoms))
+
+        if errors:
+            raise ValueError('Integrity check failed: ' + '; '.join(errors))
+
+        return results
+
     def record(self):
         self._moltype = newValue
 
@@ -780,6 +802,7 @@ class Molecule(Atom):
         operate.set_average_vdw(self)
         return
 
+
 class System(Atom):
 
     """ System is a class that is used to aggregate all components. It inherits
@@ -830,11 +853,21 @@ class Molecule_Maker(Atom):
         use within sasmol to use read_pdb() and write_pdb() methods in file_io.
 
         Default inputs are listed in the variables in __init__ and itemized below.
-        The values are assigned to all atoms in the molecule.
+        Scalar values are assigned to all atoms in the molecule.  Per-atom
+        lists, tuples, or arrays may also be supplied, and must have one value
+        for each atom.
 
         Once defined, attributes can be set using setters in the Atom class.
 
         Class has several initialization options
+
+        For most atom fields, pass a scalar value to use the same value for
+        every atom, or pass a list, tuple, or numpy array with one value per
+        atom.  Per-atom inputs must match natoms exactly.  Partial lists are
+        not expanded or repeated.  The coor argument remains a coordinate
+        array and is not interpreted as a per-atom constructor template.  Use
+        validate_integrity() after later setter calls to raise a ValueError if
+        core per-atom fields no longer match natoms.
 
         Parameters
         ----------
@@ -897,12 +930,33 @@ class Molecule_Maker(Atom):
         >>> molecule = system.Molecule_Maker(2048)
         >>> molecule = system.Molecule_Maker(2048, name='Ar')
         >>> molecule = system.Molecule_Maker(2048, name='Ar', segname='ARG0')
+        >>> molecule = system.Molecule_Maker(2, name=['N', 'CA'])
         >>> index = [x for x in range(340,1000)]
         >>> molecule = system.Molecule_Maker(660, name='Ar', index=index)
         >>> molecule.index()[0]
         340
 
     """
+
+    def _expand_constructor_value(self, field_name, value, natoms):
+        if isinstance(value, (list, tuple, numpy.ndarray)):
+            length = len(value)
+
+            if length != natoms:
+                raise ValueError(
+                    '%s must be a scalar value or have length %d' %
+                    (field_name, natoms))
+
+            return list(value)
+
+        return [value for x in range(natoms)]
+
+    def _validate_constructor_length(self, field_name, value, natoms):
+        if not isinstance(value, (list, tuple, numpy.ndarray)):
+            raise ValueError('%s must have length %d' % (field_name, natoms))
+
+        if len(value) != natoms:
+            raise ValueError('%s must have length %d' % (field_name, natoms))
 
     def __init__(
             self,
@@ -928,44 +982,55 @@ class Molecule_Maker(Atom):
         Atom.__init__(self)
 
         self._natoms = natoms
+        self._number_of_atoms = natoms
 
-        self._atom = [atom for x in range(natoms)]
+        self._atom = self._expand_constructor_value('atom', atom, natoms)
 
         if index is not None:
+            self._validate_constructor_length('index', index, natoms)
             self._index = index
         else:
             self._index = numpy.array(
                 [x + 1 for x in range(natoms)], numpy.int32)
 
-        self._name = [name for x in range(natoms)]
-        self._loc = [loc for x in range(natoms)]
-        self._resname = [resname for x in range(natoms)]
-        self._chain = [chain for x in range(natoms)]
+        self._name = self._expand_constructor_value('name', name, natoms)
+        self._loc = self._expand_constructor_value('loc', loc, natoms)
+        self._resname = self._expand_constructor_value(
+            'resname', resname, natoms)
+        self._chain = self._expand_constructor_value('chain', chain, natoms)
 
         if resid is not None:
+            self._validate_constructor_length('resid', resid, natoms)
             self._resid = resid
         else:
             self._resid = numpy.array(
                 [x + 1 for x in range(natoms)], numpy.int32)
 
-        self._rescode = [rescode for x in range(natoms)]
+        self._rescode = self._expand_constructor_value(
+            'rescode', rescode, natoms)
 
         if coor is not None:
             self._coor = coor
         else:
             self._coor = numpy.zeros((1, natoms, 3), numpy.float32)
 
-        self._occupancy = [occupancy for x in range(natoms)]
-        self._beta = [beta for x in range(natoms)]
-        self._charge = [charge for x in range(natoms)]
-        self._segname = [segname for x in range(natoms)]
-        self._element = [element for x in range(natoms)]
+        self._occupancy = self._expand_constructor_value(
+            'occupancy', occupancy, natoms)
+        self._beta = self._expand_constructor_value('beta', beta, natoms)
+        self._charge = self._expand_constructor_value(
+            'charge', charge, natoms)
+        self._segname = self._expand_constructor_value(
+            'segname', segname, natoms)
+        self._element = self._expand_constructor_value(
+            'element', element, natoms)
 
         self.setOriginal_index(self.index())
         self.setOriginal_resid(self.resid())
 
-        self._residue_flag = [residue_flag] * self.natoms()
-        self._moltype = [moltype] * self.natoms()
+        self._residue_flag = self._expand_constructor_value(
+            'residue_flag', residue_flag, natoms)
+        self._moltype = self._expand_constructor_value(
+            'moltype', moltype, natoms)
 
         self._total_mass = calculate.Calculate.calculate_mass(self)
 

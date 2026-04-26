@@ -545,7 +545,7 @@ def parse_fasta(fasta_sequence, **kwargs):
     return all_sequences
 
 
-def check_integrity(obj, fast_check=False):
+def check_integrity(obj, fast_check=False, warn=True):
     import logging
     import sasmol.config as config
 
@@ -574,11 +574,10 @@ def check_integrity(obj, fast_check=False):
         except:
             results[key] = 'N/A'
 
-    if errors:
+    if errors and warn:
         logger.warning('Integrity check mismatch: %s', errors)
     elif config.__logging_level__ == 'DEBUG':
         logger.debug('Integrity check passed: natoms=%s', natoms)
 
     return results
-
 
