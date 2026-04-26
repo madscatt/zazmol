@@ -5,14 +5,17 @@ import os
 ###     BEGIN SYSADMIN EDIT ###
 
 arch = "cluster"
-#arch = "mac"
+# arch = "mac"
 
 __cuda__ = True
 __cuda__ = False
 
 global __logging__
 __logging__ = False
-__logging__ = True
+
+# __logging__ controls Python-side debug verbosity only: DCD progress dots,
+# logging_utilites debug/info chatter, and the default _debug flag on system
+# objects. It does not change numerical/scientific behavior or C debug macros.
 
 
 ###     END SYSADMIN EDIT ###
