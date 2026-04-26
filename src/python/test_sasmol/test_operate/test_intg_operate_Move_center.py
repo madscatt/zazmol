@@ -15,6 +15,7 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 '''
 
+import os
 from sasmol.test_sasmol.utilities import env
 
 from unittest import main, skipIf
@@ -24,73 +25,76 @@ import sasmol.operate as operate
 
 import numpy
 
-import warnings; warnings.filterwarnings('ignore')
+import warnings
+warnings.filterwarnings('ignore')
 
-import os
-floattype=os.environ['SASMOL_FLOATTYPE']
+floattype = os.environ['SASMOL_FLOATTYPE']
 
-DataPath = os.path.join(os.path.dirname(os.path.realpath(__file__)),'..','data','pdb_common')+os.path.sep
+DataPath = os.path.join(os.path.dirname(os.path.realpath(
+    __file__)), '..', 'data', 'pdb_common')+os.path.sep
 
-class Test_intg_operate_Move_center(unittest.TestCase): 
+
+class Test_intg_operate_Move_center(unittest.TestCase):
 
     def setUp(self):
         warnings.filterwarnings('ignore')
-        self.o=system.Molecule(0)
+        self.o = system.Molecule(0)
 
-    def assert_list_almost_equal(self,a,b,places=5):
-        if (len(a)!=len(b)):
-           raise TypeError
+    def assert_list_almost_equal(self, a, b, places=5):
+        if (len(a) != len(b)):
+            raise TypeError
         else:
-           for i in range(len(a)):
-              if isinstance(a[i],(int,float,numpy.generic)):
-                 if (numpy.isnan(a[i]) and numpy.isnan(b[i])): continue
-                 self.assertAlmostEqual(a[i],b[i],places)
-              else:
-                 self.assert_list_almost_equal(a[i],b[i],places)
+            for i in range(len(a)):
+                if isinstance(a[i], (int, float, numpy.generic)):
+                    if (numpy.isnan(a[i]) and numpy.isnan(b[i])):
+                        continue
+                    self.assertAlmostEqual(a[i], b[i], places)
+                else:
+                    self.assert_list_almost_equal(a[i], b[i], places)
 
     def test_null(self):
         with self.assertRaises(Exception):
-          self.o.center(0)
+            self.o.center(0)
 
     def test_one_atom_pdb(self):
         self.o.read_pdb(DataPath+'1ATM.pdb')
         self.o.center(0)
         result_coor = self.o.coor()[0]
         expected_coor = numpy.array([[0.0, 0.0, 0.0]], floattype)
-        self.assert_list_almost_equal(expected_coor, result_coor,3)
+        self.assert_list_almost_equal(expected_coor, result_coor, 3)
 
     def test_two_aa_pdb(self):
         self.o.read_pdb(DataPath+'2AAD.pdb')
         self.o.center(0)
         result_coor = self.o.coor()[0]
-        expected_coor = self.o.coor()[0]-self.o.com()
-        self.assert_list_almost_equal(expected_coor, result_coor,3)
+        expected_coor = self.o.coor()[0] - self.o.center_of_mass()
+        self.assert_list_almost_equal(expected_coor, result_coor, 3)
 
     def test_rna_pdb(self):
         self.o.read_pdb(DataPath+'rna.pdb')
         self.o.center(0)
         result_coor = self.o.coor()[0]
-        expected_coor = self.o.coor()[0]-self.o.com()
-        self.assert_list_almost_equal(expected_coor, result_coor,3)
+        expected_coor = self.o.coor()[0] - self.o.center_of_mass()
+        self.assert_list_almost_equal(expected_coor, result_coor, 3)
 
     def test_1CRN_pdb(self):
         self.o.read_pdb(DataPath+'1CRN.pdb')
         self.o.center(0)
         result_coor = self.o.coor()[0]
-        expected_coor = self.o.coor()[0]-self.o.com()
-        self.assert_list_almost_equal(expected_coor, result_coor,3)
+        expected_coor = self.o.coor()[0] - self.o.center_of_mass()
+        self.assert_list_almost_equal(expected_coor, result_coor, 3)
 
-    @skipIf(os.environ['SASMOL_LARGETEST']=='n',"I am not testing large files")
+    @skipIf(os.environ['SASMOL_LARGETEST'] == 'n', "I am not testing large files")
     def test_1KP8_pdb(self):
         self.o.read_pdb(DataPath+'1KP8.pdb')
         self.o.center(0)
         result_coor = self.o.coor()[0]
-        expected_coor = self.o.coor()[0]-self.o.com()
-        self.assert_list_almost_equal(expected_coor, result_coor,3)
+        expected_coor = self.o.coor()[0] - self.o.center_of_mass()
+        self.assert_list_almost_equal(expected_coor, result_coor, 3)
 
     def tearDown(self):
         pass
 
-if __name__ == '__main__': 
-   main() 
 
+if __name__ == '__main__':
+    main()

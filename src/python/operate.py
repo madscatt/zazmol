@@ -1,7 +1,7 @@
 from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
-#from __future__ import unicode_literals
+# from __future__ import unicode_literals
 
 '''
     SASMOL: Copyright (C) 2011 Joseph E. Curtis, Ph.D. 
@@ -25,15 +25,15 @@ import math
 import sasmol as sasmol
 import sasmol.linear_algebra as linear_algebra
 
-#	OPERATE
+# OPERATE
 #
-#	12/13/2009	--	initial coding			        :	jc
+# 12/13/2009	--	initial coding			        :	jc
 #   07/23/2016  --  refactored for release          :   jc
 #   07/23/2016  --  refactored for Python 3         :   jc
 #
-#	 1         2         3         4         5         6         7
+# 1         2         3         4         5         6         7
 # LC4567890123456789012345678901234567890123456789012345678901234567890123456789
-#								       *      **
+# *      **
 '''
 	Operate contains the classes and methods to perform the basic
 	translation, rotation, and alignment operations on instances of objects 
@@ -91,13 +91,13 @@ class Move():
         ----
         mass_check determines if mass is defined for the object so that
         center of mass can be calculated
-        
+
 
         Parameters
         ----------
         kwargs 
             optional future arguments
-                                                                                     
+
         Returns
         -------
         None
@@ -109,18 +109,18 @@ class Move():
         >>> import sasmol.system as system
         >>> molecule = system.Molecule('hiv1_gag.pdb')
         >>> molecule.mass_check()
-        
-        ''' 
-          
-        if(self._total_mass <= 0.0):
+
+        '''
+
+        if (self._total_mass <= 0.0):
             self.calculate_mass()
         return
 
     def translate(self, frame, value, **kwargs):
         ''' 
-        
+
         translate moves the object 
-        
+
         Parameters
         ----------
         frame 
@@ -149,8 +149,8 @@ class Move():
         >>> molecule.translate(frame, displacement)
         >>> molecule.calculate_center_of_mass(frame)
         array([ -3.79114736, -19.71577133,  13.06558513])
-      
-         
+
+
         >>> import sasmol.system as system
         >>> molecule = system.Molecule('hiv1_gag.pdb')
         >>> frame = 0
@@ -158,39 +158,39 @@ class Move():
         >>> molecule.translate(frame, final_position, point=True)
         >>> molecule.calculate_center_of_mass(frame)  
         array([ 3.,  4.,  5.])
-         
+
         Note 
         ----------
         mass_check is called to validate self._total_mass()    
 
 
         '''
-        try: 
+        try:
             point_flag = kwargs['point']
         except:
             point_flag = False
-        
+
         self.mass_check()
 
         if point_flag:
-            self._com = self.calculate_center_of_mass(frame)
+            self._center_of_mass = self.calculate_center_of_mass(frame)
 
-            self._coor[frame, :, 0] -= self._com[0]
-            self._coor[frame, :, 1] -= self._com[1]
-            self._coor[frame, :, 2] -= self._com[2]
-         
+            self._coor[frame, :, 0] -= self._center_of_mass[0]
+            self._coor[frame, :, 1] -= self._center_of_mass[1]
+            self._coor[frame, :, 2] -= self._center_of_mass[2]
+
         self._coor[frame, :, 0] += value[0]
         self._coor[frame, :, 1] += value[1]
         self._coor[frame, :, 2] += value[2]
 
-        self._com = self.calculate_center_of_mass(frame)
+        self._center_of_mass = self.calculate_center_of_mass(frame)
 
         return
 
     def center(self, frame, **kwargs):
         '''
         Method moves the center of mass of object to [0.0, 0.0, 0.0]
-       
+
         Parameters
         ----------
         frame 
@@ -198,7 +198,7 @@ class Move():
 
         kwargs 
             optional future arguments
-                                                                                     
+
         Returns
         -------
         None
@@ -219,20 +219,23 @@ class Move():
         Note 
         ----------
         mass_check is called to validate self._total_mass()    
-        
+
         Can achieve same result using self.translate(frame, [0,0,0], point=True)
 
-        
+
         '''
 
         self.mass_check()
-        self._com = self.calculate_center_of_mass(frame)
+        self._center_of_mass = self.calculate_center_of_mass(frame)
 
-        self._coor[frame, :, 0] = self._coor[frame, :, 0] - self._com[0]
-        self._coor[frame, :, 1] = self._coor[frame, :, 1] - self._com[1]
-        self._coor[frame, :, 2] = self._coor[frame, :, 2] - self._com[2]
+        self._coor[frame, :, 0] = self._coor[frame, :, 0] - \
+            self._center_of_mass[0]
+        self._coor[frame, :, 1] = self._coor[frame, :, 1] - \
+            self._center_of_mass[1]
+        self._coor[frame, :, 2] = self._coor[frame, :, 2] - \
+            self._center_of_mass[2]
 
-        self._com = self.calculate_center_of_mass(frame)
+        self._center_of_mass = self.calculate_center_of_mass(frame)
 
         return
 
@@ -256,7 +259,7 @@ class Move():
             ----------
             frame 
                 integer : trajectory frame number to use
-    
+
             other
                 system object : molecule 1
 
@@ -265,13 +268,13 @@ class Move():
 
             other_basis
                 string : unique description of atoms used for alignment (only needed in initialization mode)
-    
+
             mode
                 string : 'initialization' or 'production'
-    
+
             align_variables
                 dict : data from initialization mode to be used in production mode
-    
+
             kwargs 
                 optional future arguments
 
@@ -292,7 +295,7 @@ class Move():
             >>> align_variables = molecule_2.align(molecule_1, basis_1, basis_2, mode='initialization')
             >>> molecule_2.align(molecule_1, align_variables=align_variables)
             >>> com_sub_2 = molecule_2.calculate_center_of_mass(frame)
-    
+
             Note
             ----
             mass_check determines if mass is defined for the object so that
@@ -302,20 +305,23 @@ class Move():
 
         if mode == 'initialization':
             if self_basis is None or other_basis is None:
-                raise ValueError("self_basis and other_basis must be provided in initialization mode")
+                raise ValueError(
+                    "self_basis and other_basis must be provided in initialization mode")
 
-            ### other = molecule_1 (reference)
+            # other = molecule_1 (reference)
             error, other_mask = other.get_subset_mask(other_basis)
             subset_other = sasmol.system.Molecule()
-            error = other.copy_molecule_using_mask(subset_other, other_mask, frame)
+            error = other.copy_molecule_using_mask(
+                subset_other, other_mask, frame)
             com_subset_other = subset_other.calculate_center_of_mass(frame)
             subset_other.center(frame)
             coor_subset_other = subset_other.coor()[frame]
 
-            ### self = molecule_2 (to be aligned to other / molecule_1)
+            # self = molecule_2 (to be aligned to other / molecule_1)
             error, self_mask = self.get_subset_mask(self_basis)
             subset_self = sasmol.system.Molecule()
-            error = self.copy_molecule_using_mask(subset_self, self_mask, frame)
+            error = self.copy_molecule_using_mask(
+                subset_self, self_mask, frame)
             com_subset_self = subset_self.calculate_center_of_mass(frame)
             subset_self.center(frame)
             coor_subset_self = subset_self.coor()[frame]
@@ -332,7 +338,8 @@ class Move():
 
         else:  # Default to production mode
             if align_variables is None:
-                raise ValueError("align_variables must be provided in production mode")
+                raise ValueError(
+                    "align_variables must be provided in production mode")
 
             # assign initialization data to variables
 
@@ -345,18 +352,19 @@ class Move():
             subset_self = align_variables['subset_self']
 
             # update self object to current state
-            error = self.copy_molecule_using_mask(subset_self, self_mask, frame)
+            error = self.copy_molecule_using_mask(
+                subset_self, self_mask, frame)
             com_subset_self = subset_self.calculate_center_of_mass(frame)
             subset_self.center(frame)
             coor_subset_self = subset_self.coor()[frame]
 
-            #u = linear_algebra.find_u(coor_subset_self, coor_subset_other)
+            # u = linear_algebra.find_u(coor_subset_self, coor_subset_other)
             u = linear_algebra.find_u(coor_subset_other, coor_subset_self)
             tao = numpy.transpose(self.coor()[frame] - com_subset_self)
             error, nat2 = linear_algebra.matrix_multiply(u, tao)
             ncoor = numpy.transpose(nat2) + com_subset_other
             self._coor[frame, :] = ncoor
-    
+
             return
 
     def rotate(self, frame, axis, theta, **kwargs):
@@ -377,7 +385,7 @@ class Move():
 
         kwargs 
             optional future arguments        
-       
+
         Returns
         -------
         None
@@ -390,24 +398,24 @@ class Move():
         >>> molecule = system.Molecule('hiv1_gag.pdb')
         >>> frame = 0 ; axis = 'x' ; theta = 45.0 * math.pi / 180.0
         >>> molecule.rotate(frame, axis, theta)
- 
+
         Note 
         ----------
         Calculations are carried out using radians
-        
+
         '''
 
         cs = numpy.cos(theta)
         si = numpy.sin(theta)
-        if(axis == 'x'):
+        if (axis == 'x'):
             mat = numpy.array(
-                    [[1.0, 0.0, 0.0], [0.0, cs, -si], [0.0, si, cs]])
-        elif(axis == 'y'):
+                [[1.0, 0.0, 0.0], [0.0, cs, -si], [0.0, si, cs]])
+        elif (axis == 'y'):
             mat = numpy.array(
-                    [[cs, 0.0, si], [0.0, 1.0, 0.0], [-si, 0.0, cs]])
-        elif(axis == 'z'):
+                [[cs, 0.0, si], [0.0, 1.0, 0.0], [-si, 0.0, cs]])
+        elif (axis == 'z'):
             mat = numpy.array(
-                    [[cs, -si, 0.0], [si, cs, 0.0], [0.0, 0.0, 1.0]])
+                [[cs, -si, 0.0], [si, cs, 0.0], [0.0, 0.0, 1.0]])
 
         coordt = self._coor[frame, :].T
         error, matrix_product = linear_algebra.matrix_multiply(mat, coordt)
@@ -428,13 +436,13 @@ class Move():
 
         theta 
             float : angle in radians
-        
+
         unit_axis
             float : [ux, uy, uz] components of unit axis
 
         kwargs 
             optional future arguments        
-       
+
         Returns
         -------
         None
@@ -448,11 +456,11 @@ class Move():
         >>> frame = 0 ; theta = 45.0 * math.pi / 180.0
         >>> unit_axis = [ 0.2, 1.3, -3.5 ]
         >>> molecule.rotate_general_axis(frame, theta, unit_axis)
- 
+
         Note 
         ----------
         Calculations are carried out using radians
-        
+
         '''
 
         ux = unit_axis[0]
@@ -498,7 +506,7 @@ class Move():
 
         kwargs 
             optional future arguments        
-       
+
         Returns
         -------
         None
@@ -514,7 +522,7 @@ class Move():
         >>> theta = 45.0 * math.pi / 180.0
         >>> psi = 32.0 * math.pi / 180.0
         >>> molecule.euler_rotate(frame, phi, theta, psi)
- 
+
         Note 
         ----------
         Calculations are carried out using radians
@@ -523,20 +531,20 @@ class Move():
 
         c11 = numpy.cos(theta) * numpy.cos(psi)
         c12 = numpy.cos(phi) * numpy.sin(psi) + \
-                numpy.sin(phi) * numpy.sin(theta) * numpy.cos(psi)
+            numpy.sin(phi) * numpy.sin(theta) * numpy.cos(psi)
         c13 = numpy.sin(phi) * numpy.sin(psi) - \
-                numpy.cos(phi) * numpy.sin(theta) * numpy.cos(psi)
+            numpy.cos(phi) * numpy.sin(theta) * numpy.cos(psi)
         c21 = -numpy.cos(theta) * numpy.sin(psi)
         c22 = numpy.cos(phi) * numpy.cos(psi) - \
-                numpy.sin(phi) * numpy.sin(theta) * numpy.sin(psi)
+            numpy.sin(phi) * numpy.sin(theta) * numpy.sin(psi)
         c23 = numpy.sin(phi) * numpy.cos(psi) + \
-                numpy.cos(phi) * numpy.sin(theta) * numpy.sin(psi)
+            numpy.cos(phi) * numpy.sin(theta) * numpy.sin(psi)
         c31 = numpy.sin(theta)
         c32 = -numpy.sin(phi) * numpy.cos(theta)
         c33 = numpy.cos(phi) * numpy.cos(theta)
 
         C = numpy.matrix(
-                [[c11, c12, c13], [c21, c22, c23], [c31, c32, c33]])
+            [[c11, c12, c13], [c21, c22, c23], [c31, c32, c33]])
 
         coor = numpy.array(self.coor()[frame] * C)
 
@@ -565,10 +573,10 @@ class Move():
         ak = ak[:, pmi_eigenvector]
 
         axes = {
-                'x': numpy.array([1.0, 0.0, 0.0]),
-                'y': numpy.array([0.0, 1.0, 0.0]),
-                'z': numpy.array([0.0, 0.0, 1.0]),
-                }
+            'x': numpy.array([1.0, 0.0, 0.0]),
+            'y': numpy.array([0.0, 1.0, 0.0]),
+            'z': numpy.array([0.0, 0.0, 1.0]),
+        }
         axis = axes[alignment_vector_axis]
 
         ak = ak / numpy.linalg.norm(ak)
@@ -585,7 +593,7 @@ class Move():
             rotvec = numpy.cross(ak, basis)
             rotvec = rotvec / numpy.linalg.norm(rotvec)
 
-        #theta = math.atan(sine / cosine)
+        # theta = math.atan(sine / cosine)
         theta = math.atan2(sine, cosine)
 
         unit_axis = [rotvec[0], rotvec[1], rotvec[2]]

@@ -164,9 +164,9 @@ class Calculate(object):
         comy = numpy.sum(self._mass * y) / self._total_mass
         comz = numpy.sum(self._mass * z) / self._total_mass
 
-        self._com = numpy.array([comx, comy, comz], float)
+        self._center_of_mass = numpy.array([comx, comy, comz], float)
 
-        return self._com
+        return self._center_of_mass
 
     def calculate_radius_of_gyration(self, frame, **kwargs):
         '''
@@ -195,11 +195,11 @@ class Calculate(object):
 
         '''
 
-        self._com = self.calculate_center_of_mass(frame)
+        self._center_of_mass = self.calculate_center_of_mass(frame)
 
         if (self._natoms > 0):
-            rg2 = ((self._coor[frame, :, :] - self._com)
-                   * (self._coor[frame, :, :] - self._com))
+            rg2 = ((self._coor[frame, :, :] - self._center_of_mass)
+                   * (self._coor[frame, :, :] - self._center_of_mass))
             self._rg = numpy.sqrt(numpy.sum(numpy.sum(rg2)) / self._natoms)
 
         return self._rg

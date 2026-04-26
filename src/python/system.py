@@ -155,7 +155,7 @@ class Atom(file_io.Files, calculate.Calculate, operate.Move, subset.Mask, proper
 
         ### float attributes 
 
-            float_keys = ['_total_mass', '_com', '_rg']
+            float_keys = ['_total_mass', '_center_of_mass', '_rg']
 
         ### strings, dictionaries, and flags 
 
@@ -172,7 +172,7 @@ class Atom(file_io.Files, calculate.Calculate, operate.Move, subset.Mask, proper
         self._natoms = 0
         self._mass = None
         self._coor = None
-        self._com = None
+        self._center_of_mass = None
         self._conect = []
 
         if config.__logging_level__ == 'DEBUG':
@@ -558,12 +558,6 @@ class Molecule(Atom):
 
     def setOne_letter_resname(self, newValue):
         self._one_letter_resname = newValue
-
-    def com(self):
-        return self._com
-
-    def setCom(self, newValue):
-        self._com = newValue
 
     def center_of_mass(self):
         return self._center_of_mass

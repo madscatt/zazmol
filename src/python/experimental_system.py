@@ -1,5 +1,6 @@
 import numpy
-import os, sys
+import os
+import sys
 import sasmol.file_io as file_io
 import sasmol.calculate as calculate
 import sasmol.operate as operate
@@ -9,6 +10,7 @@ import sasmol.topology as topology
 import sasmol.view as view
 
 import sasmol.config as config
+
 
 class Atom(file_io.Files, calculate.Calculate, operate.Move, subset.Mask, properties.Atomic, topology.Topology, view.View):
 
@@ -58,11 +60,11 @@ class Atom(file_io.Files, calculate.Calculate, operate.Move, subset.Mask, proper
         self.__resname = None
         self.__resid = None
         self.__coor = None
-        
+
         self._total_mass = 0.0
         self._natoms = 0
         self._mass = None
-        self._com = None
+        self._center_of_mass = None
         self._conect = []
 
         if config.__logging_level__ == 'DEBUG':
@@ -74,14 +76,14 @@ class Atom(file_io.Files, calculate.Calculate, operate.Move, subset.Mask, proper
 
         try:
             if self._filename is not None:
-                if(os.path.isfile(self._filename)):
+                if (os.path.isfile(self._filename)):
                     self.read_pdb(self._filename)
                     self._defined_with_input_file = True
             else:
 
                 for argument in args:
                     self._argument_flag = True
-                    if(os.path.isfile(str(argument))):
+                    if (os.path.isfile(str(argument))):
                         try:
                             self.read_pdb(argument)
                             self._defined_with_input_file = True
@@ -100,7 +102,6 @@ class Atom(file_io.Files, calculate.Calculate, operate.Move, subset.Mask, proper
         except:
             pass
 
-
     def __repr__(self):
 
         if self._defined_with_input_file:
@@ -110,66 +111,63 @@ class Atom(file_io.Files, calculate.Calculate, operate.Move, subset.Mask, proper
         else:
             return "sasmol object"
 
-
-
     def __add__(self, other):
-        #print self.__dict__
-        for key,value in self.__dict__.iteritems():
-            #print key,value
+        # print self.__dict__
+        for key, value in self.__dict__.iteritems():
+            # print key,value
             try:
                 if type(value) is list:
                     self.__dict__[key].extend(other.__dict__[key])
                 elif type(value) is numpy.ndarray:
-               #     print 'sdk = ',self.__dict__[key], 'odk =', other.__dict__[key]
-                    self.__dict__[key] = numpy.concatenate((self.__dict__[key], other.__dict__[key]))
+                   #     print 'sdk = ',self.__dict__[key], 'odk =', other.__dict__[key]
+                    self.__dict__[key] = numpy.concatenate(
+                        (self.__dict__[key], other.__dict__[key]))
             except:
                 pass
-                               
+
     def setAtom(self, atom):
-        self.__atom = atom  
-   
+        self.__atom = atom
+
     def atom(self):
-        return self.__atom 
+        return self.__atom
 
     def setIndex(self, index):
-        self.__index = index  
-   
+        self.__index = index
+
     def index(self):
-        return self.__index 
+        return self.__index
 
     def setResname(self, resname):
-        self.__resname = resname  
-   
+        self.__resname = resname
+
     def resname(self):
-        return self.__resname  
+        return self.__resname
 
     def setName(self, name):
-        self.__name = name  
-   
+        self.__name = name
+
     def name(self):
-        return self.__name 
-    
+        return self.__name
+
     def setResid(self, resid):
-        self.__resid = resid  
-   
+        self.__resid = resid
+
     def resid(self):
-        return self.__resid 
+        return self.__resid
 
     def setCoor(self, coor):
-        self.__coor = coor  
-   
+        self.__coor = coor
+
     def coor(self):
-        return self.__coor 
+        return self.__coor
 
-    
-    ## can access direclty via class_instance._Atom__name  
-    ## but class_instance.__name does NOT return name
-    
-    ## INSIDE the class you can assign directly
+    # can access direclty via class_instance._Atom__name
+    # but class_instance.__name does NOT return name
 
-    ## OUTSIDE the class you should always use setter / getter
+    # INSIDE the class you can assign directly
+
+    # OUTSIDE the class you should always use setter / getter
         # although you could assign by class_instance._Atom__name = value
-
 
 
 if __name__ == "__main__":
