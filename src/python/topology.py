@@ -422,17 +422,17 @@ class Topology(charmm_topology.CharmmTopology):
         Other use types below
 
         molecule.create_fasta(fasta_format=True,exclude_hetatm=True,by_chain=True)
-        print molecule.fasta()
+        print(molecule.fasta())
 
-        print '>>> testing by_chain with HETATM (t.py): '
+        print('>>> testing by_chain with HETATM (t.py): ')
 
         molecule.create_fasta(fasta_format=True,by_chain=True)
-        print molecule.fasta()
+        print(molecule.fasta())
 
-        print '>>> testing by_segname (t.py): '
+        print('>>> testing by_segname (t.py): ')
 
         molecule.create_fasta(fasta_format=True,exclude_hetatm=True,by_segname=True)
-        print molecule.fasta()
+        print(molecule.fasta())
 
         Note that this creates a simple string that is associated with the molecule (self)
         and it will return without assigning a string if a non-standard three letter code

@@ -205,7 +205,7 @@ class Multiprocessing_SasMol():
 
         for i in range(number_of_batches):
             dum_coor = numpy.zeros(
-                (len(frames[i]), molecule.natoms(), 3), numpy.float)
+                (len(frames[i]), molecule.natoms(), 3), numpy.float64)
             molecules[i].setCoor(dum_coor)
             count = 0
             for frame in frames[i]:
@@ -265,20 +265,25 @@ if __name__ == "__main__":
 
     molecules = test.divide_molecule(mol, number_of_batches)     
 
-    com = [molecules[0].calculate_center_of_mass(frame) for frame in xrange(molecules[0].number_of_frames())]
+    com = [molecules[0].calculate_center_of_mass(frame)
+           for frame in range(molecules[0].number_of_frames())]
 
-    print ; print ; print
-    print molecules[0].number_of_frames()
+    print()
+    print()
+    print()
+    print(molecules[0].number_of_frames())
 
     st = ''
-    for  i in xrange(len(com)):
-        print com[i].tolist()
+    for i in range(len(com)):
+        print(com[i].tolist())
 
-    print ; print ; print
-    
+    print()
+    print()
+    print()
+
     test.submit_jobs(molecules, test.example_worker, number_of_batches)
 
-    #for j in xrange(mol.number_of_frames()):
-    #    print com[j]
+    # for j in range(mol.number_of_frames()):
+    #     print(com[j])
 
     '''
