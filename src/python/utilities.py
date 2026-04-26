@@ -1,5 +1,5 @@
 # from __future__ import absolute_import
-
+import sasmol.properties as properties
 
 # from __future__ import unicode_literals
 #
