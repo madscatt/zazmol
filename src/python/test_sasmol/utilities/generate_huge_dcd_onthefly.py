@@ -5,13 +5,27 @@ import sasmol.system as system
 import sasmol._dcdio as dcdio
 
 
+def _find_test_data_file(*parts):
+    here = os.path.dirname(os.path.realpath(__file__))
+    candidates = [
+        os.path.join(here, '..', 'data', *parts),
+        os.path.join(here, '..', '..', '..', '..', 'src', 'python',
+                     'test_sasmol', 'data', *parts),
+        os.path.join(os.getcwd(), 'src', 'python', 'test_sasmol', 'data',
+                     *parts),
+    ]
+
+    for candidate in candidates:
+        candidate = os.path.realpath(candidate)
+        if os.path.exists(candidate):
+            return candidate
+
+    raise Exception(
+        'Could not locate test data file: ' + os.path.join(*parts))
+
+
 def generate(fin='rna.pdb', fout='rna.dcd', frames=1000):
-    path = os.path.dirname(os.path.realpath(__file__))
-    fin = os.path.join(path, '../', 'data', 'pdb_common', fin)
-    if not os.path.exists(fin):
-        raise Exception(
-            fin+' does not exist while generating huge rna dcd files')
-        return
+    fin = _find_test_data_file('pdb_common', fin)
     # fout = os.path.join(path,'../','data','dcd_common',fout)
     fout = os.path.join('/tmp/', fout)
     if os.path.exists(fout):
