@@ -202,8 +202,8 @@ class Test_intg_sasio_Files_close_dcd_read(unittest.TestCase):
         sys.stdout = open(stdoutFileName, 'w')
         self.o.close_dcd_read(pf)
         sys.stdout = sys.__stdout__
-        code = open(stdoutFileName).read().split()[2]
-        self.assertEqual(int(code), 0)
+        code = open(stdoutFileName).read()
+        self.assertEqual(code, '')
         os.remove(stdoutFileName)
 
     def tearDown(self):

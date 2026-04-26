@@ -215,8 +215,8 @@ class Test_intg_sasio_Files_close_dcd_write(unittest.TestCase):
         sys.stdout = open(stdoutFile, 'w')
         self.o.close_dcd_write(pf)
         sys.stdout = sys.__stdout__
-        code = open(stdoutFile).read().split()[2]
-        self.assertEqual(int(code), 0)
+        code = open(stdoutFile).read()
+        self.assertEqual(code, '')
         os.remove(stdoutFile)
         os.remove(tmpDcdFile)
 
