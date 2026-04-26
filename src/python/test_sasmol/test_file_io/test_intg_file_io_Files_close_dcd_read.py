@@ -43,31 +43,15 @@ class Test_intg_sasio_Files_close_dcd_read(unittest.TestCase):
     def test_file_doesnt_exist(self):
         '''
              test a dcd which does not exist
-
+        '''
         filename = 'file-notexist.dcd'
         dcdFileName = DataPath+filename
-        stdoutFileName = filename+'.stdiout'
 
-        # opening a file that doesn't exist returns a Null pointer
-        pf = dcdio.open_dcd_read(dcdFileName)
+        with self.assertRaisesRegex(OSError, 'Failed to open file'):
+            dcdio.open_dcd_read(dcdFileName)
 
-        with io.open(stdoutFileName, 'w') as temp_file:
-            sys.stdout = temp_file
-
-        sys.stdout = open(stdoutFileName, 'w')
-
-        # if you try to close the file that doesn't exist the called C code will seg fault
-        # so there is no reason to call the close_dcd_read method which is the reason for this test
-        # self.o.close_dcd_read(pf)
-
-        sys.stdout = sys.__stdout__
-        with io.open(stdoutFileName) as temp_file:
-            code = temp_file.read()
-
-        code = open(stdoutFileName).read()  # .split()[2]
-        self.assertEqual(int(code), -1)
-        os.remove(stdoutFileName)
-        '''
+        with self.assertRaisesRegex(OSError, 'Failed to open file'):
+            self.o.read_dcd(dcdFileName)
 
     def test_1ATM(self):
         '''
