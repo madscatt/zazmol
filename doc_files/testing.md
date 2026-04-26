@@ -68,7 +68,7 @@ These legacy areas are not part of the active parity target right now:
 - `SasSol`
 - `SasHybrid`
 - removed `manual_tests`
-- historical files under `src/python/broken`
+- removed historical `src/python/broken` files
 
 #### Extension Tests
 
