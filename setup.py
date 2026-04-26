@@ -67,7 +67,7 @@ setup(name='sasmol',
 
           Extension('sasmol._view_vmd', [os.path.join('src', 'python', 'extensions', 'view', 'view_vmd_module.c'), os.path.join('src', 'python', 'extensions', 'view', 'view_vmd.c'), os.path.join(
               'src', 'python', 'extensions', 'view', 'imd.c'), os.path.join('src', 'python', 'extensions', 'view', 'vmdsock.c')], include_dirs=[NUMPY_INCLUDE]),
-          Extension('sasmol._mask', [os.path.join('src', 'python', 'extensions', 'mask', 'mask.i'), os.path.join(
+          Extension('sasmol._mask', [os.path.join('src', 'python', 'extensions', 'mask', 'mask_module.c'), os.path.join(
               'src', 'python', 'extensions', 'mask', 'mask.c')], include_dirs=[NUMPY_INCLUDE]),
           Extension('sasmol.overlap', [os.path.join(
               'src', 'python', 'extensions', 'overlap', 'overlap.c')], include_dirs=[NUMPY_INCLUDE]),
