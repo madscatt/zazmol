@@ -24,107 +24,120 @@ import numpy
 
 import os
 
-DataPath = os.path.join(os.path.dirname(os.path.realpath(__file__)),'..','data','pdb_common')+os.path.sep
-dcdDataPath = os.path.join(os.path.dirname(os.path.realpath(__file__)),'..','data','dcd_common')+os.path.sep
+DataPath = os.path.join(os.path.dirname(os.path.realpath(
+    __file__)), '..', 'data', 'pdb_common')+os.path.sep
+dcdDataPath = os.path.join(os.path.dirname(os.path.realpath(
+    __file__)), '..', 'data', 'dcd_common')+os.path.sep
 
-class Test_sascalc_Prop_calc_minmax_all_steps(unittest.TestCase): 
+
+def hugeDcdPath(filename):
+    return os.path.join('/tmp', filename)
+
+
+class Test_sascalc_Prop_calc_minmax_all_steps(unittest.TestCase):
 
     def setUp(self):
-        self.o=system.Molecule(0)
+        self.o = system.Molecule(0)
 
-    def assert_list_almost_equal(self,a,b,places=5):
-        if (len(a)!=len(b)):
-           raise TypeError
+    def assert_list_almost_equal(self, a, b, places=5):
+        if (len(a) != len(b)):
+            raise TypeError
         else:
-           for i in range(len(a)):
-              if (numpy.isnan(a[i]) and numpy.isnan(b[i])): continue
-              self.assertAlmostEqual(a[i],b[i],places)
+            for i in range(len(a)):
+                if (numpy.isnan(a[i]) and numpy.isnan(b[i])):
+                    continue
+                self.assertAlmostEqual(a[i], b[i], places)
 
     def test_null(self):
         with self.assertRaises(Exception):
             self.o.calcminmax_frame(0)
 
-
     def test_one_atom(self):
         self.o.read_pdb(DataPath+'1ATM.pdb')
-        self.o.read_dcd(dcdDataPath+'1ATM.dcd')
-        result_minmax  = self.o.calculate_minimum_and_maximum()
-        expected_minmax = [ [73.944, 38.799, 41.652], [76.944,  41.799, 41.652]]
+        result_minmax = self.o.calculate_minimum_and_maximum_all_steps(
+            dcdDataPath+'1ATM.dcd')
+        expected_minmax = [[73.944, 38.799, 41.652], [76.944,  41.799, 41.652]]
         self.assert_list_almost_equal(expected_minmax[0], result_minmax[0])
         self.assert_list_almost_equal(expected_minmax[1], result_minmax[1])
 
     def test_two_aa(self):
         self.o.read_pdb(DataPath+'2AAD.pdb')
-        self.o.read_dcd(dcdDataPath+'2AAD.dcd')
-        result_minmax  = self.o.calculate_minimum_and_maximum()
-        expected_minmax = [[-79.712, -46.273,  39.354], [79.712,  46.273,  43.910]]
+        result_minmax = self.o.calculate_minimum_and_maximum_all_steps(
+            dcdDataPath+'2AAD.dcd')
+        expected_minmax = [[-79.712, -46.273,  39.354],
+                           [79.712,  46.273,  43.910]]
         self.assert_list_almost_equal(expected_minmax[0], result_minmax[0])
         self.assert_list_almost_equal(expected_minmax[1], result_minmax[1])
         self.assert_list_almost_equal(expected_minmax[1], result_minmax[1])
-
 
     def test_rna_1to10(self):
         self.o.read_pdb(DataPath+'rna.pdb')
-        self.o.read_dcd(dcdDataPath+'rna-1to10.dcd')
-        result_minmax  = self.o.calculate_minimum_and_maximum()
-        expected_minmax = [[-43.801, -44.888, -42.605], [ 41.234,  39.706,  41.903]]
+        result_minmax = self.o.calculate_minimum_and_maximum_all_steps(
+            dcdDataPath+'rna-1to10.dcd')
+        expected_minmax = [[-43.801, -44.888, -42.605],
+                           [41.234,  39.706,  41.903]]
         self.assert_list_almost_equal(expected_minmax[0], result_minmax[0])
         self.assert_list_almost_equal(expected_minmax[1], result_minmax[1])
         self.assert_list_almost_equal(expected_minmax[1], result_minmax[1])
 
-    @skipIf(os.environ['SASMOL_HUGETEST']=='n',"I am not testing huge files")
+    @skipIf(os.environ['SASMOL_HUGETEST'] == 'n', "I am not testing huge files")
     def test_rna_0point8g(self):
         self.o.read_pdb(DataPath+'rna.pdb')
-        self.o.read_dcd(dcdDataPath+'rna-0.8g.dcd')
-        result_minmax  = self.o.calculate_minimum_and_maximum()
-        expected_minmax = [[-45.714, -45.643, -42.868], [ 41.65 ,  41.087,  45.362]]
-        self.assert_list_almost_equal(expected_minmax[0], result_minmax[0],3)
-        self.assert_list_almost_equal(expected_minmax[1], result_minmax[1],3)
-        self.assert_list_almost_equal(expected_minmax[1], result_minmax[1],3)
+        result_minmax = self.o.calculate_minimum_and_maximum_all_steps(
+            hugeDcdPath('rna-0.8g.dcd'))
+        expected_minmax = [[-88.148, -86.246, -81.494],
+                           [84.491, 77.158, 84.429]]
+        self.assert_list_almost_equal(expected_minmax[0], result_minmax[0], 3)
+        self.assert_list_almost_equal(expected_minmax[1], result_minmax[1], 3)
+        self.assert_list_almost_equal(expected_minmax[1], result_minmax[1], 3)
 
-    @skipIf(os.environ['SASMOL_HUGETEST']=='n',"I am not testing huge files")
+    @skipIf(os.environ['SASMOL_HUGETEST'] == 'n', "I am not testing huge files")
     def test_rna_1point0g(self):
         self.o.read_pdb(DataPath+'rna.pdb')
-        self.o.read_dcd(dcdDataPath+'rna-1.0g.dcd')
-        result_minmax  = self.o.calculate_minimum_and_maximum()
-        expected_minmax = [[-46.369, -45.643, -42.868], [ 41.65 ,  41.087,  45.362]]
-        self.assert_list_almost_equal(expected_minmax[0], result_minmax[0],3)
-        self.assert_list_almost_equal(expected_minmax[1], result_minmax[1],3)
-        self.assert_list_almost_equal(expected_minmax[1], result_minmax[1],3)
+        result_minmax = self.o.calculate_minimum_and_maximum_all_steps(
+            hugeDcdPath('rna-1.0g.dcd'))
+        expected_minmax = [[-88.148, -86.246, -81.494],
+                           [84.491, 77.158, 84.429]]
+        self.assert_list_almost_equal(expected_minmax[0], result_minmax[0], 3)
+        self.assert_list_almost_equal(expected_minmax[1], result_minmax[1], 3)
+        self.assert_list_almost_equal(expected_minmax[1], result_minmax[1], 3)
 
-    @skipIf(os.environ['SASMOL_HUGETEST']=='n',"I am not testing huge files")
+    @skipIf(os.environ['SASMOL_HUGETEST'] == 'n', "I am not testing huge files")
     def test_rna_2point0g(self):
         self.o.read_pdb(DataPath+'rna.pdb')
-        self.o.read_dcd(dcdDataPath+'rna-2.0g.dcd')
-        result_minmax  = self.o.calculate_minimum_and_maximum()
-        expected_minmax = [[-48.253, -45.643, -42.868], [ 41.65 ,  41.087,  45.362]]
-        self.assert_list_almost_equal(expected_minmax[0], result_minmax[0],3)
-        self.assert_list_almost_equal(expected_minmax[1], result_minmax[1],3)
-        self.assert_list_almost_equal(expected_minmax[1], result_minmax[1],3)
+        result_minmax = self.o.calculate_minimum_and_maximum_all_steps(
+            hugeDcdPath('rna-2.0g.dcd'))
+        expected_minmax = [[-88.148, -86.246, -81.494],
+                           [84.491, 77.158, 84.429]]
+        self.assert_list_almost_equal(expected_minmax[0], result_minmax[0], 3)
+        self.assert_list_almost_equal(expected_minmax[1], result_minmax[1], 3)
+        self.assert_list_almost_equal(expected_minmax[1], result_minmax[1], 3)
 
-    @skipIf(os.environ['SASMOL_HUGETEST']=='n',"I am not testing huge files")
+    @skipIf(os.environ['SASMOL_HUGETEST'] == 'n', "I am not testing huge files")
     def test_rna_3point2g(self):
         self.o.read_pdb(DataPath+'rna.pdb')
-        self.o.read_dcd(dcdDataPath+'rna-3.2g.dcd')
-        result_minmax  = self.o.calculate_minimum_and_maximum()
-        expected_minmax = [[-48.253, -45.643, -42.868], [ 41.65 ,  41.087,  45.362]]
-        self.assert_list_almost_equal(expected_minmax[0], result_minmax[0],3)
-        self.assert_list_almost_equal(expected_minmax[1], result_minmax[1],3)
-        self.assert_list_almost_equal(expected_minmax[1], result_minmax[1],3)
+        result_minmax = self.o.calculate_minimum_and_maximum_all_steps(
+            hugeDcdPath('rna-3.2g.dcd'))
+        expected_minmax = [[-88.148, -86.246, -81.494],
+                           [84.491, 77.158, 84.429]]
+        self.assert_list_almost_equal(expected_minmax[0], result_minmax[0], 3)
+        self.assert_list_almost_equal(expected_minmax[1], result_minmax[1], 3)
+        self.assert_list_almost_equal(expected_minmax[1], result_minmax[1], 3)
 
-    @skipIf(os.environ['SASMOL_HUGETEST']=='n',"I am not testing huge files")
+    @skipIf(os.environ['SASMOL_HUGETEST'] == 'n', "I am not testing huge files")
     def test_rna_6point4g(self):
         self.o.read_pdb(DataPath+'rna.pdb')
-        self.o.read_dcd(dcdDataPath+'rna-6.4g.dcd')
-        result_minmax  = self.o.calculate_minimum_and_maximum()
-        expected_minmax = [[-48.253, -45.643, -42.868], [ 41.65 ,  41.332,  45.362]]
-        self.assert_list_almost_equal(expected_minmax[0], result_minmax[0],3)
-        self.assert_list_almost_equal(expected_minmax[1], result_minmax[1],3)
-        self.assert_list_almost_equal(expected_minmax[1], result_minmax[1],3)
+        result_minmax = self.o.calculate_minimum_and_maximum_all_steps(
+            hugeDcdPath('rna-6.4g.dcd'))
+        expected_minmax = [[-88.148, -86.246, -81.494],
+                           [84.491, 77.158, 84.429]]
+        self.assert_list_almost_equal(expected_minmax[0], result_minmax[0], 3)
+        self.assert_list_almost_equal(expected_minmax[1], result_minmax[1], 3)
+        self.assert_list_almost_equal(expected_minmax[1], result_minmax[1], 3)
 
     def tearDown(self):
         pass
 
-if __name__ == '__main__': 
-   main() 
 
+if __name__ == '__main__':
+    main()
