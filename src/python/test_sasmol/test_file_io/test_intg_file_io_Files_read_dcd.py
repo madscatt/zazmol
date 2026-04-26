@@ -15,7 +15,7 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 '''
 
-from sasmol.test_sasmol.utilities import env, generate_huge_dcd_onthefly
+from sasmol.test_sasmol.utilities import env
 
 from unittest import main,skipIf
 import unittest
@@ -107,72 +107,6 @@ class Test_intg_file_io_Files_read_dcd(unittest.TestCase):
       self.assertAlmostEqual(sum_expected_coor, sum_result_coor, self.prcsn)
 
 
-   """
-   # Memory allocation error
-   @skipIf(os.environ['SASMOL_HUGETEST']=='n',"I am not testing huge files")   
-   def test_rna_0point8gb(self):
-      '''
-      test a dcd 0.8gb based on a rna molecule
-      '''
-      #
-      #pdbFile = pdbDataPath+'rna.pdb'
-      #dcdFile = moduleDataPath+'rna-test.dcd'
-      #generate_huge_dcd_onthefly.generate(pdbFile,dcdFile,300)
-      dcdFile = '/tmp/rna-0.8g.dcd'
-      self.o.read_dcd(dcdFile)
-      result_coor = self.o.coor()
-      sum_result_coor = sum(sum(sum(result_coor)))
-      print '\nresult_coor \n',result_coor,'\nsum of result_coor\n',sum_result_coor
-      #
-      sum_expected_coor = -243137792.0
-      print '\nsum of expected_coor\n',sum_expected_coor
-      #
-      self.assertAlmostEqual(sum_expected_coor, sum_result_coor, self.prcsn)
-   """
-
-   """
-   # Memory allocation error
-   @skipIf(os.environ['SASMOL_HUGETEST']=='n',"I am not testing huge files")   
-   def test_rna_1point0gb(self):
-      '''
-      test a dcd 1.0gb based on a rna molecule
-      '''
-      #
-      #pdbFile = pdbDataPath+'rna.pdb'
-      #dcdFile = moduleDataPath+'rna-test.dcd'
-      #generate_huge_dcd_onthefly.generate(pdbFile,dcdFile,300)
-      dcdFile = '/tmp/rna-1.0g.dcd'
-      self.o.read_dcd(dcdFile)
-      result_coor = self.o.coor()
-      sum_result_coor = sum(sum(sum(result_coor)))
-      print '\nresult_coor \n',result_coor,'\nsum of result_coor\n',sum_result_coor
-      #
-      sum_expected_coor = -243137792.0
-      print '\nsum of expected_coor\n',sum_expected_coor
-      #
-      self.assertAlmostEqual(sum_expected_coor, sum_result_coor, self.prcsn)
-	"""
-
-   """
-   # Memory allocation error
-   @skipIf(os.environ['SASMOL_HUGETEST']=='n',"I am not testing huge files")   
-   def test_rna_1point2gb(self):
-      '''
-      test a dcd 1.2gb based on a rna molecule
-      '''
-      #
-      dcdFile = DataPath+'rna-1.2g.dcd'
-      self.o.read_dcd(dcdFile)
-      result_coor = self.o.coor()
-      sum_result_coor = sum(sum(sum(result_coor)))
-      print '\nresult_coor \n',result_coor,'\nsum of result_coor\n',sum_result_coor
-      #
-      sum_expected_coor = -243137792.0
-      print '\nsum of expected_coor\n',sum_expected_coor
-      #
-      self.assertAlmostEqual(sum_expected_coor, sum_result_coor, self.prcsn)
-   """
-
    def tearDown(self):
       pass
         
@@ -180,4 +114,3 @@ class Test_intg_file_io_Files_read_dcd(unittest.TestCase):
    
 if __name__ == '__main__': 
    unittest.main() 
-

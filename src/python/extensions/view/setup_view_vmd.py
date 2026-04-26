@@ -23,9 +23,9 @@ _view_vmd = Extension("_view_vmd",
                       include_dirs=[numpy_include],
                       )
 
-# NumyTypemapTests setup
+# Standalone extension setup
 setup(name="SASVIEW VMD I/O",
-      description="Module handles sending and receiving coordinates to VMD using numpy.i",
+      description="Module handles sending and receiving coordinates to VMD",
       author="Joseph E. Curtis",
       version="0.1",
       ext_modules=[_view_vmd]
