@@ -775,6 +775,10 @@ class Molecule(Atom):
     def setResidue_flag(self, newValue):
         self._residue_flag = newValue
 
+    def set_average_vdw(self):
+        import sasmol.operate as operate
+        operate.set_average_vdw(self)
+        return
 
 class System(Atom):
 

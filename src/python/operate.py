@@ -600,3 +600,98 @@ class Move():
         self.rotate_general_axis(frame, theta, unit_axis)
 
         return
+
+
+def set_average_vdw(mol):
+    '''
+    # NOTE: atom_vdw must be shape (natoms,2); only column 2 (radius) is used by pairs.f
+    '''
+
+    element_vdw = []
+
+    for e in mol.element():
+        item = legacy_van_der_waals.get(e, None)
+
+        if isinstance(item, list):
+            element_vdw.append(item)
+        else:
+            element_vdw.append([None, None])
+
+    mol.setAtom_vdw(element_vdw)
+
+    return
+
+# ----------------------------------------------------------------------
+# LEGACY van_der_waals DATA (DO NOT DELETE WITHOUT REVIEW)
+#
+# This is a mixed legacy dataset historically used by set_average_vdw.
+#
+# IMPORTANT:
+# - Some entries are LISTS: [A, B]
+#     These likely represent Lennard-Jones–type parameters
+#     (e.g., energy term and distance parameter, or A/B coefficients).
+#
+# - Some entries are SCALARS:
+#     These are NOT vdW radii and appear to be atomic weights or placeholders.
+#     They were effectively ignored by the original implementation.
+#
+# - Original behavior:
+#     Only list entries (len(item) > 1) were used to populate atom_vdw.
+#     Scalar entries were skipped or resulted in [None, None].
+#
+# - This dataset is NOT equivalent to:
+#     properties.Atomic().van_der_waals_radii()
+#
+# - This table should be preserved for:
+#     backward compatibility, historical reproducibility, and
+#     potential force-field parameter interpretation.
+#
+# TODO (future, not now):
+# - Determine exact physical meaning of [A, B]
+# - Separate into:
+#     * true vdW radii
+#     * force-field parameters (ε/σ or A/B)
+# ----------------------------------------------------------------------
+
+legacy_van_der_waals = {
+    'H': [-0.0368384615385, 0.928619230769],
+    'He': 4.0026022,
+    'Li': 6.9412, 'Be': 9.0121823, 'B': 10.8117,
+    'C': [-0.0763111111111, 2.00249333333],
+    'N': [-0.2, 1.85],
+    'O': [-0.13805625, 1.7392625],
+    'F': [-0.105, 1.7],
+    'Ne': [-0.086000, 1.5300],
+    'Na': [-0.0469, 1.36375],
+    'Mg': [-0.0150, 1.18500],
+    'Al': 26.9815382, 'Si': 28.08553,
+    'P': [-0.585, 2.15],
+    'S': [-0.450000, 2.000000],
+    'Cl': [-0.150, 2.27],
+    'Ar': 39.9481,
+    'K': [-0.0870, 1.76375],
+    'Ca': [-0.120, 1.367],
+    'Sc': 44.9559108, 'Ti': 47.8671,
+    'V': 50.94151, 'Cr': 51.99616, 'Mn': 54.9380499,
+    'Fe': [0.000000, 0.650000],
+    'Co': 58.9332009, 'Ni': 58.69342, 'Cu': 63.5463,
+    'Zn': [-0.250000, 1.09000],
+    'Ga': 69.7231, 'Ge': 72.641, 'As': 74.921602, 'Se': 78.963,
+    'Br': 79.9041, 'Kr': 83.7982, 'Rb': 85.46783, 'Sr': 87.621,
+    'Y': 88.905852, 'Zr': 91.2242, 'Nb': 92.906382, 'Mo': 95.942,
+    'Tc': 98.0, 'Ru': 101.072, 'Rh': 102.905502, 'Pd': 106.421,
+    'Ag': 107.86822, 'Cd': 112.4118, 'In': 114.8183, 'Sn': 118.7107,
+    'Sb': 121.7601, 'Te': 127.603, 'I': 126.904473, 'Xe': 131.2936,
+    'Cs': [-0.1900, 2.100],
+    'Ba': 137.3277, 'La': 138.90552, 'Ce': 140.1161,
+    'Pr': 140.907652, 'Nd': 144.243, 'Pm': 145.0, 'Sm': 150.363,
+    'Eu': 151.9641, 'Gd': 157.253, 'Tb': 158.925342, 'Dy': 162.5001,
+    'Ho': 164.930322, 'Er': 167.2593, 'Tm': 168.93421, 'Yb': 173.043,
+    'Lu': 174.9671, 'Hf': 174.9671, 'Ta': 180.94791, 'W': 183.841,
+    'Re': 186.2071, 'Os': 190.233, 'Ir': 192.2173, 'Pt': 195.0782,
+    'Au': 196.966552, 'Hg': 200.592, 'Tl': 204.38332, 'Pb': 207.21,
+    'Bi': 208.980382, 'Po': 209.0, 'At': 210.0, 'Rn': 222.0, 'Fr': 223.0,
+    'Ra': 226.0, 'Ac': 227.0, 'Th': 232.03811, 'Pa': 231.035882, 'U': 238.028913,
+    'D': [-0.0368384615385, 0.928619230769],
+    '1H': [-0.0368384615385, 0.928619230769]
+}
