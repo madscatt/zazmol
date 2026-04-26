@@ -78,3 +78,9 @@ Treat them per extension:
 1. decide whether the extension is still supported
 2. classify its tests as active, port-needed, or historical/demo
 3. only then bring supported extension tests into a repeatable workflow
+
+#### Current Ledger
+
+See the current parity status ledger here:
+
+- [`python 3 parity ledger`](parity_ledger.md)

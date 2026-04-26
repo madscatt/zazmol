@@ -22,6 +22,8 @@ mocker
 
 # [`testing and parity`](doc_files/testing.md)
 
+# [`python 3 parity ledger`](doc_files/parity_ledger.md)
+
 # [`library documentation`](https://madscatt.github.io/zazmol/index.html)
 
 # [`developer notes`](development_tools/notes.md)
