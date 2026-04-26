@@ -1,7 +1,7 @@
 from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
-#from __future__ import unicode_literals
+# from __future__ import unicode_literals
 
 '''
     SASMOL: Copyright (C) 2011 Joseph E. Curtis, Ph.D. 
@@ -26,18 +26,19 @@ import copy
 import multiprocessing
 import sasmol.system as system
 
-#	MULTIPROCESSING_SASMOL
+# MULTIPROCESSING_SASMOL
 #
-#	08/16/2015	--	initial coding			        :	jc
+# 08/16/2015	--	initial coding			        :	jc
 #
-#	 1         2         3         4         5         6         7
+# 1         2         3         4         5         6         7
 # LC4567890123456789012345678901234567890123456789012345678901234567890123456789
-#								       *      **
+# *      **
 '''
     Multiprocessing_sasmol contains methods to manage the creation and combination
     of sasmol.system objects and to manage multiprocessing jobs using
     these objects.
 '''
+
 
 class Multiprocessing_SasMol():
 
@@ -58,11 +59,11 @@ class Multiprocessing_SasMol():
         >>> molecules = test.divide_molecule(number_of_batches)
         >>> test.submit_jobs(molecules, test.example_worker, number_of_batches)
 
-       
+
         >>> molecules = molecule.divide_molecule(number_of_batches)
         >>> test = Multiprocessing_SasMol()
         >>> test.submit_jobs(molecules, test.example_worker, number_of_batches)
-        
+
         Note
         ----
 
@@ -79,7 +80,6 @@ class Multiprocessing_SasMol():
         pass
 
     def get_frame_lists(self, number_of_frames, number_of_batches, **kwargs):
-
         ''' 
         Utility method to determine individual frame lists for each
         of the total number_of_frames divided into number_of_batches
@@ -94,7 +94,7 @@ class Multiprocessing_SasMol():
 
         kwargs 
             optional future arguments
-                                                                                     
+
         Returns
         -------
         frames
@@ -104,19 +104,20 @@ class Multiprocessing_SasMol():
         -------
 
         >>> frames = self.get_frame_lists(molecule.number_of_frames(), number_of_batches)
-        
-        ''' 
-        remainder = number_of_frames%number_of_batches
+
+        '''
+        remainder = number_of_frames % number_of_batches
 
         fpb = int(math.floor(float(number_of_frames)/float(number_of_batches)))
 
         frames = []
-        for batch in xrange(number_of_batches-1):
+        for batch in range(number_of_batches-1):
             starting_frame = fpb*batch
             ending_frame = fpb*batch + fpb - 1
 
-            frames.append([x for x in xrange(starting_frame, ending_frame+1)])
-        frames.append([x for x in xrange(ending_frame + 1, ending_frame + fpb + remainder +1)])
+            frames.append([x for x in range(starting_frame, ending_frame+1)])
+        frames.append([x for x in range(ending_frame + 1,
+                      ending_frame + fpb + remainder + 1)])
 
         return frames
 
@@ -134,25 +135,25 @@ class Multiprocessing_SasMol():
 
         kwargs 
             optional future arguments
-                                                                                     
+
         Returns
         -------
         com  
             list of float center_of_mass values
 
-        ''' 
+        '''
 
-        com = [molecule.calculate_center_of_mass(frame) for frame in xrange(molecule.number_of_frames())]
+        com = [molecule.calculate_center_of_mass(
+            frame) for frame in range(molecule.number_of_frames())]
 
         return com
 
     def divide_molecule(self, molecule, number_of_batches, **kwargs):
-
         '''
         Method makes a deep copy of frame 0 of the input molecule
         into a set of new molecules indicated by the number_of_batches
         input variable.
-        
+
         After duplicating the molecule, the coordinates are assigned to
         the duplicate molecules.
 
@@ -160,13 +161,13 @@ class Multiprocessing_SasMol():
         when the number of frames is not an equal divisor of number_of_batches
         which leads to the remainder frames assigned to the last duplicate
         molecule.
-         
+
 
         Parameters
         ----------
         molecule 
             system object : 
-        
+
         number_of_batches
             integer : number of duplicate molecules to generate
 
@@ -189,7 +190,7 @@ class Multiprocessing_SasMol():
         >>> molecules = test.divide_molecule(number_of_batches)
 
         >>> molecules = molecule.divide_molecule(number_of_batches)
-       
+
         Note 
         -------
         Last line in the examples is an alternative use case to explore yet
@@ -197,12 +198,14 @@ class Multiprocessing_SasMol():
 
         '''
 
-        frames = self.get_frame_lists(molecule.number_of_frames(), number_of_batches)
+        frames = self.get_frame_lists(
+            molecule.number_of_frames(), number_of_batches)
 
-        molecules = [copy.deepcopy(molecule) for x in xrange(number_of_batches)]
+        molecules = [copy.deepcopy(molecule) for x in range(number_of_batches)]
 
-        for i in xrange(number_of_batches):
-            dum_coor = numpy.zeros((len(frames[i]), molecule.natoms(), 3), numpy.float)
+        for i in range(number_of_batches):
+            dum_coor = numpy.zeros(
+                (len(frames[i]), molecule.natoms(), 3), numpy.float)
             molecules[i].setCoor(dum_coor)
             count = 0
             for frame in frames[i]:
@@ -222,13 +225,13 @@ class Multiprocessing_SasMol():
 
         target_method
             string : name of method to call
-        
+
         number_of_jobs
             int : number of job / processes to run
 
         kwargs 
             optional future arguments
-                                                                                     
+
         Returns
         -------
         None
@@ -237,23 +240,23 @@ class Multiprocessing_SasMol():
         -------
 
         >>> test.submit_jobs(molecules, test.example_worker, number_of_batches)
-        
-        ''' 
+
+        '''
         jobs = []
         for i in range(number_of_jobs):
-            p = multiprocessing.Process(target=target_method, args=(i,molecules[i]))
+            p = multiprocessing.Process(
+                target=target_method, args=(i, molecules[i]))
             jobs.append(p)
             p.start()
 
 
-if __name__ == "__main__" :
+if __name__ == "__main__":
 
     pdbfilename = 'dum.pdb'
     dcdfilename = 'dum.dcd'
 
     mol = system.Molecule(pdbfilename)
     mol.read_dcd(dcdfilename)
-
 
     '''
     number_of_batches = 10

@@ -24,6 +24,7 @@ SUITES = {
     "operate": os.path.join(TEST_ROOT, "test_operate"),
     "properties": os.path.join(TEST_ROOT, "test_properties"),
     "subset": os.path.join(TEST_ROOT, "test_subset"),
+    "topology": os.path.join(TEST_ROOT, "test_topology"),
 }
 
 

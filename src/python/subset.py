@@ -1,7 +1,7 @@
 from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
-#from __future__ import unicode_literals
+# from __future__ import unicode_literals
 #
 #
 #    SASMOL: Copyright (C) 2011 Joseph E. Curtis, Ph.D.
@@ -19,14 +19,14 @@ from __future__ import print_function
 #    You should have received a copy of the GNU General Public License
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
-#	SUBSET
+# SUBSET
 #
-#	01/04/2011	--	initial coding 			            :	jc
-#	08/19/2016	--	added doc strings                   :	jc
+# 01/04/2011	--	initial coding 			            :	jc
+# 08/19/2016	--	added doc strings                   :	jc
 #
 # LC	 1         2         3         4         5         6         7
 # LC4567890123456789012345678901234567890123456789012345678901234567890123456789
-#								       *      **
+# *      **
 import os
 import sys
 import string
@@ -99,7 +99,8 @@ class Mask(object):
 
         farray = numpy.zeros((nflexible, natoms), numpy.longlong)
 
-        sasmol.mask.get_mask_array(farray, name, resid, flexible_residues, nresidues, mtype)
+        sasmol.mask.get_mask_array(
+            farray, name, resid, flexible_residues, nresidues, mtype)
 
         return farray
 
@@ -263,32 +264,32 @@ class Mask(object):
 # OPEN	Need to add a distance selection logic: find atoms greater than 5 angstroms from ...
 #
 #
-#	basis_filter == 'name[i] == "CA" less_than 5 angstroms from name[j] == "N" '
+# basis_filter == 'name[i] == "CA" less_than 5 angstroms from name[j] == "N" '
 #
-#	basis_filter == 'name[i] == "CA" greater_than 5 angstroms from name[j] == "N" '
+# basis_filter == 'name[i] == "CA" greater_than 5 angstroms from name[j] == "N" '
 #
-#	basis_filter == 'name[i] == "CA" between 3 and 5 angstroms from name[j] == "N" '
+# basis_filter == 'name[i] == "CA" between 3 and 5 angstroms from name[j] == "N" '
 #
-#	ANGLES
+# ANGLES
 #
-#	basis_filter == '(segname[i] == "WAT" and (name[i] == "OH2" or name[i] == "H1")) less_than 104 degrees from (segname[j] == "WAT" and name[j] == "H1") '
+# basis_filter == '(segname[i] == "WAT" and (name[i] == "OH2" or name[i] == "H1")) less_than 104 degrees from (segname[j] == "WAT" and name[j] == "H1") '
 #
-#	basis_filter == '(segname[i] == "WAT" and name[i] == "OH2") between 100 and 106 degrees from (segname[j] == "WAT" and name[j] == "H1") '
+# basis_filter == '(segname[i] == "WAT" and name[i] == "OH2") between 100 and 106 degrees from (segname[j] == "WAT" and name[j] == "H1") '
 #
 # 	--- or have the code pull out the donors and acceptors from selections?
 #
-#	basis_filter == '(resid[i] == "TIP3") between 100 and 106 degrees from (resid[j] == "TIP3")'
+# basis_filter == '(resid[i] == "TIP3") between 100 and 106 degrees from (resid[j] == "TIP3")'
 #
-#	--- or define a hydrogen_bonded keyword that takes care of distance/angle & donor/acceptor
+# --- or define a hydrogen_bonded keyword that takes care of distance/angle & donor/acceptor
 #
-#	basis_filter == '(resid[i] == "TIP3") hydrogen_bonded to (resid[j] == "TIP3")'
-#	basis_filter == '(segment[i] == "RNA") hydrogen_bonded to (resid[j] == "TIP3")'
-#	basis_filter == '(segment[i] == "RNA") hydrogen_bonded to (segment[j] == "RNA")'
+# basis_filter == '(resid[i] == "TIP3") hydrogen_bonded to (resid[j] == "TIP3")'
+# basis_filter == '(segment[i] == "RNA") hydrogen_bonded to (resid[j] == "TIP3")'
+# basis_filter == '(segment[i] == "RNA") hydrogen_bonded to (segment[j] == "RNA")'
 #
-#	--- or define an atom as a donor or acceptor and use hydrogen_bonded keyword for distance/angle
+# --- or define an atom as a donor or acceptor and use hydrogen_bonded keyword for distance/angle
 #
-#	basis_filter == '(segment[i] == "RNA" and donor[i] == 1) hydrogen_bonded to (resid[j] == "TIP3")'
-#	basis_filter == '(segment[i] == "RNA" and acceptor[i] == 1) hydrogen_bonded to (resid[j] == "TIP3")'
+# basis_filter == '(segment[i] == "RNA" and donor[i] == 1) hydrogen_bonded to (resid[j] == "TIP3")'
+# basis_filter == '(segment[i] == "RNA" and acceptor[i] == 1) hydrogen_bonded to (resid[j] == "TIP3")'
 #
 #
         error = []
@@ -300,7 +301,7 @@ class Mask(object):
         for i in range(natoms):
 
             try:
-                if(eval(basis_filter)):
+                if (eval(basis_filter)):
                     preliminary_mask_array.append(1)
                 else:
                     preliminary_mask_array.append(0)
@@ -309,7 +310,7 @@ class Mask(object):
                              basis_filter + ' for atom ' + str(i))
                 return error, preliminary_mask_array
 
-        if(numpy.sum(preliminary_mask_array) == 0):
+        if (numpy.sum(preliminary_mask_array) == 0):
             error.append(
                 'found no atoms using filter selection ' + basis_filter)
             return error, preliminary_mask_array
@@ -386,8 +387,8 @@ class Mask(object):
         natoms1 = mol1.natoms()
         natoms2 = mol2.natoms()
 
-        #print('natoms1 = ', natoms1)
-        #print('natoms2 = ', natoms2)
+        # print('natoms1 = ', natoms1)
+        # print('natoms2 = ', natoms2)
 
         frame = 0
 
@@ -452,7 +453,7 @@ class Mask(object):
                 error.append(
                     'failed in copy_molecule when attempting to assign descriptors to atom ' + str(i) + ' from mol2')
                 return error
-        
+
         x = numpy.array(x, float)
         y = numpy.array(y, float)
         z = numpy.array(z, float)
@@ -510,7 +511,7 @@ class Mask(object):
         self._conect = mol1._conect
 
         try:
-            for ndx, list_ndxs in mol2._conect.iteritems():
+            for ndx, list_ndxs in mol2._conect.items():
                 self._conect[ndx] = list_ndxs
         except:
             pass
@@ -576,7 +577,7 @@ class Mask(object):
         natoms = self.natoms()
 
         for i in range(natoms):
-            if(mask[i] == 1):
+            if (mask[i] == 1):
                 try:
                     # if True:
                     atom.append(self._atom[i])
@@ -609,23 +610,23 @@ class Mask(object):
                     except:
                         pass
 
-                    if(self._name[i] not in unique_names):
+                    if (self._name[i] not in unique_names):
                         unique_names.append(self._name[i])
-                    if(self._resname[i] not in unique_resnames):
+                    if (self._resname[i] not in unique_resnames):
                         unique_resnames.append(self._resname[i])
-                    if(self._resid[i] not in unique_resids):
+                    if (self._resid[i] not in unique_resids):
                         unique_resids.append(self._resid[i])
-                    if(self._chain[i] not in unique_chains):
+                    if (self._chain[i] not in unique_chains):
                         unique_chains.append(self._chain[i])
-                    if(self._segname[i] not in unique_segnames):
+                    if (self._segname[i] not in unique_segnames):
                         unique_segnames.append(self._segname[i])
-                    if(self._occupancy[i] not in unique_occupancies):
+                    if (self._occupancy[i] not in unique_occupancies):
                         unique_occupancies.append(self._occupancy[i])
-                    if(self._beta[i] not in unique_betas):
+                    if (self._beta[i] not in unique_betas):
                         unique_betas.append(self._beta[i])
-                    if(self._element[i] not in unique_elements):
+                    if (self._element[i] not in unique_elements):
                         unique_elements.append(self._element[i])
-                    if(self._moltype[i] not in unique_moltypes):
+                    if (self._moltype[i] not in unique_moltypes):
                         unique_moltypes.append(self._moltype[i])
 
                 except:
@@ -704,7 +705,7 @@ class Mask(object):
 
         kwargs 
             optional future arguments
-                           
+
         Returns
         -------
         molecules
@@ -719,7 +720,7 @@ class Mask(object):
         array([-21.52499962, -67.56199646,  86.75900269])
         >>> molecule.name()[:10]
         ['N', 'HT1', 'HT2', 'HT3', 'CA', 'HA1', 'HA2', 'C', 'O', 'N']  
-       
+
         >>> import sasmol.util as utilities
         >>> number_of_duplicates = 108
         >>> molecules = utilities.duplicate_molecule(molecule, number_of_duplicates)
@@ -727,17 +728,18 @@ class Mask(object):
         array([-21.52499962, -67.56199646,  86.75900269]) 
         >>> molecules[-1].name()[:10]
         ['N', 'HT1', 'HT2', 'HT3', 'CA', 'HA1', 'HA2', 'C', 'O', 'N']  
-      
-       
+
+
         Note
         ____
         Using deepcopy directly in subset.py leads to inheritance conflict.  
         Therefore subset calls a method held in utilities to make duplicates. 
-        
+
         '''
-    
-        molecules = utilities.duplicate_molecule(molecule, number_of_duplicates)
-         
+
+        molecules = utilities.duplicate_molecule(
+            molecule, number_of_duplicates)
+
         return molecules
 
     def get_indices_from_mask(self, mask):
@@ -754,7 +756,7 @@ class Mask(object):
 
         kwargs 
             optional future arguments
-                           
+
         Returns
         -------
         indices
@@ -790,7 +792,7 @@ class Mask(object):
         ----------
         frame 
             integer : trajectory frame number to use
-        
+
         mask 
             integer array : mask array of length of the number of atoms
                                   with 1 or 0 for each atom depending on the selection
@@ -798,7 +800,7 @@ class Mask(object):
 
         kwargs 
             optional future arguments
-                           
+
         Returns
         -------
         error
@@ -828,7 +830,7 @@ class Mask(object):
 
         this_frame_coor = self._coor[frame, :, :]
 
-        #coor = numpy.zeros((1, len(indicies), 3), float)
+        # coor = numpy.zeros((1, len(indicies), 3), float)
         coor = numpy.zeros((1, len(indicies), 3), numpy.float32)
 
         try:
@@ -851,7 +853,7 @@ class Mask(object):
         ----------
         frame 
             integer : trajectory frame number to use
-        
+
         mask 
             integer array : mask array of length of the number of atoms
                                   with 1 or 0 for each atom depending on the selection
@@ -859,7 +861,7 @@ class Mask(object):
 
         kwargs 
             optional future arguments
-                           
+
         Returns
         -------
         error
@@ -952,13 +954,13 @@ class Mask(object):
         >>> error = molecule.set_descriptor_using_mask(mask, descriptor, value)
         >>> descriptor[:10]
         ['0.00', '0.00', '0.00', '0.00', '1.00', '0.00', '0.00', '0.00', '0.00', '0.00']
-    
+
         which can then be used to set the new values into the molecule 
 
         >>> molecule.setBeta(descriptor)
         >>> molecule.beta()[:10]
         ['0.00', '0.00', '0.00', '0.00', '1.00', '0.00', '0.00', '0.00', '0.00', '0.00']
-       
+
         Note
         ____
         Coordinate arrays can not be manipulated by this method.
@@ -970,7 +972,7 @@ class Mask(object):
 
         natoms = self.natoms()
         for i in range(natoms):
-            if(mask[i] == 1):
+            if (mask[i] == 1):
                 try:
                     descriptor[i] = value
                 except:
@@ -1004,7 +1006,7 @@ class Mask(object):
 
         kwargs 
             optional future arguments
-                                                                                     
+
         Returns
         -------
         None
@@ -1012,7 +1014,7 @@ class Mask(object):
 
         Examples
         -------
-        
+
         Note
         ____
 
@@ -1048,7 +1050,7 @@ class Mask(object):
         ----------
         other
             system object : object to copy transformed information into
-        
+
         frame   
             integer : frame number with coordinates to transform
 
@@ -1064,7 +1066,7 @@ class Mask(object):
 
         kwargs 
             optional future arguments
-                                                                                     
+
         Returns
         -------
         None

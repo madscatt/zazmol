@@ -277,7 +277,7 @@ class Atom(file_io.Files, calculate.Calculate, operate.Move, subset.Mask, proper
         '''
 
         # print(self.__dict__)
-        for key, value in self.__dict__.iteritems():
+        for key, value in self.__dict__.items():
             # print(key)
             try:
                 if type(value) is list:
@@ -910,8 +910,6 @@ class Molecule_Maker(Atom):
         self._residue_flag = [False for x in range(natoms)]
 
         self._total_mass = calculate.Calculate.calculate_mass(self)
-        print('self._mass = ', self._mass)
-        print('self._total_mass = ', self._total_mass)
 
     def residue_flag(self):
         return self._residue_flag
