@@ -54,27 +54,20 @@ import random
 
 class Mask(object):
 
-    """ Base class containing methods to extract or combine system objects
-        using numpy masks
+    """Methods to create and apply atom-selection masks.
 
-        Examples
-        ========
+    Masks in this module are atom-aligned integer arrays (typically 0/1) with
+    length ``natoms``. A common workflow is to create a mask with
+    ``get_subset_mask`` and apply it with methods such as
+    ``get_coor_using_mask`` or ``copy_molecule_using_mask``.
 
-        First example shows how to use class methods from system object:
-
-        >>> import sasmol.system as system
-        >>> molecule = system.Molecule('hiv1_gag.pdb')
-        >>> basis_filter = 'name[i] == "CA" and resid[i] < 10'
-        >>> error, mask = molecule.get_subset_mask(basis_filter)  
-        >>> import numpy
-        >>> numpy.nonzero(mask)
-        (array([  4,  11,  21,  45,  55,  66,  82, 101, 112]),) 
-
-        Note
-        ----
-
-        `self` parameter is not shown in the ``Parameters`` section in the documentation
-
+    Examples
+    --------
+    >>> import sasmol.system as system
+    >>> molecule = system.Molecule('hiv1_gag.pdb')
+    >>> error, mask = molecule.get_subset_mask('name[i] == "CA" and resid[i] < 10')
+    >>> error
+    []
     """
 
     def get_dihedral_subset_mask(self, flexible_residues, mtype):
@@ -203,39 +196,27 @@ class Mask(object):
 
     def get_subset_mask(self, basis_filter):
         '''
-        This method creates an array of ones and/or zeros
-        of the length of the number of atoms in "self" and
-        uses the user-supplied filter string to filter the
-        parameter descriptors to obtain a subset array
-        that can be used to filter entities in other methods
-        either in this class or elsewhere.
+        Build a 0/1 atom mask from a selection expression.
 
-        usage:
+        Parameters
+        ----------
+        basis_filter
+            string : expression evaluated per atom index ``i``
 
-                Here is a way to create a mask to be used somewhere else:
+        Returns
+        -------
+        error
+            list : empty on success, otherwise a selection error message
 
-                m1=system.Molecule(0)	### create a molecule m1
-                m1.read_pdb(filename)	### read in variables, coor, etc.
+        mask_array
+            integer array : atom-aligned selection mask
 
-                . . . do stuff . . . 
-
-                basis_filter = XXXX     ### your (see examples below)
-
-                error,mask = m1.get_subset_mask(basis_filter)  ### get a mask
-
-                . . . do something with the mask using other functions in this class . . . 
-
-                Here are some example basis_filter strings:
-
-                basis_filter = 'name[i] == "CA" and resid[i] < 10'
-                basis_filter = 'name[i][0] == "H" and resid[i] < 10'
-                basis_filter = 'name[i] == "CA" and resid[i] >= 1 and resid[i] < 10'
-
-                The syntax for basis selection can be quite eloborate.  For example,
-
-                basis_filter = 'name[i] == "CA" and resid[i] >= 1 and resid[i] < 10 and moltype=="protein" and chain=="F" and occupancy==1 and beta>10.0 and element=="C" ...'
-
-                could be used for advanced selection needs.  See API for full details.
+        Examples
+        --------
+        >>> import sasmol.system as system
+        >>> molecule = system.Molecule('hiv1_gag.pdb')
+        >>> basis_filter = 'name[i] == "CA" and resid[i] < 10'
+        >>> error, mask = molecule.get_subset_mask(basis_filter)
 
         '''
         index = self.index()
@@ -343,34 +324,31 @@ class Mask(object):
 
     def merge_two_molecules(self, mol1, mol2, **kwargs):
         '''
-        This method combines two molecules into a single, new molecule. 
-        It will assign coordinates from the first frame of a molecule.
+        Merge two input molecules into ``self``.
 
-        usage:
+        Coordinates are copied from frame 0 of each input molecule.
 
+        Parameters
+        ----------
+        mol1, mol2
+            system objects : molecules to merge
 
-                m1=system.Molecule(0)	### create a molecule m1
-                m1.read_pdb(filename1)	### read in variables, coor, etc.
+        kwargs
+            optional keyword arguments:
+            ``report_missing_descriptors`` (boolean)
 
-                m2=system.Molecule(1)	### create a molecule m2
-                m2.read_pdb(filename2)	### read in variables, coor, etc.
+        Returns
+        -------
+        error
+            list : merge status and optional informational messages
 
-                m3=system.Molecule(2)	### create a molecule m3
-
-
-                . . . do stuff . . . 
-
-                error = m3.merge_two_molecules(m1,m2) 	### sets the values that define mol3
-
-        If report_missing_descriptors=True is passed, descriptors that are not
-        present in both input molecules are listed in the returned error list.
-        These messages are informational; the merge still proceeds when the
-        structural essentials are valid.
-
-        Might do: add a caller-supplied required_descriptors keyword so
-        simulation, PDB-writing, scattering, or coarse-grain callers can define
-        their own descriptor completeness requirements without imposing a
-        global molecule schema.
+        Examples
+        --------
+        >>> import sasmol.system as system
+        >>> m1 = system.Molecule('first.pdb')
+        >>> m2 = system.Molecule('second.pdb')
+        >>> merged = system.Molecule()
+        >>> error = merged.merge_two_molecules(m1, m2)
 
         '''
         error = []
@@ -539,26 +517,31 @@ class Mask(object):
 
     def copy_molecule_using_mask(self, other, mask, frame):
         '''
-        This method initializes the standard descriptors and
-        coordinates for a subset molecule defined by the
-        supplied mask array.
+        Copy selected atoms into another molecule object.
 
-        usage:
+        Parameters
+        ----------
+        other
+            system object : destination molecule
 
-                Here is a way to create a mask to be used somewhere else:
+        mask
+            integer array : atom-aligned 0/1 selection mask
 
-                m1=system.Molecule(0)	### create a molecule m1
-                m1.read_pdb(filename)	### read in variables, coor, etc.
+        frame
+            integer : source frame used for copied coordinates
 
-                . . . do stuff . . . 
+        Returns
+        -------
+        error
+            list : empty on success
 
-                basis_filter = XXXX     ### your (see examples below)
-
-                error,mask = m1.get_subset_mask(basis_filter)  ### get a mask
-
-                sub_m1=system.Molecule(1)		### create a new molecule sub_m1
-
-                error = m1.copy_molecule_using_mask(sub_m1,mask,frame) ### initializes sub_m1
+        Examples
+        --------
+        >>> import sasmol.system as system
+        >>> molecule = system.Molecule('hiv1_gag.pdb')
+        >>> error, mask = molecule.get_subset_mask("name[i] == 'CA'")
+        >>> subset_molecule = system.Molecule()
+        >>> error = molecule.copy_molecule_using_mask(subset_molecule, mask, 0)
 
         '''
         error = []
@@ -763,24 +746,17 @@ class Mask(object):
 
     def get_indices_from_mask(self, mask):
         '''
-        This method returns the internal indices for the supplied
-        mask.  
+        Return atom indices selected by a mask.
 
         Parameters
         ----------
-        mask 
-            integer array : mask array of length of the number of atoms
-                                  with 1 or 0 for each atom depending on the selection
-                                  used to create the mask
-
-        kwargs 
-            optional future arguments
+        mask
+            integer array : atom-aligned 0/1 selection mask
 
         Returns
         -------
         indices
-            integer array : indices of atoms determined by the input mask
-
+            integer array : selected atom indices
 
         Examples
         --------
@@ -789,7 +765,7 @@ class Mask(object):
         >>> molecule = system.Molecule('hiv1_gag.pdb')
         >>> basis_filter = "name[i] == 'CA'"
         >>> error, mask = molecule.get_subset_mask(basis_filter)
-        >>> indices = molecule.get_indices_from_mask(mask) 
+        >>> indices = molecule.get_indices_from_mask(mask)
         >>> indices[:10]
         array([  4,  11,  21,  45,  55,  66,  82, 101, 112, 119])
 
@@ -802,31 +778,23 @@ class Mask(object):
 
     def get_coor_using_mask(self, frame, mask):
         '''
-        This method extracts coordinates from frame=frame of system object (self)
-        using a supplied mask which has been created before this method is called.
-
-        Coorindates are chosen for the elements that are equal to 1 in the supplied mask array.
+        Extract coordinates from one frame using a supplied mask.
 
         Parameters
         ----------
-        frame 
+        frame
             integer : trajectory frame number to use
 
-        mask 
-            integer array : mask array of length of the number of atoms
-                                  with 1 or 0 for each atom depending on the selection
-                                  used to create the mask
-
-        kwargs 
-            optional future arguments
+        mask
+            integer array : atom-aligned 0/1 selection mask
 
         Returns
         -------
         error
-            string : error statement
+            list : empty on success
 
         coor
-            coordinates corresponding to those determined by the input mask
+            numpy array : selected coordinates with shape ``(1, nselected, 3)``
 
         Examples
         --------
@@ -837,8 +805,8 @@ class Mask(object):
         >>> error, mask = molecule.get_subset_mask(basis_filter)
         >>> frame = 0
         >>> error, coor = molecule.get_coor_using_mask(frame, mask)
-        >>> coor[0][0]
-        array([-21.72500038, -66.91000366,  85.45700073], dtype=COORD_DTYPE)
+        >>> len(error) == 0
+        True
 
         '''
         error = []
@@ -933,58 +901,34 @@ class Mask(object):
 
     def set_descriptor_using_mask(self, mask, descriptor, value):
         '''
-        This method writes the "value" to the given descriptor to
-        the elements that are equal to 1 in the supplied mask array.
+        Assign a descriptor value at atoms selected by mask.
 
         Parameters
         ----------
-        mask 
-            integer array : mask array of length of the number of atoms
-                                  with 1 or 0 for each atom depending on the selection
-                                  used to create the mask
+        mask
+            integer array : atom-aligned 0/1 selection mask
 
-        descriptor 
-            system property : a property defined in an instance of a system object
+        descriptor
+            list-like object : atom-aligned descriptor container
 
         value
-            string : new value to apply to selection defined by mask
+            object : value to write at selected atom positions
 
-        kwargs 
-            point = True : will translate to a fixed point
-                           given by value variable                                                                             
         Returns
         -------
-        None
-            updated self._descriptor
+        error
+            list : empty on success
 
         Examples
         --------
 
         >>> import sasmol.system as system
         >>> molecule = system.Molecule('hiv1_gag.pdb')
-        >>> molecule.beta()[:10]
-        ['0.00', '0.00', '0.00', '0.00', '0.00', '0.00', '0.00', '0.00', '0.00', '0.00']
-
         >>> basis_filter = "name[i] == 'CA'"
         >>> error, mask = molecule.get_subset_mask(basis_filter)
         >>> descriptor = molecule.beta()
-        >>> value = '1.00'
-        >>> error = molecule.set_descriptor_using_mask(mask, descriptor, value)
-        >>> descriptor[:10]
-        ['0.00', '0.00', '0.00', '0.00', '1.00', '0.00', '0.00', '0.00', '0.00', '0.00']
-
-        which can then be used to set the new values into the molecule 
-
+        >>> error = molecule.set_descriptor_using_mask(mask, descriptor, '1.00')
         >>> molecule.setBeta(descriptor)
-        >>> molecule.beta()[:10]
-        ['0.00', '0.00', '0.00', '0.00', '1.00', '0.00', '0.00', '0.00', '0.00', '0.00']
-
-        Note
-        ____
-        Coordinate arrays can not be manipulated by this method.
-
-        TODO: If possible, get rid of loop
-
         '''
         error = []
 
