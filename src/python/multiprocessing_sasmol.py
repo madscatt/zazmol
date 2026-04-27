@@ -1,6 +1,3 @@
-from __future__ import absolute_import
-from __future__ import division
-from __future__ import print_function
 # from __future__ import unicode_literals
 
 '''
@@ -285,6 +282,5 @@ if __name__ == "__main__":
     test.submit_jobs(molecules, test.example_worker, number_of_batches)
 
     # for j in range(mol.number_of_frames()):
-    #     print(com[j])
 
     '''

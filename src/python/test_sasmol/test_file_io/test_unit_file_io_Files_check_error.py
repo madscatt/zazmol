@@ -17,9 +17,9 @@
 
 from unittest import main
 import unittest
-from io import StringIO
-from contextlib import redirect_stdout
+from unittest import mock
 
+from sasmol.pdb_io import PDBElementResolutionError
 import sasmol.system as system
 
 import os
@@ -42,10 +42,32 @@ class Test_unit_sasio_Files_print_error(unittest.TestCase):
         test for error
         '''
         error = ['wrong']
-        with self.assertRaises(SystemExit):
-            with redirect_stdout(StringIO()) as captured_output:
-                self.o.check_error(error)
-        self.assertEqual(captured_output.getvalue().strip(), str(error))
+        with self.assertRaises(PDBElementResolutionError) as captured_error:
+            self.o.check_error(error)
+        self.assertEqual(str(captured_error.exception), 'wrong')
+
+    def test_read_pdb_logs_and_reraises_element_resolution_error(self):
+        '''
+        test for caller-boundary logging during PDB element resolution failure
+        '''
+        data_path = os.path.join(
+            os.path.dirname(os.path.realpath(__file__)),
+            '..',
+            'data',
+            'pdb_common'
+        ) + os.path.sep
+
+        with mock.patch.object(
+            self.o,
+            'element_filter',
+            side_effect=PDBElementResolutionError('wrong')
+        ):
+            with self.assertLogs('sasmol.pdb_io', level='ERROR') as captured_logs:
+                with self.assertRaises(PDBElementResolutionError):
+                    self.o.read_pdb(data_path + '1ATM.pdb')
+
+        self.assertTrue(any('Unable to resolve PDB element names while reading' in line
+                            for line in captured_logs.output))
 
     def tearDown(self):
         pass

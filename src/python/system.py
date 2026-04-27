@@ -1,6 +1,3 @@
-from __future__ import absolute_import
-from __future__ import division
-from __future__ import print_function
 # from __future__ import unicode_literals
 #
 #    SASMOL: Copyright (C) 2011 Joseph E. Curtis, Ph.D.
@@ -201,20 +198,16 @@ class Atom(
         Frame-count compatibility is not validated here.
         '''
 
-        # print(self.__dict__)
         for key, value in self.__dict__.items():
-            # print(key)
             try:
                 if type(value) is list:
                     self.__dict__[key].extend(other.__dict__[key])
                 elif type(value) is numpy.ndarray:
-                   # print 'sdk = ',self.__dict__[key], 'odk =',
                    # other.__dict__[key]
                     if key == '_coor':
                         self.__dict__[key] = numpy.concatenate(
                             (self.__dict__[key], other.__dict__[key]), axis=1)
                     elif len(value.shape) == 1:
-                        # print(key)
                         self.__dict__[key] = numpy.concatenate(
                             (self.__dict__[key], other.__dict__[key]))
                     else:

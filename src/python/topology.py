@@ -1,6 +1,3 @@
-from __future__ import absolute_import
-from __future__ import division
-from __future__ import print_function
 # from __future__ import unicode_literals
 
 #   SASMOL: Copyright (C) 2011 Joseph E. Curtis, Ph.D.
@@ -513,7 +510,6 @@ class Topology(charmm_topology.CharmmTopology):
             if this_resname in residue_dictionary:
                 one_resname.append(residue_dictionary[this_resname])
             elif (atom[i] == 'HETATM'):
-                # print 'skipping non-standard resname in HETATM record:
                 # ',this_resname
                 one_resname.append("X")
             else:

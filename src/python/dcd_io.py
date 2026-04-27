@@ -1,6 +1,3 @@
-from __future__ import absolute_import
-from __future__ import division
-from __future__ import print_function
 # from __future__ import unicode_literals
 #
 '''
@@ -301,14 +298,11 @@ class DCD(object):
         num_fixed = 0
         result = 1
 
-        # print('calling read dcd header')
         readheaderresult, filepointer, nnatoms, nset, istart, nsavc, delta, namnf, reverseEndian, charmm = dcdio.read_dcdheader(
             infile)
         if (readheaderresult != 0):
             print('failed to read header')
             print('readheaderresult = ', readheaderresult)
-
-        # print('done with read dcd header')
 
         coor = numpy.zeros((1, nnatoms, 3), config.COORD_DTYPE)
 
@@ -321,8 +315,6 @@ class DCD(object):
         for i in range(frame):
             result = dcdio.read_dcdstep(
                 infile, nnatoms, tx, ty, tz, num_fixed, first, reverseEndian, charmm)
-
-        # print('result = ',result)
 
         coor[0, :, 0] = tx
         coor[0, :, 1] = ty

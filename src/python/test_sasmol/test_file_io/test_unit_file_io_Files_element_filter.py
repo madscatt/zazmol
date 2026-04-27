@@ -32,6 +32,7 @@ import unittest
 
 import warnings
 
+from sasmol.pdb_io import PDBElementResolutionError
 import sasmol.system as system
 
 import os, sys, string
@@ -165,7 +166,7 @@ class Test_unit_file_io_Files_element_filter(unittest.TestCase):
       if len(names)>0:
          self.o.setResname(resnames)
          self.o.setElement(elements)
-         with self.assertRaises(SystemExit):
+         with self.assertRaises(PDBElementResolutionError):
             self.o.element_filter()
 
 
@@ -216,7 +217,7 @@ class Test_unit_file_io_Files_element_filter(unittest.TestCase):
       if len(names)>0:
          self.o.setResname(resnames)
          self.o.setElement(elements)
-         with self.assertRaises(SystemExit):
+         with self.assertRaises(PDBElementResolutionError):
             self.o.element_filter()
 
    
@@ -267,7 +268,7 @@ class Test_unit_file_io_Files_element_filter(unittest.TestCase):
       if len(names)>0:
          self.o.setResname(resnames)
          self.o.setElement(elements)
-         with self.assertRaises(SystemExit):
+         with self.assertRaises(PDBElementResolutionError):
             self.o.element_filter()
 
 
@@ -319,7 +320,7 @@ class Test_unit_file_io_Files_element_filter(unittest.TestCase):
       if len(names)>0:
          self.o.setResname(resnames)
          self.o.setElement(elements)
-         with self.assertRaises(SystemExit):
+         with self.assertRaises(PDBElementResolutionError):
             self.o.element_filter()
 
 
@@ -370,7 +371,7 @@ class Test_unit_file_io_Files_element_filter(unittest.TestCase):
       if len(names)>0:
          self.o.setResname(resnames)
          self.o.setElement(elements)
-         with self.assertRaises(SystemExit):
+         with self.assertRaises(PDBElementResolutionError):
             self.o.element_filter()
 
 
@@ -421,7 +422,7 @@ class Test_unit_file_io_Files_element_filter(unittest.TestCase):
       if len(names)>0:
          self.o.setResname(resnames)
          self.o.setElement(elements)
-         with self.assertRaises(SystemExit):
+         with self.assertRaises(PDBElementResolutionError):
             self.o.element_filter()
 
    def test_miscellaneous(self):

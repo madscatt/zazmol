@@ -545,8 +545,6 @@ def get_chemical_formula(formula_string):
         items.sort()
 
         # for sym, count in items:
-        #    print sym," :: ",count
-
     except ValueError as detail:
         error.append(str(detail))
 

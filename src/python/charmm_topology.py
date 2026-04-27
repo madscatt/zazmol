@@ -1,6 +1,3 @@
-from __future__ import absolute_import
-from __future__ import division
-from __future__ import print_function
 #from __future__ import unicode_literals
 
 #   SASMOL: Copyright (C) 2011 Joseph E. Curtis, Ph.D. 
@@ -383,7 +380,6 @@ class CharmmTopology(object):
                             self.add(self.topology_info[cur_res][
                                      'DELE'], 'ANGL', words[2:])
                         else:
-                            # print 'WARNING!\n'+line+' NOT PARSED!\n' #
                             # Current "top_all27_prot_na.inp" file only has
                             # DELE ATOM and DELE ANGL, and therefore other
                             # situations are not parsed but warned
@@ -522,7 +518,6 @@ class CharmmTopology(object):
         for atom in atoms:
             if atom[0] == 'HG1':
                 atoms.remove(atom)
-        # print atoms
         return atoms
 
     def setup_charmm_residue_atoms(self, **kwargs):
@@ -646,8 +641,6 @@ class CharmmTopology(object):
                 child_names = child.name()
                 child_indices = child.index()
                 #
-                # print child_resname,self.charmm_residue_atoms[child_resname], child_names
-                # print
                 # self.compare_list_ignore_order(self.charmm_residue_atoms[child_resname],
                 # child_names)
                 if not self.compare_list_ignore_order(self.charmm_residue_atoms[child_resname], child_names):
@@ -660,7 +653,6 @@ class CharmmTopology(object):
                             if not self.compare_list_ignore_order(self.charmm_residue_atoms[child_resname], child_names):
                                 child_resname = 'HSP'  # OPEN: try HSP if HIS doesnt work
                     if child_resid == resid_nter:
-                            # print child_resname
                         if child_resname == 'GLY':
                             patch = 'GLYP'
                         elif child_resname == 'PRO':
@@ -681,9 +673,6 @@ class CharmmTopology(object):
                 #
                 # if self.charmm_residue_atoms[child_resname] == child_names:
                 #	continue
-                #import pprint
-                # pprint.pprint(child_resname)
-                # pprint.pprint(self.charmm_residue_atoms[child_resname],width=100)
                 new_indices = []
                 for name in self.charmm_residue_atoms[child_resname]:
                     new_indices.append(child_names.index(name))
@@ -722,4 +711,3 @@ class CharmmTopology(object):
                     self.coor()[0][child_indices[i] -
                                    1] = child.coor()[0][new_indices[i]]
         return error
-

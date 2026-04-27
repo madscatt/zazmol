@@ -19,7 +19,6 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 '''
-import sys
 import string
 import locale
 import numpy
@@ -51,6 +50,10 @@ from . import config as config
     These classes are accessed by the Atom class found in
     the sasmol.system module through the file_io File() class.
 '''
+
+
+class PDBElementResolutionError(ValueError):
+    '''Raised when a PDB atom name cannot be mapped to an element.'''
 
 class PDB(object):
     '''
@@ -101,7 +104,7 @@ class PDB(object):
 
     def check_error(self,error):
         '''
-        Exit immediately when an error list is non-empty.
+        Raise an exception when an error list is non-empty.
 
         Parameters
         ----------
@@ -110,8 +113,7 @@ class PDB(object):
         '''
 
         if(len(error)>0):
-            print(error)
-            sys.exit()
+            raise PDBElementResolutionError('\n'.join(error))
 
         return
 
@@ -294,8 +296,6 @@ class PDB(object):
                     infile.close()
                     raise
 
-        # TODO: Check with Joseph to see if logic acceptable -
-        # i.e. is 'final' always accompanied by 'model'?
         if ('final' in kwargs) or ('model' not in kwargs):
 
             if conect:
@@ -791,7 +791,12 @@ class PDB(object):
         if 'check_zero_coor' in kwargs:
             self.check_for_all_zero_columns(self._coor)
 			
-        unique_elements = self.element_filter()
+        logger = logging.getLogger(__name__)
+        try:
+            unique_elements = self.element_filter()
+        except PDBElementResolutionError:
+            logger.error('Unable to resolve PDB element names while reading %s', filename, exc_info=True)
+            raise
 
         self._number_of_elements = len(unique_elements) ; self._elements = unique_elements
 
