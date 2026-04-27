@@ -12,6 +12,3 @@ System
 .. automodule:: system
     :members:
     :undoc-members:
-
-
-

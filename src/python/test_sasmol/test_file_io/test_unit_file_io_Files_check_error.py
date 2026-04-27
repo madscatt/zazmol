@@ -15,38 +15,41 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 '''
 
-from unittest import main 
+from unittest import main
 import unittest
+from io import StringIO
+from contextlib import redirect_stdout
 
 import sasmol.system as system
 
 import os
 
+
 class Test_unit_sasio_Files_print_error(unittest.TestCase):
 
-   def setUp(self):
-      self.o=system.Molecule(0)
+    def setUp(self):
+        self.o = system.Molecule(0)
 
-   def test_no_error(self):
-      '''
-      test for no error
-      '''
-      error = []
-      self.o.check_error(error)
+    def test_no_error(self):
+        '''
+        test for no error
+        '''
+        error = []
+        self.o.check_error(error)
 
-   def test_error(self):
-      '''
-      test for error
-      '''
-      error = ['wrong']
-      with self.assertRaises(SystemExit):
-         self.o.check_error(error)
+    def test_error(self):
+        '''
+        test for error
+        '''
+        error = ['wrong']
+        with self.assertRaises(SystemExit):
+            with redirect_stdout(StringIO()) as captured_output:
+                self.o.check_error(error)
+        self.assertEqual(captured_output.getvalue().strip(), str(error))
 
-   def tearDown(self):
-      pass
-        
-   
-   
-if __name__ == '__main__': 
-   unittest.main() 
+    def tearDown(self):
+        pass
 
+
+if __name__ == '__main__':
+    unittest.main()

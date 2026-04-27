@@ -33,6 +33,15 @@ class Test_intg_file_io_Files_read_dcd(unittest.TestCase):
    def setUp(self):
       self.o=system.Molecule(0)
 
+   def test_file_doesnt_exist(self):
+      '''
+      test that missing pdb files raise a Python file error
+      '''
+      pdbFileName = DataPath+'file-notexist.pdb'
+
+      with self.assertRaises(FileNotFoundError):
+         self.o.read_pdb(pdbFileName)
+
    def assert_list_almost_equal(self,a,b,places=5):
       if (len(a)!=len(b)):
          raise TypeError
@@ -266,4 +275,3 @@ class Test_intg_file_io_Files_read_dcd(unittest.TestCase):
    
 if __name__ == '__main__': 
    unittest.main() 
-

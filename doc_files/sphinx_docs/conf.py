@@ -12,17 +12,26 @@
 # All configuration values have a default; values that are commented out
 # serve to show the default.
 
-import sys
 import os
+import sys
+import types
 
 
-print sys.executable
+print(sys.executable)
 
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
 #sys.path.insert(0, os.path.abspath('.'))
-sys.path.insert(0, os.path.abspath('../../src/python'))
+PROJECT_SOURCE_ROOT = os.path.abspath('../../src/python')
+sys.path.insert(0, PROJECT_SOURCE_ROOT)
+
+# Present src/python as the local "sasmol" package so autodoc resolves
+# package-relative imports from the workspace sources.
+if 'sasmol' not in sys.modules:
+    sasmol_package = types.ModuleType('sasmol')
+    sasmol_package.__path__ = [PROJECT_SOURCE_ROOT]
+    sys.modules['sasmol'] = sasmol_package
 
 # -- General configuration ------------------------------------------------
 
@@ -41,8 +50,14 @@ extensions = [
     'sphinx.ext.ifconfig',
     'sphinx.ext.viewcode',
     'sphinx.ext.githubpages',
-    'sphinx.ext.autodoc', 
     'sphinx.ext.napoleon',
+]
+
+autodoc_mock_imports = [
+    'sasmol._dcdio',
+    'sasmol._mask',
+    'sasmol._view_vmd',
+    'sasmol.matrix_math',
 ]
 
 # Add any paths that contain templates here, relative to this directory.
@@ -152,7 +167,7 @@ html_theme = 'alabaster'
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
-html_static_path = ['_static']
+html_static_path = []
 
 # Add any extra paths that contain custom files (such as robots.txt or
 # .htaccess) here, relative to this directory. These files are copied

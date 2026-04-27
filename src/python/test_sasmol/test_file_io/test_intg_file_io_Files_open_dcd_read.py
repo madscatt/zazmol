@@ -21,8 +21,10 @@ from unittest import main, skipIf
 import unittest
 
 import sasmol.system as system
+import sasmol._dcdio as dcdio
 
 import os
+import tempfile
 
 DataPath = os.path.join(os.path.dirname(os.path.realpath(__file__)),'..','data','dcd_common')+os.path.sep
 
@@ -30,6 +32,43 @@ class Test_intg_file_io_Files_open_dcd_read(unittest.TestCase):
 
    def setUp(self):
       self.o=system.Molecule(0)
+
+   def assert_open_dcd_read_raises_without_stderr(self, dcdFileName):
+      stderr_fd = os.dup(2)
+      devnull_fd = os.open(os.devnull, os.O_WRONLY)
+      try:
+         os.dup2(devnull_fd, 2)
+         with self.assertRaisesRegex(RuntimeError, 'Failed to read DCD header'):
+            self.o.open_dcd_read(dcdFileName)
+      finally:
+         os.dup2(stderr_fd, 2)
+         os.close(devnull_fd)
+         os.close(stderr_fd)
+
+   def test_file_doesnt_exist(self):
+      '''
+      test that missing dcd files raise before any header read is attempted
+      '''
+      dcdFileName = DataPath+'file-notexist.dcd'
+
+      with self.assertRaisesRegex(OSError, 'Failed to open file'):
+         dcdio.open_dcd_read(dcdFileName)
+
+      with self.assertRaisesRegex(OSError, 'Failed to open file'):
+         self.o.open_dcd_read(dcdFileName)
+
+   def test_truncated_header_raises_python_exception(self):
+      '''
+      test that a malformed dcd header fails without crashing
+      '''
+      with tempfile.NamedTemporaryFile(suffix='.dcd', delete=False) as dcd_file:
+         dcdFileName = dcd_file.name
+         dcd_file.write(b'not a complete dcd header')
+
+      try:
+         self.assert_open_dcd_read_raises_without_stderr(dcdFileName)
+      finally:
+         os.remove(dcdFileName)
 
    def test_1ATM(self):
       '''
@@ -138,4 +177,3 @@ class Test_intg_file_io_Files_open_dcd_read(unittest.TestCase):
    
 if __name__ == '__main__': 
    unittest.main() 
-

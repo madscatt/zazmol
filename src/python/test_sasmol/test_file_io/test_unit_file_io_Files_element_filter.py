@@ -424,39 +424,6 @@ class Test_unit_file_io_Files_element_filter(unittest.TestCase):
          with self.assertRaises(SystemExit):
             self.o.element_filter()
 
-
-   """
-   def test_Other(self):
-      '''
-      test for periodic table heavy atoms
-      '''
-      #
-      datafile = DataPath+'Otheratoms.txt'
-      names = []
-      resnames = []
-      elements = []
-      expected_elements = []
-      for atom in open(datafile).readlines():
-         name = atom.strip()
-         element = name
-         resname = 'RES'
-         names.append(name)
-         resnames.append(resname)
-         elements.append('  ')
-         expected_elements.append(element)
-      print 'names\n',names
-      self.o.setName(names)
-      self.o.setResname(resnames)
-      self.o.setElement(elements)
-      self.o.element_filter()
-      result_elements = self.o.element()
-      print '\nexpected_elements:\n',expected_elements
-      print '\nresult_elements:\n',result_elements
-      self.assertTrue(expected_elements==result_elements)
-   """
-
-
-
    def test_miscellaneous(self):
       '''
       test for miscellaneous atoms
@@ -508,4 +475,3 @@ class Test_unit_file_io_Files_element_filter(unittest.TestCase):
    
 if __name__ == '__main__': 
    unittest.main() 
-

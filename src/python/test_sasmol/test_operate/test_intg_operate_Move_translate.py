@@ -20,6 +20,7 @@ from sasmol.test_sasmol.utilities import env
 from unittest import main, skipIf
 import unittest
 import sasmol.system as system
+import sasmol.config as config
 import sasmol.operate as operate
 
 import numpy
@@ -27,100 +28,97 @@ import numpy
 import warnings
 
 import os
-floattype=os.environ['SASMOL_FLOATTYPE']
+floattype = os.environ['SASMOL_FLOATTYPE']
 
-DataPath = os.path.join(os.path.dirname(os.path.realpath(__file__)),'..','data','pdb_common')+os.path.sep
+DataPath = os.path.join(os.path.dirname(os.path.realpath(
+    __file__)), '..', 'data', 'pdb_common')+os.path.sep
 
-class Test_intg_operate_Move_translate(unittest.TestCase): 
+
+class Test_intg_operate_Move_translate(unittest.TestCase):
 
     def setUp(self):
         warnings.filterwarnings('ignore')
-        self.o=system.Molecule(0)
+        self.o = system.Molecule(0)
         self.tol = 3
 
-    def assert_list_almost_equal(self,a,b,places=5):
-        if (len(a)!=len(b)):
-           raise TypeError
+    def assert_list_almost_equal(self, a, b, places=5):
+        if (len(a) != len(b)):
+            raise TypeError
         else:
-           for i in range(len(a)):
-              if isinstance(a[i],(int,float,numpy.generic)):
-                 if (numpy.isnan(a[i]) and numpy.isnan(b[i])): continue
-                 self.assertAlmostEqual(a[i],b[i],places)
-              else:
-                 self.assert_list_almost_equal(a[i],b[i],places)
-
+            for i in range(len(a)):
+                if isinstance(a[i], (int, float, numpy.generic)):
+                    if (numpy.isnan(a[i]) and numpy.isnan(b[i])):
+                        continue
+                    self.assertAlmostEqual(a[i], b[i], places)
+                else:
+                    self.assert_list_almost_equal(a[i], b[i], places)
 
     def test_null(self):
-        value = numpy.array([1.0, 3.0, 6.0],floattype)
+        value = numpy.array([1.0, 3.0, 6.0], floattype)
         with self.assertRaises(Exception):
-          self.o.translate(0,value)
-
+            self.o.translate(0, value)
 
     def test_one_atom_pdb(self):
         self.o.read_pdb(DataPath+'1ATM.pdb')
-        value = numpy.array([1.0, 3.0, 6.0],floattype)
-        self.o.translate(0,value)
+        value = numpy.array([1.0, 3.0, 6.0], floattype)
+        self.o.translate(0, value)
         result_coor = self.o.coor()
         expected_coor = numpy.array([[[74.944, 44.799, 47.652]]], floattype)
-        self.assert_list_almost_equal(expected_coor, result_coor,self.tol)
-
-
+        self.assert_list_almost_equal(expected_coor, result_coor, self.tol)
 
     def test_two_aa_pdb(self):
         self.o.read_pdb(DataPath+'2AAD.pdb')
-        value = numpy.array([1.0, 3.0, 6.0],floattype)
-        self.o.translate(0,value)
+        value = numpy.array([1.0, 3.0, 6.0], floattype)
+        self.o.translate(0, value)
         result_coor = self.o.coor()
         numpy.set_printoptions(precision=3)
-        expected_coor = numpy.array([[[ 74.944, 44.799, 47.652],\
-                                      [ 75.229, 45.563, 46.456],\
-                                      [ 76.667, 46.093, 46.463],\
-                                      [ 77.264, 46.279, 45.401],\
-                                      [ 74.210, 46.734, 46.336],\
-                                      [ 72.856, 46.168, 45.926],\
-                                      [ 74.677, 47.782, 45.354],\
-                                      [ 71.721, 47.177, 45.946],\
-                                      [ 77.231, 46.330, 47.647],\
-                                      [ 78.592, 46.852, 47.730],\
-                                      [ 79.617, 45.820, 48.184],\
-                                      [ 80.712, 46.169, 48.656],\
-                                      [ 78.671, 48.097, 48.648],\
-                                      [ 78.054, 47.816, 49.910],\
-                                      [ 77.970, 49.273, 48.000]]], floattype)
-        self.assert_list_almost_equal(expected_coor, result_coor,self.tol)
-
+        expected_coor = numpy.array([[[74.944, 44.799, 47.652],
+                                      [75.229, 45.563, 46.456],
+                                      [76.667, 46.093, 46.463],
+                                      [77.264, 46.279, 45.401],
+                                      [74.210, 46.734, 46.336],
+                                      [72.856, 46.168, 45.926],
+                                      [74.677, 47.782, 45.354],
+                                      [71.721, 47.177, 45.946],
+                                      [77.231, 46.330, 47.647],
+                                      [78.592, 46.852, 47.730],
+                                      [79.617, 45.820, 48.184],
+                                      [80.712, 46.169, 48.656],
+                                      [78.671, 48.097, 48.648],
+                                      [78.054, 47.816, 49.910],
+                                      [77.970, 49.273, 48.000]]], floattype)
+        self.assert_list_almost_equal(expected_coor, result_coor, self.tol)
 
     def test_rna_pdb(self):
         self.o.read_pdb(DataPath+'rna.pdb')
-        value = numpy.array([1.0, 3.0, 6.0],floattype)
-        self.o.translate(0,value)
-        result_coor_sum = sum(sum(sum(self.o.coor())))
+        value = numpy.array([1.0, 3.0, 6.0], floattype)
+        self.o.translate(0, value)
+        result_coor_sum = numpy.sum(self.o.coor(), dtype=config.CALC_DTYPE)
         expected_coor_sum = 165825.827
-        self.assertAlmostEqual(expected_coor_sum, result_coor_sum,self.tol)
-
+        self.assertAlmostEqual(expected_coor_sum, result_coor_sum, self.tol)
 
     def test_1CRN_pdb(self):
         self.o.read_pdb(DataPath+'1CRN.pdb')
-        value = numpy.array([1.0, 3.0, 6.0],floattype)
-        self.o.translate(0,value)
-        result_coor_sum = sum(sum(sum(self.o.coor())))
+        value = numpy.array([1.0, 3.0, 6.0], floattype)
+        self.o.translate(0, value)
+        result_coor_sum = numpy.sum(self.o.coor(), dtype=config.CALC_DTYPE)
         expected_coor_sum = 11779.587
-        self.assertAlmostEqual(expected_coor_sum, result_coor_sum,self.tol)
+        self.assertAlmostEqual(expected_coor_sum, result_coor_sum, self.tol)
 
-
-    @skipIf(os.environ['SASMOL_LARGETEST']=='n',"I am not testing large files")
+    @skipIf(os.environ['SASMOL_LARGETEST'] == 'n', "I am not testing large files")
     def test_1KP8_pdb(self):
         self.o.read_pdb(DataPath+'1KP8.pdb')
-        value = numpy.array([1.0, 3.0, 6.0],floattype)
-        self.o.translate(0,value)
-        result_coor_sum = sum(sum(sum(self.o.coor())))
-        expected_coor_sum = 6840020.260
-        self.assertAlmostEqual(expected_coor_sum, result_coor_sum,self.tol)
-
+        value = numpy.array([1.0, 3.0, 6.0], floattype)
+        self.o.translate(0, value)
+        result_coor_sum = numpy.sum(self.o.coor(), dtype=config.CALC_DTYPE)
+        # Expected value reflects float32 coordinate storage with float64
+        # summation.
+        expected_coor_sum = 6840020.260054469
+        self.assertAlmostEqual(expected_coor_sum, result_coor_sum, self.tol)
 
     def tearDown(self):
         pass
 
-if __name__ == '__main__': 
-   main() 
 
+if __name__ == '__main__':
+    main()

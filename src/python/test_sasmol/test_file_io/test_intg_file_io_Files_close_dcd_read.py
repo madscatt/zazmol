@@ -21,7 +21,9 @@ from unittest import main, skipIf
 
 import unittest
 import warnings
+import numpy
 
+import sasmol.config as config
 import sasmol.system as system
 import sasmol._dcdio as dcdio
 
@@ -43,33 +45,15 @@ class Test_intg_sasio_Files_close_dcd_read(unittest.TestCase):
     def test_file_doesnt_exist(self):
         '''
              test a dcd which does not exist
-
+        '''
         filename = 'file-notexist.dcd'
         dcdFileName = DataPath+filename
-        stdoutFileName = filename+'.stdiout'
 
-        # opening a file that doesn't exist returns a Null pointer
-        pf = dcdio.open_dcd_read(dcdFileName)
+        with self.assertRaisesRegex(OSError, 'Failed to open file'):
+            dcdio.open_dcd_read(dcdFileName)
 
-        print('pf = ', pf, '\ttype(pf) = ', type(pf))
-
-        with io.open(stdoutFileName, 'w') as temp_file:
-            sys.stdout = temp_file
-
-        sys.stdout = open(stdoutFileName, 'w')
-
-        # if you try to close the file that doesn't exist the called C code will seg fault
-        # so there is no reason to call the close_dcd_read method which is the reason for this test
-        # self.o.close_dcd_read(pf)
-
-        sys.stdout = sys.__stdout__
-        with io.open(stdoutFileName) as temp_file:
-            code = temp_file.read()
-
-        code = open(stdoutFileName).read()  # .split()[2]
-        self.assertEqual(int(code), -1)
-        os.remove(stdoutFileName)
-        '''
+        with self.assertRaisesRegex(OSError, 'Failed to open file'):
+            self.o.read_dcd(dcdFileName)
 
     def test_1ATM(self):
         '''
@@ -85,11 +69,38 @@ class Test_intg_sasio_Files_close_dcd_read(unittest.TestCase):
         self.o.close_dcd_read(pf)
         sys.stdout = sys.__stdout__
         with io.open(stdoutFileName) as temp_file:
-            code = temp_file.read().split()[2]
-#            print("test_1ATM: code = ", code)
-
-        self.assertEqual(int(code), 0)
+            code = temp_file.read()
+        self.assertEqual(code, '')
         os.remove(stdoutFileName)
+
+    def test_1ATM_dcd_file_list(self):
+        '''
+        test close_dcd_read accepts the open_dcd_read return list
+        '''
+        filename = '1ATM.dcd'
+        dcdFileName = DataPath+filename
+        dcdFile = self.o.open_dcd_read(dcdFileName)
+
+        self.o.close_dcd_read(dcdFile)
+
+    def test_1ATM_read_step_then_close_dcd_file_list(self):
+        '''
+        test read_dcd_step and close_dcd_read accept the same dcd file list
+        '''
+        filename = '1ATM.dcd'
+        dcdFileName = DataPath+filename
+        dcdFile = self.o.open_dcd_read(dcdFileName)
+        self.o._coor = numpy.zeros((1, dcdFile[1], 3), config.COORD_DTYPE)
+
+        self.o.read_dcd_step(dcdFile, 0, no_print=True)
+        self.o.close_dcd_read(dcdFile)
+
+    def test_empty_dcd_file_list_raises_value_error(self):
+        '''
+        test close_dcd_read rejects an empty dcd file list
+        '''
+        with self.assertRaisesRegex(ValueError, 'filepointer'):
+            self.o.close_dcd_read([])
 
     def test_2AAD(self):
         '''
@@ -104,116 +115,110 @@ class Test_intg_sasio_Files_close_dcd_read(unittest.TestCase):
         sys.stdout = open(stdoutFileName, 'w')
         self.o.close_dcd_read(pf)
         sys.stdout = sys.__stdout__
-        # code=string.split(open(stdoutFileName).read())[2]
-        code = open(stdoutFileName).read().split()[2]
-        self.assertEqual(int(code), 0)
+        code = open(stdoutFileName).read()
+        self.assertEqual(code, '')
         os.remove(stdoutFileName)
-
 
     def test_rna_1to10(self):
         '''
-	   test a dcd with 10 frames based on a 2-aa pdb
+           test a dcd with 10 frames based on a 2-aa pdb
 
         '''
-      
+
         filename = 'rna-1to10.dcd'
         dcdFileName = DataPath+filename
         stdoutFileName = filename+'.stdiout'
         pf = dcdio.open_dcd_read(dcdFileName)
-        sys.stdout = open(stdoutFileName,'w')
+        sys.stdout = open(stdoutFileName, 'w')
         self.o.close_dcd_read(pf)
         sys.stdout = sys.__stdout__
-        code=open(stdoutFileName).read().split()[2]
-        self.assertEqual(int(code), 0)
+        code = open(stdoutFileName).read()
+        self.assertEqual(code, '')
         os.remove(stdoutFileName)
 
-
-    @skipIf(os.environ['SASMOL_HUGETEST']=='n',"I am not testing huge files")
+    @skipIf(os.environ['SASMOL_HUGETEST'] == 'n', "I am not testing huge files")
     def test_rna_0point8gb(self):
         '''
         test a dcd of size 0.8gb based on a rna molecule
         '''
-     
+
         filename = "rna-0.8g.dcd"
-        dcdFileName = os.path.join('/tmp/',filename)
+        dcdFileName = os.path.join('/tmp/', filename)
         stdoutFileName = filename+'.stdiout'
         pf = dcdio.open_dcd_read(dcdFileName)
-        sys.stdout = open(stdoutFileName,'w')
+        sys.stdout = open(stdoutFileName, 'w')
         self.o.close_dcd_read(pf)
         sys.stdout = sys.__stdout__
-        code=open(stdoutFileName).read().split()[2]
-        self.assertEqual(int(code), 0)
+        code = open(stdoutFileName).read()
+        self.assertEqual(code, '')
         os.remove(stdoutFileName)
 
-    @skipIf(os.environ['SASMOL_HUGETEST']=='n',"I am not testing huge files")
+    @skipIf(os.environ['SASMOL_HUGETEST'] == 'n', "I am not testing huge files")
     def test_rna_1point0gb(self):
         '''
         test a dcd of size 1.0gb based on a rna molecule
         '''
       #
         filename = "rna-1.0g.dcd"
-        dcdFileName = os.path.join('/tmp/',filename)
+        dcdFileName = os.path.join('/tmp/', filename)
         stdoutFileName = filename+'.stdiout'
         pf = dcdio.open_dcd_read(dcdFileName)
-        sys.stdout = open(stdoutFileName,'w')
+        sys.stdout = open(stdoutFileName, 'w')
         self.o.close_dcd_read(pf)
         sys.stdout = sys.__stdout__
-        code=open(stdoutFileName).read().split()[2]
-        self.assertEqual(int(code), 0)
+        code = open(stdoutFileName).read()
+        self.assertEqual(code, '')
         os.remove(stdoutFileName)
 
-
-    @skipIf(os.environ['SASMOL_HUGETEST']=='n',"I am not testing huge files")
+    @skipIf(os.environ['SASMOL_HUGETEST'] == 'n', "I am not testing huge files")
     def test_rna_2point0gb(self):
         '''
         test a dcd of size 2.0gb based on a rna molecule
         '''
       #
         filename = "rna-1.0g.dcd"
-        dcdFileName = os.path.join('/tmp/',filename)
+        dcdFileName = os.path.join('/tmp/', filename)
         stdoutFileName = filename+'.stdiout'
         pf = dcdio.open_dcd_read(dcdFileName)
-        sys.stdout = open(stdoutFileName,'w')
+        sys.stdout = open(stdoutFileName, 'w')
         self.o.close_dcd_read(pf)
         sys.stdout = sys.__stdout__
-        code=open(stdoutFileName).read().split()[2]
-        self.assertEqual(int(code), 0)
+        code = open(stdoutFileName).read()
+        self.assertEqual(code, '')
         os.remove(stdoutFileName)
 
-
-    @skipIf(os.environ['SASMOL_HUGETEST']=='n',"I am not testing huge files")
+    @skipIf(os.environ['SASMOL_HUGETEST'] == 'n', "I am not testing huge files")
     def test_rna_3point2gb(self):
         '''
         test a dcd of size 3.2gb based on a rna molecule
         '''
-      
+
         filename = "rna-3.2g.dcd"
-        dcdFileName = os.path.join('/tmp/',filename)
+        dcdFileName = os.path.join('/tmp/', filename)
         stdoutFileName = filename+'.stdiout'
         pf = dcdio.open_dcd_read(dcdFileName)
-        sys.stdout = open(stdoutFileName,'w')
+        sys.stdout = open(stdoutFileName, 'w')
         self.o.close_dcd_read(pf)
         sys.stdout = sys.__stdout__
-        code=open(stdoutFileName).read().split()[2]
-        self.assertEqual(int(code), 0)
+        code = open(stdoutFileName).read()
+        self.assertEqual(code, '')
         os.remove(stdoutFileName)
 
-
-    @skipIf(os.environ['SASMOL_HUGETEST']=='n',"I am not testing huge files")
+    @skipIf(os.environ['SASMOL_HUGETEST'] == 'n', "I am not testing huge files")
     def test_rna_6point4gb(self):
         '''
-	    test a dcd of size 6.4gb based on a rna molecule
-	    '''
-      
+            test a dcd of size 6.4gb based on a rna molecule
+            '''
+
         filename = "rna-6.4g.dcd"
-        dcdFileName = os.path.join('/tmp/',filename)
+        dcdFileName = os.path.join('/tmp/', filename)
         stdoutFileName = filename+'.stdiout'
         pf = dcdio.open_dcd_read(dcdFileName)
-        sys.stdout = open(stdoutFileName,'w')
+        sys.stdout = open(stdoutFileName, 'w')
         self.o.close_dcd_read(pf)
         sys.stdout = sys.__stdout__
-        code=open(stdoutFileName).read().split()[2]
-        self.assertEqual(int(code), 0)
+        code = open(stdoutFileName).read()
+        self.assertEqual(code, '')
         os.remove(stdoutFileName)
 
     def tearDown(self):

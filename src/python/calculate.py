@@ -1,7 +1,7 @@
 from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
-#from __future__ import unicode_literals
+# from __future__ import unicode_literals
 #
 #    SASMOL: Copyright (C) 2011 Joseph E. Curtis, Ph.D.
 #
@@ -18,15 +18,15 @@ from __future__ import print_function
 #    You should have received a copy of the GNU General Public License
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
-#	CALCULATE
+# CALCULATE
 #
-#	12/10/2009	--	initial coding			        :	jc
-#	12/20/2015	--	refactored for release          :	jc
-#	07/23/2016	--	refactored for Python 3         :	jc
+# 12/10/2009	--	initial coding			        :	jc
+# 12/20/2015	--	refactored for release          :	jc
+# 07/23/2016	--	refactored for Python 3         :	jc
 #
-#	 1         2         3         4         5         6         7
+# 1         2         3         4         5         6         7
 # LC4567890123456789012345678901234567890123456789012345678901234567890123456789
-#								       *      **
+# *      **
 
 '''
     Calculate contains the classes and methods to calculate various
@@ -36,7 +36,9 @@ from __future__ import print_function
 
 import sys
 import numpy
+import sasmol.config as config
 import sasmol.operate as operate
+
 
 class Calculate(object):
 
@@ -107,7 +109,7 @@ class Calculate(object):
 
         standard_atomic_weight = self.amu()
         self._total_mass = 0.0
-        self._mass = numpy.zeros(len(self._element), float)
+        self._mass = numpy.zeros(len(self._element), config.CALC_DTYPE)
 
         count = 0
 
@@ -152,20 +154,25 @@ class Calculate(object):
 
         '''
 
-        if(self._total_mass <= 0.0):
+        if (self._total_mass <= 0.0):
             self.calculate_mass()
 
-        x = self._coor[frame, :, 0]
-        y = self._coor[frame, :, 1]
-        z = self._coor[frame, :, 2]
+        coordinates = self._coor[frame].astype(config.CALC_DTYPE)
+        x = coordinates[:, 0]
+        y = coordinates[:, 1]
+        z = coordinates[:, 2]
 
-        comx = numpy.sum(self._mass * x) / self._total_mass
-        comy = numpy.sum(self._mass * y) / self._total_mass
-        comz = numpy.sum(self._mass * z) / self._total_mass
+        mass = self._mass.astype(config.CALC_DTYPE)
+        total_mass = config.CALC_DTYPE(self._total_mass)
 
-        self._com = numpy.array([comx, comy, comz], float)
+        comx = numpy.sum(mass * x, dtype=config.CALC_DTYPE) / total_mass
+        comy = numpy.sum(mass * y, dtype=config.CALC_DTYPE) / total_mass
+        comz = numpy.sum(mass * z, dtype=config.CALC_DTYPE) / total_mass
 
-        return self._com
+        self._center_of_mass = numpy.array(
+            [comx, comy, comz], config.CALC_DTYPE)
+
+        return self._center_of_mass
 
     def calculate_radius_of_gyration(self, frame, **kwargs):
         '''
@@ -194,11 +201,11 @@ class Calculate(object):
 
         '''
 
-        self._com = self.calculate_center_of_mass(frame)
+        self._center_of_mass = self.calculate_center_of_mass(frame)
 
-        if(self._natoms > 0):
-            rg2 = ((self._coor[frame, :, :] - self._com)
-                    * (self._coor[frame, :, :] - self._com))
+        if (self._natoms > 0):
+            rg2 = ((self._coor[frame, :, :] - self._center_of_mass)
+                   * (self._coor[frame, :, :] - self._center_of_mass))
             self._rg = numpy.sqrt(numpy.sum(numpy.sum(rg2)) / self._natoms)
 
         return self._rg
@@ -240,7 +247,7 @@ class Calculate(object):
             dxyz = ((self._coor - other._coor) * (self._coor - other._coor))
             self._rmsd = numpy.sqrt((numpy.sum(dxyz)) / self._natoms)
         except:
-            if(self._natoms != other._natoms):
+            if (self._natoms != other._natoms):
                 print('number of atoms in (1) != (2)')
                 print('rmsd not calculated: None returned')
                 print('number of atoms in self is < 1')
@@ -289,14 +296,13 @@ class Calculate(object):
 
         '''
 
-        com = self.calculate_center_of_mass(frame)
-
-        operate.Move.center(self, frame)
-
         n_atoms = self._natoms
-        m = self._mass.reshape(n_atoms, -1)
-        m_coor = m * self._coor[frame]
-        m_coor2 = numpy.dot(self._coor[frame].T, m_coor)
+        com = self.calculate_center_of_mass(frame)
+        operate.Move.center(self, frame)
+        coor = self._coor[frame].astype(config.CALC_DTYPE)
+        m = self._mass.astype(config.CALC_DTYPE).reshape(n_atoms, -1)
+        m_coor = m * coor
+        m_coor2 = numpy.dot(coor.T, m_coor)
         numpy.fill_diagonal(m_coor2, m_coor2.diagonal() - m_coor2.trace())
         I = -m_coor2
 
@@ -366,25 +372,25 @@ class Calculate(object):
 
         for frame in frames:
 
-            this_min_x=numpy.min(self._coor[frame,:,0])
-            this_max_x=numpy.max(self._coor[frame,:,0])
-            this_min_y=numpy.min(self._coor[frame,:,1])
-            this_max_y=numpy.max(self._coor[frame,:,1])
-            this_min_z=numpy.min(self._coor[frame,:,2])
-            this_max_z=numpy.max(self._coor[frame,:,2])
+            this_min_x = numpy.min(self._coor[frame, :, 0])
+            this_max_x = numpy.max(self._coor[frame, :, 0])
+            this_min_y = numpy.min(self._coor[frame, :, 1])
+            this_max_y = numpy.max(self._coor[frame, :, 1])
+            this_min_z = numpy.min(self._coor[frame, :, 2])
+            this_max_z = numpy.max(self._coor[frame, :, 2])
 
-            if(first_flag or (this_min_x < min_x)):
+            if (first_flag or (this_min_x < min_x)):
                 min_x = this_min_x
-            if(first_flag or (this_min_y < min_y)):
+            if (first_flag or (this_min_y < min_y)):
                 min_y = this_min_y
-            if(first_flag or (this_min_z < min_z)):
+            if (first_flag or (this_min_z < min_z)):
                 min_z = this_min_z
 
-            if(first_flag or (this_max_x > max_x)):
+            if (first_flag or (this_max_x > max_x)):
                 max_x = this_max_x
-            if(first_flag or (this_max_y > max_y)):
+            if (first_flag or (this_max_y > max_y)):
                 max_y = this_max_y
-            if(first_flag or (this_max_z > max_z)):
+            if (first_flag or (this_max_z > max_z)):
                 max_z = this_max_z
 
             first_flag = False
@@ -393,6 +399,85 @@ class Calculate(object):
         self._maximum = numpy.array([max_x, max_y, max_z])
 
         return [self._minimum, self._maximum]
+
+    def calculate_minimum_and_maximum_all_steps(self, trajectory_filename=None,
+                                                **kwargs):
+        '''
+        Calculate the global minimum and maximum values in (x, y, z)
+        by streaming over all frames in a trajectory or all loaded frames
+        already present in memory.
+
+        Parameters
+        ----------
+        trajectory_filename
+            string : optional DCD filename to stream frame-by-frame
+
+        kwargs
+            `pdb=True` : iterate over already loaded frames instead of a DCD
+
+        Returns
+        -------
+        numpy array
+            nested list of minimum and maximum values
+            [ [ min_x, min_y, min_z ], [max_x, max_y, max_z] ]
+        '''
+
+        if 'pdb' in kwargs:
+            file_type = 'pdb'
+            number_of_frames = self.number_of_frames()
+        else:
+            file_type = 'dcd'
+            dcdfilepointer_array = self.open_dcd_read(trajectory_filename)
+            dcdfile = dcdfilepointer_array[0]
+            number_of_frames = dcdfilepointer_array[2]
+
+        min_x = None
+        min_y = None
+        min_z = None
+        max_x = None
+        max_y = None
+        max_z = None
+
+        for i in range(number_of_frames):
+
+            if file_type == 'dcd':
+                self.read_dcd_step(dcdfilepointer_array, i)
+                this_minmax = self.calculate_minimum_and_maximum(frames=[0])
+            else:
+                this_minmax = self.calculate_minimum_and_maximum(frames=[i])
+
+            this_min_x = this_minmax[0][0]
+            this_max_x = this_minmax[1][0]
+            this_min_y = this_minmax[0][1]
+            this_max_y = this_minmax[1][1]
+            this_min_z = this_minmax[0][2]
+            this_max_z = this_minmax[1][2]
+
+            if (min_x is None) or (this_min_x < min_x):
+                min_x = this_min_x
+            if (min_y is None) or (this_min_y < min_y):
+                min_y = this_min_y
+            if (min_z is None) or (this_min_z < min_z):
+                min_z = this_min_z
+
+            if (max_x is None) or (this_max_x > max_x):
+                max_x = this_max_x
+            if (max_y is None) or (this_max_y > max_y):
+                max_y = this_max_y
+            if (max_z is None) or (this_max_z > max_z):
+                max_z = this_max_z
+
+        if file_type == 'dcd':
+            self.close_dcd_read(dcdfile)
+
+        self._minimum = numpy.array([min_x, min_y, min_z])
+        self._maximum = numpy.array([max_x, max_y, max_z])
+
+        return [self._minimum, self._maximum]
+
+    def calc_minmax_all_steps(self, dcdfilename, **kwargs):
+        return self.calculate_minimum_and_maximum_all_steps(dcdfilename,
+                                                            **kwargs)
 
     def calculate_residue_charge(self, **kwargs):
         '''
@@ -435,32 +520,19 @@ class Calculate(object):
 
         atom_charge = self.atom_charge()
 
-        charge_sum = 0.0
-        charge_residue_sum = []
-        last_resid = resid[0]
+        atom_charge = numpy.asarray(atom_charge, config.CALC_DTYPE)
+        charge_residue_sum = {}
 
         for i in range(natoms):
             this_resid = resid[i]
-            this_charge = atom_charge[i]
+            if this_resid not in charge_residue_sum:
+                charge_residue_sum[this_resid] = config.CALC_DTYPE(0.0)
+            charge_residue_sum[this_resid] += atom_charge[i]
 
-            if(this_resid != last_resid or i == natoms - 1):
-                charge_residue_sum.append([last_resid, charge_sum])
-                charge_sum = this_charge
-                last_resid = this_resid
-            else:
-                charge_sum += this_charge
+        charge_residue = [charge_residue_sum[this_resid]
+                          for this_resid in resid]
 
-        last_resid = resid[0]
-        charge_residue = []
-
-        for i in range(natoms):
-            this_resid = resid[i]
-            for j in range(len(charge_residue_sum)):
-                if(this_resid == charge_residue_sum[j][0]):
-                    charge_residue.append(charge_residue_sum[j][1])
-                    continue
-
-        self.setResidue_charge(numpy.array(charge_residue, float32))
+        self.setResidue_charge(numpy.array(charge_residue, config.CALC_DTYPE))
 
         return
 

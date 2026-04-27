@@ -1,7 +1,7 @@
 from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
-#from __future__ import unicode_literals
+# from __future__ import unicode_literals
 #
 '''
     SASMOL: Copyright (C) 2011 Joseph E. Curtis, Ph.D. 
@@ -24,19 +24,24 @@ import sys
 import string
 import time
 import numpy
-#import sasmol.dcdio as dcdio
+from . import config as config
+# import sasmol.dcdio as dcdio
 import sasmol._dcdio as dcdio
 
-#	DCD_IO
+DEBUG = False
+if config.__logging_level__ == "DEBUG":
+    DEBUG = True
+
+# DCD_IO
 #
-#	12/5/2009	--	initial coding			                        :	jc
-#	12/10/2009	--	doc strings 			                        :	jc
-#	01/01/2011	--	added dcdio wrappers		                    :	jc
+# 12/5/2009	--	initial coding			                        :	jc
+# 12/10/2009	--	doc strings 			                        :	jc
+# 01/01/2011	--	added dcdio wrappers		                    :	jc
 #   08/26/2016  --  forked from file_io                             :   jc
 #
-#LC	 1         2         3         4         5         6         7
-#LC4567890123456789012345678901234567890123456789012345678901234567890123456789
-#								       *      **
+# LC	 1         2         3         4         5         6         7
+# LC4567890123456789012345678901234567890123456789012345678901234567890123456789
+# *      **
 '''
 	DCD_IO is the main module that contains classes that 
 	read and write atomic information from and to DCD files on the hard disk,
@@ -55,29 +60,31 @@ import sasmol._dcdio as dcdio
 
 '''
 
+
 class DCD(object):
 
-    def open_dcd_read(self,filename):
+    def open_dcd_read(self, filename):
         '''
         This method opens a file to read in the Charmm/Xplor data format.
         by calling a pre-compiled C module (dcdio).
         '''
 
-        filepointer=dcdio.open_dcd_read(filename)
+        filepointer = dcdio.open_dcd_read(filename)
 
-        num_fixed=0
+        num_fixed = 0
         result = 1
 
-        readheaderresult,filepointer,nnatoms,nset,istart,nsavc,delta,namnf,reverseEndian,charmm=dcdio.read_dcdheader(filepointer)
-        if(readheaderresult!=0):
+        readheaderresult, filepointer, nnatoms, nset, istart, nsavc, delta, namnf, reverseEndian, charmm = dcdio.read_dcdheader(
+            filepointer)
+        if (readheaderresult != 0):
             print('failed to read header')
-            print('readheaderresult = ',readheaderresult)	
-	
-        dcdfile = [filepointer,nnatoms,nset,reverseEndian,charmm]
-	
+            print('readheaderresult = ', readheaderresult)
+
+        dcdfile = [filepointer, nnatoms, nset, reverseEndian, charmm]
+
         return dcdfile
 
-    def open_dcd_write(self,filename):
+    def open_dcd_write(self, filename):
         '''
         This method opens a file and writes the headerfile in the Charmm/Xplor data format.
         by calling a pre-compiled C module (dcdio).
@@ -85,37 +92,40 @@ class DCD(object):
         This function will OVERWRITE a file with the same name without prompting.
         '''
 
-        filepointer=dcdio.open_dcd_write(filename)
+        filepointer = dcdio.open_dcd_write(filename)
 
-        self.write_dcd_header(filepointer,1)
+        self.write_dcd_header(filepointer, 1)
 
         return filepointer
 
-    def write_dcd_header(self,filepointer,nset):
+    def write_dcd_header(self, filepointer, nset):
         '''
         This method writes the headerfile in the Charmm/Xplor data format.
         by calling a pre-compiled C module (dcdio).
         '''
-        filename=" "
-        natoms = self._coor[0,:,0].shape[0]
-        istart = 0 ; nsavc = 1 ; delta = 1.0
-        headerresult=dcdio.write_dcdheader(filepointer,filename,natoms,nset,istart,nsavc,delta)
+        filename = " "
+        natoms = self._coor[0, :, 0].shape[0]
+        istart = 0
+        nsavc = 1
+        delta = 1.0
+        headerresult = dcdio.write_dcdheader(
+            filepointer, filename, natoms, nset, istart, nsavc, delta)
 
-        return 
+        return
 
-    def write_dcd_step(self,filepointer,frame,step):
+    def write_dcd_step(self, filepointer, frame, step):
         '''
         This method writes a single step in the Charmm/Xplor data format.
         by calling a pre-compiled C module (dcdio).
         '''
 
-        natoms = self._coor[0,:,0].shape[0]
+        natoms = self._coor[0, :, 0].shape[0]
 
-        tx=self._coor[frame,:,0].astype(numpy.float32)	
-        ty=self._coor[frame,:,1].astype(numpy.float32)	
-        tz=self._coor[frame,:,2].astype(numpy.float32)	
+        tx = self._coor[frame, :, 0].astype(config.COORD_DTYPE)
+        ty = self._coor[frame, :, 1].astype(config.COORD_DTYPE)
+        tz = self._coor[frame, :, 2].astype(config.COORD_DTYPE)
 
-        stepresult=dcdio.write_dcdstep(filepointer,natoms,tx,ty,tz,step)
+        stepresult = dcdio.write_dcdstep(filepointer, natoms, tx, ty, tz, step)
 
         return
 
@@ -126,192 +136,226 @@ class DCD(object):
         by calling a pre-compiled C module (dcdio).
         '''
 
-        outfile=dcdio.open_dcd_write(filename)
+        outfile = dcdio.open_dcd_write(filename)
         nset = end-start
-        natoms = self._coor[0,:,0].shape[0]
-        istart = 0 ; nsavc = 1 ; delta = 1.0
+        natoms = self._coor[0, :, 0].shape[0]
+        istart = 0
+        nsavc = 1
+        delta = 1.0
 
-        headerresult=dcdio.write_dcdheader(outfile,filename,natoms,nset,istart,nsavc,delta)
+        headerresult = dcdio.write_dcdheader(
+            outfile, filename, natoms, nset, istart, nsavc, delta)
 
         i = 0
-        for frame in range(start,end):
-            print(".",)
-            sys.stdout.flush()
+        for frame in range(start, end):
+            # Historically this printed per-frame progress during long DCD writes.
+            if DEBUG:
+                print(".",)
+                sys.stdout.flush()
 
-            tx=self._coor[frame,:,0].astype(numpy.float32)	
-            ty=self._coor[frame,:,1].astype(numpy.float32)	
-            tz=self._coor[frame,:,2].astype(numpy.float32)	
+            tx = self._coor[frame, :, 0].astype(config.COORD_DTYPE)
+            ty = self._coor[frame, :, 1].astype(config.COORD_DTYPE)
+            tz = self._coor[frame, :, 2].astype(config.COORD_DTYPE)
 
-            stepresult=dcdio.write_dcdstep(outfile,natoms,tx,ty,tz,i+1)
+            stepresult = dcdio.write_dcdstep(outfile, natoms, tx, ty, tz, i+1)
             i += 1
 
         result = dcdio.close_dcd_write(outfile)
 
         return
 
-    def close_dcd_write(self,filepointer):
+    def close_dcd_write(self, filepointer):
         '''
         This method closes a dcd file.
         '''
         result = dcdio.close_dcd_write(filepointer)
-        print('result = ',result)
-	
+
         return
-	
-    def close_dcd_read(self,filepointer):
+
+    def _dcd_read_filepointer(self, dcd_file):
+        if isinstance(dcd_file, (list, tuple)):
+            if len(dcd_file) < 1:
+                raise ValueError('dcd_file must contain a filepointer')
+            return dcd_file[0]
+
+        return dcd_file
+
+    def close_dcd_read(self, dcd_file):
         '''
         This method closes a dcd file.
         '''
+        filepointer = self._dcd_read_filepointer(dcd_file)
         result = dcdio.close_dcd_read(filepointer)
-        print('result = ',result)
-	
+
         return
 
-    def write_dcd(self,filename):
+    def write_dcd(self, filename):
         '''
         This method writes data in the Charmm/Xplor data format.
         by calling a pre-compiled C module (dcdio).
         '''
-		
-        outfile=dcdio.open_dcd_write(filename)
 
-        nset = self._coor[:,0,0].shape[0]
-        natoms = self._coor[0,:,0].shape[0]
-        istart = 0 ; nsavc = 1 ; delta = 1.0
-		
-        headerresult=dcdio.write_dcdheader(outfile,filename,natoms,nset,istart,nsavc,delta)
+        outfile = dcdio.open_dcd_write(filename)
+
+        nset = self._coor[:, 0, 0].shape[0]
+        natoms = self._coor[0, :, 0].shape[0]
+        istart = 0
+        nsavc = 1
+        delta = 1.0
+
+        headerresult = dcdio.write_dcdheader(
+            outfile, filename, natoms, nset, istart, nsavc, delta)
 
         for frame in range(nset):
-            print(".",)
-            sys.stdout.flush()
+            # Historically this printed per-frame progress during long DCD writes.
+            if DEBUG:
+                print(".",)
+                sys.stdout.flush()
 
-            tx=self._coor[frame,:,0].astype(numpy.float32)	
-            ty=self._coor[frame,:,1].astype(numpy.float32)	
-            tz=self._coor[frame,:,2].astype(numpy.float32)	
+            tx = self._coor[frame, :, 0].astype(config.COORD_DTYPE)
+            ty = self._coor[frame, :, 1].astype(config.COORD_DTYPE)
+            tz = self._coor[frame, :, 2].astype(config.COORD_DTYPE)
 
-            stepresult=dcdio.write_dcdstep(outfile,natoms,tx,ty,tz,frame+1)
+            stepresult = dcdio.write_dcdstep(
+                outfile, natoms, tx, ty, tz, frame+1)
 
         result = dcdio.close_dcd_write(outfile)
 
         return
 
-    def read_single_dcd_step(self,filename,frame):
+    def read_single_dcd_step(self, filename, frame):
         '''
         This method reads a single dcd step in the Charmm/Xplor data format.
-	
+
         The method simply reads all frames up until frame and then assigns
         coordinates to the last frame (no seek option is utilizied)
 
         '''
 
-        infile=dcdio.open_dcd_read(filename)
-        num_fixed=0
+        infile = dcdio.open_dcd_read(filename)
+        num_fixed = 0
         result = 1
 
-        #print('calling read dcd header')
-        readheaderresult,filepointer,nnatoms,nset,istart,nsavc,delta,namnf,reverseEndian,charmm=dcdio.read_dcdheader(infile)
-        if(readheaderresult!=0):
+        # print('calling read dcd header')
+        readheaderresult, filepointer, nnatoms, nset, istart, nsavc, delta, namnf, reverseEndian, charmm = dcdio.read_dcdheader(
+            infile)
+        if (readheaderresult != 0):
             print('failed to read header')
-            print('readheaderresult = ',readheaderresult)	
+            print('readheaderresult = ', readheaderresult)
 
-        #print('done with read dcd header')
+        # print('done with read dcd header')
 
-        coor=numpy.zeros((1,nnatoms,3),numpy.float32)	
-        #coor=numpy.zeros((1,nnatoms,3),float)	
-	
-        tx=numpy.zeros(nnatoms,dtype=numpy.float32)
-        ty=numpy.zeros(nnatoms,dtype=numpy.float32)
-        tz=numpy.zeros(nnatoms,dtype=numpy.float32)
+        coor = numpy.zeros((1, nnatoms, 3), config.COORD_DTYPE)
+
+        tx = numpy.zeros(nnatoms, dtype=config.COORD_DTYPE)
+        ty = numpy.zeros(nnatoms, dtype=config.COORD_DTYPE)
+        tz = numpy.zeros(nnatoms, dtype=config.COORD_DTYPE)
 
         first = 1  # since num_fixed = 0 ; the "first" variable is inconsequential
-		
-        for i in range(frame):	
-            result=dcdio.read_dcdstep(infile,nnatoms,tx,ty,tz,num_fixed,first,reverseEndian,charmm)
 
+        for i in range(frame):
+            result = dcdio.read_dcdstep(
+                infile, nnatoms, tx, ty, tz, num_fixed, first, reverseEndian, charmm)
 
-        #print('result = ',result)
+        # print('result = ',result)
 
-        #coor[0,:,0]=tx.astype(numpy.float) ; coor[0,:,1]=ty.astype(numpy.float) ; coor[0,:,2]=tz.astype(numpy.float)
-        coor[0,:,0]=tx.astype(float) ; coor[0,:,1]=ty.astype(float) ; coor[0,:,2]=tz.astype(float)
-		
+        coor[0, :, 0] = tx
+        coor[0, :, 1] = ty
+        coor[0, :, 2] = tz
+
         result = dcdio.close_dcd_read(infile)
-        self._coor=numpy.array(coor)
-	
-        if(result!=0):
-            print('failed to read coordinates')	
-            print('result = ',result)
+        self._coor = numpy.array(coor)
+
+        if (result != 0):
+            print('failed to read coordinates')
+            print('result = ', result)
 
         return
-	
-    def read_dcd_step(self,dcdfile,frame,**kwargs):
+
+    def read_dcd_step(self, dcdfile, frame, **kwargs):
         '''
         This method reads a single dcd step in the Charmm/Xplor data format.
         '''
-        num_fixed=0
+        num_fixed = 0
 
         filepointer = dcdfile[0]
         nnatoms = dcdfile[1]
         reverseEndian = dcdfile[3]
         charmm = dcdfile[4]
 
-        tx=numpy.zeros(nnatoms,dtype=numpy.float32)
-        ty=numpy.zeros(nnatoms,dtype=numpy.float32)
-        tz=numpy.zeros(nnatoms,dtype=numpy.float32)
+        tx = numpy.zeros(nnatoms, dtype=config.COORD_DTYPE)
+        ty = numpy.zeros(nnatoms, dtype=config.COORD_DTYPE)
+        tz = numpy.zeros(nnatoms, dtype=config.COORD_DTYPE)
 
-        result=dcdio.read_dcdstep(filepointer,nnatoms,tx,ty,tz,num_fixed,frame,reverseEndian,charmm)
+        result = dcdio.read_dcdstep(
+            filepointer, nnatoms, tx, ty, tz, num_fixed, frame, reverseEndian, charmm)
 
-        #self._coor[0,:,0]=tx.astype(numpy.float) ; self._coor[0,:,1]=ty.astype(numpy.float) ; self._coor[0,:,2]=tz.astype(numpy.float)
-        self._coor[0,:,0]=tx.astype(float) ; self._coor[0,:,1]=ty.astype(float) ; self._coor[0,:,2]=tz.astype(float)
-	
-        if len(kwargs) < 1:
-            sys.stdout.write('.',)
-        elif not kwargs['no_print']: 
-            try:
+        self._coor[0, :, 0] = tx
+        self._coor[0, :, 1] = ty
+        self._coor[0, :, 2] = tz
+
+        # Historically this printed per-frame progress during long DCD reads.
+        if DEBUG:
+            if len(kwargs) < 1:
                 sys.stdout.write('.',)
-            except:
-                pass
+            elif not kwargs['no_print']:
+                try:
+                    sys.stdout.write('.',)
+                except:
+                    pass
 
         return
 
-    def read_dcd(self,filename):
-
+    def read_dcd(self, filename):
         '''
         This method reads data in the Charmm/Xplor data format.
         '''
 
-        infile=dcdio.open_dcd_read(filename)
+        infile = dcdio.open_dcd_read(filename)
 
-        nnatoms=0 ; nset=0 ; istart=0 ; nsavc=0 ; delta=0.0
-        namnf=0 ; freeindexes=[] ; reverseEndian=0 ; charmm=0
+        nnatoms = 0
+        nset = 0
+        istart = 0
+        nsavc = 0
+        delta = 0.0
+        namnf = 0
+        freeindexes = []
+        reverseEndian = 0
+        charmm = 0
 
-        readheaderresult,filepointer,nnatoms,nset,istart,nsavc,delta,namnf,reverseEndian,charmm=dcdio.read_dcdheader(infile)
-        coor=numpy.zeros((nset,nnatoms,3),float)	
-	
-        num_fixed=0 
-        result=1
+        readheaderresult, filepointer, nnatoms, nset, istart, nsavc, delta, namnf, reverseEndian, charmm = dcdio.read_dcdheader(
+            infile)
+        coor = numpy.zeros((nset, nnatoms, 3), config.COORD_DTYPE)
 
-        sum=0.0
+        num_fixed = 0
+        result = 1
+
+        sum = 0.0
         for i in range(nset):
-            print('.',)
-            sys.stdout.flush()
-            read_start_time=time.time()
+            # Historically this printed per-frame progress during long DCD reads.
+            if DEBUG:
+                print('.',)
+                sys.stdout.flush()
+            read_start_time = time.time()
 
-            tx=numpy.zeros(nnatoms,dtype=numpy.float32)
-            ty=numpy.zeros(nnatoms,dtype=numpy.float32)
-            tz=numpy.zeros(nnatoms,dtype=numpy.float32)
-		
-            result=dcdio.read_dcdstep(infile,nnatoms,tx,ty,tz,num_fixed,i,reverseEndian,charmm)
-            read_end_time=time.time()
-	
-            sum+=read_end_time-read_start_time
+            tx = numpy.zeros(nnatoms, dtype=config.COORD_DTYPE)
+            ty = numpy.zeros(nnatoms, dtype=config.COORD_DTYPE)
+            tz = numpy.zeros(nnatoms, dtype=config.COORD_DTYPE)
 
-            coor[i,:,0]=tx.astype(float) ; coor[i,:,1]=ty.astype(float) ; coor[i,:,2]=tz.astype(float)
-	
+            result = dcdio.read_dcdstep(
+                infile, nnatoms, tx, ty, tz, num_fixed, i, reverseEndian, charmm)
+            read_end_time = time.time()
+
+            sum += read_end_time-read_start_time
+
+            coor[i, :, 0] = tx
+            coor[i, :, 1] = ty
+            coor[i, :, 2] = tz
+
         result = dcdio.close_dcd_read(infile)
-        self._coor=numpy.array(coor)
+        self._coor = numpy.array(coor)
 
-        print()
+        if DEBUG:
+            print()
 
         return
-
-

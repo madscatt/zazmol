@@ -1,9 +1,9 @@
 from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
-#from __future__ import unicode_literals
+# from __future__ import unicode_literals
 
-#   SASMOL: Copyright (C) 2011 Joseph E. Curtis, Ph.D. 
+#   SASMOL: Copyright (C) 2011 Joseph E. Curtis, Ph.D.
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -18,19 +18,20 @@ from __future__ import print_function
 #    You should have received a copy of the GNU General Public License
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
-#	TOPOLOGY
+# TOPOLOGY
 #
-#	1/26/2012	--	initial coding				: jc
-#	12/26/2015	--	refactored for release      : jc
-#	08/18/2016	--	documentation               : jc
+# 1/26/2012	--	initial coding				: jc
+# 12/26/2015	--	refactored for release      : jc
+# 08/18/2016	--	documentation               : jc
 #
-#	 1         2         3         4         5         6         7
+# 1         2         3         4         5         6         7
 # LC4567890123456789012345678901234567890123456789012345678901234567890123456789
-#								       *      **
+# *      **
 
 import numpy
 import sasmol.charmm_topology as charmm_topology
 import sasmol.properties as properties
+
 
 class Topology(charmm_topology.CharmmTopology):
 
@@ -51,7 +52,7 @@ class Topology(charmm_topology.CharmmTopology):
         kwargs 
             index :
             resid :
-                                                                                     
+
         Returns
         -------
         None
@@ -68,10 +69,10 @@ class Topology(charmm_topology.CharmmTopology):
         1
         >>> molecule.resid()[0]
         1
-       
+
         default renumber() with no arguments renumbers
         both index and resid starting at 1 
-        
+
         >>> molecule.renumber()
         >>> molecule.index()[0]
         1
@@ -103,79 +104,84 @@ class Topology(charmm_topology.CharmmTopology):
 
         renumber_index_flag = False
         renumber_index_start = 1
-       
+
         renumber_resid_flag = False
-        renumber_resid_start = 1     
-    
+        renumber_resid_start = 1
+
+        if len(kwargs) == 0:
+            renumber_index_flag = True
+            renumber_resid_flag = True
+
         try:
-            if kwargs['index']:
+            if kwargs['index'] is not None:
                 renumber_index_flag = True
                 renumber_index_start = kwargs['index']
         except:
             pass
 
         try:
-            if kwargs['resid']:
-                renumber_resid_flag = True     
+            if kwargs['resid'] is not None:
+                renumber_resid_flag = True
                 renumber_resid_start = kwargs['resid']
         except:
             pass
 
         if renumber_index_flag:
             start = renumber_index_start
-            index = numpy.array([x for x in xrange(start,start+self._natoms)])
+            index = numpy.array(
+                [x for x in range(start, start + self._natoms)])
             self._index = index
 
         if renumber_resid_flag:
             resid = self._resid
-            resid_array=[] 
+            resid_array = []
             count = renumber_resid_start
-            for i in xrange(len(resid)):
+            for i in range(len(resid)):
                 this_resid = resid[i]
-                if(i==0):
+                if (i == 0):
                     last_resid = this_resid
                 else:
-                    if(this_resid != last_resid):	
+                    if (this_resid != last_resid):
                         count += 1
-                resid_array.append(count)	
+                resid_array.append(count)
                 last_resid = this_resid
 
-            self._resid = numpy.array(resid_array, numpy.int)
+            self._resid = numpy.array(resid_array, int)
 
         return
 
     def make_constraint_pdb(self, filename, basis_type, **kwargs):
         ''' 
-     
+
         Method to rename attribute fields and assign values
         of 1.00 for the given basis type.
 
         "beta" is the default attribute field to reassign
-        
+
         Default usage sets all attribute fields to zero
         prior to re-assigning basis type atoms to 1.00
 
         Parameters
         ----------
         filename    string : name of output PDB file to write 
-             
+
         basis types: 
 
             'heavy : all atoms except hydrogen
-          
+
             'protein' : all atoms in moltype protein
-             
+
             'nucleic' : all atoms in moltype nucleic
-                                        
+
             'backbone'
                 -> proteins: N, CA, C, O
-            
+
             'solute'    : all protein and nucleic
 
 
         kwargs 
             optional arguments
-                
+
                 field='beta' : write 1.00 to beta field
 
                 field='occupancy' : write 1.00 to occupancy field
@@ -185,7 +191,7 @@ class Topology(charmm_topology.CharmmTopology):
 
                 reset=False: only change desired values to 1.00
                                  ignoring all other values
-                    
+
         Returns
         -------
         None
@@ -205,20 +211,20 @@ class Topology(charmm_topology.CharmmTopology):
         >>> molecule.make_constraint_pdb('constrainted_heavy_hiv1_gag.pdb', 'heavy')
 
         constrain all protein atoms
-        
+
         >>> molecule.make_constraint_pdb('constrainted_protein_hiv1_gag.pdb', 'protein')
 
         constrain all non-solvent atoms
-        
+
         >>> molecule.make_constraint_pdb('constrainted_solute_hiv1_gag.pdb', 'solute')
-        
+
         Note
         ----
 
         Only moltype `protein` and `nucleic` are supported.
 
         Output PDB file will contain coordinates from frame 0
-             
+
         '''
 
         try:
@@ -230,9 +236,9 @@ class Topology(charmm_topology.CharmmTopology):
             reset = kwargs['reset']
         except:
             reset = True
-    
+
         if reset:
-            new_value = ['0.00' for x in xrange(self._natoms)]
+            new_value = ['0.00' for x in range(self._natoms)]
             if field == 'beta':
                 self._beta = new_value
             elif field == 'occupancy':
@@ -240,13 +246,13 @@ class Topology(charmm_topology.CharmmTopology):
 
         if basis_type == 'backbone':
             basis_string = "name[i] == 'N' or name[i] == 'CA' or name[i] == 'C' or name[i] == 'O'"
-                           
+
         elif basis_type == 'heavy':
             basis_string = "name[i][0] != 'H'"
 
         elif basis_type == 'protein':
             basis_string = "moltype[i] == 'protein'"
-        
+
         elif basis_type == 'nucleic':
             basis_string = "moltype[i] == 'nucleic'"
 
@@ -264,24 +270,22 @@ class Topology(charmm_topology.CharmmTopology):
         elif field == 'occupancy':
             descriptor = self._occupancy
 
-        error = self.set_descriptor_using_mask(mask, descriptor, '1.00') 
-        
+        error = self.set_descriptor_using_mask(mask, descriptor, '1.00')
+
         if len(error) > 0:
             print('error = ', error)
             return
-               
-        if field == 'beta': 
+
+        if field == 'beta':
             self._beta = descriptor
-        elif field == 'occupancy': 
+        elif field == 'occupancy':
             self._occupancy = descriptor
 
-        self.write_pdb(filename,0,'w')
+        self.write_pdb(filename, 0, 'w')
 
         return
 
-
     def make_backbone_pdb_from_fasta(self, filename, moltype, **kwargs):
-        
         """
         Method to write a PDB file of one atom per residue
         based on input FASTA sequence
@@ -291,14 +295,14 @@ class Topology(charmm_topology.CharmmTopology):
         Parameters
         ----------
         filename    string : name of output PDB file to write 
-        
+
         moltype string
                 -> 'protein' ; fasta sequence of a protein 
                 -> 'nucleic' ; fasta sequence of a nucleic acid 
-             
+
         kwargs 
             optional future arguments
-                                                                                     
+
         Returns
         -------
         self._fasta
@@ -322,20 +326,20 @@ class Topology(charmm_topology.CharmmTopology):
         Only protein and nucleic acid one-letter codes are supported
         Protein PDB files are written with one "CA" atom per residue
         Nucleic acid PDF files are written with on "O5'" atom per residue
-       
+
         N-terminal patches for proteins (GLYP, PROP) are accommodated
-        
+
         All coordinate values are set to 0.000 
-         
+
         """
 
         if moltype == "protein":
-            residue_dictionary = self.one_to_three_letter_protein_residue_dictionary            
-            sequence_name = "CA" 
+            residue_dictionary = self.one_to_three_letter_protein_residue_dictionary
+            sequence_name = "CA"
 
         elif moltype == "nucleic":
-            residue_dictionary = self.one_to_three_letter_nucleic_residue_dictionary 
-            sequence_name = "O5'" 
+            residue_dictionary = self.one_to_three_letter_nucleic_residue_dictionary
+            sequence_name = "O5'"
 
         sequence = []
         first_flag = True
@@ -347,16 +351,16 @@ class Topology(charmm_topology.CharmmTopology):
                     sequence.append('GLYP')
                 elif residue == 'P' and first_flag:
                     sequence.append('PROP')
-                else:     
+                else:
                     sequence.append(residue_dictionary[residue])
 
             elif moltype == "nucleic":
                 sequence.append(residue_dictionary[residue])
-        
+
             first_flag = False
 
         import sasmol.system as system
-         
+
         molecule = system.Molecule_Maker(len(sequence), name=sequence_name)
 
         molecule._resname = sequence
@@ -375,7 +379,7 @@ class Topology(charmm_topology.CharmmTopology):
         ----------
         kwargs 
             optional future arguments
-                                                                                     
+
         Returns
         -------
         self._fasta
@@ -412,23 +416,23 @@ class Topology(charmm_topology.CharmmTopology):
         GARASVLSGGELDKWEKIRLRPGGKKQYKLKHIVWASRELERFAVNPGLLETSEGCRQIL
         GQLQPSLQTGSEELRSLYNTIAVL
 
-        
+
         Note
         ----
         Other use types below
 
         molecule.create_fasta(fasta_format=True,exclude_hetatm=True,by_chain=True)
-        print molecule.fasta()
+        print(molecule.fasta())
 
-        print '>>> testing by_chain with HETATM (t.py): '
+        print('>>> testing by_chain with HETATM (t.py): ')
 
         molecule.create_fasta(fasta_format=True,by_chain=True)
-        print molecule.fasta()
+        print(molecule.fasta())
 
-        print '>>> testing by_segname (t.py): '
+        print('>>> testing by_segname (t.py): ')
 
         molecule.create_fasta(fasta_format=True,exclude_hetatm=True,by_segname=True)
-        print molecule.fasta()
+        print(molecule.fasta())
 
         Note that this creates a simple string that is associated with the molecule (self)
         and it will return without assigning a string if a non-standard three letter code
@@ -504,7 +508,7 @@ class Topology(charmm_topology.CharmmTopology):
             'URA': 'U'
         }
 
-        for i in xrange(len(resname)):
+        for i in range(len(resname)):
             this_resname = resname[i]
             if this_resname in residue_dictionary:
                 one_resname.append(residue_dictionary[this_resname])
@@ -531,7 +535,7 @@ class Topology(charmm_topology.CharmmTopology):
         chain_name = []
         segname_name = []
         first = True
-        for i in xrange(len(resid)):
+        for i in range(len(resid)):
             this_resid = resid[i]
 
             if by_chain:
@@ -578,7 +582,7 @@ class Topology(charmm_topology.CharmmTopology):
         if by_segname:
             number_of_chains = number_of_segnames
 
-        for i in xrange(number_of_chains):
+        for i in range(number_of_chains):
             saveme = False
             if fasta_format:
                 from textwrap import TextWrapper
@@ -597,10 +601,10 @@ class Topology(charmm_topology.CharmmTopology):
 
                 formatted_fasta = "\n".join(wrapper.wrap(joined_fasta))
 
-                if(len(formatted_fasta.strip()) > 0):
+                if (len(formatted_fasta.strip()) > 0):
                     saveme = True
 
-                if(len(header) > 1):
+                if (len(header) > 1):
                     if by_chain:
                         formatted_fasta = header + ' chain:' + \
                             chain_name[i] + '\n' + formatted_fasta
@@ -633,12 +637,7 @@ class Topology(charmm_topology.CharmmTopology):
         return
 
 
-
 if __name__ == "__main__":
     import doctest
-    #doctest.testmod(verbose=True)
+    # doctest.testmod(verbose=True)
     doctest.testmod()
-
-
-
-

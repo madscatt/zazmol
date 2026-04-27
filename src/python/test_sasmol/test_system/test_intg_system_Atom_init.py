@@ -15,48 +15,47 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 '''
 
-from unittest import main 
+from unittest import main
 import unittest
 
 import sasmol.system as system
 
+
 class Test_intg_system_Molecule_init(unittest.TestCase):
 
-   def setUp(self):
-      pass
+    def setUp(self):
+        pass
 
-   def test_default(self):
-      '''
-      test initializer with default input
-      '''
-      #
-      o=system.Molecule()
-      self.assertEqual(o.id(),0)
-      self.assertEqual(o.total_mass(),0.0)
-      self.assertEqual(o.natoms(),0)
-      self.assertEqual(o.mass(),None)
-      self.assertEqual(o.coor(),None)
-      self.assertEqual(o.com(),None)
+    def test_default(self):
+        '''
+        test initializer with default input
+        '''
+        #
+        o = system.Molecule()
+        self.assertEqual(o.id(), 0)
+        self.assertEqual(o.total_mass(), 0.0)
+        self.assertEqual(o.natoms(), 0)
+        self.assertEqual(o.mass(), None)
+        self.assertEqual(o.coor(), None)
+        self.assertEqual(o.center_of_mass(), None)
 
-   def test_id(self):
-      '''
-      test initializer with id
-      '''
-      #
-      id=3
-      o=system.Molecule(id)
-      self.assertEqual(o.id(),id)
-      self.assertEqual(o.total_mass(),0.0)
-      self.assertEqual(o.natoms(),0)
-      self.assertEqual(o.mass(),None)
-      self.assertEqual(o.coor(),None)
-      self.assertEqual(o.com(),None)
+    def test_id(self):
+        '''
+        test initializer with id
+        '''
+        #
+        id = 3
+        o = system.Molecule(id)
+        self.assertEqual(o.id(), id)
+        self.assertEqual(o.total_mass(), 0.0)
+        self.assertEqual(o.natoms(), 0)
+        self.assertEqual(o.mass(), None)
+        self.assertEqual(o.coor(), None)
+        self.assertEqual(o.center_of_mass(), None)
 
-   def tearDown(self):
-      pass
-        
-   
-   
-if __name__ == '__main__': 
-   unittest.main() 
+    def tearDown(self):
+        pass
 
+
+if __name__ == '__main__':
+    unittest.main()

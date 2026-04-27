@@ -24,20 +24,21 @@ import sasmol.system as system
 import numpy
 
 import os
-floattype=os.environ['SASMOL_FLOATTYPE']
+floattype = os.environ['SASMOL_FLOATTYPE']
 
-DataPath = os.path.join(os.path.dirname(os.path.realpath(__file__)),'..','data','pdb_common')+os.path.sep
+DataPath = os.path.join(os.path.dirname(os.path.realpath(
+    __file__)), '..', 'data', 'pdb_common')+os.path.sep
 
-class Test_sascalc_Prop_calccom(unittest.TestCase): 
+
+class Test_sascalc_Prop_calccom(unittest.TestCase):
 
     def setUp(self):
-        self.o=system.Molecule(0)
+        self.o = system.Molecule(0)
 
     def calc_exp(self):
         self.o.calculate_center_of_mass(0)
-        coor = numpy.array((self.o._coor[0]),floattype)
-        return numpy.sqrt(numpy.sum((coor-self.o._com)**2)/len(coor))
-
+        coor = numpy.array((self.o._coor[0]), floattype)
+        return numpy.sqrt(numpy.sum((coor - self.o._center_of_mass) ** 2) / len(coor))
 
     def test_null(self):
         with self.assertRaises(Exception):
@@ -47,46 +48,46 @@ class Test_sascalc_Prop_calccom(unittest.TestCase):
         self.o.read_pdb(DataPath+'1ATM.pdb')
         self.o.setTotal_mass(0.0)
         self.o.setNatoms(len(self.o._element))
-        result_rg  = self.o.calculate_radius_of_gyration(0)
+        result_rg = self.o.calculate_radius_of_gyration(0)
         expected_rg = 0.0
         self.assertAlmostEqual(expected_rg, result_rg)
 
     def test_two_aa_pdb(self):
         self.o.read_pdb(DataPath+'2AAD.pdb')
-        self.o.setTotal_mass(0.0) 
+        self.o.setTotal_mass(0.0)
         self.o.setNatoms(len(self.o._element))
-        result_rg  = self.o.calculate_radius_of_gyration(0)
+        result_rg = self.o.calculate_radius_of_gyration(0)
         expected_rg = 2.998744
         self.assertAlmostEqual(expected_rg, result_rg, 5)
 
     def test_rna_pdb(self):
         self.o.read_pdb(DataPath+'rna.pdb')
-        self.o.setTotal_mass(0.0) 
+        self.o.setTotal_mass(0.0)
         self.o.setNatoms(len(self.o._element))
-        result_rg  = self.o.calculate_radius_of_gyration(0)
+        result_rg = self.o.calculate_radius_of_gyration(0)
         expected_rg = self.calc_exp()
         self.assertAlmostEqual(expected_rg, result_rg, 3)
 
     def test_1CRN_pdb(self):
         self.o.read_pdb(DataPath+'1CRN.pdb')
-        self.o.setTotal_mass(0.0) 
+        self.o.setTotal_mass(0.0)
         self.o.setNatoms(len(self.o._element))
-        result_rg  = self.o.calculate_radius_of_gyration(0)
+        result_rg = self.o.calculate_radius_of_gyration(0)
         expected_rg = self.calc_exp()
         self.assertAlmostEqual(expected_rg, result_rg, 3)
 
-    @skipIf(os.environ['SASMOL_LARGETEST']=='n',"I am not testing large files")
+    @skipIf(os.environ['SASMOL_LARGETEST'] == 'n', "I am not testing large files")
     def test_1KP8_pdb(self):
         self.o.read_pdb(DataPath+'1KP8.pdb')
-        self.o.setTotal_mass(0.0) 
+        self.o.setTotal_mass(0.0)
         self.o.setNatoms(len(self.o._element))
-        result_rg  = self.o.calculate_radius_of_gyration(0)
+        result_rg = self.o.calculate_radius_of_gyration(0)
         expected_rg = self.calc_exp()
         self.assertAlmostEqual(expected_rg, result_rg, 3)
 
     def tearDown(self):
         pass
 
-if __name__ == '__main__': 
-   main() 
 
+if __name__ == '__main__':
+    main()

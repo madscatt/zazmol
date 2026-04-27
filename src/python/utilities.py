@@ -1,9 +1,8 @@
-#from __future__ import absolute_import
+# from __future__ import absolute_import
 
-
-#from __future__ import unicode_literals
+# from __future__ import unicode_literals
 #
-#    SASMOL: Copyright (C) 2011 Joseph E. Curtis, Ph.D. 
+#    SASMOL: Copyright (C) 2011 Joseph E. Curtis, Ph.D.
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -18,32 +17,37 @@
 #    You should have received a copy of the GNU General Public License
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
-#	UTIL
+# UTIL
 #
-#	12/10/2009	--	initial coding				:	jc
-#	11/24/2011	-- 	moved to seperate file      :	jc
-#	12/27/2015	-- 	refactored for release      :   jc
-#	08/19/2016	-- 	added doc strings           :   jc
+# 12/10/2009	--	initial coding				:	jc
+# 11/24/2011	-- 	moved to seperate file      :	jc
+# 12/27/2015	-- 	refactored for release      :   jc
+# 08/19/2016	-- 	added doc strings           :   jc
 #
-#	 1         2         3         4         5         6         7
+# 1         2         3         4         5         6         7
 # LC4567890123456789012345678901234567890123456789012345678901234567890123456789
-#								       *      **
+# *      **
 '''
 	Util holds general methods for file naming, os differences,
         chemical formula parsing, etc.
 '''
-#import system as system
+import sasmol.system as system
+import re
 import string
 import copy
 import numpy
 
+
 def find_unique(this_list):
     return list(numpy.unique(this_list))
 
+
 class Copy_Using_Mask():
 
+    #@classmethod
+    #def from_sasmol(class_instance,  mask, **kwargs):
     @classmethod
-    def from_sasmol(class_instance,  mask, **kwargs):
+    def from_sasmol(cls, class_instance, mask, **kwargs):
         ''' 
 
         Parameters
@@ -98,23 +102,27 @@ class Copy_Using_Mask():
 
             why can't this method be in subset?
 
-        ''' 
-       
-        list_keys = ['_residue_flag', '_occupancy', '_charge', '_atom', '_chain', '_segname', '_beta', '_loc', '_element', '_name', '_rescode', '_moltype', '_resname']
+        '''
 
-        numpy_keys = ['_original_index', '_original_resid', '_index', '_resid', '_mass', '_coor'] 
-     
-        short_keys = ['_resnames', '_resids', '_elements', '_segnames', '_betas', '_names', '_moltypes', '_occupancies' ]      
-        
-        int_keys = ['_number_of_chains', '_number_of_betas', '_number_of_resids', '_number_of_names', '_number_of_moltypes', '_number_of_resnames', '_number_of_segnames', '_number_of_elements', '_id', '_number_of_occupancies' ]  
-       
-        other_keys = ['_header', '_conect', '_debug']  
-            
+        list_keys = ['_residue_flag', '_occupancy', '_charge', '_atom', '_chain', '_segname',
+                     '_beta', '_loc', '_element', '_name', '_rescode', '_moltype', '_resname']
+
+        numpy_keys = ['_original_index', '_original_resid',
+                      '_index', '_resid', '_mass', '_coor']
+
+        short_keys = ['_resnames', '_resids', '_elements',
+                      '_segnames', '_betas', '_names', '_moltypes', '_occupancies']
+
+        int_keys = ['_number_of_chains', '_number_of_betas', '_number_of_resids', '_number_of_names', '_number_of_moltypes',
+                    '_number_of_resnames', '_number_of_segnames', '_number_of_elements', '_id', '_number_of_occupancies']
+
+        other_keys = ['_header', '_conect', '_debug']
+
         new_dict = {}
 
         number_of_frames = len(class_instance.coor())
-        mask_length = len(mask) 
-        
+        mask_length = len(mask)
+
         natoms = class_instance._natoms
         all_data = [[] for x in range(natoms)]
         for i in range(natoms):
@@ -132,29 +140,31 @@ class Copy_Using_Mask():
                 count += 1
 
         molecule = system.Molecule()
-        molecule.__dict__ = new_dict  
-      
+        molecule.__dict__ = new_dict
+
         molecule.setId(0)
 
-        molecule.setNatoms(mask_length) 
-        
-        molecule.setOriginal_index(numpy.take(class_instance.original_index(),mask))        
-        molecule.setOriginal_resid(numpy.take(class_instance.original_resid(),mask))        
-        molecule.setIndex(numpy.take(class_instance.index(),mask))        
-        molecule.setResid(numpy.take(class_instance.resid(),mask))
-                
-        molecule.setMass(numpy.take(class_instance.mass(),mask))        
-       
-        molecule.setCoor(numpy.take(class_instance.coor(),mask,axis=1))
-            
+        molecule.setNatoms(mask_length)
+
+        molecule.setOriginal_index(numpy.take(
+            class_instance.original_index(), mask))
+        molecule.setOriginal_resid(numpy.take(
+            class_instance.original_resid(), mask))
+        molecule.setIndex(numpy.take(class_instance.index(), mask))
+        molecule.setResid(numpy.take(class_instance.resid(), mask))
+
+        molecule.setMass(numpy.take(class_instance.mass(), mask))
+
+        molecule.setCoor(numpy.take(class_instance.coor(), mask, axis=1))
+
         return molecule
+
 
 def duplicate_molecule(molecule, number_of_duplicates):
     return [copy.deepcopy(molecule) for x in range(number_of_duplicates)]
 
 
 NAME, NUM, LPAREN, RPAREN, EOS = list(range(5))
-import re
 _lexer = re.compile(r"[A-Z][a-z]*|\d+|[()]|<EOS>").match
 del re
 
@@ -287,7 +297,7 @@ class Element:
 def build_dict(s):
     import string
     answer = {}
-    for line in string.split(s, "\n"):
+    for line in s.split("\n"):
         symbol, name, num, weight = eval(line)
         answer[symbol] = Element(symbol, name, num, weight)
     return answer
@@ -398,11 +408,10 @@ def parse_sequence(sym2elt):
         t.error("empty sequence")
     return seq
 
+
 def get_chemical_formula(formula_string):
 
-    Atomic = properties.Atomic()
-    #standard_atomic_weights = Atomic.amu(keep_lower_case=True)
-    amu = Atomic.amu(keep_lower_case=True)
+    # standard_atomic_weights = Atomic.amu(keep_lower_case=True)
     sym2elt = build_dict(_data)
 
 #    #sym2elt = amu
@@ -411,20 +420,19 @@ def get_chemical_formula(formula_string):
 
     error = []
     try:
-        seq = parse(formula_string.strip(" "),sym2elt)
-        #seq.displaysyms(sym2elt)
-        seq.addsyms(1,formula_dictionary)
+        seq = parse(formula_string.strip(" "), sym2elt)
+        # seq.displaysyms(sym2elt)
+        seq.addsyms(1, formula_dictionary)
         items = list(formula_dictionary.items())
         items.sort()
 
-        #for sym, count in items:
+        # for sym, count in items:
         #    print sym," :: ",count
 
     except ValueError as detail:
-        print(str(detail))
-        error.append(detail)
+        error.append(str(detail))
 
-    return error,formula_dictionary
+    return error, formula_dictionary
 
 
 if __name__ == "__main__":
@@ -435,7 +443,7 @@ if __name__ == "__main__":
 
     '''
     while 1:
-        x = raw_input("? ")
+        x = input("? ")
         fields = string.split(x)
         if len(fields) != 2:
             print("input must have two fields")
@@ -445,7 +453,7 @@ if __name__ == "__main__":
         try:
             seq = parse(formula,sym2elt)
             ok = 1
-        except ValueError, detail:
+        except ValueError as detail:
             print(str(detail))
         if not ok:
             continue
@@ -456,6 +464,8 @@ if __name__ == "__main__":
         else:
             print("unknown action:", action)
     '''
+
+
 def parse_fasta(fasta_sequence, **kwargs):
     """
     method to convert fasta_sequence object to list of strings
@@ -533,4 +543,41 @@ def parse_fasta(fasta_sequence, **kwargs):
         all_sequences.append(new_sequence)
 
     return all_sequences
+
+
+def check_integrity(obj, fast_check=False, warn=True):
+    import logging
+    import sasmol.config as config
+
+    logger = logging.getLogger(__name__)
+
+    natoms = obj.natoms()
+    results = {}
+    errors = []
+
+    core_keys = [
+        '_atom', '_index', '_name', '_loc', '_resname', '_chain',
+        '_resid', '_rescode', '_occupancy', '_beta',
+        '_segname', '_element', '_charge'
+    ]
+
+    for key in core_keys:
+        val = obj.__dict__.get(key, None)
+        if val is None:
+            results[key] = None
+            continue
+        try:
+            length = len(val)
+            results[key] = length
+            if length != natoms:
+                errors.append((key, length, natoms))
+        except:
+            results[key] = 'N/A'
+
+    if errors and warn:
+        logger.warning('Integrity check mismatch: %s', errors)
+    elif config.__logging_level__ == 'DEBUG':
+        logger.debug('Integrity check passed: natoms=%s', natoms)
+
+    return results
 

@@ -24,6 +24,9 @@ import string
 import locale
 import numpy
 import io
+import logging
+
+from . import config as config
 
 #	PDB_IO
 #
@@ -50,6 +53,15 @@ import io
 '''
 
 class PDB(object):
+
+    def _pdb_optional_field_value(self, field_name, atom_index, default_value, fill_missing_optional):
+        if not fill_missing_optional:
+            return getattr(self, field_name)[atom_index]
+
+        try:
+            return getattr(self, field_name)[atom_index]
+        except (AttributeError, IndexError, TypeError):
+            return default_value
 
     def print_error(self,name,my_message):
 
@@ -161,7 +173,8 @@ class PDB(object):
         debug=0
         result=1
         conect = False
-        printme = False
+        fill_missing_optional = kwargs.get('fill_missing_optional', False)
+        logger = logging.getLogger(__name__)
 	
         if(flag=='w' or flag=='W'):
             infile=open(filename,'w')
@@ -202,27 +215,21 @@ class PDB(object):
                 sy = "{0:8.3f}".format(float(self._coor[frame,i,1]))[:8]
                 sz = "{0:8.3f}".format(float(self._coor[frame,i,2]))[:8]
 
-                infile.write("%-6s%5s %-4s%1s%-4s%1s%4s%1s   %8s%8s%8s%6s%6s      %-4s%2s%2s\n" % (self._atom[i],this_index,self._name[i],self._loc[i],self._resname[i],self._chain[i],this_resid,self._rescode[i],sx,sy,sz,self._occupancy[i],self._beta[i],self._segname[i],self._element[i],self._charge[i]))
-            except:
-                if printme:
-                    print('\n>>>> ERROR IN WRITE_PDB <<<<\n')
-                    print('>> i = ',i)
-                    print('atom = ',self._atom[i],' : type = ',type(self._atom[i]))
-                    print('index = ',this_index,' : type = ',type(this_index))
-                    print('name = ',self._name[i],' : type = ',type(self._name[i]))
-                    print('loc = ',self._loc[i],' : type = ',type(self._loc[i]))
-                    print('resname = ',self._resname[i],' : type = ',type(self._resname[i]))
-                    print('chain = ',self._chain[i],' : type = ',type(self._chain[i]))
-                    print('resid = ',self._resid[i],' : type = ',type(self._resid[i]))
-                    print('rescode = ',self._rescode[i],' : type = ',type(self._rescode[i]))
-                    print('coor_x = ',self._coor[frame,i,0],' : type = ',type(self._coor[frame,i,0]))
-                    print('coor_y = ',self._coor[frame,i,1],' : type = ',type(self._coor[frame,i,1]))
-                    print('coor_z = ',self._coor[frame,i,2],' : type = ',type(self._coor[frame,i,2]))
-                    print('occupancy = ',self._occupancy[i],' : type = ',type(self._occupancy[i]))
-                    print('beta = ',self._beta[i],' : type = ',type(self._beta[i]))
-                    print('segname = ',self._segname[i],' : type = ',type(self._segname[i]))
-                    print('element = ',self._element[i],' : type = ',type(self._element[i]))
-                    print('charge = ',self._charge[i],' : type = ',type(self._charge[i]))
+                loc = self._pdb_optional_field_value('_loc',i,' ',fill_missing_optional)
+                rescode = self._pdb_optional_field_value('_rescode',i,' ',fill_missing_optional)
+                occupancy = self._pdb_optional_field_value('_occupancy',i,'0.00',fill_missing_optional)
+                beta = self._pdb_optional_field_value('_beta',i,'0.00',fill_missing_optional)
+                segname = self._pdb_optional_field_value('_segname',i,' ',fill_missing_optional)
+                element = self._pdb_optional_field_value('_element',i,' ',fill_missing_optional)
+                charge = self._pdb_optional_field_value('_charge',i,' ',fill_missing_optional)
+
+                infile.write("%-6s%5s %-4s%1s%-4s%1s%4s%1s   %8s%8s%8s%6s%6s      %-4s%2s%2s\n" % (self._atom[i],this_index,self._name[i],loc,self._resname[i],self._chain[i],this_resid,rescode,sx,sy,sz,occupancy,beta,segname,element,charge))
+            except Exception:
+                if config.__logging_level__ == 'DEBUG':
+                    logger.debug('Unexpected error writing PDB atom index %s', i, exc_info=True)
+                if fill_missing_optional:
+                    infile.close()
+                    raise
 
         # TODO: Check with Joseph to see if logic acceptable -
         # i.e. is 'final' always accompanied by 'model'?
@@ -492,7 +499,7 @@ class PDB(object):
 
         true_index = 0
 	
-        coor=numpy.zeros((num_frames,num_atoms,3),float)	
+        coor=numpy.zeros((num_frames,num_atoms,3),config.COORD_DTYPE)
 
         unique_names = [] ; unique_resnames = [] ; unique_resids = [] ; unique_chains = [] 
         unique_occupancies = [] ; unique_betas = [] ; unique_segnames = [] ; unique_moltypes = []
@@ -636,10 +643,10 @@ class PDB(object):
                     resid=numpy.array(resid,int)
                     original_resid=numpy.array(original_resid,int)
 
-                    x=numpy.array(x,float)
-                    y=numpy.array(y,float)
-                    z=numpy.array(z,float)
-                    coor[0,:,0]=x.astype(float) ; coor[0,:,1]=y.astype(float) ; coor[0,:,2]=z.astype(float)
+                    x=numpy.array(x,config.COORD_DTYPE)
+                    y=numpy.array(y,config.COORD_DTYPE)
+                    z=numpy.array(z,config.COORD_DTYPE)
+                    coor[0,:,0]=x ; coor[0,:,1]=y ; coor[0,:,2]=z
                     true_index = 0
                     x=[] ; y=[] ; z=[]
                     if(this_frame == 1):
@@ -672,9 +679,9 @@ class PDB(object):
 		
                 if(true_index == num_atoms):
                     if(printme): print('finished reading frame = ',this_frame)
-                    x=numpy.array(x,float)
-                    y=numpy.array(y,float)
-                    z=numpy.array(z,float)
+                    x=numpy.array(x,config.COORD_DTYPE)
+                    y=numpy.array(y,config.COORD_DTYPE)
+                    z=numpy.array(z,config.COORD_DTYPE)
                     coor[this_frame-1,:,0]=x ; coor[this_frame-1,:,1]=y ; coor[this_frame-1,:,2]=z
                     true_index = 0
                     this_frame += 1		
