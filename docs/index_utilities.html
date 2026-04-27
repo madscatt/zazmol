@@ -1,0 +1,331 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+    <title>Utilities &#8212; sasmol 1.0 documentation</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="_static/alabaster.css" />
+    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/doctools.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="View" href="index_view.html" />
+    <link rel="prev" title="Topology" href="index_topology.html" />
+
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+
+
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+
+
+          <div class="body" role="main">
+
+  <section id="utilities">
+<h1>Utilities<a class="headerlink" href="#utilities" title="Permalink to this headline">¶</a></h1>
+<section id="id1">
+<h2><code class="xref py py-mod docutils literal notranslate"><span class="pre">Utilities</span></code><a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h2>
+<span class="target" id="module-sasmol.utilities"></span><p>Util holds general methods for file naming, os differences,
+chemical formula parsing, etc.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="sasmol.utilities.Copy_Using_Mask">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">sasmol.utilities.</span></span><span class="sig-name descname"><span class="pre">Copy_Using_Mask</span></span><a class="reference internal" href="_modules/sasmol/utilities.html#Copy_Using_Mask"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sasmol.utilities.Copy_Using_Mask" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="sasmol.utilities.Copy_Using_Mask.from_sasmol">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">from_sasmol</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">class_instance</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mask</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sasmol/utilities.html#Copy_Using_Mask.from_sasmol"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sasmol.utilities.Copy_Using_Mask.from_sasmol" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>class_instance</strong> – system object</p></li>
+<li><p><strong>mask</strong> – integer list</p></li>
+<li><p><strong>kwargs</strong> – optional future keyword arguments</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>new system object</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>molecule</p>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">sasmol.system</span> <span class="k">as</span> <span class="nn">system</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">sasmol.util</span> <span class="k">as</span> <span class="nn">utilties</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">molecule</span> <span class="o">=</span> <span class="n">system</span><span class="o">.</span><span class="n">Molecule</span><span class="p">(</span><span class="s1">&#39;hiv1_gag.pdb&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">molecule</span><span class="o">.</span><span class="n">name</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
+<span class="go">&#39;N&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">molecule</span><span class="o">.</span><span class="n">name</span><span class="p">()[</span><span class="mi">4</span><span class="p">]</span>
+<span class="go">&#39;CA&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">molecule</span><span class="o">.</span><span class="n">name</span><span class="p">()[</span><span class="mi">14</span><span class="p">]</span>
+<span class="go">&#39;HB1&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">mask</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">14</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">new_molecule</span> <span class="o">=</span> <span class="n">utilities</span><span class="o">.</span><span class="n">Copy_Using_Mask</span><span class="o">.</span><span class="n">from_sasmol</span><span class="p">(</span><span class="n">molecule</span><span class="p">,</span> <span class="n">mask</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">new_molecule</span><span class="o">.</span><span class="n">name</span><span class="p">()</span>
+<span class="go">[&#39;N&#39;, &#39;CA&#39;, &#39;HB1&#39;]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">new_molecule</span><span class="o">.</span><span class="n">mass</span><span class="p">()</span>
+<span class="go">array([ 14.00672 ,  12.01078 ,   1.007947])</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<dl class="simple">
+<dt>if more attributes are added in system.Atom() then the key lists below need</dt><dd><p>to be updated</p>
+</dd>
+</dl>
+<p>currently only list_keys and numpy_keys are returned</p>
+<p>int_keys would have to be recalculated based on mask</p>
+<p>short_keys would have to be re-initialized (init_children)</p>
+<p>may want to consider passing a list of specific attributes to extract if memory is an issue</p>
+<p>copies all frames (untested)</p>
+<p>why can’t this method be in subset?</p>
+</div>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="sasmol.utilities.Element">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">sasmol.utilities.</span></span><span class="sig-name descname"><span class="pre">Element</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">symbol</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">atomicnumber</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">molweight</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sasmol/utilities.html#Element"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sasmol.utilities.Element" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="sasmol.utilities.Element.addsyms">
+<span class="sig-name descname"><span class="pre">addsyms</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">weight</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">result</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sasmol/utilities.html#Element.addsyms"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sasmol.utilities.Element.addsyms" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="sasmol.utilities.Element.getweight">
+<span class="sig-name descname"><span class="pre">getweight</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/sasmol/utilities.html#Element.getweight"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sasmol.utilities.Element.getweight" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="sasmol.utilities.ElementSequence">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">sasmol.utilities.</span></span><span class="sig-name descname"><span class="pre">ElementSequence</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">seq</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sasmol/utilities.html#ElementSequence"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sasmol.utilities.ElementSequence" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="sasmol.utilities.ElementSequence.addsyms">
+<span class="sig-name descname"><span class="pre">addsyms</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">weight</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">result</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sasmol/utilities.html#ElementSequence.addsyms"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sasmol.utilities.ElementSequence.addsyms" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="sasmol.utilities.ElementSequence.append">
+<span class="sig-name descname"><span class="pre">append</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">thing</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sasmol/utilities.html#ElementSequence.append"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sasmol.utilities.ElementSequence.append" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="sasmol.utilities.ElementSequence.displaysyms">
+<span class="sig-name descname"><span class="pre">displaysyms</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sym2elt</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sasmol/utilities.html#ElementSequence.displaysyms"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sasmol.utilities.ElementSequence.displaysyms" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="sasmol.utilities.ElementSequence.getweight">
+<span class="sig-name descname"><span class="pre">getweight</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/sasmol/utilities.html#ElementSequence.getweight"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sasmol.utilities.ElementSequence.getweight" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="sasmol.utilities.ElementSequence.set_count">
+<span class="sig-name descname"><span class="pre">set_count</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sasmol/utilities.html#ElementSequence.set_count"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sasmol.utilities.ElementSequence.set_count" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="sasmol.utilities.Tokenizer">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">sasmol.utilities.</span></span><span class="sig-name descname"><span class="pre">Tokenizer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sasmol/utilities.html#Tokenizer"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sasmol.utilities.Tokenizer" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="sasmol.utilities.Tokenizer.error">
+<span class="sig-name descname"><span class="pre">error</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">msg</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sasmol/utilities.html#Tokenizer.error"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sasmol.utilities.Tokenizer.error" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="sasmol.utilities.Tokenizer.gettoken">
+<span class="sig-name descname"><span class="pre">gettoken</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/sasmol/utilities.html#Tokenizer.gettoken"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sasmol.utilities.Tokenizer.gettoken" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="sasmol.utilities.build_dict">
+<span class="sig-prename descclassname"><span class="pre">sasmol.utilities.</span></span><span class="sig-name descname"><span class="pre">build_dict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">s</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sasmol/utilities.html#build_dict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sasmol.utilities.build_dict" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="sasmol.utilities.check_integrity">
+<span class="sig-prename descclassname"><span class="pre">sasmol.utilities.</span></span><span class="sig-name descname"><span class="pre">check_integrity</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">obj</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fast_check</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">warn</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sasmol/utilities.html#check_integrity"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sasmol.utilities.check_integrity" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="sasmol.utilities.duplicate_molecule">
+<span class="sig-prename descclassname"><span class="pre">sasmol.utilities.</span></span><span class="sig-name descname"><span class="pre">duplicate_molecule</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">molecule</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">number_of_duplicates</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sasmol/utilities.html#duplicate_molecule"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sasmol.utilities.duplicate_molecule" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="sasmol.utilities.find_unique">
+<span class="sig-prename descclassname"><span class="pre">sasmol.utilities.</span></span><span class="sig-name descname"><span class="pre">find_unique</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">this_list</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sasmol/utilities.html#find_unique"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sasmol.utilities.find_unique" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="sasmol.utilities.get_chemical_formula">
+<span class="sig-prename descclassname"><span class="pre">sasmol.utilities.</span></span><span class="sig-name descname"><span class="pre">get_chemical_formula</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">formula_string</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sasmol/utilities.html#get_chemical_formula"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sasmol.utilities.get_chemical_formula" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="sasmol.utilities.parse">
+<span class="sig-prename descclassname"><span class="pre">sasmol.utilities.</span></span><span class="sig-name descname"><span class="pre">parse</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">s</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sym2elt</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sasmol/utilities.html#parse"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sasmol.utilities.parse" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="sasmol.utilities.parse_fasta">
+<span class="sig-prename descclassname"><span class="pre">sasmol.utilities.</span></span><span class="sig-name descname"><span class="pre">parse_fasta</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fasta_sequence</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sasmol/utilities.html#parse_fasta"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sasmol.utilities.parse_fasta" title="Permalink to this definition">¶</a></dt>
+<dd><blockquote>
+<div><p>method to convert fasta_sequence object to list of strings
+for each valid sequence in the initial object</p>
+<p>format is based on the NCBI fasta format convention
+<a class="reference external" href="https://blast.ncbi.nlm.nih.gov/Blast.cgi?CMD=Web&amp;PAGE_TYPE=BlastDocs&amp;DOC_TYPE=BlastHelp">https://blast.ncbi.nlm.nih.gov/Blast.cgi?CMD=Web&amp;PAGE_TYPE=BlastDocs&amp;DOC_TYPE=BlastHelp</a></p>
+<p>notes:</p>
+<dl class="simple">
+<dt>fasta_sequence</dt><dd><p>list with formatted fasta input</p>
+</dd>
+<dt>kwargs</dt><dd><p>optional future arguments</p>
+</dd>
+</dl>
+<p>all_sequences</p>
+<blockquote>
+<div><p>a list containing sequences without comments, spaces, carriage returns, numbers,
+or termination flags.</p>
+<p>or</p>
+<p>an error indicating an empty line in the file</p>
+</div></blockquote>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">sasmol.sasutil</span> <span class="k">as</span> <span class="nn">sasutil</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">fasta_sequence</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="s1">&#39;test_fasta.txt&#39;</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">readlines</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">all_sequences</span> <span class="o">=</span> <span class="n">sasutil</span><span class="o">.</span><span class="n">parse_fasta</span><span class="p">(</span><span class="n">fasta_sequence</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">all_sequences</span><span class="p">)</span>
+</pre></div>
+</div>
+<blockquote>
+<div><ol class="arabic simple">
+<li><p>lines beginning with &gt; or ; are treated as comments and passed</p></li>
+<li><p>spaces are ignored</p></li>
+<li><ul class="simple">
+<li><p>are ignored (should be a termination)</p></li>
+</ul>
+</li>
+</ol>
+<p>4) numbers are ignored so you can have numbering at the beginning of a line
+5)</p>
+</div></blockquote>
+</div></blockquote>
+<dl class="simple">
+<dt>are processed</dt><dd><ol class="arabic simple" start="6">
+<li><p>comment lines are NOT required in the input</p></li>
+<li><p>comment lines cause a new sequence to be started</p></li>
+</ol>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="sasmol.utilities.parse_sequence">
+<span class="sig-prename descclassname"><span class="pre">sasmol.utilities.</span></span><span class="sig-name descname"><span class="pre">parse_sequence</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sym2elt</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sasmol/utilities.html#parse_sequence"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sasmol.utilities.parse_sequence" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</section>
+</section>
+
+
+          </div>
+
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="index.html">sasmol</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="index_calculate.html">Calculate</a></li>
+<li class="toctree-l1"><a class="reference internal" href="index_charmm_topology.html">Charmm Topology</a></li>
+<li class="toctree-l1"><a class="reference internal" href="index_dcd_io.html">DCD IO</a></li>
+<li class="toctree-l1"><a class="reference internal" href="index_file_io.html">File IO</a></li>
+<li class="toctree-l1"><a class="reference internal" href="index_linear_algebra.html">Linear Algebra</a></li>
+<li class="toctree-l1"><a class="reference internal" href="index_multiprocessing_sasmol.html">Multiprocessing SasMol</a></li>
+<li class="toctree-l1"><a class="reference internal" href="index_operate.html">Operate</a></li>
+<li class="toctree-l1"><a class="reference internal" href="index_pdb_io.html">PDB IO</a></li>
+<li class="toctree-l1"><a class="reference internal" href="index_properties.html">Properties</a></li>
+<li class="toctree-l1"><a class="reference internal" href="index_subset.html">Subset</a></li>
+<li class="toctree-l1"><a class="reference internal" href="index_system.html">System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="index_topology.html">Topology</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Utilities</a></li>
+<li class="toctree-l1"><a class="reference internal" href="index_view.html">View</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+      <li>Previous: <a href="index_topology.html" title="previous chapter">Topology</a></li>
+      <li>Next: <a href="index_view.html" title="next chapter">View</a></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2016, Joseph E. Curtis, Ph.D.
+
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 4.4.0</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+
+      |
+      <a href="_sources/index_utilities.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+
+
+
+  </body>
+</html>

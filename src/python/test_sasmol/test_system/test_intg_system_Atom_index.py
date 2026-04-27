@@ -16,7 +16,7 @@
 '''
 
 from unittest import main 
-from mocker import Mocker, MockerTestCase
+import unittest
 
 import sasmol.system as system
 
@@ -26,7 +26,7 @@ import os
 
 DataPath = os.path.join(os.path.dirname(os.path.realpath(__file__)),'..','data','sasmol','system')+os.path.sep
 
-class Test_intg_system_Atom_index(MockerTestCase):
+class Test_intg_system_Atom_index(unittest.TestCase):
 
    def setUp(self):
       self.o=system.Atom(3,'1CRN-3frames.pdb')
@@ -47,7 +47,7 @@ class Test_intg_system_Atom_index(MockerTestCase):
 	   test a regular pdb file with 3 frame
 	   '''
       #
-      expected = range(1,328)
+      expected = list(range(1,328))
       #
       self.o.read_pdb(DataPath+'1CRN-3frames.pdb')
       #
@@ -62,5 +62,5 @@ class Test_intg_system_Atom_index(MockerTestCase):
    
    
 if __name__ == '__main__': 
-   main() 
+   unittest.main() 
 

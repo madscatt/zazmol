@@ -19,12 +19,12 @@
 inf nan and etc need not be tested for this module
 '''
 from unittest import main 
-from mocker import Mocker, MockerTestCase, ANY, ARGS, KWARGS
+import unittest
 import sasmol.system as system
 
 import numpy
 
-class Test_sascalc_Prop_calcmass(MockerTestCase): 
+class Test_sascalc_Prop_calcmass(unittest.TestCase): 
 
     def setUp(self):
         self.o=system.Molecule(0)

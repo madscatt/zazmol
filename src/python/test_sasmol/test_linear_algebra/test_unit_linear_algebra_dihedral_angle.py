@@ -18,18 +18,19 @@
 from sasmol.test_sasmol.utilities import env, util
 
 from unittest import main 
-from mocker import Mocker, MockerTestCase
+import unittest
 import sasmol.linear_algebra as linear_algebra
+import warnings
 
 import numpy
 
 import os
 floattype=os.environ['SASMOL_FLOATTYPE']
 
-class Test_linear_algebra_dihedral_angle(MockerTestCase): 
+class Test_linear_algebra_dihedral_angle(unittest.TestCase):
 
     def setUp(self):
-        pass 
+        warnings.filterwarnings('ignore')
 
     def test_all_zero_arrays(self):
         a=numpy.array([0.0, 0.0, 0.0],floattype)

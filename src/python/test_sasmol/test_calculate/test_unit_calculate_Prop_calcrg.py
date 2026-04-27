@@ -17,116 +17,124 @@
 
 from sasmol.test_sasmol.utilities import env, util
 
-from unittest import main 
-from mocker import Mocker, MockerTestCase
+from unittest import main
+import unittest
 import sasmol.system as system
 
 import numpy
 
-import warnings; warnings.filterwarnings('ignore')
+import warnings
 
 import os
-floattype=os.environ['SASMOL_FLOATTYPE']
+floattype = os.environ['SASMOL_FLOATTYPE']
 
-class Test_sascalc_Prop_calcrg(MockerTestCase): 
+
+class Test_sascalc_Prop_calcrg(unittest.TestCase):
 
     def setUp(self):
-        self.o=system.Molecule(0)
+        self.o = system.Molecule(0)
         self.tol = 3
+        warnings.filterwarnings('ignore')
 
     def calc_exp(self):
         self.o.calculate_center_of_mass(0)
-        coor = numpy.array((self.o.coor()[0]),floattype)
-        return numpy.sqrt(numpy.sum((coor-self.o.com())**2)/len(coor))
+        coor = numpy.array((self.o.coor()[0]), floattype)
+        return numpy.sqrt(numpy.sum((coor - self.o.center_of_mass()) ** 2) / len(coor))
 
     def test_one_null(self):
         with self.assertRaises(Exception):
-          result_rg  = self.o.calculate_radius_of_gyration(0)
+            result_rg = self.o.calculate_radius_of_gyration(0)
 
     def test_one_atom(self):
         self.o.setElement(['C'])
-        self.o.setCoor(numpy.array([[[1.0, 2.0, 3.0]]],floattype))
+        self.o.setCoor(numpy.array([[[1.0, 2.0, 3.0]]], floattype))
         self.o.setTotal_mass(0.0)
         self.o.setNatoms(len(self.o.element()))
-        result_rg  = self.o.calculate_radius_of_gyration(0)
+        result_rg = self.o.calculate_radius_of_gyration(0)
         expected_rg = 0.0
         self.assertAlmostEqual(expected_rg, result_rg, self.tol)
 
     def test_two_atoms(self):
         self.o.setElement(['C', 'AG'])
-        self.o.setCoor(numpy.array([[[1.0, 2.0, 3.0],[4.0, 5.0, 6.0]]],floattype))
+        self.o.setCoor(numpy.array(
+            [[[1.0, 2.0, 3.0], [4.0, 5.0, 6.0]]], floattype))
         self.o.setTotal_mass(0.0)
         self.o.setNatoms(len(self.o.element()))
-        result_rg  = self.o.calculate_radius_of_gyration(0)
+        result_rg = self.o.calculate_radius_of_gyration(0)
         expected_rg = 3.3265416
         self.assertAlmostEqual(expected_rg, result_rg, self.tol)
 
     def test_six_atoms_duplicate(self):
-        self.o.setElement(['C','O','C','1H','KR','AG'])
-        self.o.setCoor(numpy.array([[[1.0, 2.0, 3.0],[4.0, 5.0, 6.0],[7.0, 8.0, 9.0],[1.0, 3.0, 5.0],[2.0, 4.0, 6.0],[0.0, 2.0, 3.0]]],floattype))
+        self.o.setElement(['C', 'O', 'C', '1H', 'KR', 'AG'])
+        self.o.setCoor(numpy.array([[[1.0, 2.0, 3.0], [4.0, 5.0, 6.0], [7.0, 8.0, 9.0], [
+                       1.0, 3.0, 5.0], [2.0, 4.0, 6.0], [0.0, 2.0, 3.0]]], floattype))
         self.o.setTotal_mass(0.0)
         self.o.setNatoms(len(self.o._element))
-        result_rg  = self.o.calculate_radius_of_gyration(0)
+        result_rg = self.o.calculate_radius_of_gyration(0)
         expected_rg = self.calc_exp()
         self.assertAlmostEqual(expected_rg, result_rg, self.tol)
 
     def test_six_atoms_duplicate_inf1(self):
-        self.o.setElement(['C','O','C','1H','KR','AG'])
-        self.o.setCoor(numpy.array([[[1.0, 2.0, 3.0],[util.HUGE, 5.0, 6.0],[7.0, 8.0, 9.0],[1.0, 3.0, 5.0],[2.0, 4.0, 6.0],[0.0, 2.0, 3.0]]],floattype))
+        self.o.setElement(['C', 'O', 'C', '1H', 'KR', 'AG'])
+        self.o.setCoor(numpy.array([[[1.0, 2.0, 3.0], [util.HUGE, 5.0, 6.0], [
+                       7.0, 8.0, 9.0], [1.0, 3.0, 5.0], [2.0, 4.0, 6.0], [0.0, 2.0, 3.0]]], floattype))
         self.o.setTotal_mass(0.0)
         self.o.setNatoms(len(self.o._element))
-        result_rg  = self.o.calculate_radius_of_gyration(0)
+        result_rg = self.o.calculate_radius_of_gyration(0)
         expected_rg = util.INF
         self.assertAlmostEqual(expected_rg, result_rg, self.tol)
 
     def test_six_atoms_duplicate_inf2(self):
-        self.o.setElement(['C','O','C','1H','KR','AG'])
-        self.o.setCoor(numpy.array([[[1.0, 2.0, 3.0],[util.INF, 5.0, 6.0],[7.0, 8.0, 9.0],[1.0, 3.0, 5.0],[2.0, 4.0, 6.0],[0.0, 2.0, 3.0]]],floattype))
+        self.o.setElement(['C', 'O', 'C', '1H', 'KR', 'AG'])
+        self.o.setCoor(numpy.array([[[1.0, 2.0, 3.0], [util.INF, 5.0, 6.0], [
+                       7.0, 8.0, 9.0], [1.0, 3.0, 5.0], [2.0, 4.0, 6.0], [0.0, 2.0, 3.0]]], floattype))
         self.o.setTotal_mass(0.0)
         self.o.setNatoms(len(self.o._element))
-        result_rg  = self.o.calculate_radius_of_gyration(0)
+        result_rg = self.o.calculate_radius_of_gyration(0)
         self.assertTrue(numpy.isnan(result_rg))
 
     def test_six_atoms_duplicate_nan(self):
-        self.o.setElement(['C','O','C','1H','KR','AG'])
-        self.o.setCoor(numpy.array([[[1.0, 2.0, 3.0],[util.NAN, 5.0, 6.0],[7.0, 8.0, 9.0],[1.0, 3.0, 5.0],[2.0, 4.0, 6.0],[0.0, 2.0, 3.0]]],floattype))
+        self.o.setElement(['C', 'O', 'C', '1H', 'KR', 'AG'])
+        self.o.setCoor(numpy.array([[[1.0, 2.0, 3.0], [util.NAN, 5.0, 6.0], [
+                       7.0, 8.0, 9.0], [1.0, 3.0, 5.0], [2.0, 4.0, 6.0], [0.0, 2.0, 3.0]]], floattype))
         self.o.setTotal_mass(0.0)
         self.o.setNatoms(len(self.o._element))
-        result_rg  = self.o.calculate_radius_of_gyration(0)
+        result_rg = self.o.calculate_radius_of_gyration(0)
         self.assertTrue(numpy.isnan(result_rg))
 
     def test_six_atoms_duplicate_tiny(self):
-        self.o.setElement(['C','O','C','1H','KR','AG'])
-        self.o.setCoor(numpy.array([[[1.0, 2.0, 3.0],[util.TINY, 5.0, 6.0],[7.0, 8.0, 9.0],[1.0, 3.0, 5.0],[2.0, 4.0, 6.0],[0.0, 2.0, 3.0]]],floattype))
+        self.o.setElement(['C', 'O', 'C', '1H', 'KR', 'AG'])
+        self.o.setCoor(numpy.array([[[1.0, 2.0, 3.0], [util.TINY, 5.0, 6.0], [
+                       7.0, 8.0, 9.0], [1.0, 3.0, 5.0], [2.0, 4.0, 6.0], [0.0, 2.0, 3.0]]], floattype))
         self.o.setTotal_mass(0.0)
         self.o.setNatoms(len(self.o._element))
-        result_rg  = self.o.calculate_radius_of_gyration(0)
+        result_rg = self.o.calculate_radius_of_gyration(0)
         expected_rg = self.calc_exp()
         self.assertAlmostEqual(expected_rg, result_rg, self.tol)
 
     def test_six_atoms_duplicate_zero(self):
-        self.o.setElement(['C','O','C','1H','KR','AG'])
-        self.o.setCoor(numpy.array([[[1.0, 2.0, 3.0],[util.ZERO, 5.0, 6.0],[7.0, 8.0, 9.0],[1.0, 3.0, 5.0],[2.0, 4.0, 6.0],[0.0, 2.0, 3.0]]],floattype))
+        self.o.setElement(['C', 'O', 'C', '1H', 'KR', 'AG'])
+        self.o.setCoor(numpy.array([[[1.0, 2.0, 3.0], [util.ZERO, 5.0, 6.0], [
+                       7.0, 8.0, 9.0], [1.0, 3.0, 5.0], [2.0, 4.0, 6.0], [0.0, 2.0, 3.0]]], floattype))
         self.o.setTotal_mass(0.0)
-        self.o.setNatoms(len(self.o._element))        
-        result_rg  = self.o.calculate_radius_of_gyration(0)
+        self.o.setNatoms(len(self.o._element))
+        result_rg = self.o.calculate_radius_of_gyration(0)
         expected_rg = self.calc_exp()
         self.assertAlmostEqual(expected_rg, result_rg, self.tol)
 
     def test_wrong(self):
-        self.o.setElement(['X','M'])
-        self.o.setCoor(numpy.array([[[1.0, 2.0, 3.0],[7.0, 8.0, 9.0]]],floattype))
+        self.o.setElement(['X', 'M'])
+        self.o.setCoor(numpy.array(
+            [[[1.0, 2.0, 3.0], [7.0, 8.0, 9.0]]], floattype))
         self.o.setTotal_mass(0.0)
-        self.o.setNatoms(len(self.o._element))        
-        result_rg  = self.o.calculate_radius_of_gyration(0)
+        self.o.setNatoms(len(self.o._element))
+        result_rg = self.o.calculate_radius_of_gyration(0)
         import math
         self.assertTrue(math.isnan(result_rg))
-
-
 
     def tearDown(self):
         pass
 
-if __name__ == '__main__': 
-   main() 
 
+if __name__ == '__main__':
+    main()

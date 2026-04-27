@@ -18,7 +18,7 @@
 from sasmol.test_sasmol.utilities import env
 
 from unittest import main, skipIf
-from mocker import Mocker, MockerTestCase, ANY, ARGS, KWARGS
+import unittest
 import sasmol.system as system
 
 import numpy, os, copy
@@ -28,10 +28,19 @@ floattype=os.environ['SASMOL_FLOATTYPE']
 DataPath = os.path.join(os.path.dirname(os.path.realpath(__file__)),'..','data','pdb_common')+os.path.sep
 moduleDataPath = os.path.join(os.path.dirname(os.path.realpath(__file__)),'..','data','sasmol','file_io')+os.path.sep
 
-class Test_intg_file_io_Files_read_dcd(MockerTestCase):
+class Test_intg_file_io_Files_read_dcd(unittest.TestCase):
 
    def setUp(self):
       self.o=system.Molecule(0)
+
+   def test_file_doesnt_exist(self):
+      '''
+      test that missing pdb files raise a Python file error
+      '''
+      pdbFileName = DataPath+'file-notexist.pdb'
+
+      with self.assertRaises(FileNotFoundError):
+         self.o.read_pdb(pdbFileName)
 
    def assert_list_almost_equal(self,a,b,places=5):
       if (len(a)!=len(b)):
@@ -51,10 +60,10 @@ class Test_intg_file_io_Files_read_dcd(MockerTestCase):
       #
       self.o.read_pdb(DataPath+'1ATM.pdb')
       result_coor = self.o.coor()
-      print '\nresult_coor \n',result_coor
+      #print('\nresult_coor \n',result_coor)
       #
       expected_coor = numpy.array([[[73.944, 41.799, 41.652]]],floattype)
-      print '\nexpected_coor \n',expected_coor
+      #print('\nexpected_coor \n',expected_coor)
       #
       self.assert_list_almost_equal(expected_coor, result_coor,3)
 
@@ -66,10 +75,10 @@ class Test_intg_file_io_Files_read_dcd(MockerTestCase):
       #
       self.o.read_pdb(DataPath+'1ATM-1to2.pdb')
       result_coor = self.o.coor()
-      print '\nresult_coor \n',result_coor
+      #print('\nresult_coor \n',result_coor)
       #
       expected_coor = numpy.array([[[76.944, 41.799, 41.652]],[[73.944, 38.799, 41.652]]],floattype)
-      print '\nexpected_coor \n',expected_coor
+      #print('\nexpected_coor \n',expected_coor)
       #
       self.assert_list_almost_equal(expected_coor, result_coor,3)
 
@@ -81,10 +90,10 @@ class Test_intg_file_io_Files_read_dcd(MockerTestCase):
       #
       self.o.read_pdb(DataPath+'2AAD.pdb')
       result_coor = self.o.coor()
-      print '\nresult_coor \n',result_coor
+      #print('\nresult_coor \n',result_coor)
       #
       expected_coor = numpy.array([[[  73.944,   41.799,   41.652], [  74.229,   42.563,   40.456], [  75.667,   43.093,   40.463], [  76.264,   43.279,   39.401], [  73.210,   43.734,   40.336], [  71.856,   43.168,   39.926], [  73.677,   44.782,   39.354], [  70.721,   44.177,   39.946], [  76.231,   43.330,   41.647], [  77.592,   43.852,   41.730], [  78.617,   42.820,   42.184], [  79.712,   43.169,   42.656], [  77.671,   45.097,   42.648], [  77.054,   44.816,   43.910], [  76.970,   46.273,   42.000]]],floattype)
-      print '\nexpected_coor \n',expected_coor
+      #print('\nexpected_coor \n',expected_coor)
       #
       self.assert_list_almost_equal(expected_coor, result_coor,3)
 
@@ -96,12 +105,12 @@ class Test_intg_file_io_Files_read_dcd(MockerTestCase):
       #
       self.o.read_pdb(moduleDataPath+'2AAD-1to3-END.pdb')
       result_coor = self.o.coor()
-      print '\nresult_coor \n',result_coor
+      #print('\nresult_coor \n',result_coor)
       #
       expected_coor = numpy.array([[[  73.944,   41.799,   41.652], [  74.229,   42.563,   40.456], [  75.667,   43.093,   40.463], [  76.264,   43.279,   39.401], [  73.210,   43.734,   40.336], [  71.856,   43.168,   39.926], [  73.677,   44.782,   39.354], [  70.721,   44.177,   39.946], [  76.231,   43.330,   41.647], [  77.592,   43.852,   41.730], [  78.617,   42.820,   42.184], [  79.712,   43.169,   42.656], [  77.671,   45.097,   42.648], [  77.054,   44.816,   43.910], [  76.970,   46.273,   42.000]],\
       [[ -73.944,   41.799,   41.652], [ -74.229,   42.563,   40.456], [ -75.667,   43.093,   40.463], [ -76.264,   43.279,   39.401], [ -73.210,   43.734,   40.336], [ -71.856,   43.168,   39.926], [ -73.677,   44.782,   39.354], [ -70.721,   44.177,   39.946], [ -76.231,   43.330,   41.647], [ -77.592,   43.852,   41.730], [ -78.617,   42.820,   42.184], [ -79.712,   43.169,   42.656], [ -77.671,   45.097,   42.648], [ -77.054,   44.816,   43.910], [ -76.970,   46.273,   42.000]],\
       [[  73.944,  -41.799,   41.652], [  74.229,  -42.563,   40.456], [  75.667,  -43.093,   40.463], [  76.264,  -43.279,   39.401], [  73.210,  -43.734,   40.336], [  71.856,  -43.168,   39.926], [  73.677,  -44.782,   39.354], [  70.721,  -44.177,   39.946], [  76.231,  -43.330,   41.647], [  77.592,  -43.852,   41.730], [  78.617,  -42.820,   42.184], [  79.712,  -43.169,   42.656], [  77.671,  -45.097,   42.648], [  77.054,  -44.816,   43.910], [  76.970,  -46.273,   42.000]]],floattype)
-      print '\nexpected_coor \n',expected_coor
+      #print('\nexpected_coor \n',expected_coor)
       #
       self.assert_list_almost_equal(expected_coor, result_coor,3)
  
@@ -118,7 +127,7 @@ class Test_intg_file_io_Files_read_dcd(MockerTestCase):
       self.assertEqual(self.o.number_of_frames(),3)
       self.assertEqual(self.o.atom(),['ATOM']*natoms)
       self.assertEqual(self.o.name(),['N','CA','C','O','CB','CG1','CG2','CD1','N','CA','C','O','CB','OG1','CG2'])
-      self.assert_list_almost_equal(self.o.index(),range(1,natoms+1))
+      self.assert_list_almost_equal(self.o.index(),list(range(1,natoms+1)))
       self.assertEqual(self.o.loc(),[' ']*natoms)
       self.assertEqual(self.o.resname(),['ILE']*8+['THR']*7)
       self.assertEqual(self.o.chain(),['N']*natoms)
@@ -148,12 +157,12 @@ class Test_intg_file_io_Files_read_dcd(MockerTestCase):
       #
       self.o.read_pdb(moduleDataPath+'2AAD-1to3-MODEL.pdb')
       result_coor = self.o.coor()
-      print '\nresult_coor \n',result_coor
+      #print('\nresult_coor \n',result_coor)
       #
       expected_coor = numpy.array([[[  73.944,   41.799,   41.652], [  74.229,   42.563,   40.456], [  75.667,   43.093,   40.463], [  76.264,   43.279,   39.401], [  73.210,   43.734,   40.336], [  71.856,   43.168,   39.926], [  73.677,   44.782,   39.354], [  70.721,   44.177,   39.946], [  76.231,   43.330,   41.647], [  77.592,   43.852,   41.730], [  78.617,   42.820,   42.184], [  79.712,   43.169,   42.656], [  77.671,   45.097,   42.648], [  77.054,   44.816,   43.910], [  76.970,   46.273,   42.000]],\
       [[ -73.944,   41.799,   41.652], [ -74.229,   42.563,   40.456], [ -75.667,   43.093,   40.463], [ -76.264,   43.279,   39.401], [ -73.210,   43.734,   40.336], [ -71.856,   43.168,   39.926], [ -73.677,   44.782,   39.354], [ -70.721,   44.177,   39.946], [ -76.231,   43.330,   41.647], [ -77.592,   43.852,   41.730], [ -78.617,   42.820,   42.184], [ -79.712,   43.169,   42.656], [ -77.671,   45.097,   42.648], [ -77.054,   44.816,   43.910], [ -76.970,   46.273,   42.000]],\
       [[  73.944,  -41.799,   41.652], [  74.229,  -42.563,   40.456], [  75.667,  -43.093,   40.463], [  76.264,  -43.279,   39.401], [  73.210,  -43.734,   40.336], [  71.856,  -43.168,   39.926], [  73.677,  -44.782,   39.354], [  70.721,  -44.177,   39.946], [  76.231,  -43.330,   41.647], [  77.592,  -43.852,   41.730], [  78.617,  -42.820,   42.184], [  79.712,  -43.169,   42.656], [  77.671,  -45.097,   42.648], [  77.054,  -44.816,   43.910], [  76.970,  -46.273,   42.000]]],floattype)
-      print '\nexpected_coor \n',expected_coor
+      #print('\nexpected_coor \n',expected_coor)
       #
       self.assert_list_almost_equal(expected_coor, result_coor,3)
  
@@ -195,7 +204,7 @@ class Test_intg_file_io_Files_read_dcd(MockerTestCase):
       #
       self.o.read_pdb(DataPath+"rna-1to10.pdb")
       result_coor = self.o.coor()
-      print '\nresult_coor \n',result_coor[2][10627]
+      #print('\nresult_coor \n',result_coor[2][10627])
       #
       self.assertEqual(len(result_coor),10)
       self.assertEqual(len(result_coor[3]),10632)
@@ -243,8 +252,8 @@ class Test_intg_file_io_Files_read_dcd(MockerTestCase):
       #
       self.o.read_pdb(moduleDataPath+"new_package_rna.pdb")
       result_coor = self.o.coor()
-      print '\nlength of result_coor \n',len(result_coor[0])
-      print '\nresult_coor \n',result_coor
+      #print('\nlength of result_coor \n',len(result_coor[0]))
+      #print('\nresult_coor \n',result_coor)
       #
       self.assertEqual(len(result_coor[0]),3719)
       expected_coor_sample = numpy.array([-12.872, 13.360, -153.873],floattype) #atom 10627 of frame 3
@@ -255,9 +264,9 @@ class Test_intg_file_io_Files_read_dcd(MockerTestCase):
 	   test a pdb file with non-charmm atom names
       '''
       #
-      print 'ZHL'
+      #print('ZHL')
       self.o.read_pdb(moduleDataPath+"nef_nohis.pdb")
-      print self.o.name()
+      #print(self.o.name())
 
    def tearDown(self):
       pass
@@ -265,5 +274,4 @@ class Test_intg_file_io_Files_read_dcd(MockerTestCase):
    
    
 if __name__ == '__main__': 
-   main() 
-
+   unittest.main() 

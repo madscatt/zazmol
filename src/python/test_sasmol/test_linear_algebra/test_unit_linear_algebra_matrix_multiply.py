@@ -17,183 +17,153 @@
 
 from sasmol.test_sasmol.utilities import env, util
 
-from unittest import main 
-from mocker import Mocker, MockerTestCase
-import sasmol.linear_algebra as linear_algebra
+from unittest import main
+import unittest
+import sasmol.config as config
+from sasmol.linear_algebra import matrix_multiply  # Import the C extension method
 
 import numpy
 
-import os
-floattype=os.environ['SASMOL_FLOATTYPE']
+calculation_dtype = config.CALC_DTYPE
 
-class Test_linear_algebra_matrix_multiply(MockerTestCase): 
+class TestMatrixMultiply(unittest.TestCase):
 
-    def setUp(self):
-        pass 
-
-    def assert_list_almost_equal(self,a,b,places=5):
-      if (len(a)!=len(b)):
-         raise TypeError
-      else:
-         for i in range(len(a)):
-            if isinstance(a[i],(int,float,numpy.generic)):
-               if (numpy.isnan(a[i]) and numpy.isnan(b[i])): continue
-               self.assertAlmostEqual(a[i],b[i],places)
-            else:
-               self.assert_list_almost_equal(a[i],b[i],places)
+    def assert_list_almost_equal(self, a, b, places=6):
+        for i in range(len(a)):
+            if numpy.isnan(a[i]) and numpy.isnan(b[i]):
+                continue    
+            self.assertAlmostEqual(a[i], b[i], places=places)
 
     def test_all_zero_arrays_1(self):
-        a=numpy.array([[0.0, 0.0, 0.0]],floattype)
-        b=numpy.array([[0.0, 0.0, 0.0]],floattype).T
-        result = linear_algebra.matrix_multiply(a,b)[1]
-        expected = numpy.array([[0.0]],floattype)
-        self.assert_list_almost_equal(result,expected)
-	result_error = linear_algebra.matrix_multiply(a,b)[0]
-	expected_error = []
-	self.assertEqual(result_error, expected_error)
+        a = numpy.zeros((3, 3), dtype=calculation_dtype)
+        b = numpy.zeros((3, 3), dtype=calculation_dtype)
+        result_error, result = matrix_multiply(a, b)
+        expected = numpy.zeros((3, 3), dtype=calculation_dtype)
+        self.assert_list_almost_equal(result.flatten(), expected.flatten())
+        expected_error = []
+        self.assertEqual(result_error, expected_error)
 
     def test_all_zero_arrays_2(self):
-        a=numpy.array([[0.0, 0.0, 0.0],[0.0, 0.0, 0.0]],floattype)
-        b=numpy.array([[0.0, 0.0, 0.0],[0.0, 0.0, 0.0]],floattype).T
-        result = linear_algebra.matrix_multiply(a,b)[1]
-        expected = numpy.array([[0.0, 0.0],[0.0, 0.0]],floattype)
-        self.assert_list_almost_equal(result,expected)
-	result_error = linear_algebra.matrix_multiply(a,b)[0]
-	expected_error = []
-	self.assertEqual(result_error, expected_error)
+        a = numpy.zeros((2, 3), dtype=calculation_dtype)
+        b = numpy.zeros((3, 2), dtype=calculation_dtype)
+        result_error, result = matrix_multiply(a, b)
+        expected = numpy.zeros((2, 2), dtype=calculation_dtype)
+        self.assert_list_almost_equal(result.flatten(), expected.flatten())
+        expected_error = []
+        self.assertEqual(result_error, expected_error)
 
     def test_all_zero_arrays_3(self):
-        a=numpy.array([[0.0, 0.0, 0.0],[0.0, 0.0, 0.0]],floattype)
-        b=numpy.array([[0.0, 0.0, 0.0]],floattype).T
-        result = linear_algebra.matrix_multiply(a,b)[1]
-        expected = numpy.array([[0.0],[0.0]],floattype)
-        self.assert_list_almost_equal(result,expected)
-	result_error = linear_algebra.matrix_multiply(a,b)[0]
-	expected_error = []
-	self.assertEqual(result_error, expected_error)
+        a = numpy.zeros((3, 2), dtype=calculation_dtype)
+        b = numpy.zeros((2, 3), dtype=calculation_dtype)
+        result_error, result = matrix_multiply(a, b)
+        expected = numpy.zeros((3, 3), dtype=calculation_dtype)
+        self.assert_list_almost_equal(result.flatten(), expected.flatten())
+        expected_error = []
+        self.assertEqual(result_error, expected_error)
 
     def test_unit_arrays_1(self):
-        a=numpy.array([[1.0, 0.0, 0.0]],floattype)
-        b=numpy.array([[1.0, 1.0, 0.0]],floattype).T
-        result = linear_algebra.matrix_multiply(a,b)[1]
-        expected = numpy.array([[1.0]],floattype)
-        self.assert_list_almost_equal(result,expected)
-    	result_error = linear_algebra.matrix_multiply(a,b)[0]
-	expected_error = []
-	self.assertEqual(result_error, expected_error)
+        a = numpy.array([[1.0, 0.0, 0.0]], dtype=calculation_dtype)
+        b = numpy.array([[1.0, 1.0, 0.0]], dtype=calculation_dtype).T
+        result_error, result = matrix_multiply(a, b)
+        expected = numpy.array([[1.0]], dtype=calculation_dtype)
+        self.assert_list_almost_equal(result.flatten(), expected.flatten())
+        expected_error = []
+        self.assertEqual(result_error, expected_error)
 
     def test_unit_arrays_2(self):
-        a=numpy.array([[1.0, 0.0, 0.0],[0.0, 1.0, 0.0]],floattype)
-        b=numpy.array([[1.0, 0.0, 0.0],[0.0, 1.0, 0.0]],floattype).T
-        result = linear_algebra.matrix_multiply(a,b)[1]
-        expected = numpy.array([[1.0, 0.0],[0.0, 1.0]],floattype)
-        self.assert_list_almost_equal(result,expected)
-	result_error = linear_algebra.matrix_multiply(a,b)[0]
-	expected_error = []
-	self.assertEqual(result_error, expected_error)
+        a = numpy.array([[1.0, 0.0, 0.0], [0.0, 1.0, 0.0]], dtype=calculation_dtype)
+        b = numpy.array([[1.0, 0.0, 0.0], [0.0, 1.0, 0.0]], dtype=calculation_dtype).T
+        result_error, result = matrix_multiply(a, b)
+        expected = numpy.array([[1.0, 0.0], [0.0, 1.0]], dtype=calculation_dtype)
+
+        self.assert_list_almost_equal(result.flatten(), expected.flatten())
+        expected_error = []
+        self.assertEqual(result_error, expected_error)
 
     def test_unit_arrays_3(self):
-        a=numpy.array([[1.0, 0.0, 0.0]],floattype)
-        b=numpy.array([[1.0, 0.0, 0.0],[0.0, 1.0, 0.0]],floattype).T
-        result = linear_algebra.matrix_multiply(a,b)[1]
-        expected = numpy.array([[1.0, 0.0]],floattype)
-        self.assert_list_almost_equal(result,expected)
-	result_error = linear_algebra.matrix_multiply(a,b)[0]
-	expected_error = []
-	self.assertEqual(result_error, expected_error)
+        a = numpy.array([[1.0, 0.0, 0.0]], dtype=calculation_dtype)
+        b = numpy.array([[1.0, 0.0, 0.0], [0.0, 1.0, 0.0]], dtype=calculation_dtype).T
+        result_error, result = matrix_multiply(a, b)
+        expected = numpy.array([[1.0, 0.0]], dtype=calculation_dtype)
+        self.assert_list_almost_equal(result.flatten(), expected.flatten())
+        expected_error = []
+        self.assertEqual(result_error, expected_error)
 
     def test_arb_1(self):
-        a=numpy.array([[12.0, -20.0, -80.0],[2.02, -901.0, 0.0]],floattype)
-        b=numpy.array([[1.23, 0.03, 20.0],[10.0, 1.0, 3.0]],floattype).T
-        result = linear_algebra.matrix_multiply(a,b)[1]
-        expected = numpy.array([[-1585.84, -140.0],[-24.5454, -880.8]],floattype)
-	print result
-        self.assert_list_almost_equal(result,expected)
-	result_error = linear_algebra.matrix_multiply(a,b)[0]
-	expected_error = []
-	self.assertEqual(result_error, expected_error)
+        a = numpy.array([[12.0, -20.0, -80.0], [2.02, -901.0, 0.0]], dtype=calculation_dtype)
+        b = numpy.array([[1.23, 0.03, 20.0], [10.0, 1.0, 3.0]], dtype=calculation_dtype).T
+        result_error, result = matrix_multiply(a, b)
+        expected = numpy.array([[-1585.84, -140.0], [-24.5454, -880.8]], dtype=calculation_dtype)
+        result = numpy.round(result, 3)
+        expected = numpy.round(expected, 3)
+        self.assert_list_almost_equal(result.flatten(), expected.flatten())
+        expected_error = []
+        self.assertEqual(result_error, expected_error)
 
     def test_arb_2(self):
-        a=numpy.array([[1.0168308, -1.35572028, -1.35362422],[-0.69958848, 1.66901076, 0.49978462]],floattype)
-        b=numpy.array([-20.69958848, 16.66901076, 20.49978462],floattype)
-        result = linear_algebra.matrix_multiply(a,b)[1]
-        expected = numpy.array([[-71.396],[52.547]],floattype)
-	print result
-        self.assert_list_almost_equal(result,expected,3)
-	result_error = linear_algebra.matrix_multiply(a,b)[0]
-	expected_error = []
-	self.assertEqual(result_error, expected_error)
+        a = numpy.array([[1.0168308, -1.35572028, -1.35362422], [-0.69958848, 1.66901076, 0.49978462]], dtype=calculation_dtype)
+        b = numpy.array([[-20.69958848, 16.66901076, 20.49978462]], dtype=calculation_dtype).T
+        result_error, result = matrix_multiply(a, b)
+        expected = numpy.array([[-71.396], [52.547]], dtype=calculation_dtype)
+        result = numpy.round(result, 3)
+        expected = numpy.round(expected, 3)
+        self.assert_list_almost_equal(result.flatten(), expected.flatten())
+        expected_error = []
+        self.assertEqual(result_error, expected_error)
 
     def test_inf_1(self):
-        a=numpy.array([[util.HUGE, -20.0, 80.0],[2.02, util.HUGE, 20.0]],floattype)
-        b=numpy.array([[1.23, 2.0, 20.0],[10.0, 21.0, util.HUGE]],floattype).T
-        result = linear_algebra.matrix_multiply(a,b)[1]
-        expected = numpy.array([[util.INF, util.INF],[util.INF, util.INF]],floattype)
-	print result
-        self.assert_list_almost_equal(result,expected)
-	result_error = linear_algebra.matrix_multiply(a,b)[0]
-	expected_error = []
-	self.assertEqual(result_error, expected_error)
+        a = numpy.array([[util.INF, -20.0, 80.0]], dtype=calculation_dtype)
+        b = numpy.array([[1.23, 2.0, 20.0]], dtype=calculation_dtype).T
+        result_error, result = matrix_multiply(a, b)
+        expected = numpy.array([[util.INF]], dtype=calculation_dtype)
+        self.assert_list_almost_equal(result.flatten(), expected.flatten())
+        expected_error = []
+        self.assertEqual(result_error, expected_error)
 
     def test_inf_2(self):
-        a=numpy.array([[util.INF, -20.0, 80.0],[2.02, util.INF, 20.0]],floattype)
-        b=numpy.array([[1.23, 2.0, 20.0],[10.0, 21.0, util.INF]],floattype).T
-        result = linear_algebra.matrix_multiply(a,b)[1]
-        expected = numpy.array([[util.INF, util.INF],[util.INF, util.INF]],floattype)
-	print result
-        self.assert_list_almost_equal(result,expected)
-	result_error = linear_algebra.matrix_multiply(a,b)[0]
-	expected_error = []
-	self.assertEqual(result_error, expected_error)
+        a = numpy.array([[util.INF, -20.0, 80.0], [2.02, util.INF, 20.0]], dtype=calculation_dtype)
+        b = numpy.array([[1.23, 2.0, 20.0], [10.0, 21.0, util.INF]], dtype=calculation_dtype).T
+        result_error, result = matrix_multiply(a, b)
+        expected = numpy.array([[util.INF, util.INF], [util.INF, util.INF]], dtype=calculation_dtype)
+        self.assert_list_almost_equal(result.flatten(), expected.flatten())
+        expected_error = []
+        self.assertEqual(result_error, expected_error)
 
     def test_nan(self):
-        a=numpy.array([[util.NAN, -20.0, 80.0],[2.02, util.NAN, 20.0]],floattype)
-        b=numpy.array([[1.23, 2.0, 20.0],[10.0, 21.0, util.NAN]],floattype).T
-        result = linear_algebra.matrix_multiply(a,b)[1]
-        expected = numpy.array([[util.NAN, util.NAN],[util.NAN, util.NAN]],floattype)
-	print result
-        self.assert_list_almost_equal(result,expected)
-	result_error = linear_algebra.matrix_multiply(a,b)[0]
-	expected_error = []
-	self.assertEqual(result_error, expected_error)
+        a = numpy.array([[util.NAN, -20.0, 80.0], [2.02, util.NAN, 20.0]], dtype=calculation_dtype)
+        b = numpy.array([[1.23, 2.0, 20.0], [10.0, 21.0, util.NAN]], dtype=calculation_dtype).T
+        result_error, result = matrix_multiply(a, b)
+        expected = numpy.array([[util.NAN, util.NAN], [util.NAN, util.NAN]], dtype=calculation_dtype)
+        self.assert_list_almost_equal(result.flatten(), expected.flatten())
+        expected_error = []
+        self.assertEqual(result_error, expected_error)
 
     def test_nan_inf(self):
-        a=numpy.array([[util.INF, -20.0, 80.0],[2.02, util.NAN, 20.0]],floattype)
-        b=numpy.array([[1.23, 2.0, 20.0],[10.0, 21.0, util.NAN]],floattype).T
-        result = linear_algebra.matrix_multiply(a,b)[1]
-        expected = numpy.array([[util.INF, util.NAN],[util.NAN, util.NAN]],floattype)
-	print result
-        self.assert_list_almost_equal(result,expected)
-	result_error = linear_algebra.matrix_multiply(a,b)[0]
-	expected_error = []
-	self.assertEqual(result_error, expected_error)
+        a = numpy.array([[util.INF, -20.0, 80.0], [2.02, util.NAN, 20.0]], dtype=calculation_dtype)
+        b = numpy.array([[1.23, 2.0, 20.0], [10.0, 21.0, util.NAN]], dtype=calculation_dtype).T
+        result_error, result = matrix_multiply(a, b)
+        expected = numpy.array([[util.INF, util.NAN], [util.NAN, util.NAN]], dtype=calculation_dtype)
+        self.assert_list_almost_equal(result.flatten(), expected.flatten())
+        expected_error = []
+        self.assertEqual(result_error, expected_error)
 
     def test_tiny(self):
-        a=numpy.array([[util.TINY, -20.0, 80.0],[2.02, util.TINY, 20.0]],floattype)
-        b=numpy.array([[1.23, 2.0, 20.0],[10.0, 21.0, util.TINY]],floattype).T
-        result = linear_algebra.matrix_multiply(a,b)[1]
-        expected = numpy.array([[1560.0, -420.0],[402.4846, 20.2]],floattype)
-	print result
-        self.assert_list_almost_equal(result,expected)
-	result_error = linear_algebra.matrix_multiply(a,b)[0]
-	expected_error = []
-	self.assertEqual(result_error, expected_error)
+        a = numpy.array([[util.TINY, -20.0, 80.0], [2.02, util.TINY, 20.0]], dtype=calculation_dtype)
+        b = numpy.array([[1.23, 2.0, 20.0], [10.0, 21.0, util.TINY]], dtype=calculation_dtype).T
+        result_error, result = matrix_multiply(a, b)
+        expected = numpy.array([[1560.0, -420.0], [402.4846, 20.2]], dtype=calculation_dtype)
+        self.assert_list_almost_equal(result.flatten(), expected.flatten())
+        expected_error = []
+        self.assertEqual(result_error, expected_error)
 
     def test_zero(self):
-        a=numpy.array([[util.ZERO, -20.0, 80.0],[2.02, util.ZERO, 20.0]],floattype)
-        b=numpy.array([[1.23, 2.0, 20.0],[10.0, 21.0, util.ZERO]],floattype).T
-        result = linear_algebra.matrix_multiply(a,b)[1]
-        expected = numpy.array([[1560.0, -420.0],[402.4846, 20.2]],floattype)
-	print result
-        self.assert_list_almost_equal(result,expected)
-	result_error = linear_algebra.matrix_multiply(a,b)[0]
-	expected_error = []
-	self.assertEqual(result_error, expected_error)
+        a = numpy.array([[util.ZERO, -20.0, 80.0], [2.02, util.ZERO, 20.0]], dtype=calculation_dtype)
+        b = numpy.array([[1.23, 2.0, 20.0], [10.0, 21.0, util.ZERO]], dtype=calculation_dtype).T
+        result_error, result = matrix_multiply(a, b)
+        expected = numpy.array([[1560.0, -420.0], [402.4846, 20.2]], dtype=calculation_dtype)
+        self.assert_list_almost_equal(result.flatten(), expected.flatten())
+        expected_error = []
+        self.assertEqual(result_error, expected_error)
 
-
-    def tearDown(self):
-        pass
-
-if __name__ == '__main__': 
-   main() 
-
+if __name__ == '__main__':
+    unittest.main()

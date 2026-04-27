@@ -1,3 +1,25 @@
+
+done:
+
+working on resource error warnings in:
+
+test_intg_file_io_Files_close_dcd_write.py
+
+import warnings
+
+and in setup
+
+warnings.filterwarnings('ignore')
+
+will remove the stale open() file warnings that could be also removed by using with open () etc.
+
+
+
+
+
+The notes below are in relation to the state of tests for these modules from SASMOL (for sassie 2.0) not in relation to the Python 3.X port
+
+
 replaced all sassie w/ sasmol
 
 need to fix relative path using os.path.join()

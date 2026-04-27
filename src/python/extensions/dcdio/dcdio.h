@@ -1,6 +1,9 @@
 #include <stdio.h>
 #include <string.h>
 
+#ifndef DCIO_H
+#define DCIO_H
+
 /* These defines are necessary to support CHARMm DCD files. See
    comments in ReadDCD.C, in read_dcdheader(). */
 #define DCD_IS_CHARMM 		0x01
@@ -18,9 +21,12 @@
 
 extern FILE * open_dcd_read(const char *);  
 
-extern int read_dcdheader(FILE * fd, int *N, int  *NSET, int  *ISTART,
-               int  *NSAVC, double  *DELTA, int  *NAMNF,
+extern int read_dcdheader(FILE * fd, int *N, int  *NSET, int  *ISTART, \
+               int  *NSAVC, double  *DELTA, int  *NAMNF, \
                int *reverseEndian, int *charmm);
+
+extern int read_dcdstep(FILE * fd, int N, float *X, float *Y, float *Z, int num_fixed,\
+        int first, int reverseEndian, int charmm);
 
 extern int close_dcd_read(FILE * fd);
 
@@ -30,8 +36,10 @@ extern int write_dcdheader(FILE * fd, char *filename, int N, int NSET, \
 extern int write_dcdstep(FILE *,int N,float *x,float *y,float *z, int curframe);
 extern int close_dcd_write(FILE * fd);
 
-extern int* reverseFourByteWord(int* ); /* revert 4 byte word byteorder */
+extern int* reverseFourByteWord(int* N); /* revert 4 byte word byteorder */
 
 extern int* reverseEightByteDouble(int* ); /* revert 8 byte word byteorder */
 
-
+extern void pad(char* s, int len);
+int seek_dcd(FILE *fd, long offset, int whence) ;
+#endif // DCIO_H

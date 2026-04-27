@@ -27,158 +27,152 @@ make sure the right phosphorous list was generated
 make sure the right other list (from the periodic table) was generated
 '''
 
-from unittest import main 
-from mocker import Mocker, MockerTestCase
+from unittest import main
+import unittest
+
+import warnings
 
 import sasmol.system as system
 
 import os
 
-DataPath = os.path.join(os.path.dirname(os.path.realpath(__file__)),'..','data','sasmol','properties')+os.path.sep
+DataPath = os.path.join(os.path.dirname(os.path.realpath(
+    __file__)), '..', 'data', 'sasmol', 'properties')+os.path.sep
 
 
-class Test_unit_properties_Atomic_charmm_names(MockerTestCase):
+class Test_unit_properties_Atomic_charmm_names(unittest.TestCase):
 
-   def setUp(self):
-      self.o=system.Molecule(0)
-      charmm_names = self.o.charmm_names()
-        
-      hl = charmm_names['hydrogen']
-      cl = charmm_names['carbon']
-      nl = charmm_names['nitrogen']
-      ol = charmm_names['oxygen']
-      sl = charmm_names['sulfur']
-      pl = charmm_names['phosphorus']
-      otherl = charmm_names['other']
+    def setUp(self):
+        warnings.filterwarnings('ignore')
+        self.o = system.Molecule(0)
+        charmm_names = self.o.charmm_names()
 
-      (self.hl, self.cl, self.nl, self.ol, self.sl, self.pl, self.otherl) = (hl, cl,nl, ol, sl, pl, otherl)
+        hl = charmm_names['hydrogen']
+        cl = charmm_names['carbon']
+        nl = charmm_names['nitrogen']
+        ol = charmm_names['oxygen']
+        sl = charmm_names['sulfur']
+        pl = charmm_names['phosphorus']
+        otherl = charmm_names['other']
 
-      #(self.hl, self.cl, self.nl, self.ol, self.sl, self.pl, self.otherl)=self.o.charmm_names()
+        (self.hl, self.cl, self.nl, self.ol, self.sl, self.pl,
+         self.otherl) = (hl, cl, nl, ol, sl, pl, otherl)
 
-   def unique(self,seq):
-      '''
-      remove the duplicate elements
-      '''
-      seen = set()
-      seen_add = seen.add
-      return [ x for x in seq if x not in seen and not seen_add(x)]
+        #(self.hl, self.cl, self.nl, self.ol, self.sl, self.pl, self.otherl)=self.o.charmm_names()
 
-   def compare_namelists(self, l1, l2):
-      '''
-      check whether two list contains the same atoms
-      the order doesnt matter
-      '''
-      if len(l1)!=len(l2):
-         return -1
-      else:
-         for i1 in l1:
-            if i1 not in l2:
-               return -1
-      return 0
+    def unique(self, seq):
+        '''
+        remove the duplicate elements
+        '''
+        seen = set()
+        seen_add = seen.add
+        return [x for x in seq if x not in seen and not seen_add(x)]
 
+    def compare_namelists(self, l1, l2):
+        '''
+        check whether two list contains the same atoms
+        the order doesnt matter
+        '''
+        if len(l1) != len(l2):
+            return -1
+        else:
+            for i1 in l1:
+                if i1 not in l2:
+                    return -1
+        return 0
 
-   def test_uniqe(self):
-      '''
-	   make sure the list is unique
-      '''
-      #
-      lall = self.hl + self.cl + self.nl + self.ol + self.sl + self.pl + self.otherl
-      lallunique = self.unique(lall)
-      self.assertEqual(lall,lallunique)
+    def test_uniqe(self):
+        '''
+             make sure the list is unique
+        '''
+        #
+        lall = self.hl + self.cl + self.nl + self.ol + self.sl + self.pl + self.otherl
+        lallunique = self.unique(lall)
+        self.assertEqual(lall, lallunique)
 
+    def test_H(self):
+        '''
+        make sure the right hydrogen list was generated
+        '''
+        #
+        datafile = DataPath+'Hatoms.txt'
+        hltmp = []
+        for atom in open(datafile).readlines():
+            hltmp.append(atom.strip())
+        self.assertEqual(self.compare_namelists(hltmp, self.hl), 0)
 
+    def test_C(self):
+        '''
+        make sure the right carbon list was generated
+        '''
+        #
+        datafile = DataPath+'Catoms.txt'
+        cltmp = []
+        for atom in open(datafile).readlines():
+            cltmp.append(atom.strip())
+        self.assertEqual(self.compare_namelists(cltmp, self.cl), 0)
 
-   def test_H(self):
-      '''
-      make sure the right hydrogen list was generated
-      '''
-      #
-      datafile = DataPath+'Hatoms.txt'
-      hltmp = []
-      for atom in open(datafile).readlines():
-         hltmp.append(atom.strip())
-      self.assertEqual(self.compare_namelists(hltmp, self.hl), 0)
+    def test_N(self):
+        '''
+        make sure the right nitrogen list was generated
+        '''
+        #
+        datafile = DataPath+'Natoms.txt'
+        nltmp = []
+        for atom in open(datafile).readlines():
+            nltmp.append(atom.strip())
+        self.assertEqual(self.compare_namelists(nltmp, self.nl), 0)
 
+    def test_O(self):
+        '''
+        make sure the right oxygen list was generated
+        '''
+        #
+        datafile = DataPath+'Oatoms.txt'
+        oltmp = []
+        for atom in open(datafile).readlines():
+            oltmp.append(atom.strip())
+        self.assertEqual(self.compare_namelists(oltmp, self.ol), 0)
 
-   def test_C(self):
-      '''
-      make sure the right carbon list was generated
-      '''
-      #
-      datafile = DataPath+'Catoms.txt'
-      cltmp = []
-      for atom in open(datafile).readlines():
-         cltmp.append(atom.strip())
-      self.assertEqual(self.compare_namelists(cltmp, self.cl), 0)
+    def test_S(self):
+        '''
+        make sure the right sulfur list was generated
+        '''
+        #
+        datafile = DataPath+'Satoms.txt'
+        sltmp = []
+        for atom in open(datafile).readlines():
+            sltmp.append(atom.strip())
+        self.assertEqual(self.compare_namelists(sltmp, self.sl), 0)
 
+    def test_P(self):
+        '''
+        make sure the right phosphorous list was generated
+        '''
+        #
+        datafile = DataPath+'Patoms.txt'
+        pltmp = []
+        for atom in open(datafile).readlines():
+            pltmp.append(atom.strip())
+        self.assertEqual(self.compare_namelists(pltmp, self.pl), 0)
 
-   def test_N(self):
-      '''
-      make sure the right nitrogen list was generated
-      '''
-      #
-      datafile = DataPath+'Natoms.txt'
-      nltmp = []
-      for atom in open(datafile).readlines():
-         nltmp.append(atom.strip())
-      self.assertEqual(self.compare_namelists(nltmp, self.nl), 0)
+    def test_Other(self):
+        '''
+        make sure the right other list (from the periodic table) was generated
+        '''
+        #
+        datafile = DataPath+'Otheratoms.txt'
+        otherltmp = []
+        for atom in open(datafile).readlines():
+            otherltmp.append(atom.strip())
+        # print 'otherltmp = ',otherltmp
+        # print 'self.otherl = ',self.otherl
+        # print list(set(self.otherl) - set(otherltmp))
+        self.assertEqual(self.compare_namelists(otherltmp, self.otherl), 0)
 
-
-   def test_O(self):
-      '''
-      make sure the right oxygen list was generated
-      '''
-      #
-      datafile = DataPath+'Oatoms.txt'
-      oltmp = []
-      for atom in open(datafile).readlines():
-         oltmp.append(atom.strip())
-      self.assertEqual(self.compare_namelists(oltmp, self.ol), 0)
-
-   def test_S(self):
-      '''
-      make sure the right sulfur list was generated
-      '''
-      #
-      datafile = DataPath+'Satoms.txt'
-      sltmp = []
-      for atom in open(datafile).readlines():
-         sltmp.append(atom.strip())
-      self.assertEqual(self.compare_namelists(sltmp, self.sl), 0)
-
-
-   def test_P(self):
-      '''
-      make sure the right phosphorous list was generated
-      '''
-      #
-      datafile = DataPath+'Patoms.txt'
-      pltmp = []
-      for atom in open(datafile).readlines():
-         pltmp.append(atom.strip())
-      self.assertEqual(self.compare_namelists(pltmp, self.pl), 0)
-
-
-   def test_Other(self):
-      '''
-      make sure the right other list (from the periodic table) was generated
-      '''
-      #
-      datafile = DataPath+'Otheratoms.txt'
-      otherltmp = []
-      for atom in open(datafile).readlines():
-         otherltmp.append(atom.strip())
-      #print 'otherltmp = ',otherltmp
-      #print 'self.otherl = ',self.otherl
-      #print list(set(self.otherl) - set(otherltmp))
-      self.assertEqual(self.compare_namelists(otherltmp, self.otherl), 0)
+    def tearDown(self):
+        pass
 
 
-   def tearDown(self):
-      pass
-        
-   
-   
-if __name__ == '__main__': 
-   main() 
-
+if __name__ == '__main__':
+    main()

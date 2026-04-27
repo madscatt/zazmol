@@ -18,7 +18,8 @@
 from sasmol.test_sasmol.utilities import env
 
 from unittest import main 
-from mocker import Mocker, MockerTestCase, ANY, ARGS, KWARGS
+import unittest
+
 import sasmol.system as system
 import numpy, os, copy
 
@@ -29,7 +30,7 @@ floattype=os.environ['SASMOL_FLOATTYPE']
 import os
 DataPath = os.path.join(os.path.dirname(os.path.realpath(__file__)),'..','data','sasmol','system')+os.path.sep
 
-class Test_intg_system_Atom_number_of_frames(MockerTestCase):
+class Test_intg_system_Atom_number_of_frames(unittest.TestCase):
 
    def setUp(self):
       self.o=system.Atom(3,'1CRN-3frames.pdb')
@@ -54,5 +55,5 @@ class Test_intg_system_Atom_number_of_frames(MockerTestCase):
    
    
 if __name__ == '__main__': 
-   main() 
+   unittest.main() 
 

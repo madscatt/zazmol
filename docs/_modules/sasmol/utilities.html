@@ -1,0 +1,696 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>sasmol.utilities &#8212; sasmol 1.0 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/alabaster.css" />
+    <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+    <script src="../../_static/jquery.js"></script>
+    <script src="../../_static/underscore.js"></script>
+    <script src="../../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+
+  <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
+
+
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+
+
+          <div class="body" role="main">
+
+  <h1>Source code for sasmol.utilities</h1><div class="highlight"><pre>
+<span></span><span class="c1"># from __future__ import absolute_import</span>
+
+<span class="c1"># from __future__ import unicode_literals</span>
+<span class="c1">#</span>
+<span class="c1">#    SASMOL: Copyright (C) 2011 Joseph E. Curtis, Ph.D.</span>
+<span class="c1">#</span>
+<span class="c1">#    This program is free software: you can redistribute it and/or modify</span>
+<span class="c1">#    it under the terms of the GNU General Public License as published by</span>
+<span class="c1">#    the Free Software Foundation, either version 3 of the License, or</span>
+<span class="c1">#    (at your option) any later version.</span>
+<span class="c1">#</span>
+<span class="c1">#    This program is distributed in the hope that it will be useful,</span>
+<span class="c1">#    but WITHOUT ANY WARRANTY; without even the implied warranty of</span>
+<span class="c1">#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the</span>
+<span class="c1">#    GNU General Public License for more details.</span>
+<span class="c1">#</span>
+<span class="c1">#    You should have received a copy of the GNU General Public License</span>
+<span class="c1">#    along with this program.  If not, see &lt;http://www.gnu.org/licenses/&gt;.</span>
+<span class="c1">#</span>
+<span class="c1"># UTIL</span>
+<span class="c1">#</span>
+<span class="c1"># 12/10/2009	--	initial coding				:	jc</span>
+<span class="c1"># 11/24/2011	-- 	moved to seperate file      :	jc</span>
+<span class="c1"># 12/27/2015	-- 	refactored for release      :   jc</span>
+<span class="c1"># 08/19/2016	-- 	added doc strings           :   jc</span>
+<span class="c1">#</span>
+<span class="c1"># 1         2         3         4         5         6         7</span>
+<span class="c1"># LC4567890123456789012345678901234567890123456789012345678901234567890123456789</span>
+<span class="c1"># *      **</span>
+<span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">	Util holds general methods for file naming, os differences,</span>
+<span class="sd">        chemical formula parsing, etc.</span>
+<span class="sd">&#39;&#39;&#39;</span>
+<span class="kn">import</span> <span class="nn">sasmol.system</span> <span class="k">as</span> <span class="nn">system</span>
+<span class="kn">import</span> <span class="nn">re</span>
+<span class="kn">import</span> <span class="nn">string</span>
+<span class="kn">import</span> <span class="nn">copy</span>
+<span class="kn">import</span> <span class="nn">numpy</span>
+
+
+<div class="viewcode-block" id="find_unique"><a class="viewcode-back" href="../../index_utilities.html#sasmol.utilities.find_unique">[docs]</a><span class="k">def</span> <span class="nf">find_unique</span><span class="p">(</span><span class="n">this_list</span><span class="p">):</span>
+    <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="n">numpy</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">this_list</span><span class="p">))</span></div>
+
+
+<div class="viewcode-block" id="Copy_Using_Mask"><a class="viewcode-back" href="../../index_utilities.html#sasmol.utilities.Copy_Using_Mask">[docs]</a><span class="k">class</span> <span class="nc">Copy_Using_Mask</span><span class="p">():</span>
+
+    <span class="c1">#@classmethod</span>
+    <span class="c1">#def from_sasmol(class_instance,  mask, **kwargs):</span>
+<div class="viewcode-block" id="Copy_Using_Mask.from_sasmol"><a class="viewcode-back" href="../../index_utilities.html#sasmol.utilities.Copy_Using_Mask.from_sasmol">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">from_sasmol</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">class_instance</span><span class="p">,</span> <span class="n">mask</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39; </span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        __________</span>
+<span class="sd">        class_instance</span>
+<span class="sd">            system object</span>
+
+<span class="sd">        mask</span>
+<span class="sd">            integer list</span>
+
+<span class="sd">        kwargs</span>
+<span class="sd">            optional future keyword arguments</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        _______</span>
+<span class="sd">            molecule</span>
+<span class="sd">                new system object</span>
+
+<span class="sd">        Examples</span>
+<span class="sd">        --------</span>
+<span class="sd">            &gt;&gt;&gt; import sasmol.system as system </span>
+<span class="sd">            &gt;&gt;&gt; import sasmol.util as utilties </span>
+<span class="sd">            &gt;&gt;&gt; molecule = system.Molecule(&#39;hiv1_gag.pdb&#39;)</span>
+<span class="sd">            &gt;&gt;&gt; molecule.name()[0] </span>
+<span class="sd">            &#39;N&#39;</span>
+<span class="sd">            &gt;&gt;&gt; molecule.name()[4] </span>
+<span class="sd">            &#39;CA&#39;</span>
+<span class="sd">            &gt;&gt;&gt; molecule.name()[14] </span>
+<span class="sd">            &#39;HB1&#39;</span>
+<span class="sd">            &gt;&gt;&gt; mask = [0, 4, 14]</span>
+<span class="sd">            &gt;&gt;&gt; new_molecule = utilities.Copy_Using_Mask.from_sasmol(molecule, mask) </span>
+<span class="sd">            &gt;&gt;&gt; new_molecule.name()</span>
+<span class="sd">            [&#39;N&#39;, &#39;CA&#39;, &#39;HB1&#39;]</span>
+<span class="sd">            &gt;&gt;&gt; new_molecule.mass()</span>
+<span class="sd">            array([ 14.00672 ,  12.01078 ,   1.007947])</span>
+
+<span class="sd">        Note</span>
+<span class="sd">        ____</span>
+
+<span class="sd">            if more attributes are added in system.Atom() then the key lists below need</span>
+<span class="sd">                to be updated</span>
+
+<span class="sd">            currently only list_keys and numpy_keys are returned</span>
+
+<span class="sd">            int_keys would have to be recalculated based on mask</span>
+
+<span class="sd">            short_keys would have to be re-initialized (init_children)</span>
+
+<span class="sd">            may want to consider passing a list of specific attributes to extract if memory is an issue</span>
+
+<span class="sd">            copies all frames (untested)</span>
+
+<span class="sd">            why can&#39;t this method be in subset?</span>
+
+<span class="sd">        &#39;&#39;&#39;</span>
+
+        <span class="n">list_keys</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;_residue_flag&#39;</span><span class="p">,</span> <span class="s1">&#39;_occupancy&#39;</span><span class="p">,</span> <span class="s1">&#39;_charge&#39;</span><span class="p">,</span> <span class="s1">&#39;_atom&#39;</span><span class="p">,</span> <span class="s1">&#39;_chain&#39;</span><span class="p">,</span> <span class="s1">&#39;_segname&#39;</span><span class="p">,</span>
+                     <span class="s1">&#39;_beta&#39;</span><span class="p">,</span> <span class="s1">&#39;_loc&#39;</span><span class="p">,</span> <span class="s1">&#39;_element&#39;</span><span class="p">,</span> <span class="s1">&#39;_name&#39;</span><span class="p">,</span> <span class="s1">&#39;_rescode&#39;</span><span class="p">,</span> <span class="s1">&#39;_moltype&#39;</span><span class="p">,</span> <span class="s1">&#39;_resname&#39;</span><span class="p">]</span>
+
+        <span class="n">numpy_keys</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;_original_index&#39;</span><span class="p">,</span> <span class="s1">&#39;_original_resid&#39;</span><span class="p">,</span>
+                      <span class="s1">&#39;_index&#39;</span><span class="p">,</span> <span class="s1">&#39;_resid&#39;</span><span class="p">,</span> <span class="s1">&#39;_mass&#39;</span><span class="p">,</span> <span class="s1">&#39;_coor&#39;</span><span class="p">]</span>
+
+        <span class="n">short_keys</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;_resnames&#39;</span><span class="p">,</span> <span class="s1">&#39;_resids&#39;</span><span class="p">,</span> <span class="s1">&#39;_elements&#39;</span><span class="p">,</span>
+                      <span class="s1">&#39;_segnames&#39;</span><span class="p">,</span> <span class="s1">&#39;_betas&#39;</span><span class="p">,</span> <span class="s1">&#39;_names&#39;</span><span class="p">,</span> <span class="s1">&#39;_moltypes&#39;</span><span class="p">,</span> <span class="s1">&#39;_occupancies&#39;</span><span class="p">]</span>
+
+        <span class="n">int_keys</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;_number_of_chains&#39;</span><span class="p">,</span> <span class="s1">&#39;_number_of_betas&#39;</span><span class="p">,</span> <span class="s1">&#39;_number_of_resids&#39;</span><span class="p">,</span> <span class="s1">&#39;_number_of_names&#39;</span><span class="p">,</span> <span class="s1">&#39;_number_of_moltypes&#39;</span><span class="p">,</span>
+                    <span class="s1">&#39;_number_of_resnames&#39;</span><span class="p">,</span> <span class="s1">&#39;_number_of_segnames&#39;</span><span class="p">,</span> <span class="s1">&#39;_number_of_elements&#39;</span><span class="p">,</span> <span class="s1">&#39;_id&#39;</span><span class="p">,</span> <span class="s1">&#39;_number_of_occupancies&#39;</span><span class="p">]</span>
+
+        <span class="n">other_keys</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;_header&#39;</span><span class="p">,</span> <span class="s1">&#39;_conect&#39;</span><span class="p">,</span> <span class="s1">&#39;_debug&#39;</span><span class="p">]</span>
+
+        <span class="n">new_dict</span> <span class="o">=</span> <span class="p">{}</span>
+
+        <span class="n">number_of_frames</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">class_instance</span><span class="o">.</span><span class="n">coor</span><span class="p">())</span>
+        <span class="n">mask_length</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">mask</span><span class="p">)</span>
+
+        <span class="n">natoms</span> <span class="o">=</span> <span class="n">class_instance</span><span class="o">.</span><span class="n">_natoms</span>
+        <span class="n">all_data</span> <span class="o">=</span> <span class="p">[[]</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">natoms</span><span class="p">)]</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">natoms</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">mask</span><span class="p">:</span>
+                <span class="n">count</span> <span class="o">=</span> <span class="mi">0</span>
+                <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">class_instance</span><span class="o">.</span><span class="vm">__dict__</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                    <span class="k">if</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">list_keys</span><span class="p">:</span>
+                        <span class="n">all_data</span><span class="p">[</span><span class="n">count</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">value</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+                        <span class="n">count</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="n">count</span> <span class="o">=</span> <span class="mi">0</span>
+
+        <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">class_instance</span><span class="o">.</span><span class="vm">__dict__</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">list_keys</span><span class="p">:</span>
+                <span class="n">new_dict</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">all_data</span><span class="p">[</span><span class="n">count</span><span class="p">]</span>
+                <span class="n">count</span> <span class="o">+=</span> <span class="mi">1</span>
+
+        <span class="n">molecule</span> <span class="o">=</span> <span class="n">system</span><span class="o">.</span><span class="n">Molecule</span><span class="p">()</span>
+        <span class="n">molecule</span><span class="o">.</span><span class="vm">__dict__</span> <span class="o">=</span> <span class="n">new_dict</span>
+
+        <span class="n">molecule</span><span class="o">.</span><span class="n">setId</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+
+        <span class="n">molecule</span><span class="o">.</span><span class="n">setNatoms</span><span class="p">(</span><span class="n">mask_length</span><span class="p">)</span>
+
+        <span class="n">molecule</span><span class="o">.</span><span class="n">setOriginal_index</span><span class="p">(</span><span class="n">numpy</span><span class="o">.</span><span class="n">take</span><span class="p">(</span>
+            <span class="n">class_instance</span><span class="o">.</span><span class="n">original_index</span><span class="p">(),</span> <span class="n">mask</span><span class="p">))</span>
+        <span class="n">molecule</span><span class="o">.</span><span class="n">setOriginal_resid</span><span class="p">(</span><span class="n">numpy</span><span class="o">.</span><span class="n">take</span><span class="p">(</span>
+            <span class="n">class_instance</span><span class="o">.</span><span class="n">original_resid</span><span class="p">(),</span> <span class="n">mask</span><span class="p">))</span>
+        <span class="n">molecule</span><span class="o">.</span><span class="n">setIndex</span><span class="p">(</span><span class="n">numpy</span><span class="o">.</span><span class="n">take</span><span class="p">(</span><span class="n">class_instance</span><span class="o">.</span><span class="n">index</span><span class="p">(),</span> <span class="n">mask</span><span class="p">))</span>
+        <span class="n">molecule</span><span class="o">.</span><span class="n">setResid</span><span class="p">(</span><span class="n">numpy</span><span class="o">.</span><span class="n">take</span><span class="p">(</span><span class="n">class_instance</span><span class="o">.</span><span class="n">resid</span><span class="p">(),</span> <span class="n">mask</span><span class="p">))</span>
+
+        <span class="n">molecule</span><span class="o">.</span><span class="n">setMass</span><span class="p">(</span><span class="n">numpy</span><span class="o">.</span><span class="n">take</span><span class="p">(</span><span class="n">class_instance</span><span class="o">.</span><span class="n">mass</span><span class="p">(),</span> <span class="n">mask</span><span class="p">))</span>
+
+        <span class="n">molecule</span><span class="o">.</span><span class="n">setCoor</span><span class="p">(</span><span class="n">numpy</span><span class="o">.</span><span class="n">take</span><span class="p">(</span><span class="n">class_instance</span><span class="o">.</span><span class="n">coor</span><span class="p">(),</span> <span class="n">mask</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">))</span>
+
+        <span class="k">return</span> <span class="n">molecule</span></div></div>
+
+
+<div class="viewcode-block" id="duplicate_molecule"><a class="viewcode-back" href="../../index_utilities.html#sasmol.utilities.duplicate_molecule">[docs]</a><span class="k">def</span> <span class="nf">duplicate_molecule</span><span class="p">(</span><span class="n">molecule</span><span class="p">,</span> <span class="n">number_of_duplicates</span><span class="p">):</span>
+    <span class="k">return</span> <span class="p">[</span><span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">molecule</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">number_of_duplicates</span><span class="p">)]</span></div>
+
+
+<span class="n">NAME</span><span class="p">,</span> <span class="n">NUM</span><span class="p">,</span> <span class="n">LPAREN</span><span class="p">,</span> <span class="n">RPAREN</span><span class="p">,</span> <span class="n">EOS</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">5</span><span class="p">))</span>
+<span class="n">_lexer</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;[A-Z][a-z]*|\d+|[()]|&lt;EOS&gt;&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">match</span>
+<span class="k">del</span> <span class="n">re</span>
+
+<span class="c1"># symbol, name, atomic number, molecular weight</span>
+<span class="n">_data</span> <span class="o">=</span> <span class="sa">r</span><span class="s2">&quot;&quot;&quot;&#39;Ac&#39;, &#39;Actinium&#39;, 89, 227</span>
+<span class="s2">&#39;Ag&#39;, &#39;Silver&#39;, 47, 107.868</span>
+<span class="s2">&#39;Al&#39;, &#39;Aluminum&#39;, 13, 26.98154</span>
+<span class="s2">&#39;Am&#39;, &#39;Americium&#39;, 95, 243</span>
+<span class="s2">&#39;Ar&#39;, &#39;Argon&#39;, 18, 39.948</span>
+<span class="s2">&#39;As&#39;, &#39;Arsenic&#39;, 33, 74.9216</span>
+<span class="s2">&#39;At&#39;, &#39;Astatine&#39;, 85, 210</span>
+<span class="s2">&#39;Au&#39;, &#39;Gold&#39;, 79, 196.9665</span>
+<span class="s2">&#39;B&#39;, &#39;Boron&#39;, 5, 10.81</span>
+<span class="s2">&#39;Ba&#39;, &#39;Barium&#39;, 56, 137.33</span>
+<span class="s2">&#39;Be&#39;, &#39;Beryllium&#39;, 4, 9.01218</span>
+<span class="s2">&#39;Bi&#39;, &#39;Bismuth&#39;, 83, 208.9804</span>
+<span class="s2">&#39;Bk&#39;, &#39;Berkelium&#39;, 97, 247</span>
+<span class="s2">&#39;Br&#39;, &#39;Bromine&#39;, 35, 79.904</span>
+<span class="s2">&#39;C&#39;, &#39;Carbon&#39;, 6, 12.011</span>
+<span class="s2">&#39;Ca&#39;, &#39;Calcium&#39;, 20, 40.08</span>
+<span class="s2">&#39;Cd&#39;, &#39;Cadmium&#39;, 48, 112.41</span>
+<span class="s2">&#39;Ce&#39;, &#39;Cerium&#39;, 58, 140.12</span>
+<span class="s2">&#39;Cf&#39;, &#39;Californium&#39;, 98, 251</span>
+<span class="s2">&#39;Cl&#39;, &#39;Chlorine&#39;, 17, 35.453</span>
+<span class="s2">&#39;Cm&#39;, &#39;Curium&#39;, 96, 247</span>
+<span class="s2">&#39;Co&#39;, &#39;Cobalt&#39;, 27, 58.9332</span>
+<span class="s2">&#39;Cr&#39;, &#39;Chromium&#39;, 24, 51.996</span>
+<span class="s2">&#39;Cs&#39;, &#39;Cesium&#39;, 55, 132.9054</span>
+<span class="s2">&#39;Cu&#39;, &#39;Copper&#39;, 29, 63.546</span>
+<span class="s2">&#39;Dy&#39;, &#39;Dysprosium&#39;, 66, 162.50</span>
+<span class="s2">&#39;Er&#39;, &#39;Erbium&#39;, 68, 167.26</span>
+<span class="s2">&#39;Es&#39;, &#39;Einsteinium&#39;, 99, 254</span>
+<span class="s2">&#39;Eu&#39;, &#39;Europium&#39;, 63, 151.96</span>
+<span class="s2">&#39;F&#39;, &#39;Fluorine&#39;, 9, 18.998403</span>
+<span class="s2">&#39;Fe&#39;, &#39;Iron&#39;, 26, 55.847</span>
+<span class="s2">&#39;Fm&#39;, &#39;Fermium&#39;, 100, 257</span>
+<span class="s2">&#39;Fr&#39;, &#39;Francium&#39;, 87, 223</span>
+<span class="s2">&#39;Ga&#39;, &#39;Gallium&#39;, 31, 69.735</span>
+<span class="s2">&#39;Gd&#39;, &#39;Gadolinium&#39;, 64, 157.25</span>
+<span class="s2">&#39;Ge&#39;, &#39;Germanium&#39;, 32, 72.59</span>
+<span class="s2">&#39;H&#39;, &#39;Hydrogen&#39;, 1, 1.0079</span>
+<span class="s2">&#39;He&#39;, &#39;Helium&#39;, 2, 4.0026</span>
+<span class="s2">&#39;Hf&#39;, &#39;Hafnium&#39;, 72, 178.49</span>
+<span class="s2">&#39;Hg&#39;, &#39;Mercury&#39;, 80, 200.59</span>
+<span class="s2">&#39;Ho&#39;, &#39;Holmium&#39;, 67, 164.9304</span>
+<span class="s2">&#39;I&#39;, &#39;Iodine&#39;, 53, 126.9045</span>
+<span class="s2">&#39;In&#39;, &#39;Indium&#39;, 49, 114.82</span>
+<span class="s2">&#39;Ir&#39;, &#39;Iridium&#39;, 77, 192.22</span>
+<span class="s2">&#39;K&#39;, &#39;Potassium&#39;, 19, 39.0983</span>
+<span class="s2">&#39;Kr&#39;, &#39;Krypton&#39;, 36, 83.80</span>
+<span class="s2">&#39;La&#39;, &#39;Lanthanum&#39;, 57, 138.9055</span>
+<span class="s2">&#39;Li&#39;, &#39;Lithium&#39;, 3, 6.94</span>
+<span class="s2">&#39;Lr&#39;, &#39;Lawrencium&#39;, 103, 260</span>
+<span class="s2">&#39;Lu&#39;, &#39;Lutetium&#39;, 71, 174.96</span>
+<span class="s2">&#39;Md&#39;, &#39;Mendelevium&#39;, 101, 258</span>
+<span class="s2">&#39;Mg&#39;, &#39;Magnesium&#39;, 12, 24.305</span>
+<span class="s2">&#39;Mn&#39;, &#39;Manganese&#39;, 25, 54.9380</span>
+<span class="s2">&#39;Mo&#39;, &#39;Molybdenum&#39;, 42, 95.94</span>
+<span class="s2">&#39;N&#39;, &#39;Nitrogen&#39;, 7, 14.0067</span>
+<span class="s2">&#39;Na&#39;, &#39;Sodium&#39;, 11, 22.98977</span>
+<span class="s2">&#39;Nb&#39;, &#39;Niobium&#39;, 41, 92.9064</span>
+<span class="s2">&#39;Nd&#39;, &#39;Neodymium&#39;, 60, 144.24</span>
+<span class="s2">&#39;Ne&#39;, &#39;Neon&#39;, 10, 20.17</span>
+<span class="s2">&#39;Ni&#39;, &#39;Nickel&#39;, 28, 58.71</span>
+<span class="s2">&#39;No&#39;, &#39;Nobelium&#39;, 102, 259</span>
+<span class="s2">&#39;Np&#39;, &#39;Neptunium&#39;, 93, 237.0482</span>
+<span class="s2">&#39;O&#39;, &#39;Oxygen&#39;, 8, 15.9994</span>
+<span class="s2">&#39;Os&#39;, &#39;Osmium&#39;, 76, 190.2</span>
+<span class="s2">&#39;P&#39;, &#39;Phosphorous&#39;, 15, 30.97376</span>
+<span class="s2">&#39;Pa&#39;, &#39;Proactinium&#39;, 91, 231.0359</span>
+<span class="s2">&#39;Pb&#39;, &#39;Lead&#39;, 82, 207.2</span>
+<span class="s2">&#39;Pd&#39;, &#39;Palladium&#39;, 46, 106.4</span>
+<span class="s2">&#39;Pm&#39;, &#39;Promethium&#39;, 61, 145</span>
+<span class="s2">&#39;Po&#39;, &#39;Polonium&#39;, 84, 209</span>
+<span class="s2">&#39;Pr&#39;, &#39;Praseodymium&#39;, 59, 140.9077</span>
+<span class="s2">&#39;Pt&#39;, &#39;Platinum&#39;, 78, 195.09</span>
+<span class="s2">&#39;Pu&#39;, &#39;Plutonium&#39;, 94, 244</span>
+<span class="s2">&#39;Ra&#39;, &#39;Radium&#39;, 88, 226.0254</span>
+<span class="s2">&#39;Rb&#39;, &#39;Rubidium&#39;, 37, 85.467</span>
+<span class="s2">&#39;Re&#39;, &#39;Rhenium&#39;, 75, 186.207</span>
+<span class="s2">&#39;Rh&#39;, &#39;Rhodium&#39;, 45, 102.9055</span>
+<span class="s2">&#39;Rn&#39;, &#39;Radon&#39;, 86, 222</span>
+<span class="s2">&#39;Ru&#39;, &#39;Ruthenium&#39;, 44, 101.07</span>
+<span class="s2">&#39;S&#39;, &#39;Sulfur&#39;, 16, 32.06</span>
+<span class="s2">&#39;Sb&#39;, &#39;Antimony&#39;, 51, 121.75</span>
+<span class="s2">&#39;Sc&#39;, &#39;Scandium&#39;, 21, 44.9559</span>
+<span class="s2">&#39;Se&#39;, &#39;Selenium&#39;, 34, 78.96</span>
+<span class="s2">&#39;Si&#39;, &#39;Silicon&#39;, 14, 28.0855</span>
+<span class="s2">&#39;Sm&#39;, &#39;Samarium&#39;, 62, 150.4</span>
+<span class="s2">&#39;Sn&#39;, &#39;Tin&#39;, 50, 118.69</span>
+<span class="s2">&#39;Sr&#39;, &#39;Strontium&#39;, 38, 87.62</span>
+<span class="s2">&#39;Ta&#39;, &#39;Tantalum&#39;, 73, 180.947</span>
+<span class="s2">&#39;Tb&#39;, &#39;Terbium&#39;, 65, 158.9254</span>
+<span class="s2">&#39;Tc&#39;, &#39;Technetium&#39;, 43, 98.9062</span>
+<span class="s2">&#39;Te&#39;, &#39;Tellurium&#39;, 52, 127.60</span>
+<span class="s2">&#39;Th&#39;, &#39;Thorium&#39;, 90, 232.0381</span>
+<span class="s2">&#39;Ti&#39;, &#39;Titanium&#39;, 22, 47.90</span>
+<span class="s2">&#39;Tl&#39;, &#39;Thallium&#39;, 81, 204.37</span>
+<span class="s2">&#39;Tm&#39;, &#39;Thulium&#39;, 69, 168.9342</span>
+<span class="s2">&#39;U&#39;, &#39;Uranium&#39;, 92, 238.029</span>
+<span class="s2">&#39;Unh&#39;, &#39;Unnilhexium&#39;, 106, 263</span>
+<span class="s2">&#39;Unp&#39;, &#39;Unnilpentium&#39;, 105, 260</span>
+<span class="s2">&#39;Unq&#39;, &#39;Unnilquadium&#39;, 104, 260</span>
+<span class="s2">&#39;Uns&#39;, &#39;Unnilseptium&#39;, 107, 262</span>
+<span class="s2">&#39;V&#39;, &#39;Vanadium&#39;, 23, 50.9415</span>
+<span class="s2">&#39;W&#39;, &#39;Tungsten&#39;, 74, 183.85</span>
+<span class="s2">&#39;Xe&#39;, &#39;Xenon&#39;, 54, 131.30</span>
+<span class="s2">&#39;Y&#39;, &#39;Yttrium&#39;, 39, 88.9059</span>
+<span class="s2">&#39;Yb&#39;, &#39;Ytterbium&#39;, 70, 173.04</span>
+<span class="s2">&#39;Zn&#39;, &#39;Zinc&#39;, 30, 65.38</span>
+<span class="s2">&#39;Zr&#39;, &#39;Zirconium&#39;, 40, 91.22</span>
+<span class="s2">&#39;D&#39;, &#39;Deuterium&#39;, 1, 2.158&quot;&quot;&quot;</span>
+
+
+<div class="viewcode-block" id="Element"><a class="viewcode-back" href="../../index_utilities.html#sasmol.utilities.Element">[docs]</a><span class="k">class</span> <span class="nc">Element</span><span class="p">:</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">symbol</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">atomicnumber</span><span class="p">,</span> <span class="n">molweight</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sym</span> <span class="o">=</span> <span class="n">symbol</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">name</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ano</span> <span class="o">=</span> <span class="n">atomicnumber</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mw</span> <span class="o">=</span> <span class="n">molweight</span>
+
+<div class="viewcode-block" id="Element.getweight"><a class="viewcode-back" href="../../index_utilities.html#sasmol.utilities.Element.getweight">[docs]</a>    <span class="k">def</span> <span class="nf">getweight</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">mw</span></div>
+
+<div class="viewcode-block" id="Element.addsyms"><a class="viewcode-back" href="../../index_utilities.html#sasmol.utilities.Element.addsyms">[docs]</a>    <span class="k">def</span> <span class="nf">addsyms</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">weight</span><span class="p">,</span> <span class="n">result</span><span class="p">):</span>
+        <span class="n">result</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">sym</span><span class="p">]</span> <span class="o">=</span> <span class="n">result</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sym</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span> <span class="o">+</span> <span class="n">weight</span></div></div>
+
+
+<div class="viewcode-block" id="build_dict"><a class="viewcode-back" href="../../index_utilities.html#sasmol.utilities.build_dict">[docs]</a><span class="k">def</span> <span class="nf">build_dict</span><span class="p">(</span><span class="n">s</span><span class="p">):</span>
+    <span class="kn">import</span> <span class="nn">string</span>
+    <span class="n">answer</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">s</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">):</span>
+        <span class="n">symbol</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">num</span><span class="p">,</span> <span class="n">weight</span> <span class="o">=</span> <span class="nb">eval</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
+        <span class="n">answer</span><span class="p">[</span><span class="n">symbol</span><span class="p">]</span> <span class="o">=</span> <span class="n">Element</span><span class="p">(</span><span class="n">symbol</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">num</span><span class="p">,</span> <span class="n">weight</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">answer</span></div>
+
+
+<div class="viewcode-block" id="ElementSequence"><a class="viewcode-back" href="../../index_utilities.html#sasmol.utilities.ElementSequence">[docs]</a><span class="k">class</span> <span class="nc">ElementSequence</span><span class="p">:</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">seq</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">seq</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">seq</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">count</span> <span class="o">=</span> <span class="mi">1</span>
+
+<div class="viewcode-block" id="ElementSequence.append"><a class="viewcode-back" href="../../index_utilities.html#sasmol.utilities.ElementSequence.append">[docs]</a>    <span class="k">def</span> <span class="nf">append</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">thing</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">seq</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">thing</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="ElementSequence.getweight"><a class="viewcode-back" href="../../index_utilities.html#sasmol.utilities.ElementSequence.getweight">[docs]</a>    <span class="k">def</span> <span class="nf">getweight</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="nb">sum</span> <span class="o">=</span> <span class="mf">0.0</span>
+        <span class="k">for</span> <span class="n">thing</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">seq</span><span class="p">:</span>
+            <span class="nb">sum</span> <span class="o">=</span> <span class="nb">sum</span> <span class="o">+</span> <span class="n">thing</span><span class="o">.</span><span class="n">getweight</span><span class="p">()</span>
+        <span class="k">return</span> <span class="nb">sum</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">count</span></div>
+
+<div class="viewcode-block" id="ElementSequence.set_count"><a class="viewcode-back" href="../../index_utilities.html#sasmol.utilities.ElementSequence.set_count">[docs]</a>    <span class="k">def</span> <span class="nf">set_count</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">count</span> <span class="o">=</span> <span class="n">n</span></div>
+
+    <span class="k">def</span> <span class="fm">__len__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">seq</span><span class="p">)</span>
+
+<div class="viewcode-block" id="ElementSequence.addsyms"><a class="viewcode-back" href="../../index_utilities.html#sasmol.utilities.ElementSequence.addsyms">[docs]</a>    <span class="k">def</span> <span class="nf">addsyms</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">weight</span><span class="p">,</span> <span class="n">result</span><span class="p">):</span>
+        <span class="n">totalweight</span> <span class="o">=</span> <span class="n">weight</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">count</span>
+        <span class="k">for</span> <span class="n">thing</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">seq</span><span class="p">:</span>
+            <span class="n">thing</span><span class="o">.</span><span class="n">addsyms</span><span class="p">(</span><span class="n">totalweight</span><span class="p">,</span> <span class="n">result</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="ElementSequence.displaysyms"><a class="viewcode-back" href="../../index_utilities.html#sasmol.utilities.ElementSequence.displaysyms">[docs]</a>    <span class="k">def</span> <span class="nf">displaysyms</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sym2elt</span><span class="p">):</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">addsyms</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">result</span><span class="p">)</span>
+        <span class="n">items</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">result</span><span class="o">.</span><span class="n">items</span><span class="p">())</span>
+        <span class="n">items</span><span class="o">.</span><span class="n">sort</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">sym</span><span class="p">,</span> <span class="n">count</span> <span class="ow">in</span> <span class="n">items</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="n">sym</span><span class="p">,</span> <span class="s2">&quot; : &quot;</span><span class="p">,</span> <span class="n">count</span><span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="Tokenizer"><a class="viewcode-back" href="../../index_utilities.html#sasmol.utilities.Tokenizer">[docs]</a><span class="k">class</span> <span class="nc">Tokenizer</span><span class="p">:</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">input</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">input</span> <span class="o">=</span> <span class="nb">input</span> <span class="o">+</span> <span class="s2">&quot;&lt;EOS&gt;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">i</span> <span class="o">=</span> <span class="mi">0</span>
+
+<div class="viewcode-block" id="Tokenizer.gettoken"><a class="viewcode-back" href="../../index_utilities.html#sasmol.utilities.Tokenizer.gettoken">[docs]</a>    <span class="k">def</span> <span class="nf">gettoken</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">global</span> <span class="n">ttype</span><span class="p">,</span> <span class="n">tvalue</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">lasti</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">i</span>
+        <span class="n">m</span> <span class="o">=</span> <span class="n">_lexer</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">input</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">i</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">m</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;unexpected character&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">i</span> <span class="o">=</span> <span class="n">m</span><span class="o">.</span><span class="n">end</span><span class="p">()</span>
+        <span class="n">tvalue</span> <span class="o">=</span> <span class="n">m</span><span class="o">.</span><span class="n">group</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">tvalue</span> <span class="o">==</span> <span class="s2">&quot;(&quot;</span><span class="p">:</span>
+            <span class="n">ttype</span> <span class="o">=</span> <span class="n">LPAREN</span>
+        <span class="k">elif</span> <span class="n">tvalue</span> <span class="o">==</span> <span class="s2">&quot;)&quot;</span><span class="p">:</span>
+            <span class="n">ttype</span> <span class="o">=</span> <span class="n">RPAREN</span>
+        <span class="k">elif</span> <span class="n">tvalue</span> <span class="o">==</span> <span class="s2">&quot;&lt;EOS&gt;&quot;</span><span class="p">:</span>
+            <span class="n">ttype</span> <span class="o">=</span> <span class="n">EOS</span>
+        <span class="k">elif</span> <span class="s2">&quot;0&quot;</span> <span class="o">&lt;=</span> <span class="n">tvalue</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="s2">&quot;9&quot;</span><span class="p">:</span>
+            <span class="n">ttype</span> <span class="o">=</span> <span class="n">NUM</span>
+            <span class="n">tvalue</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">tvalue</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">ttype</span> <span class="o">=</span> <span class="n">NAME</span></div>
+
+<div class="viewcode-block" id="Tokenizer.error"><a class="viewcode-back" href="../../index_utilities.html#sasmol.utilities.Tokenizer.error">[docs]</a>    <span class="k">def</span> <span class="nf">error</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">msg</span><span class="p">):</span>
+        <span class="n">emsg</span> <span class="o">=</span> <span class="n">msg</span> <span class="o">+</span> <span class="s2">&quot;:</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="n">emsg</span> <span class="o">=</span> <span class="n">emsg</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">input</span><span class="p">[:</span><span class="o">-</span><span class="mi">5</span><span class="p">]</span> <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span>  <span class="c1"># strip &lt;EOS&gt;</span>
+        <span class="n">emsg</span> <span class="o">=</span> <span class="n">emsg</span> <span class="o">+</span> <span class="s2">&quot; &quot;</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">lasti</span> <span class="o">+</span> <span class="s2">&quot;^</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">emsg</span><span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="parse"><a class="viewcode-back" href="../../index_utilities.html#sasmol.utilities.parse">[docs]</a><span class="k">def</span> <span class="nf">parse</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="n">sym2elt</span><span class="p">):</span>
+    <span class="k">global</span> <span class="n">t</span><span class="p">,</span> <span class="n">ttype</span><span class="p">,</span> <span class="n">tvalue</span>
+    <span class="n">t</span> <span class="o">=</span> <span class="n">Tokenizer</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
+    <span class="n">t</span><span class="o">.</span><span class="n">gettoken</span><span class="p">()</span>
+    <span class="n">seq</span> <span class="o">=</span> <span class="n">parse_sequence</span><span class="p">(</span><span class="n">sym2elt</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">ttype</span> <span class="o">!=</span> <span class="n">EOS</span><span class="p">:</span>
+        <span class="n">t</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;expected end of input&quot;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">seq</span></div>
+
+
+<div class="viewcode-block" id="parse_sequence"><a class="viewcode-back" href="../../index_utilities.html#sasmol.utilities.parse_sequence">[docs]</a><span class="k">def</span> <span class="nf">parse_sequence</span><span class="p">(</span><span class="n">sym2elt</span><span class="p">):</span>
+    <span class="k">global</span> <span class="n">t</span><span class="p">,</span> <span class="n">ttype</span><span class="p">,</span> <span class="n">tvalue</span>
+    <span class="n">seq</span> <span class="o">=</span> <span class="n">ElementSequence</span><span class="p">()</span>
+    <span class="k">while</span> <span class="n">ttype</span> <span class="ow">in</span> <span class="p">(</span><span class="n">LPAREN</span><span class="p">,</span> <span class="n">NAME</span><span class="p">):</span>
+        <span class="c1"># parenthesized expression or straight name</span>
+        <span class="k">if</span> <span class="n">ttype</span> <span class="o">==</span> <span class="n">LPAREN</span><span class="p">:</span>
+            <span class="n">t</span><span class="o">.</span><span class="n">gettoken</span><span class="p">()</span>
+            <span class="n">thisguy</span> <span class="o">=</span> <span class="n">parse_sequence</span><span class="p">(</span><span class="n">sym2elt</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">ttype</span> <span class="o">!=</span> <span class="n">RPAREN</span><span class="p">:</span>
+                <span class="n">t</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;expected right paren&quot;</span><span class="p">)</span>
+            <span class="n">t</span><span class="o">.</span><span class="n">gettoken</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">assert</span> <span class="n">ttype</span> <span class="o">==</span> <span class="n">NAME</span>
+            <span class="k">if</span> <span class="n">tvalue</span> <span class="ow">in</span> <span class="n">sym2elt</span><span class="p">:</span>
+                <span class="n">thisguy</span> <span class="o">=</span> <span class="n">ElementSequence</span><span class="p">(</span><span class="n">sym2elt</span><span class="p">[</span><span class="n">tvalue</span><span class="p">])</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">t</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;&#39;&quot;</span> <span class="o">+</span> <span class="n">tvalue</span> <span class="o">+</span> <span class="s2">&quot;&#39; is not an element symbol&quot;</span><span class="p">)</span>
+            <span class="n">t</span><span class="o">.</span><span class="n">gettoken</span><span class="p">()</span>
+    <span class="c1"># followed by optional count</span>
+        <span class="k">if</span> <span class="n">ttype</span> <span class="o">==</span> <span class="n">NUM</span><span class="p">:</span>
+            <span class="n">thisguy</span><span class="o">.</span><span class="n">set_count</span><span class="p">(</span><span class="n">tvalue</span><span class="p">)</span>
+            <span class="n">t</span><span class="o">.</span><span class="n">gettoken</span><span class="p">()</span>
+        <span class="n">seq</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">thisguy</span><span class="p">)</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">seq</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">t</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;empty sequence&quot;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">seq</span></div>
+
+
+<div class="viewcode-block" id="get_chemical_formula"><a class="viewcode-back" href="../../index_utilities.html#sasmol.utilities.get_chemical_formula">[docs]</a><span class="k">def</span> <span class="nf">get_chemical_formula</span><span class="p">(</span><span class="n">formula_string</span><span class="p">):</span>
+
+    <span class="c1"># standard_atomic_weights = Atomic.amu(keep_lower_case=True)</span>
+    <span class="n">sym2elt</span> <span class="o">=</span> <span class="n">build_dict</span><span class="p">(</span><span class="n">_data</span><span class="p">)</span>
+
+<span class="c1">#    #sym2elt = amu</span>
+
+    <span class="n">formula_dictionary</span> <span class="o">=</span> <span class="p">{}</span>
+
+    <span class="n">error</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">seq</span> <span class="o">=</span> <span class="n">parse</span><span class="p">(</span><span class="n">formula_string</span><span class="o">.</span><span class="n">strip</span><span class="p">(</span><span class="s2">&quot; &quot;</span><span class="p">),</span> <span class="n">sym2elt</span><span class="p">)</span>
+        <span class="c1"># seq.displaysyms(sym2elt)</span>
+        <span class="n">seq</span><span class="o">.</span><span class="n">addsyms</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">formula_dictionary</span><span class="p">)</span>
+        <span class="n">items</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">formula_dictionary</span><span class="o">.</span><span class="n">items</span><span class="p">())</span>
+        <span class="n">items</span><span class="o">.</span><span class="n">sort</span><span class="p">()</span>
+
+        <span class="c1"># for sym, count in items:</span>
+        <span class="c1">#    print sym,&quot; :: &quot;,count</span>
+
+    <span class="k">except</span> <span class="ne">ValueError</span> <span class="k">as</span> <span class="n">detail</span><span class="p">:</span>
+        <span class="n">error</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">detail</span><span class="p">))</span>
+
+    <span class="k">return</span> <span class="n">error</span><span class="p">,</span> <span class="n">formula_dictionary</span></div>
+
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+
+    <span class="n">path</span> <span class="o">=</span> <span class="s1">&#39;./&#39;</span>
+
+    <span class="n">filename</span> <span class="o">=</span> <span class="s1">&#39;run_0&#39;</span>
+
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    while 1:</span>
+<span class="sd">        x = input(&quot;? &quot;)</span>
+<span class="sd">        fields = string.split(x)</span>
+<span class="sd">        if len(fields) != 2:</span>
+<span class="sd">            print(&quot;input must have two fields&quot;)</span>
+<span class="sd">            continue</span>
+<span class="sd">        action, formula = fields</span>
+<span class="sd">        ok = 0</span>
+<span class="sd">        try:</span>
+<span class="sd">            seq = parse(formula,sym2elt)</span>
+<span class="sd">            ok = 1</span>
+<span class="sd">        except ValueError as detail:</span>
+<span class="sd">            print(str(detail))</span>
+<span class="sd">        if not ok:</span>
+<span class="sd">            continue</span>
+<span class="sd">        if action == &quot;molw&quot;:</span>
+<span class="sd">            print(&quot;molecular weight&quot;, seq.getweight())</span>
+<span class="sd">        elif action == &quot;syms&quot;:</span>
+<span class="sd">            seq.displaysyms(sym2elt)</span>
+<span class="sd">        else:</span>
+<span class="sd">            print(&quot;unknown action:&quot;, action)</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+
+
+<div class="viewcode-block" id="parse_fasta"><a class="viewcode-back" href="../../index_utilities.html#sasmol.utilities.parse_fasta">[docs]</a><span class="k">def</span> <span class="nf">parse_fasta</span><span class="p">(</span><span class="n">fasta_sequence</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    method to convert fasta_sequence object to list of strings</span>
+<span class="sd">    for each valid sequence in the initial object</span>
+
+<span class="sd">    format is based on the NCBI fasta format convention</span>
+<span class="sd">    https://blast.ncbi.nlm.nih.gov/Blast.cgi?CMD=Web&amp;PAGE_TYPE=BlastDocs&amp;DOC_TYPE=BlastHelp</span>
+
+<span class="sd">    notes:</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    fasta_sequence</span>
+<span class="sd">        list with formatted fasta input</span>
+
+<span class="sd">    kwargs</span>
+<span class="sd">        optional future arguments</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    all_sequences</span>
+
+<span class="sd">        a list containing sequences without comments, spaces, carriage returns, numbers,</span>
+<span class="sd">        or termination flags.</span>
+
+<span class="sd">        or</span>
+
+<span class="sd">        an error indicating an empty line in the file</span>
+
+<span class="sd">    Examples</span>
+<span class="sd">    -------</span>
+
+<span class="sd">    &gt;&gt;&gt; import sasmol.sasutil as sasutil</span>
+<span class="sd">    &gt;&gt;&gt; fasta_sequence = open(&#39;test_fasta.txt&#39;, &#39;r&#39;).readlines()</span>
+<span class="sd">    &gt;&gt;&gt; all_sequences = sasutil.parse_fasta(fasta_sequence)</span>
+<span class="sd">    &gt;&gt;&gt; print(all_sequences)</span>
+
+<span class="sd">    Note</span>
+<span class="sd">    ----</span>
+<span class="sd">        1) lines beginning with &gt; or ; are treated as comments and passed</span>
+<span class="sd">        2) spaces are ignored</span>
+<span class="sd">        3) * are ignored (should be a termination)</span>
+<span class="sd">        4) numbers are ignored so you can have numbering at the beginning of a line</span>
+<span class="sd">        5) \n are processed</span>
+<span class="sd">        6) comment lines are NOT required in the input</span>
+<span class="sd">        7) comment lines cause a new sequence to be started</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">all_sequences</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">fasta_sequence</span><span class="p">:</span>
+        <span class="c1"># check if line is empty</span>
+        <span class="k">if</span> <span class="n">line</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="o">==</span> <span class="s1">&#39;&#39;</span><span class="p">:</span>
+            <span class="n">error</span> <span class="o">=</span> <span class="s1">&#39;ERROR: empty lines in fasta sequence are not allowed&#39;</span>
+            <span class="nb">print</span><span class="p">(</span><span class="n">error</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">error</span>
+        <span class="c1"># check if first character is the comment identifier</span>
+        <span class="k">elif</span> <span class="n">line</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;&gt;&#39;</span> <span class="ow">or</span> <span class="n">line</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;;&#39;</span><span class="p">:</span>
+            <span class="c1"># try to add completed sequence to full list (if it exists)</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">new_sequence</span> <span class="o">!=</span> <span class="s1">&#39;&#39;</span><span class="p">:</span>
+                    <span class="n">all_sequences</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">new_sequence</span><span class="p">)</span>
+            <span class="k">except</span><span class="p">:</span>
+                <span class="k">pass</span>
+            <span class="n">new_sequence</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">char</span> <span class="ow">in</span> <span class="n">line</span><span class="p">:</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">char</span><span class="o">.</span><span class="n">isspace</span><span class="p">()</span> <span class="ow">and</span> <span class="n">char</span> <span class="o">!=</span> <span class="s1">&#39;*&#39;</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">char</span><span class="o">.</span><span class="n">isdigit</span><span class="p">():</span>
+                    <span class="k">try</span><span class="p">:</span>
+                        <span class="n">new_sequence</span> <span class="o">+=</span> <span class="n">char</span>
+                    <span class="k">except</span><span class="p">:</span>
+                        <span class="n">new_sequence</span> <span class="o">=</span> <span class="n">char</span>
+
+    <span class="k">if</span> <span class="n">new_sequence</span> <span class="o">!=</span> <span class="s1">&#39;&#39;</span><span class="p">:</span>
+        <span class="n">all_sequences</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">new_sequence</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">all_sequences</span></div>
+
+
+<div class="viewcode-block" id="check_integrity"><a class="viewcode-back" href="../../index_utilities.html#sasmol.utilities.check_integrity">[docs]</a><span class="k">def</span> <span class="nf">check_integrity</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">fast_check</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">warn</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+    <span class="kn">import</span> <span class="nn">logging</span>
+    <span class="kn">import</span> <span class="nn">sasmol.config</span> <span class="k">as</span> <span class="nn">config</span>
+
+    <span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+
+    <span class="n">natoms</span> <span class="o">=</span> <span class="n">obj</span><span class="o">.</span><span class="n">natoms</span><span class="p">()</span>
+    <span class="n">results</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="n">errors</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="n">core_keys</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="s1">&#39;_atom&#39;</span><span class="p">,</span> <span class="s1">&#39;_index&#39;</span><span class="p">,</span> <span class="s1">&#39;_name&#39;</span><span class="p">,</span> <span class="s1">&#39;_loc&#39;</span><span class="p">,</span> <span class="s1">&#39;_resname&#39;</span><span class="p">,</span> <span class="s1">&#39;_chain&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;_resid&#39;</span><span class="p">,</span> <span class="s1">&#39;_rescode&#39;</span><span class="p">,</span> <span class="s1">&#39;_occupancy&#39;</span><span class="p">,</span> <span class="s1">&#39;_beta&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;_segname&#39;</span><span class="p">,</span> <span class="s1">&#39;_element&#39;</span><span class="p">,</span> <span class="s1">&#39;_charge&#39;</span>
+    <span class="p">]</span>
+
+    <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">core_keys</span><span class="p">:</span>
+        <span class="n">val</span> <span class="o">=</span> <span class="n">obj</span><span class="o">.</span><span class="vm">__dict__</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">val</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">results</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="k">continue</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">length</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">val</span><span class="p">)</span>
+            <span class="n">results</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">length</span>
+            <span class="k">if</span> <span class="n">length</span> <span class="o">!=</span> <span class="n">natoms</span><span class="p">:</span>
+                <span class="n">errors</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">key</span><span class="p">,</span> <span class="n">length</span><span class="p">,</span> <span class="n">natoms</span><span class="p">))</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="n">results</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;N/A&#39;</span>
+
+    <span class="k">if</span> <span class="n">errors</span> <span class="ow">and</span> <span class="n">warn</span><span class="p">:</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s1">&#39;Integrity check mismatch: </span><span class="si">%s</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">errors</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">config</span><span class="o">.</span><span class="n">__logging_level__</span> <span class="o">==</span> <span class="s1">&#39;DEBUG&#39;</span><span class="p">:</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Integrity check passed: natoms=</span><span class="si">%s</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">natoms</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">results</span></div>
+
+</pre></div>
+
+          </div>
+
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../../index.html">sasmol</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../index_calculate.html">Calculate</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../index_charmm_topology.html">Charmm Topology</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../index_dcd_io.html">DCD IO</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../index_file_io.html">File IO</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../index_linear_algebra.html">Linear Algebra</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../index_multiprocessing_sasmol.html">Multiprocessing SasMol</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../index_operate.html">Operate</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../index_pdb_io.html">PDB IO</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../index_properties.html">Properties</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../index_subset.html">Subset</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../index_system.html">System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../index_topology.html">Topology</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../index_utilities.html">Utilities</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../index_view.html">View</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../index.html">Documentation overview</a><ul>
+  <li><a href="../index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2016, Joseph E. Curtis, Ph.D.
+
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 4.4.0</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+
+    </div>
+
+
+
+
+  </body>
+</html>

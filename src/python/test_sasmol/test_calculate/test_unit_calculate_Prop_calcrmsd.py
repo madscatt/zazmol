@@ -18,21 +18,22 @@
 from sasmol.test_sasmol.utilities import env, util
 
 from unittest import main 
-from mocker import Mocker, MockerTestCase, ANY, ARGS, KWARGS
+import unittest
 import sasmol.system as system
 
 import numpy
 
-import warnings; warnings.filterwarnings('ignore')
+import warnings
 
 import os
 floattype=os.environ['SASMOL_FLOATTYPE']
 
-class Test_sascalc_Prop_calcrmsd(MockerTestCase): 
+class Test_sascalc_Prop_calcrmsd(unittest.TestCase): 
 
     def setUp(self):
         self.o1=system.Molecule(0)
         self.o2=system.Molecule(0)
+        warnings.filterwarnings('ignore')
 
     def calc_exp(self):
         c1 = numpy.array((self.o1.coor()[0]),floattype)

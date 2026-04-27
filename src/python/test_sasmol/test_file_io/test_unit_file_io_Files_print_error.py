@@ -16,13 +16,13 @@
 '''
 
 from unittest import main 
-from mocker import Mocker, MockerTestCase
+import unittest
 
 import sasmol.system as system
 
 import os
 
-class Test_unit_file_io_Files_print_error(MockerTestCase):
+class Test_unit_file_io_Files_print_error(unittest.TestCase):
 
    def setUp(self):
       self.o=system.Molecule(0)
@@ -53,5 +53,5 @@ class Test_unit_file_io_Files_print_error(MockerTestCase):
    
    
 if __name__ == '__main__': 
-   main() 
+   unittest.main() 
 

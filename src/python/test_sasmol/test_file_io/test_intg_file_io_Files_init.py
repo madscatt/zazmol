@@ -17,10 +17,10 @@
 
 
 from unittest import main 
-from mocker import Mocker, MockerTestCase
+import unittest
 import sasmol.file_io as file_io
 
-class Test_intg_sasmol_Files_init(MockerTestCase):
+class Test_intg_sasmol_Files_init(unittest.TestCase):
 
    def setUp(self):
       pass
@@ -35,12 +35,11 @@ class Test_intg_sasmol_Files_init(MockerTestCase):
       o=file_io.Files(filename, flag)
 
 
-
    def tearDown(self):
       pass
         
    
    
 if __name__ == '__main__': 
-   main() 
+    unittest.main() 
 

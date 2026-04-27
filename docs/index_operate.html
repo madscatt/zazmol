@@ -1,67 +1,60 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
+<!DOCTYPE html>
 
-<html xmlns="http://www.w3.org/1999/xhtml">
+<html>
   <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    
-    <title>Operate &mdash; sasmol 1.0 documentation</title>
-    
-    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
-    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-    
-    <script type="text/javascript">
-      var DOCUMENTATION_OPTIONS = {
-        URL_ROOT:    './',
-        VERSION:     '1.0',
-        COLLAPSE_INDEX: false,
-        FILE_SUFFIX: '.html',
-        HAS_SOURCE:  true
-      };
-    </script>
-    <script type="text/javascript" src="_static/jquery.js"></script>
-    <script type="text/javascript" src="_static/underscore.js"></script>
-    <script type="text/javascript" src="_static/doctools.js"></script>
-    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
-    <link rel="top" title="sasmol 1.0 documentation" href="index.html" />
-    <link rel="next" title="Properties" href="index_properties.html" />
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+    <title>Operate &#8212; sasmol 1.0 documentation</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="_static/alabaster.css" />
+    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/doctools.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="PDB IO" href="index_pdb_io.html" />
     <link rel="prev" title="Multiprocessing SasMol" href="index_multiprocessing_sasmol.html" />
-   
+
   <link rel="stylesheet" href="_static/custom.css" type="text/css" />
-  
+
+
   <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
 
-  </head>
-  <body role="document">
-  
+  </head><body>
+
 
     <div class="document">
       <div class="documentwrapper">
         <div class="bodywrapper">
+
+
           <div class="body" role="main">
-            
-  <div class="section" id="operate">
+
+  <section id="operate">
 <h1>Operate<a class="headerlink" href="#operate" title="Permalink to this headline">¶</a></h1>
-<div class="section" id="id1">
-<h2><code class="xref py py-mod docutils literal"><span class="pre">Operate</span></code><a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h2>
-<span class="target" id="module-operate"></span><dl class="class">
-<dt id="operate.Move">
-<em class="property">class </em><code class="descclassname">operate.</code><code class="descname">Move</code><a class="reference internal" href="_modules/operate.html#Move"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#operate.Move" title="Permalink to this definition">¶</a></dt>
-<dd><p>Base class containing methods to perform basic translation, rotation,
+<section id="id1">
+<h2><code class="xref py py-mod docutils literal notranslate"><span class="pre">Operate</span></code><a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h2>
+<span class="target" id="module-sasmol.operate"></span><dl class="py class">
+<dt class="sig sig-object py" id="sasmol.operate.Move">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">sasmol.operate.</span></span><span class="sig-name descname"><span class="pre">Move</span></span><a class="reference internal" href="_modules/sasmol/operate.html#Move"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sasmol.operate.Move" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Base class containing methods to perform basic translation, rotation,
 and alignment operations on instances of system objects.</p>
 <p>The methods in this class move entire objects, not pieces
 of single objects (i.e. no intra-object movements)</p>
 <p class="rubric">Examples</p>
 <p>First example shows how to use class methods from system object:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">sasmol.system</span> <span class="k">as</span> <span class="nn">system</span> <span class="p">;</span> <span class="kn">import</span> <span class="nn">math</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">sasmol.system</span> <span class="k">as</span> <span class="nn">system</span> <span class="p">;</span> <span class="kn">import</span> <span class="nn">math</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">molecule</span> <span class="o">=</span> <span class="n">system</span><span class="o">.</span><span class="n">Molecule</span><span class="p">(</span><span class="s1">&#39;hiv1_gag.pdb&#39;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">frame</span> <span class="o">=</span> <span class="mi">0</span> <span class="p">;</span> <span class="n">axis</span> <span class="o">=</span> <span class="s1">&#39;x&#39;</span> <span class="p">;</span> <span class="n">theta</span> <span class="o">=</span> <span class="mf">45.0</span> <span class="o">*</span> <span class="n">math</span><span class="o">.</span><span class="n">pi</span> <span class="o">/</span> <span class="mf">180.0</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">molecule</span><span class="o">.</span><span class="n">rotate</span><span class="p">(</span><span class="n">frame</span><span class="p">,</span> <span class="n">axis</span><span class="p">,</span> <span class="n">theta</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>Second example shows how to use class methods directly:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">sasmol.system</span> <span class="k">as</span> <span class="nn">system</span> <span class="p">;</span> <span class="kn">import</span> <span class="nn">math</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">sasmol.system</span> <span class="k">as</span> <span class="nn">system</span> <span class="p">;</span> <span class="kn">import</span> <span class="nn">math</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">sasmol.operate</span> <span class="k">as</span> <span class="nn">operate</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">molecule</span> <span class="o">=</span> <span class="n">system</span><span class="o">.</span><span class="n">Molecule</span><span class="p">(</span><span class="s1">&#39;hiv1_gag.pdb&#39;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">frame</span> <span class="o">=</span> <span class="mi">0</span> <span class="p">;</span> <span class="n">axis</span> <span class="o">=</span> <span class="s1">&#39;x&#39;</span> <span class="p">;</span> <span class="n">theta</span> <span class="o">=</span> <span class="mf">45.0</span> <span class="o">*</span> <span class="n">math</span><span class="o">.</span><span class="n">pi</span> <span class="o">/</span> <span class="mf">180.0</span>
@@ -69,15 +62,14 @@ of single objects (i.e. no intra-object movements)</p>
 </pre></div>
 </div>
 <div class="admonition note">
-<p class="first admonition-title">Note</p>
-<p class="last"><cite>self</cite> parameter is not shown in the <code class="docutils literal"><span class="pre">Parameters</span></code> section in the documentation</p>
+<p class="admonition-title">Note</p>
+<p><cite>self</cite> parameter is not shown in the <code class="docutils literal notranslate"><span class="pre">Parameters</span></code> section in the documentation</p>
 </div>
-<dl class="method">
-<dt id="operate.Move.align">
-<code class="descname">align</code><span class="sig-paren">(</span><em>other</em>, <em>self_basis</em>, <em>other_basis</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/operate.html#Move.align"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#operate.Move.align" title="Permalink to this definition">¶</a></dt>
-<dd><blockquote>
-<div><p>Alignment of one object on top of another
-&#8220;self&#8221; is aligned onto &#8220;other&#8221; using the basis
+<dl class="py method">
+<dt class="sig sig-object py" id="sasmol.operate.Move.align">
+<span class="sig-name descname"><span class="pre">align</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">other</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">self_basis</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">other_basis</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mode</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'production'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">align_variables</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sasmol/operate.html#Move.align"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sasmol.operate.Move.align" title="Permalink to this definition">¶</a></dt>
+<dd><p>Alignment of one object on top of another
+“self” is aligned onto “other” using the basis
 of molecule 2 to align onto the basis of molecule 1
 and the transformation is then done to all the atoms of
 molecule 2</p>
@@ -85,70 +77,76 @@ molecule 2</p>
 <p>other = molecule_1</p>
 <p>self aligned to other</p>
 <p>molecule_2 aligned to molecule_1</p>
-</div></blockquote>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>frame</strong> &#8211; integer : trajectory frame number to use</li>
-<li><strong>other</strong> &#8211; system object : molecule 1</li>
-<li><strong>self_basis</strong> &#8211; string : unique description of atoms used for alignment</li>
-<li><strong>other_basis</strong> &#8211; string : unique description of atoms used for alignment</li>
-<li><strong>kwargs</strong> &#8211; optional future arguments</li>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>frame</strong> – integer : trajectory frame number to use</p></li>
+<li><p><strong>other</strong> – system object : molecule 1</p></li>
+<li><p><strong>self_basis</strong> – string : unique description of atoms used for alignment (only needed in initialization mode)</p></li>
+<li><p><strong>other_basis</strong> – string : unique description of atoms used for alignment (only needed in initialization mode)</p></li>
+<li><p><strong>mode</strong> – string : ‘initialization’ or ‘production’</p></li>
+<li><p><strong>align_variables</strong> – dict : data from initialization mode to be used in production mode</p></li>
+<li><p><strong>kwargs</strong> – optional future arguments</p></li>
 </ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">updated self._coor</p>
-</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://docs.python.org/library/constants.html#None" title="(in Python v2.7)">None</a></p>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>updated self._coor or initialization data</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>None or dict</p>
+</dd>
+</dl>
 <p class="rubric">Examples</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">sasmol.system</span> <span class="k">as</span> <span class="nn">system</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">sasmol.system</span> <span class="k">as</span> <span class="nn">system</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">molecule_1</span> <span class="o">=</span> <span class="n">system</span><span class="o">.</span><span class="n">Molecule</span><span class="p">(</span><span class="s1">&#39;hiv1_gag.pdb&#39;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">molecule_2</span> <span class="o">=</span> <span class="n">system</span><span class="o">.</span><span class="n">Molecule</span><span class="p">(</span><span class="s1">&#39;moved_and_rotated_hiv1_gag.pdb&#39;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">frame</span> <span class="o">=</span> <span class="mi">0</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">basis_1</span> <span class="o">=</span> <span class="s1">&#39;name[i] == &quot;CA&quot;&#39;</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">basis_2</span> <span class="o">=</span> <span class="s1">&#39;name[i] == &quot;CA&quot;&#39;</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">molecule_2</span><span class="o">.</span><span class="n">align</span><span class="p">(</span><span class="n">molecule_1</span><span class="p">,</span> <span class="n">basis_1</span><span class="p">,</span> <span class="n">basis_2</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">align_variables</span> <span class="o">=</span> <span class="n">molecule_2</span><span class="o">.</span><span class="n">align</span><span class="p">(</span><span class="n">molecule_1</span><span class="p">,</span> <span class="n">basis_1</span><span class="p">,</span> <span class="n">basis_2</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;initialization&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">molecule_2</span><span class="o">.</span><span class="n">align</span><span class="p">(</span><span class="n">molecule_1</span><span class="p">,</span> <span class="n">align_variables</span><span class="o">=</span><span class="n">align_variables</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">com_sub_2</span> <span class="o">=</span> <span class="n">molecule_2</span><span class="o">.</span><span class="n">calculate_center_of_mass</span><span class="p">(</span><span class="n">frame</span><span class="p">)</span>
 </pre></div>
 </div>
 <div class="admonition note">
-<p class="first admonition-title">Note</p>
-<p class="last">mass_check determines if mass is defined for the object so that
+<p class="admonition-title">Note</p>
+<p>mass_check determines if mass is defined for the object so that
 center of mass can be calculated</p>
 </div>
 </dd></dl>
 
-<dl class="method">
-<dt id="operate.Move.center">
-<code class="descname">center</code><span class="sig-paren">(</span><em>frame</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/operate.html#Move.center"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#operate.Move.center" title="Permalink to this definition">¶</a></dt>
+<dl class="py method">
+<dt class="sig sig-object py" id="sasmol.operate.Move.align_pmi_on_axis">
+<span class="sig-name descname"><span class="pre">align_pmi_on_axis</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">frame</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pmi_eigenvector</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">alignment_vector_axis</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sasmol/operate.html#Move.align_pmi_on_axis"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sasmol.operate.Move.align_pmi_on_axis" title="Permalink to this definition">¶</a></dt>
+<dd><p>aligns one principal moment eigenvector to the given axis</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="sasmol.operate.Move.align_pmi_on_cardinal_axes">
+<span class="sig-name descname"><span class="pre">align_pmi_on_cardinal_axes</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">frame</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sasmol/operate.html#Move.align_pmi_on_cardinal_axes"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sasmol.operate.Move.align_pmi_on_cardinal_axes" title="Permalink to this definition">¶</a></dt>
+<dd><p>aligns all principal moment eigenvectors to cardinal x, y, &amp; z axes</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="sasmol.operate.Move.center">
+<span class="sig-name descname"><span class="pre">center</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">frame</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sasmol/operate.html#Move.center"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sasmol.operate.Move.center" title="Permalink to this definition">¶</a></dt>
 <dd><p>Method moves the center of mass of object to [0.0, 0.0, 0.0]</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>frame</strong> &#8211; integer : trajectory frame number to use</li>
-<li><strong>kwargs</strong> &#8211; optional future arguments</li>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>frame</strong> – integer : trajectory frame number to use</p></li>
+<li><p><strong>kwargs</strong> – optional future arguments</p></li>
 </ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">updated self._coor and self._center_of_mass</p>
-</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://docs.python.org/library/constants.html#None" title="(in Python v2.7)">None</a></p>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>updated self._coor and self._center_of_mass</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>None</p>
+</dd>
+</dl>
 <p class="rubric">Examples</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">sasmol.system</span> <span class="k">as</span> <span class="nn">system</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">sasmol.system</span> <span class="k">as</span> <span class="nn">system</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">molecule</span> <span class="o">=</span> <span class="n">system</span><span class="o">.</span><span class="n">Molecule</span><span class="p">(</span><span class="s1">&#39;hiv1_gag.pdb&#39;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">frame</span> <span class="o">=</span> <span class="mi">0</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">molecule</span><span class="o">.</span><span class="n">calculate_center_of_mass</span><span class="p">(</span><span class="n">frame</span><span class="p">)</span>
@@ -159,105 +157,97 @@ center of mass can be calculated</p>
 </pre></div>
 </div>
 <div class="admonition note">
-<p class="first admonition-title">Note</p>
+<p class="admonition-title">Note</p>
 <p>mass_check is called to validate self._total_mass()</p>
-<p class="last">Can achieve same result using self.translate(frame, [0,0,0], point=True)</p>
+<p>Can achieve same result using self.translate(frame, [0,0,0], point=True)</p>
 </div>
 </dd></dl>
 
-<dl class="method">
-<dt id="operate.Move.mass_check">
-<code class="descname">mass_check</code><span class="sig-paren">(</span><em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/operate.html#Move.mass_check"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#operate.Move.mass_check" title="Permalink to this definition">¶</a></dt>
+<dl class="py method">
+<dt class="sig sig-object py" id="sasmol.operate.Move.mass_check">
+<span class="sig-name descname"><span class="pre">mass_check</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sasmol/operate.html#Move.mass_check"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sasmol.operate.Move.mass_check" title="Permalink to this definition">¶</a></dt>
 <dd><div class="admonition note">
-<p class="first admonition-title">Note</p>
-<p class="last">mass_check determines if mass is defined for the object so that
+<p class="admonition-title">Note</p>
+<p>mass_check determines if mass is defined for the object so that
 center of mass can be calculated</p>
 </div>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>kwargs</strong> &#8211; optional future arguments</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">updated self._total_mass</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/library/constants.html#None" title="(in Python v2.7)">None</a></td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>kwargs</strong> – optional future arguments</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>updated self._total_mass</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>None</p>
+</dd>
+</dl>
 <p class="rubric">Examples</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">sasmol.system</span> <span class="k">as</span> <span class="nn">system</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">sasmol.system</span> <span class="k">as</span> <span class="nn">system</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">molecule</span> <span class="o">=</span> <span class="n">system</span><span class="o">.</span><span class="n">Molecule</span><span class="p">(</span><span class="s1">&#39;hiv1_gag.pdb&#39;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">molecule</span><span class="o">.</span><span class="n">mass_check</span><span class="p">()</span>
 </pre></div>
 </div>
 </dd></dl>
 
-<dl class="method">
-<dt id="operate.Move.rotate">
-<code class="descname">rotate</code><span class="sig-paren">(</span><em>frame</em>, <em>axis</em>, <em>theta</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/operate.html#Move.rotate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#operate.Move.rotate" title="Permalink to this definition">¶</a></dt>
+<dl class="py method">
+<dt class="sig sig-object py" id="sasmol.operate.Move.rotate">
+<span class="sig-name descname"><span class="pre">rotate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">frame</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">axis</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">theta</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sasmol/operate.html#Move.rotate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sasmol.operate.Move.rotate" title="Permalink to this definition">¶</a></dt>
 <dd><blockquote>
-<div>Simple rotation about the x, y, or z axis.</div></blockquote>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>frame</strong> &#8211; integer : trajectory frame number to use</li>
-<li><strong>axis</strong> &#8211; string : &#8216;x&#8217;, &#8216;y&#8217;, or &#8216;z&#8217;</li>
-<li><strong>theta</strong> &#8211; float : angle in radians</li>
-<li><strong>kwargs</strong> &#8211; optional future arguments</li>
+<div><p>Simple rotation about the x, y, or z axis.</p>
+</div></blockquote>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>frame</strong> – integer : trajectory frame number to use</p></li>
+<li><p><strong>axis</strong> – string : ‘x’, ‘y’, or ‘z’</p></li>
+<li><p><strong>theta</strong> – float : angle in radians</p></li>
+<li><p><strong>kwargs</strong> – optional future arguments</p></li>
 </ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">updated self._coor</p>
-</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://docs.python.org/library/constants.html#None" title="(in Python v2.7)">None</a></p>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>updated self._coor</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>None</p>
+</dd>
+</dl>
 <p class="rubric">Examples</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">sasmol.system</span> <span class="k">as</span> <span class="nn">system</span> <span class="p">;</span> <span class="kn">import</span> <span class="nn">math</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">sasmol.system</span> <span class="k">as</span> <span class="nn">system</span> <span class="p">;</span> <span class="kn">import</span> <span class="nn">math</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">molecule</span> <span class="o">=</span> <span class="n">system</span><span class="o">.</span><span class="n">Molecule</span><span class="p">(</span><span class="s1">&#39;hiv1_gag.pdb&#39;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">frame</span> <span class="o">=</span> <span class="mi">0</span> <span class="p">;</span> <span class="n">axis</span> <span class="o">=</span> <span class="s1">&#39;x&#39;</span> <span class="p">;</span> <span class="n">theta</span> <span class="o">=</span> <span class="mf">45.0</span> <span class="o">*</span> <span class="n">math</span><span class="o">.</span><span class="n">pi</span> <span class="o">/</span> <span class="mf">180.0</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">molecule</span><span class="o">.</span><span class="n">rotate</span><span class="p">(</span><span class="n">frame</span><span class="p">,</span> <span class="n">axis</span><span class="p">,</span> <span class="n">theta</span><span class="p">)</span>
 </pre></div>
 </div>
 <div class="admonition note">
-<p class="first admonition-title">Note</p>
-<p class="last">Calculations are carried out using radians</p>
+<p class="admonition-title">Note</p>
+<p>Calculations are carried out using radians</p>
 </div>
 </dd></dl>
 
-<dl class="method">
-<dt id="operate.Move.rotate_euler">
-<code class="descname">rotate_euler</code><span class="sig-paren">(</span><em>frame</em>, <em>phi</em>, <em>theta</em>, <em>psi</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/operate.html#Move.rotate_euler"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#operate.Move.rotate_euler" title="Permalink to this definition">¶</a></dt>
+<dl class="py method">
+<dt class="sig sig-object py" id="sasmol.operate.Move.rotate_euler">
+<span class="sig-name descname"><span class="pre">rotate_euler</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">frame</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">phi</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">theta</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">psi</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sasmol/operate.html#Move.rotate_euler"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sasmol.operate.Move.rotate_euler" title="Permalink to this definition">¶</a></dt>
 <dd><p>Rotate the molecule by a euler angle set (phi,theta,psi)</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>frame</strong> &#8211; integer : trajectory frame number to use</li>
-<li><strong>phi</strong> &#8211; float : phi angle</li>
-<li><strong>theta</strong> &#8211; float : theta angle</li>
-<li><strong>psi</strong> &#8211; float : psi angle</li>
-<li><strong>kwargs</strong> &#8211; optional future arguments</li>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>frame</strong> – integer : trajectory frame number to use</p></li>
+<li><p><strong>phi</strong> – float : phi angle</p></li>
+<li><p><strong>theta</strong> – float : theta angle</p></li>
+<li><p><strong>psi</strong> – float : psi angle</p></li>
+<li><p><strong>kwargs</strong> – optional future arguments</p></li>
 </ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">updated self._coor</p>
-</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://docs.python.org/library/constants.html#None" title="(in Python v2.7)">None</a></p>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>updated self._coor</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>None</p>
+</dd>
+</dl>
 <p class="rubric">Examples</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">sasmol.system</span> <span class="k">as</span> <span class="nn">system</span> <span class="p">;</span> <span class="kn">import</span> <span class="nn">math</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">sasmol.system</span> <span class="k">as</span> <span class="nn">system</span> <span class="p">;</span> <span class="kn">import</span> <span class="nn">math</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">molecule</span> <span class="o">=</span> <span class="n">system</span><span class="o">.</span><span class="n">Molecule</span><span class="p">(</span><span class="s1">&#39;hiv1_gag.pdb&#39;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">frame</span> <span class="o">=</span> <span class="mi">0</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">phi</span> <span class="o">=</span> <span class="mf">45.0</span> <span class="o">*</span> <span class="n">math</span><span class="o">.</span><span class="n">pi</span> <span class="o">/</span> <span class="mf">180.0</span>
@@ -267,39 +257,36 @@ center of mass can be calculated</p>
 </pre></div>
 </div>
 <div class="admonition note">
-<p class="first admonition-title">Note</p>
-<p class="last">Calculations are carried out using radians</p>
+<p class="admonition-title">Note</p>
+<p>Calculations are carried out using radians</p>
 </div>
 </dd></dl>
 
-<dl class="method">
-<dt id="operate.Move.rotate_general_axis">
-<code class="descname">rotate_general_axis</code><span class="sig-paren">(</span><em>frame</em>, <em>theta</em>, <em>unit_axis</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/operate.html#Move.rotate_general_axis"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#operate.Move.rotate_general_axis" title="Permalink to this definition">¶</a></dt>
+<dl class="py method">
+<dt class="sig sig-object py" id="sasmol.operate.Move.rotate_general_axis">
+<span class="sig-name descname"><span class="pre">rotate_general_axis</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">frame</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">theta</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">unit_axis</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sasmol/operate.html#Move.rotate_general_axis"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sasmol.operate.Move.rotate_general_axis" title="Permalink to this definition">¶</a></dt>
 <dd><blockquote>
-<div>The general rotation of a molecule along an arbitrarily
-given unit axis (ux,uy,uz) by an angle theta.</div></blockquote>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>frame</strong> &#8211; integer : trajectory frame number to use</li>
-<li><strong>theta</strong> &#8211; float : angle in radians</li>
-<li><strong>unit_axis</strong> &#8211; float : [ux, uy, uz] components of unit axis</li>
-<li><strong>kwargs</strong> &#8211; optional future arguments</li>
+<div><p>The general rotation of a molecule along an arbitrarily
+given unit axis (ux,uy,uz) by an angle theta.</p>
+</div></blockquote>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>frame</strong> – integer : trajectory frame number to use</p></li>
+<li><p><strong>theta</strong> – float : angle in radians</p></li>
+<li><p><strong>unit_axis</strong> – float : [ux, uy, uz] components of unit axis</p></li>
+<li><p><strong>kwargs</strong> – optional future arguments</p></li>
 </ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">updated self._coor</p>
-</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://docs.python.org/library/constants.html#None" title="(in Python v2.7)">None</a></p>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>updated self._coor</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>None</p>
+</dd>
+</dl>
 <p class="rubric">Examples</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">sasmol.system</span> <span class="k">as</span> <span class="nn">system</span> <span class="p">;</span> <span class="kn">import</span> <span class="nn">math</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">sasmol.system</span> <span class="k">as</span> <span class="nn">system</span> <span class="p">;</span> <span class="kn">import</span> <span class="nn">math</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">molecule</span> <span class="o">=</span> <span class="n">system</span><span class="o">.</span><span class="n">Molecule</span><span class="p">(</span><span class="s1">&#39;hiv1_gag.pdb&#39;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">frame</span> <span class="o">=</span> <span class="mi">0</span> <span class="p">;</span> <span class="n">theta</span> <span class="o">=</span> <span class="mf">45.0</span> <span class="o">*</span> <span class="n">math</span><span class="o">.</span><span class="n">pi</span> <span class="o">/</span> <span class="mf">180.0</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">unit_axis</span> <span class="o">=</span> <span class="p">[</span> <span class="mf">0.2</span><span class="p">,</span> <span class="mf">1.3</span><span class="p">,</span> <span class="o">-</span><span class="mf">3.5</span> <span class="p">]</span>
@@ -307,40 +294,36 @@ given unit axis (ux,uy,uz) by an angle theta.</div></blockquote>
 </pre></div>
 </div>
 <div class="admonition note">
-<p class="first admonition-title">Note</p>
-<p class="last">Calculations are carried out using radians</p>
+<p class="admonition-title">Note</p>
+<p>Calculations are carried out using radians</p>
 </div>
 </dd></dl>
 
-<dl class="method">
-<dt id="operate.Move.translate">
-<code class="descname">translate</code><span class="sig-paren">(</span><em>frame</em>, <em>value</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/operate.html#Move.translate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#operate.Move.translate" title="Permalink to this definition">¶</a></dt>
+<dl class="py method">
+<dt class="sig sig-object py" id="sasmol.operate.Move.translate">
+<span class="sig-name descname"><span class="pre">translate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">frame</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sasmol/operate.html#Move.translate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sasmol.operate.Move.translate" title="Permalink to this definition">¶</a></dt>
 <dd><p>translate moves the object</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>frame</strong> &#8211; integer : trajectory frame number to use</li>
-<li><strong>value</strong> &#8211; list of x, y, z float values</li>
-<li><strong>kwargs</strong> &#8211; <dl class="docutils">
-<dt>point = True</dt>
- <span class="classifier-delimiter">:</span> <span class="classifier">will translate to a fixed point</span><dd>given by value variable</dd>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>frame</strong> – integer : trajectory frame number to use</p></li>
+<li><p><strong>value</strong> – list of x, y, z float values</p></li>
+<li><p><strong>kwargs</strong> – <dl class="simple">
+<dt>point = True<span class="classifier">will translate to a fixed point</span></dt><dd><p>given by value variable</p>
+</dd>
 </dl>
-</li>
+</p></li>
 </ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">updated self._coor and self._center_of_mass</p>
-</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://docs.python.org/library/constants.html#None" title="(in Python v2.7)">None</a></p>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>updated self._coor and self._center_of_mass</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>None</p>
+</dd>
+</dl>
 <p class="rubric">Examples</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">sasmol.system</span> <span class="k">as</span> <span class="nn">system</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">sasmol.system</span> <span class="k">as</span> <span class="nn">system</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">molecule</span> <span class="o">=</span> <span class="n">system</span><span class="o">.</span><span class="n">Molecule</span><span class="p">(</span><span class="s1">&#39;hiv1_gag.pdb&#39;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">frame</span> <span class="o">=</span> <span class="mi">0</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">molecule</span><span class="o">.</span><span class="n">calculate_center_of_mass</span><span class="p">(</span><span class="n">frame</span><span class="p">)</span>
@@ -351,7 +334,7 @@ given unit axis (ux,uy,uz) by an angle theta.</div></blockquote>
 <span class="go">array([ -3.79114736, -19.71577133,  13.06558513])</span>
 </pre></div>
 </div>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">sasmol.system</span> <span class="k">as</span> <span class="nn">system</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">sasmol.system</span> <span class="k">as</span> <span class="nn">system</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">molecule</span> <span class="o">=</span> <span class="n">system</span><span class="o">.</span><span class="n">Molecule</span><span class="p">(</span><span class="s1">&#39;hiv1_gag.pdb&#39;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">frame</span> <span class="o">=</span> <span class="mi">0</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">final_position</span> <span class="o">=</span> <span class="p">[</span><span class="mf">3.0</span><span class="p">,</span> <span class="mf">4.0</span><span class="p">,</span> <span class="mf">5.0</span><span class="p">]</span>
@@ -361,73 +344,101 @@ given unit axis (ux,uy,uz) by an angle theta.</div></blockquote>
 </pre></div>
 </div>
 <div class="admonition note">
-<p class="first admonition-title">Note</p>
-<p class="last">mass_check is called to validate self._total_mass()</p>
+<p class="admonition-title">Note</p>
+<p>mass_check is called to validate self._total_mass()</p>
 </div>
 </dd></dl>
 
 </dd></dl>
 
-</div>
-</div>
+<dl class="py function">
+<dt class="sig sig-object py" id="sasmol.operate.set_average_vdw">
+<span class="sig-prename descclassname"><span class="pre">sasmol.operate.</span></span><span class="sig-name descname"><span class="pre">set_average_vdw</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mol</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sasmol/operate.html#set_average_vdw"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sasmol.operate.set_average_vdw" title="Permalink to this definition">¶</a></dt>
+<dd><p># NOTE: atom_vdw must be shape (natoms,2); only column 2 (radius) is used by pairs.f</p>
+</dd></dl>
+
+</section>
+</section>
 
 
           </div>
+
         </div>
       </div>
       <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
         <div class="sphinxsidebarwrapper">
-  <h3><a href="index.html">Table Of Contents</a></h3>
-  <ul>
-<li><a class="reference internal" href="#">Operate</a><ul>
-<li><a class="reference internal" href="#id1"><code class="docutils literal"><span class="pre">Operate</span></code></a></li>
+<h1 class="logo"><a href="index.html">sasmol</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="index_calculate.html">Calculate</a></li>
+<li class="toctree-l1"><a class="reference internal" href="index_charmm_topology.html">Charmm Topology</a></li>
+<li class="toctree-l1"><a class="reference internal" href="index_dcd_io.html">DCD IO</a></li>
+<li class="toctree-l1"><a class="reference internal" href="index_file_io.html">File IO</a></li>
+<li class="toctree-l1"><a class="reference internal" href="index_linear_algebra.html">Linear Algebra</a></li>
+<li class="toctree-l1"><a class="reference internal" href="index_multiprocessing_sasmol.html">Multiprocessing SasMol</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Operate</a></li>
+<li class="toctree-l1"><a class="reference internal" href="index_pdb_io.html">PDB IO</a></li>
+<li class="toctree-l1"><a class="reference internal" href="index_properties.html">Properties</a></li>
+<li class="toctree-l1"><a class="reference internal" href="index_subset.html">Subset</a></li>
+<li class="toctree-l1"><a class="reference internal" href="index_system.html">System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="index_topology.html">Topology</a></li>
+<li class="toctree-l1"><a class="reference internal" href="index_utilities.html">Utilities</a></li>
+<li class="toctree-l1"><a class="reference internal" href="index_view.html">View</a></li>
 </ul>
-</li>
-</ul>
+
 <div class="relations">
 <h3>Related Topics</h3>
 <ul>
   <li><a href="index.html">Documentation overview</a><ul>
       <li>Previous: <a href="index_multiprocessing_sasmol.html" title="previous chapter">Multiprocessing SasMol</a></li>
-      <li>Next: <a href="index_properties.html" title="next chapter">Properties</a></li>
+      <li>Next: <a href="index_pdb_io.html" title="next chapter">PDB IO</a></li>
   </ul></li>
 </ul>
 </div>
-  <div role="note" aria-label="source link">
-    <h3>This Page</h3>
-    <ul class="this-page-menu">
-      <li><a href="_sources/index_operate.txt"
-            rel="nofollow">Show Source</a></li>
-    </ul>
-   </div>
 <div id="searchbox" style="display: none" role="search">
-  <h3>Quick search</h3>
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
     <form class="search" action="search.html" method="get">
-      <input type="text" name="q" />
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
       <input type="submit" value="Go" />
-      <input type="hidden" name="check_keywords" value="yes" />
-      <input type="hidden" name="area" value="default" />
     </form>
+    </div>
 </div>
-<script type="text/javascript">$('#searchbox').show(0);</script>
+<script>$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
         </div>
       </div>
       <div class="clearer"></div>
     </div>
     <div class="footer">
-      &copy;2016, Joseph E. Curtis, Ph.D..
-      
+      &copy;2016, Joseph E. Curtis, Ph.D.
+
       |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.4.1</a>
-      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.8</a>
-      
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 4.4.0</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+
       |
-      <a href="_sources/index_operate.txt"
+      <a href="_sources/index_operate.rst.txt"
           rel="nofollow">Page source</a>
     </div>
 
-    
 
-    
+
+
   </body>
 </html>

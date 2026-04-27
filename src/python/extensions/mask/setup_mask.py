@@ -6,7 +6,7 @@
 '''
 # System imports
 from distutils.core import *
-from distutils      import sysconfig
+from distutils import sysconfig
 
 # Third-party modules - we depend on numpy for everything
 import numpy
@@ -19,15 +19,14 @@ except AttributeError:
 
 # simple extension module
 _mask = Extension("_mask",
-                   ["mask.i","mask.c"],
-                   include_dirs = [numpy_include],
-                   )
+                  ["mask_module.c", "mask.c"],
+                  include_dirs=[numpy_include],
+                  )
 
 # NumyTypemapTests setup
-setup(  name        = "MASK",
-        description = "Module handles mask selection",
-        author      = "Joseph E. Curtis",
-        version     = "0.1",
-        ext_modules = [_mask]
-        )
-
+setup(name="MASK",
+      description="Module handles mask selection",
+      author="Joseph E. Curtis",
+      version="0.1",
+      ext_modules=[_mask]
+      )

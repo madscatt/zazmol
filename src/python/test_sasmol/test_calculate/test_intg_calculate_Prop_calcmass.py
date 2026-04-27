@@ -18,8 +18,8 @@
 from sasmol.test_sasmol.utilities import env
 
 from unittest import main, skipIf
-from mocker import Mocker, MockerTestCase, ANY, ARGS, KWARGS
 import sasmol.system as system
+import unittest
 
 import numpy
 
@@ -27,7 +27,7 @@ import os
 
 DataPath = os.path.join(os.path.dirname(os.path.realpath(__file__)),'..','data','pdb_common')+os.path.sep
 
-class Test_calculate_Prop_calcmass(MockerTestCase): 
+class Test_calculate_Prop_calcmass(unittest.TestCase): 
 
     def setUp(self):
         self.o=system.Molecule(0)

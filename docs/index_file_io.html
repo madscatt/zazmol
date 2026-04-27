@@ -1,0 +1,292 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+    <title>File IO &#8212; sasmol 1.0 documentation</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="_static/alabaster.css" />
+    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/doctools.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Linear Algebra" href="index_linear_algebra.html" />
+    <link rel="prev" title="DCD IO" href="index_dcd_io.html" />
+
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+
+
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+
+
+          <div class="body" role="main">
+
+  <section id="file-io">
+<h1>File IO<a class="headerlink" href="#file-io" title="Permalink to this headline">¶</a></h1>
+<section id="id1">
+<h2><code class="xref py py-mod docutils literal notranslate"><span class="pre">File</span> <span class="pre">IO</span></code><a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h2>
+<span class="target" id="module-sasmol.file_io"></span><dl class="py class">
+<dt class="sig sig-object py" id="sasmol.file_io.Files">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">sasmol.file_io.</span></span><span class="sig-name descname"><span class="pre">Files</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">flag</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sasmol/file_io.html#Files"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sasmol.file_io.Files" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="index_pdb_io.html#sasmol.pdb_io.PDB" title="sasmol.pdb_io.PDB"><code class="xref py py-class docutils literal notranslate"><span class="pre">sasmol.pdb_io.PDB</span></code></a>, <a class="reference internal" href="index_dcd_io.html#sasmol.dcd_io.DCD" title="sasmol.dcd_io.DCD"><code class="xref py py-class docutils literal notranslate"><span class="pre">sasmol.dcd_io.DCD</span></code></a></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="sasmol.file_io.Files.check_error">
+<span class="sig-name descname"><span class="pre">check_error</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">error</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#sasmol.file_io.Files.check_error" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="sasmol.file_io.Files.check_for_all_zero_columns">
+<span class="sig-name descname"><span class="pre">check_for_all_zero_columns</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">coor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">frame</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#sasmol.file_io.Files.check_for_all_zero_columns" title="Permalink to this definition">¶</a></dt>
+<dd><p>Make sure there are no two all zero columns in coordinates
+This is needed for the alignment module</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="sasmol.file_io.Files.close_dcd_read">
+<span class="sig-name descname"><span class="pre">close_dcd_read</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dcd_file</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#sasmol.file_io.Files.close_dcd_read" title="Permalink to this definition">¶</a></dt>
+<dd><p>This method closes a dcd file.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="sasmol.file_io.Files.close_dcd_write">
+<span class="sig-name descname"><span class="pre">close_dcd_write</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filepointer</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#sasmol.file_io.Files.close_dcd_write" title="Permalink to this definition">¶</a></dt>
+<dd><p>This method closes a dcd file.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="sasmol.file_io.Files.create_conect_pdb_lines">
+<span class="sig-name descname"><span class="pre">create_conect_pdb_lines</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#sasmol.file_io.Files.create_conect_pdb_lines" title="Permalink to this definition">¶</a></dt>
+<dd><p>Output stored conect information in PDB record format.
+Indices are converted from those read in - original_index - to
+those used in output.
+Format of CONECT line:
+Record name CONECT followed by list of atom indexes in 6 character
+columns. First is the base atom, following atoms are those
+connected to it.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="sasmol.file_io.Files.element_filter">
+<span class="sig-name descname"><span class="pre">element_filter</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#sasmol.file_io.Files.element_filter" title="Permalink to this definition">¶</a></dt>
+<dd><p>This function filters the PDB file to sraighten
+out various things (add to this as you go along).</p>
+<p>Filter element list…</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="sasmol.file_io.Files.get_element">
+<span class="sig-name descname"><span class="pre">get_element</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">resname</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#sasmol.file_io.Files.get_element" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get elment from charmm27 atom name list plus extras from periodic table
+and resolve name conflicts</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="sasmol.file_io.Files.get_resnames">
+<span class="sig-name descname"><span class="pre">get_resnames</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#sasmol.file_io.Files.get_resnames" title="Permalink to this definition">¶</a></dt>
+<dd><p>This method holds names of residues to use to set moltype.  Based on Charmm 27 naming.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="sasmol.file_io.Files.initialize_children">
+<span class="sig-name descname"><span class="pre">initialize_children</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#sasmol.file_io.Files.initialize_children" title="Permalink to this definition">¶</a></dt>
+<dd><p>This initializes the following “children” with their
+masks already defined to the “parent” molecule</p>
+<p>names()             : names_mask()
+resnames()          : resnames_mask()
+resids()            : resids_mask()
+chains()            : chains_mask()
+segnames()          : segnames_mask()
+occupancies()       : occupancies_mask()
+betas()             : betas_mask()
+elements()          : elements_mask()</p>
+<p>The objects on the left contain the unique values and
+the objects on the right contain the masks that have
+the indices to extract the information for each unique
+value from the parent molecule.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="sasmol.file_io.Files.open_dcd_read">
+<span class="sig-name descname"><span class="pre">open_dcd_read</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#sasmol.file_io.Files.open_dcd_read" title="Permalink to this definition">¶</a></dt>
+<dd><p>This method opens a file to read in the Charmm/Xplor data format.
+by calling a pre-compiled C module (dcdio).</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="sasmol.file_io.Files.open_dcd_write">
+<span class="sig-name descname"><span class="pre">open_dcd_write</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#sasmol.file_io.Files.open_dcd_write" title="Permalink to this definition">¶</a></dt>
+<dd><p>This method opens a file and writes the headerfile in the Charmm/Xplor data format.
+by calling a pre-compiled C module (dcdio).</p>
+<p>This function will OVERWRITE a file with the same name without prompting.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="sasmol.file_io.Files.open_file">
+<span class="sig-name descname"><span class="pre">open_file</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/sasmol/file_io.html#Files.open_file"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sasmol.file_io.Files.open_file" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="sasmol.file_io.Files.print_error">
+<span class="sig-name descname"><span class="pre">print_error</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">my_message</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#sasmol.file_io.Files.print_error" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="sasmol.file_io.Files.read_dcd">
+<span class="sig-name descname"><span class="pre">read_dcd</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#sasmol.file_io.Files.read_dcd" title="Permalink to this definition">¶</a></dt>
+<dd><p>This method reads data in the Charmm/Xplor data format.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="sasmol.file_io.Files.read_dcd_step">
+<span class="sig-name descname"><span class="pre">read_dcd_step</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dcdfile</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">frame</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#sasmol.file_io.Files.read_dcd_step" title="Permalink to this definition">¶</a></dt>
+<dd><p>This method reads a single dcd step in the Charmm/Xplor data format.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="sasmol.file_io.Files.read_pdb">
+<span class="sig-name descname"><span class="pre">read_pdb</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#sasmol.file_io.Files.read_pdb" title="Permalink to this definition">¶</a></dt>
+<dd><p>This method reads a PDB file.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="sasmol.file_io.Files.read_single_dcd_step">
+<span class="sig-name descname"><span class="pre">read_single_dcd_step</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">frame</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#sasmol.file_io.Files.read_single_dcd_step" title="Permalink to this definition">¶</a></dt>
+<dd><p>This method reads a single dcd step in the Charmm/Xplor data format.</p>
+<p>The method simply reads all frames up until frame and then assigns
+coordinates to the last frame (no seek option is utilizied)</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="sasmol.file_io.Files.write_dcd">
+<span class="sig-name descname"><span class="pre">write_dcd</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#sasmol.file_io.Files.write_dcd" title="Permalink to this definition">¶</a></dt>
+<dd><p>This method writes data in the Charmm/Xplor data format.
+by calling a pre-compiled C module (dcdio).</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="sasmol.file_io.Files.write_dcd_frames">
+<span class="sig-name descname"><span class="pre">write_dcd_frames</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">end</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#sasmol.file_io.Files.write_dcd_frames" title="Permalink to this definition">¶</a></dt>
+<dd><p>This method writes a single step or multiple frames
+in the Charmm/Xplor data format.
+by calling a pre-compiled C module (dcdio).</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="sasmol.file_io.Files.write_dcd_header">
+<span class="sig-name descname"><span class="pre">write_dcd_header</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filepointer</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nset</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#sasmol.file_io.Files.write_dcd_header" title="Permalink to this definition">¶</a></dt>
+<dd><p>This method writes the headerfile in the Charmm/Xplor data format.
+by calling a pre-compiled C module (dcdio).</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="sasmol.file_io.Files.write_dcd_step">
+<span class="sig-name descname"><span class="pre">write_dcd_step</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filepointer</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">frame</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">step</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#sasmol.file_io.Files.write_dcd_step" title="Permalink to this definition">¶</a></dt>
+<dd><p>This method writes a single step in the Charmm/Xplor data format.
+by calling a pre-compiled C module (dcdio).</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="sasmol.file_io.Files.write_pdb">
+<span class="sig-name descname"><span class="pre">write_pdb</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">frame</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">flag</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#sasmol.file_io.Files.write_pdb" title="Permalink to this definition">¶</a></dt>
+<dd><p>This method writes the PDB file</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+</section>
+
+
+          </div>
+
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="index.html">sasmol</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="index_calculate.html">Calculate</a></li>
+<li class="toctree-l1"><a class="reference internal" href="index_charmm_topology.html">Charmm Topology</a></li>
+<li class="toctree-l1"><a class="reference internal" href="index_dcd_io.html">DCD IO</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">File IO</a></li>
+<li class="toctree-l1"><a class="reference internal" href="index_linear_algebra.html">Linear Algebra</a></li>
+<li class="toctree-l1"><a class="reference internal" href="index_multiprocessing_sasmol.html">Multiprocessing SasMol</a></li>
+<li class="toctree-l1"><a class="reference internal" href="index_operate.html">Operate</a></li>
+<li class="toctree-l1"><a class="reference internal" href="index_pdb_io.html">PDB IO</a></li>
+<li class="toctree-l1"><a class="reference internal" href="index_properties.html">Properties</a></li>
+<li class="toctree-l1"><a class="reference internal" href="index_subset.html">Subset</a></li>
+<li class="toctree-l1"><a class="reference internal" href="index_system.html">System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="index_topology.html">Topology</a></li>
+<li class="toctree-l1"><a class="reference internal" href="index_utilities.html">Utilities</a></li>
+<li class="toctree-l1"><a class="reference internal" href="index_view.html">View</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+      <li>Previous: <a href="index_dcd_io.html" title="previous chapter">DCD IO</a></li>
+      <li>Next: <a href="index_linear_algebra.html" title="next chapter">Linear Algebra</a></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2016, Joseph E. Curtis, Ph.D.
+
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 4.4.0</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+
+      |
+      <a href="_sources/index_file_io.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+
+
+
+  </body>
+</html>

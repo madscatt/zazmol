@@ -116,9 +116,9 @@ int write_dcdheader(FILE * fd, char *filename, int N, int NSET,
 int write_dcdstep(FILE * fd, int N, float *X, float *Y, float *Z, int curframe)
 {
       int out_integer;
-      int curstep ;
+      //int curstep ;
 
-      curstep=curframe ;
+      //curstep=curframe ;
 
       out_integer = N*4;
       WRITE(fd, (char *) &out_integer, sizeof(int));
@@ -232,24 +232,74 @@ double* reverseEightByteWord(double* N)
                         return(DCD_BADEOF); \
                        }
 
-int read_dcdheader(FILE * fd, int *N, int *NSET, int *ISTART,
-               int *NSAVC, double *DELTA, int *NAMNF,
+int read_dcdheader(FILE * fd, int *N, int *NSET, int *ISTART,\
+               int *NSAVC, double *DELTA, int *NAMNF,\
                int *reverseEndian, int *charmm)
+//int read_dcdheader(FILE* fd, int* N, int* NSET, int* ISTART, int* NSAVC, int* NAMNF, double* DELTA, float* data, int* extra_arg, int* reverseEndian, int* charmm) 
 {
   int input_integer;    /*  Integer buffer space      */
   int ret_val;          /*  Return value from read    */
   int i;          /*  Loop counter        */
   char hdrbuf[84];      /*  Char buffer used to store header      */
   int NTITLE;
-  int **FREEINDEXES;
+  int **FREEINDEXES = NULL;
 
 /*  (*FREEINDEXES) = *((int *) (hdrbuf + 12)); */
 
 
-  /*  First thing in the file should be an 84         */
+  // Add detailed debugging statements
+  //fprintf(stderr, "Inside read_dcdheader\n");
+  //fprintf(stderr, "File pointer: %p\n", fd);
+  //fflush(stderr);
+
+  // Check if the file pointer is valid
+  //if (fd == NULL) {
+  //      fprintf(stderr, "Invalid file pointer\n");
+  //      fflush(stderr);
+  //      return DCD_BADFORMAT;
+  //}else{
+  //      fprintf(stderr, "Valid file pointer\n");
+  //      fflush(stderr);
+  //} 
+
+  /*  value in file should be an 84         */
   ret_val = READ(fd, &input_integer, sizeof(int));
-  CHECK_FREAD(ret_val, "reading first int from dcd file");
-  CHECK_FEOF(ret_val, "reading first int from dcd file");
+  CHECK_FREAD(ret_val, "reading initial int from dcd file");
+  CHECK_FEOF(ret_val, "reading initial int from dcd file");
+
+  // by jec
+  //*reverseEndian=1;
+
+  // Ensure the file pointer is at the beginning of the file
+  fseek(fd, 0, SEEK_SET);
+
+  // Read the magic number from the file header
+  ret_val = fread(&input_integer, sizeof(int), 1, fd);
+  if (ret_val != 1) {
+        fprintf(stderr, "Error reading initial int from DCD file\n");
+        fflush(stderr);
+        return DCD_BADFORMAT;
+  }
+  //fprintf(stderr, "read_dcdheader: input_integer = %d\n", input_integer);
+  //fflush(stderr);
+
+
+  /* Check magic number in file header and determine byte order*/
+  if (input_integer != 84) {
+    // Reverse the byte order
+    input_integer = ((input_integer >> 24) & 0x000000FF) |
+                    ((input_integer >> 8)  & 0x0000FF00) |
+                    ((input_integer << 8)  & 0x00FF0000) |
+                    ((input_integer << 24) & 0xFF000000);
+
+    if (input_integer != 84) {
+        fprintf(stderr, "Invalid magic number in file header: %d\n", input_integer);
+        fflush(stderr);
+        return DCD_BADFORMAT;
+    }
+  }
+
+
 
   /* Check magic number in file header and determine byte order*/
   if (input_integer != 84) {
@@ -259,9 +309,11 @@ int read_dcdheader(FILE * fd, int *N, int *NSET, int *ISTART,
 
     if (input_integer == 84) {
       *reverseEndian=1;
-    }
-    else {
-      return(DCD_BADFORMAT);
+      //fprintf(stderr, "Reversed endian detected\n");
+      } else {
+            fprintf(stderr, "Invalid magic number in file header: %d\n", input_integer);
+            fflush(stderr);
+            return DCD_BADFORMAT;
     }
   }
   else {
@@ -334,7 +386,7 @@ int read_dcdheader(FILE * fd, int *N, int *NSET, int *ISTART,
     if (*reverseEndian) DELTA=reverseEightByteWord(DELTA);
   }
 
-  /*  Get the end size of the first block             */
+  /*  Get the end size of the initial block             */
   ret_val = READ(fd, &input_integer, sizeof(int));
   CHECK_FREAD(ret_val, "reading second 84 from dcd file");
   CHECK_FEOF(ret_val, "reading second 84 from dcd file");
@@ -444,23 +496,10 @@ int read_dcdstep(FILE * fd, int N, float *X, float *Y, float *Z, int num_fixed,
 {
   int ret_val;          /*  Return value from read          */
   int input_integer;    /*  Integer buffer space            */
-  int i,j;                /*  Loop counter              */
-/*  int indexes;
+  int i;                /*  Loop counter              */
 
-  indexes = (int *) malloc(N*sizeof(int)) ;
-   for (j=0;j<N;j++) {
-        indexes[j]=1 ;
-   } */
-/*  printf("number of atoms = %d\n",N);
-  printf("num_fixed = %d\n",num_fixed) ;
-  printf("first = %d\n",first) ;
-  if(num_fixed==0) printf("nf = true\n") ;
-  if(first==0) printf("f0 = true\n") ;
-  if(first==1) printf("f1 = true\n") ;
-  if(first) printf("first = true\n") ;
-*/
   if ( (num_fixed==0) || first) {
-//    printf("\n\n>>> in first loop\n\n") ;
+    //printf("\n\n>>> in first loop\n\n") ;
     /* If this is a CHARMm file and contains an extra data block,
        we must skip it to avoid problems */
     if ((charmm & DCD_IS_CHARMM) &&
@@ -476,10 +515,7 @@ int read_dcdstep(FILE * fd, int N, float *X, float *Y, float *Z, int num_fixed,
    }
 
     /*  Get the first size from the file                          */
-    /*printf(">>> ret_val = %d\n",ret_val) ;*/
     ret_val = READ(fd, &input_integer, sizeof(int));
- //     printf("> input_integer = %d\n",input_integer) ;
-//    printf(">>> ret_val = %d\n",ret_val) ;
     CHECK_FREAD(ret_val, "reading number of atoms at begining of step");
     if (reverseEndian) input_integer= *reverseFourByteWord(&input_integer);
 
@@ -489,26 +525,23 @@ int read_dcdstep(FILE * fd, int N, float *X, float *Y, float *Z, int num_fixed,
       return(-1);
     }
 
-
-    /*printf("> input_integer = %d\n",input_integer) ;*/
-
     if (input_integer != 4*N){
       printf(">>> input_integer != 4*N (1)\n\n") ;
       return(DCD_BADFORMAT);
     }
-    /*printf(">>> ret_val = %d\n",ret_val) ;*/
+    //printf(">>> ret_val = %d\n",ret_val) ;
     ret_val = READ(fd, X, 4*N);
-      //printf("ZHL %8.3f %8.3f %8.3f %8.3f\n",X[0],X[1],X[N-2],X[N-1]);
+    //printf("ZHL %8.3f %8.3f %8.3f %8.3f %8.3f %8.3f\n",X[0],X[1],X[2],X[3],X[N-2],X[N-1]);
     /*printf(">>> just before reading X array: ret_val = %d\n",ret_val) ;*/
     CHECK_FREAD(ret_val, "reading X array");
     CHECK_FEOF(ret_val, "reading X array");
     if (reverseEndian) {
       for (i=0; i<N; i++) {
         X[i]=*((float*)(reverseFourByteWord((int*)&X[i])));
-        printf("X[i] = %f\n",X[i]) ;
+        //printf("X[i] = %f\n",X[i]) ;
       }
     }
-    /*printf(">>> just after reading X array: ret_val = %d\n",ret_val) ;*/
+    //printf(">>> just after reading X array: ret_val = %d\n",ret_val) ;
     ret_val = READ(fd, &input_integer, sizeof(int));
     CHECK_FREAD(ret_val, "reading number of atoms after X array");
     CHECK_FEOF(ret_val, "reading number of atoms after X array");
@@ -538,6 +571,7 @@ int read_dcdstep(FILE * fd, int N, float *X, float *Y, float *Z, int num_fixed,
     }
 
     ret_val = READ(fd, &input_integer, sizeof(int));
+    //printf("ZHL Y: %8.3f %8.3f %8.3f %8.3f %8.3f %8.3f\n",Y[0],Y[1],Y[2],Y[3],Y[N-2],Y[N-1]);
     CHECK_FREAD(ret_val, "reading number of atoms after Y array");
     CHECK_FEOF(ret_val, "reading number of atoms after Y array");
     if (reverseEndian) input_integer= *reverseFourByteWord(&input_integer);
@@ -557,6 +591,7 @@ int read_dcdstep(FILE * fd, int N, float *X, float *Y, float *Z, int num_fixed,
       return(DCD_BADFORMAT);
     }
     ret_val = READ(fd, Z, 4*N);
+    //printf("ZHL Z: %8.3f %8.3f %8.3f %8.3f %8.3f %8.3f\n",Z[0],Z[1],Z[2],Z[3],Z[N-2],Z[N-1]);
     CHECK_FREAD(ret_val, "reading Z array");
     CHECK_FEOF(ret_val, "reading Z array");
     if (reverseEndian) {
@@ -574,7 +609,6 @@ int read_dcdstep(FILE * fd, int N, float *X, float *Y, float *Z, int num_fixed,
       printf(">>> input_integer != 4*N (6)\n\n") ;
       return(DCD_BADFORMAT);
     }
-
 
     /* If this is a CHARMm file and contains a 4th dimension block,
        we must skip it to avoid problems */
@@ -689,7 +723,7 @@ int read_dcdstep(FILE * fd, int N, float *X, float *Y, float *Z, int num_fixed,
         CHECK_FREAD(ret_val, "reading extra charmm block");
     }
   }
-  /*printf(" I got to the end, jeepers\n");*/
+  //printf(" I got to the end, jeepers\n");
   return(0);
 }
 

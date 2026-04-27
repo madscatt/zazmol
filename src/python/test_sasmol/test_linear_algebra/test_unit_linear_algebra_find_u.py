@@ -18,12 +18,15 @@
 from sasmol.test_sasmol.utilities import env
 
 from unittest import main 
-from mocker import Mocker, MockerTestCase, ANY, ARGS, KWARGS
+import unittest
+from unittest.mock import MagicMock
+
 import sasmol.system as system
+import sasmol.config as config
 import sasmol.linear_algebra as linear_algebra
 
 import numpy
-import warnings; warnings.filterwarnings('ignore')
+import warnings
 
 import os
 floattype=os.environ['SASMOL_FLOATTYPE']
@@ -31,14 +34,15 @@ floattype=os.environ['SASMOL_FLOATTYPE']
 PdbPath = os.path.join(os.path.dirname(os.path.realpath(__file__)),'..','data','pdb_common')+os.path.sep
 modulePdbPath = os.path.join(os.path.dirname(os.path.realpath(__file__)),'..','data','sasmol','linear_algebra')+os.path.sep
 
-class Test_linear_algebra(MockerTestCase): 
+class Test_linear_algebra(unittest.TestCase): 
 
     def setUp(self):
-        self.m = Mocker()
+        warnings.filterwarnings('ignore')
+        self.m = MagicMock()
 
         """
         linear_algebra.Math.__init__ = self.m.mock()
-        linear_algebra.Math.__init__(ARGS)
+        linear_algebra.Math.__init__()
         self.m.result(None)
         self.m.count(0,None)
         """
@@ -66,7 +70,7 @@ class Test_linear_algebra(MockerTestCase):
     def test_against_mathematica_two_unit_atoms(self):
         x=numpy.array([[1.0, 1.0, 1.0], [2.0, 1.0, 1.0]], floattype)
         y=numpy.array([[1.0, 1.0, 1.0], [1.0, 2.0, 1.0]], floattype)
-        result_u = linear_algebra.find_u(x,y); print result_u
+        result_u = linear_algebra.find_u(x,y)
         expected_u = [[0.0, 1.0, 0.0], [0.0, 0.0, 1.0], [1.0, 0.0, 0.0]];
         for i in range(len(result_u)):
           self.assert_list_almost_equal(list(result_u[i]),expected_u[i])
@@ -74,8 +78,7 @@ class Test_linear_algebra(MockerTestCase):
     def test_against_mathematica_two_overlap_unit_atoms(self):
         x=numpy.array([[1.0, 1.0, 1.0], [1.0, 2.0, 1.0]], floattype)
         y=numpy.array([[1.0, 1.0, 1.0], [1.0, 2.0, 1.0]], floattype)
-        result_u = linear_algebra.find_u(x,y); print result_u
-        print result_u
+        result_u = linear_algebra.find_u(x,y)
         expected_u = [[1.0, 0.0, 0.0], [0.0, 1.0, 0.0], [0.0, 0.0, 1.0]];
         for i in range(len(result_u)):
           self.assert_list_almost_equal(list(result_u[i]),expected_u[i])
@@ -144,7 +147,9 @@ class Test_linear_algebra(MockerTestCase):
         coor_sub_m2 = m2.coor()[0]
 
         u = linear_algebra.find_u(coor_sub_m1, coor_sub_m2)
-        result = numpy.array((numpy.matrix(u)*(numpy.matrix(coor_sub_m2).T)).T, numpy.float)
+        result = numpy.array((numpy.matrix(u) *
+                              (numpy.matrix(coor_sub_m2).T)).T,
+                             config.CALC_DTYPE)
         #print numpy.dot(result.reshape(1,-1)[0],coor_sub_m1.reshape(1,-1)[0])/numpy.sqrt(numpy.dot(coor_sub_m1.reshape(1,-1)[0],coor_sub_m1.reshape(1,-1)[0])*numpy.dot(result.reshape(1,-1)[0],result.reshape(1,-1)[0]))
         #m3 = system.Molecule(2)
         #m3.read_pdb('1CRN.pdb')
@@ -162,4 +167,3 @@ class Test_linear_algebra(MockerTestCase):
 
 if __name__ == '__main__': 
    main() 
-

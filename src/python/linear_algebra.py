@@ -1,8 +1,3 @@
-from __future__ import absolute_import
-from __future__ import division
-from __future__ import print_function
-#from __future__ import unicode_literals
-
 #    SASMOL: Copyright (C) 2011 Joseph E. Curtis, Ph.D.
 #
 #    This program is free software: you can redistribute it and/or modify
@@ -18,14 +13,14 @@ from __future__ import print_function
 #    You should have received a copy of the GNU General Public License
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
-#	LINEAR_ALGEBRA
+# LINEAR_ALGEBRA
 #
-#	12/13/2009	--	initial coding			:	jc
-#	12/24/2015	--	refactored for release  :	jc
+# 12/13/2009	--	initial coding			:	jc
+# 12/24/2015	--	refactored for release  :	jc
 #
-#	 1         2         3         4         5         6         7
+# 1         2         3         4         5         6         7
 # LC4567890123456789012345678901234567890123456789012345678901234567890123456789
-#								       *      **
+# *      **
 '''
 	LINEAR_ALGEBRA contains methods to perform basic mathematical operations
 '''
@@ -33,10 +28,12 @@ from __future__ import print_function
 import sys
 import numpy
 import math
+import sasmol.config as config
 import sasmol.matrix_math as matrix_math
 
+
 def cross_product(a, b):
-    ''' 
+    '''
     Returns cross product (vector product) on two vectors
 
     Parameters
@@ -58,7 +55,7 @@ def cross_product(a, b):
     >>> a = [1.0, 2.0, 3.0]
     >>> b = [-1.0, 6.0, 8.0]
     >>> linear_algebra.cross_product(a, b)
-    array([ -2., -11.,   8.]) 
+    array([ -2., -11.,   8.])
 
     '''
 
@@ -71,7 +68,7 @@ def cross_product(a, b):
 
 
 def matrix_multiply(a, b):
-    ''' 
+    '''
     Returns the result of multiplying matrix a by matrix b
 
     Parameters
@@ -84,7 +81,7 @@ def matrix_multiply(a, b):
 
     Returns
     -------
-    tuple 
+    tuple
         error
             list with error code (if error occurs)
 
@@ -113,16 +110,18 @@ def matrix_multiply(a, b):
 
     try:
         dim_b2 = b.shape[1]
-    except:
+    except IndexError:
         dim_b2 = 1
 
-    c = numpy.zeros((dim_a1, dim_b2), numpy.float)
-    if(dim_a2 != dim_b1):
+    c = numpy.zeros((dim_a1, dim_b2), config.CALC_DTYPE)
+    if (dim_a2 != dim_b1):
         message = 'incompatible matrices'
         error.append(message)
+        c = None
         return error, c
 
-    c = matrix_math.matrix_multiply(a, b, dim_a1, dim_a2, dim_b2)
+#    c = matrix_math.matrix_multiply(a, b, dim_a1, dim_a2, dim_b2)
+    c = numpy.dot(a, b)
 
     return error, c
 
@@ -160,7 +159,7 @@ def find_u(x, y):
 
     '''
 
-    b = numpy.zeros(9, numpy.float)
+    b = numpy.zeros(9, config.CALC_DTYPE)
     k = 0
     for i in range(3):
         for j in range(3):
@@ -170,7 +169,8 @@ def find_u(x, y):
             numpy.put(b, k, rad)
             k = k + 1
     r = numpy.reshape(b, (-1, 3))
-    r = numpy.mat(r)
+    # r = numpy.mat(r)
+    r = numpy.asmatrix(r)
     rt = r.T		# transpose of r
     rtr = rt * r  # matrix multiply rt * r
     uk, ak = numpy.linalg.eig(rtr)
@@ -187,22 +187,22 @@ def find_u(x, y):
     rak0.shape = (1, 3)
     rak1.shape = (1, 3)
 
-    if(uk[0] == 0.0):
+    if (uk[0] == 0.0):
         urak0 = (10**15) * rak0
     else:
         urak0 = (1.0 / math.sqrt(abs(uk[0]))) * rak0
 
-    if(uk[1] == 0.0):
+    if (uk[1] == 0.0):
         urak1 = (10**15) * rak1
     else:
         urak1 = (1.0 / math.sqrt(abs(uk[1]))) * rak1
 
     urak2 = numpy.cross(urak0, urak1)
-    bk = numpy.zeros((3, 3), numpy.float)
+    bk = numpy.zeros((3, 3), config.CALC_DTYPE)
     bk[0] = urak0
     bk[1] = urak1
     bk[2] = urak2
-    lu = numpy.zeros(9, numpy.float)
+    lu = numpy.zeros(9, config.CALC_DTYPE)
     lk = 0
     for j in range(3):
         for i in range(3):
@@ -214,6 +214,67 @@ def find_u(x, y):
     u = numpy.reshape(lu, (-1, 3))
 
     return u
+
+
+def vec_sub(a, b, c):
+    '''
+    Subtract vector ``c`` from vector ``b`` and store the result in ``a``.
+
+    Parameters
+    ----------
+    a
+        float list : output vector
+
+    b
+        float list : minuend vector
+
+    c
+        float list : subtrahend vector
+
+    Returns
+    -------
+    output vector ``a``
+    '''
+
+    a[0] = b[0] - c[0]
+    a[1] = b[1] - c[1]
+    a[2] = b[2] - c[2]
+
+    return a
+
+
+def vec_scale(a, b, c):
+    '''
+    Scale vector ``c`` by scalar ``b`` and store the result in ``a``.
+
+    Parameters
+    ----------
+    a
+        float list : output vector
+
+    b
+        float : scale factor
+
+    c
+        float list : vector to scale
+
+    Returns
+    -------
+    output vector ``a``
+    '''
+
+    a[0] = b * c[0]
+    a[1] = b * c[1]
+    a[2] = b * c[2]
+
+    return a
+
+
+def cmp(a, b):
+    '''
+    python 3 does not provide the cmp function from python 2.7
+    '''
+    return bool(a > b) - bool(a < b)
 
 
 def signed_angle(a, b, c):
@@ -246,21 +307,21 @@ def signed_angle(a, b, c):
     >>> b = [-1.0, 6.0, 8.0]
     >>> c = [-4.0, -1.0, 4]
     >>> linear_algebra.signed_angle(a, b, c)
-    21.444512921997863   
+    21.444512921997863
 
     '''
 
     ada = (a[0] * a[0] + a[1] * a[1] + a[2] * a[2])
     bdb = (b[0] * b[0] + b[1] * b[1] + b[2] * b[2])
 
-    if(ada * bdb <= 0.0):
+    if (ada * bdb <= 0.0):
         return 180.0
     else:
         adb = (a[0] * b[0] + a[1] * b[1] + a[2] * b[2])
         try:
             argument = adb / math.sqrt(ada * bdb)
             angle = (180.0 / math.pi) * math.acos(argument)
-        except:
+        except BaseException:
             return 180.0
 
     cp = cross_product(a, b)
@@ -272,7 +333,7 @@ def signed_angle(a, b, c):
 
 def dihedral_angle(a1, a2, a3, a4):
     '''
-    Calculates the dihedral angle between four vectors  
+    Calculates the dihedral angle between four vectors
 
 
     Parameters
@@ -303,14 +364,14 @@ def dihedral_angle(a1, a2, a3, a4):
     >>> a3 = numpy.array([-4.0, -1.0, 4.0])
     >>> a4 = numpy.array([-3.0, -41, 3.0])
     >>> linear_algebra.dihedral_angle(a1, a2, a3, a4)
-    85.950635659264 
+    85.950635659264
 
     '''
 
-    r1 = numpy.zeros(3, numpy.float)
-    r2 = numpy.zeros(3, numpy.float)
-    r3 = numpy.zeros(3, numpy.float)
-    r4 = numpy.zeros(3, numpy.float)
+    r1 = numpy.zeros(3, config.CALC_DTYPE)
+    r2 = numpy.zeros(3, config.CALC_DTYPE)
+    r3 = numpy.zeros(3, config.CALC_DTYPE)
+    r4 = numpy.zeros(3, config.CALC_DTYPE)
 
     r1 = a1 - a2
     r2 = a3 - a2
@@ -327,36 +388,42 @@ def dihedral_angle(a1, a2, a3, a4):
 
 def calculate_angle(a, b, c):
     '''
+        Calculates the angle at point b formed by three points a, b, and c.
 
-    Calculates the dihedral angle between three vectors  
+        The angle is defined between the vectors(a - b) and (c - b).
 
-    Parameters
+        Parameters
         ----------
-    a
-        float list : vector a
+        a
+        float list: point a
 
-    b
-        float list : vector b
+        b
+        float list: vertex point
 
-    c
-        float list : vector c
+        c
+        float list: point c
 
-    Returns
-    -------
-    float
+        Returns
+        -------
+        float
         angle in radians
 
-    Examples
-    -------
+        Notes
+        -----
+        Returns NaN or Inf if either vector has zero length.
 
-    >>> import sasmol.linear_algebra as linear_algebra
-    >>> a = numpy.array([1.0, 2.0, 3.0])
-    >>> b = numpy.array([-1.0, 6.0, 8.0])
-    >>> c = numpy.array([-4.0, -1.0, 4.0])
-    >>> linear_algebra.calculate_angle(a, b, c)
-    0.7556508878558726 
+        Examples
+        --------
 
+        >> > import numpy
+        >> > import sasmol.linear_algebra as linear_algebra
+        >> > a = numpy.array([1.0, 0.0, 0.0])
+        >> > b = numpy.array([0.0, 0.0, 0.0])
+        >> > c = numpy.array([0.0, 1.0, 0.0])
+        >> > linear_algebra.calculate_angle(a, b, c)
+        1.5707963267948966
     '''
+
     u = a - b
     v = c - b
 

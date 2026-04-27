@@ -1,5 +1,5 @@
 '''
-    SASMOL: Copyright (C) 2011 Joseph E. Curtis, Ph.D. 
+    SASMOL: Copyright (C) 2011 Joseph E. Curtis, Ph.D.
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -15,57 +15,26 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 '''
 
-from sasmol.test_sasmol.utilities import env
+from unittest import main
+import unittest
 
-from unittest import main 
-from mocker import Mocker, MockerTestCase, ANY, ARGS, KWARGS
 import sasmol.system as system
 
-import numpy, os, copy
 
-import warnings; warnings.filterwarnings('ignore')
+class Test_intg_system_Atom_filename(unittest.TestCase):
 
-floattype=os.environ['SASMOL_FLOATTYPE']
+    def setUp(self):
+        self.o = system.Atom(3, '1CRN-3frames.pdb')
 
-DataPath = os.path.join(os.path.dirname(os.path.realpath(__file__)),'..','data','sasmol','system')+os.path.sep
+    def test_filename(self):
+        expected = '1CRN.pdb'
+        self.o.setFilename(expected)
+        result = self.o.filename()
+        self.assertEqual(expected, result)
 
-class Test_intg_system_Atom_Filename(MockerTestCase):
-
-   def setUp(self):
-      self.o=system.Atom(3,'1CRN-3frames.pdb')
-
-   def assert_list_almost_equal(self,a,b,places=5):
-      if (len(a)!=len(b)):
-         raise TypeError
-      else:
-         for i in range(len(a)):
-            if isinstance(a[i],(int,float,numpy.generic)):
-               if (numpy.isnan(a[i]) and numpy.isnan(b[i])): continue
-               self.assertAlmostEqual(a[i],b[i],places)
-            else:
-               self.assert_list_almost_equal(a[i],b[i],places)
-
-   def test_1CRN_3frames(self):
-      '''
-	   test a regular pdb file with 3 frame
-	   '''
-      #
-      fileName = '1CRN-3frames.pdb'
-      expected_fileName = fileName
-      #
-      self.o.read_pdb(DataPath+'1CRN-3frames.pdb')
-      self.o.setFilename(fileName)
-      #
-      result_fileName = self.o.filename()
-      #
-      self.assertEqual(expected_fileName, result_fileName)
+    def tearDown(self):
+        pass
 
 
-   def tearDown(self):
-      pass
-        
-   
-   
-if __name__ == '__main__': 
-   main() 
-
+if __name__ == '__main__':
+    unittest.main()

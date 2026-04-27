@@ -1,7 +1,7 @@
 from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
-#from __future__ import unicode_literals
+# from __future__ import unicode_literals
 #
 #    SASMOL: Copyright (C) 2011 Joseph E. Curtis, Ph.D.
 #
@@ -18,15 +18,15 @@ from __future__ import print_function
 #    You should have received a copy of the GNU General Public License
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
-#	CALCULATE
+# CALCULATE
 #
-#	12/10/2009	--	initial coding			        :	jc
-#	12/20/2015	--	refactored for release          :	jc
-#	07/23/2016	--	refactored for Python 3         :	jc
+# 12/10/2009	--	initial coding			        :	jc
+# 12/20/2015	--	refactored for release          :	jc
+# 07/23/2016	--	refactored for Python 3         :	jc
 #
-#	 1         2         3         4         5         6         7
+# 1         2         3         4         5         6         7
 # LC4567890123456789012345678901234567890123456789012345678901234567890123456789
-#								       *      **
+# *      **
 
 '''
     Calculate contains the classes and methods to calculate various
@@ -36,7 +36,9 @@ from __future__ import print_function
 
 import sys
 import numpy
+import sasmol.config as config
 import sasmol.operate as operate
+
 
 class Calculate(object):
 
@@ -57,17 +59,17 @@ class Calculate(object):
         >>> import sasmol.system as system
         >>> import sasmol.calculate as calculate
         >>> molecule = system.Molecule('hiv1_gag.pdb')
-        >>> calculate.Calculate.calculate_mass(molecule) 
+        >>> calculate.Calculate.calculate_mass(molecule)
         47896.61864599498
 
         Note
         ----
-    
+
         `self` parameter is not shown in the ``Parameters`` section in the documentation
 
         TODO:  Need to write a generic driver to loop over single or multiple frames
 
-    """ 
+    """
 
     def calculate_mass(self, **kwargs):
         '''
@@ -81,15 +83,15 @@ class Calculate(object):
 
         standard atomic weight is based on the natural istopic composition
 
-        NOTE: deuterium is 'D' 2H1 and '1H' is 1H1, all other elements 
+        NOTE: deuterium is 'D' 2H1 and '1H' is 1H1, all other elements
         have their natural abundance weight. These elements are located
         at the end of the dictionary.
 
         Parameters
         ----------
-        kwargs 
+        kwargs
             optional future arguments
-                                                                                     
+
         Returns
         -------
         float
@@ -107,7 +109,7 @@ class Calculate(object):
 
         standard_atomic_weight = self.amu()
         self._total_mass = 0.0
-        self._mass = numpy.zeros(len(self._element), numpy.float)
+        self._mass = numpy.zeros(len(self._element), config.CALC_DTYPE)
 
         count = 0
 
@@ -126,20 +128,20 @@ class Calculate(object):
         return self._total_mass
 
     def calculate_center_of_mass(self, frame, **kwargs):
-        '''	
-        This method calculates the center of mass of the object.  
+        '''
+        This method calculates the center of mass of the object.
 
         Parameters
         ----------
-        frame 
+        frame
             integer : trajectory frame number to use
 
-        kwargs 
+        kwargs
             optional future arguments
-                                                                                     
+
         Returns
         -------
-        numpy array 
+        numpy array
             coordinates of center of mass
 
         Examples
@@ -152,37 +154,42 @@ class Calculate(object):
 
         '''
 
-        if(self._total_mass <= 0.0):
+        if (self._total_mass <= 0.0):
             self.calculate_mass()
 
-        x = self._coor[frame, :, 0]
-        y = self._coor[frame, :, 1]
-        z = self._coor[frame, :, 2]
+        coordinates = self._coor[frame].astype(config.CALC_DTYPE)
+        x = coordinates[:, 0]
+        y = coordinates[:, 1]
+        z = coordinates[:, 2]
 
-        comx = numpy.sum(self._mass * x) / self._total_mass
-        comy = numpy.sum(self._mass * y) / self._total_mass
-        comz = numpy.sum(self._mass * z) / self._total_mass
+        mass = self._mass.astype(config.CALC_DTYPE)
+        total_mass = config.CALC_DTYPE(self._total_mass)
 
-        self._com = numpy.array([comx, comy, comz], numpy.float)
+        comx = numpy.sum(mass * x, dtype=config.CALC_DTYPE) / total_mass
+        comy = numpy.sum(mass * y, dtype=config.CALC_DTYPE) / total_mass
+        comz = numpy.sum(mass * z, dtype=config.CALC_DTYPE) / total_mass
 
-        return self._com
+        self._center_of_mass = numpy.array(
+            [comx, comy, comz], config.CALC_DTYPE)
+
+        return self._center_of_mass
 
     def calculate_radius_of_gyration(self, frame, **kwargs):
-        '''	
+        '''
         This method calculates the radius of gyration of the object
 
         Parameters
         ----------
-        frame 
+        frame
             integer : trajectory frame number to use
 
-        kwargs 
+        kwargs
             optional future arguments
-                                                                                     
+
         Returns
         -------
         float
-            radius of gyration of object 
+            radius of gyration of object
 
         Examples
         -------
@@ -190,44 +197,44 @@ class Calculate(object):
         >>> import sasmol.system as system
         >>> molecule = system.Molecule('hiv1_gag.pdb')
         >>> molecule.calculate_radius_of_gyration(0)
-        64.043168998442368 
+        64.043168998442368
 
         '''
 
-        self._com = self.calculate_center_of_mass(frame)
+        self._center_of_mass = self.calculate_center_of_mass(frame)
 
-        if(self._natoms > 0):
-            rg2 = ((self._coor[frame, :, :] - self._com)
-                    * (self._coor[frame, :, :] - self._com))
+        if (self._natoms > 0):
+            rg2 = ((self._coor[frame, :, :] - self._center_of_mass)
+                   * (self._coor[frame, :, :] - self._center_of_mass))
             self._rg = numpy.sqrt(numpy.sum(numpy.sum(rg2)) / self._natoms)
 
         return self._rg
 
     def calculate_root_mean_square_deviation(self, other, **kwargs):
-        '''	
+        '''
         This method calculates the radius root mean square deviation (rmsd)
         of one set of coordinates compared to another
 
         self contains the coordinates of set 1
         other contains the coordinates of set 2
 
-        the number of coordinates in each set must be equal	
+        the number of coordinates in each set must be equal
 
         To use this over multiple frames you must call this function
         repeatedly.
 
         Parameters
         ----------
-        other 
+        other
             system object with coordinates with equal number of frames
 
-        kwargs 
+        kwargs
             optional future arguments
-                                                                                     
+
         Returns
         -------
         float
-            root mean square deviation between objects 
+            root mean square deviation between objects
 
         Examples
         -------
@@ -240,7 +247,7 @@ class Calculate(object):
             dxyz = ((self._coor - other._coor) * (self._coor - other._coor))
             self._rmsd = numpy.sqrt((numpy.sum(dxyz)) / self._natoms)
         except:
-            if(self._natoms != other._natoms):
+            if (self._natoms != other._natoms):
                 print('number of atoms in (1) != (2)')
                 print('rmsd not calculated: None returned')
                 print('number of atoms in self is < 1')
@@ -249,11 +256,11 @@ class Calculate(object):
 
         return self._rmsd
 
-    def calculate_principle_moments_of_inertia(self, frame, **kwargs):
-        '''	
+    def calculate_principal_moments_of_inertia(self, frame, **kwargs):
+        '''
         This method calculates the principal moments of inertia
         of the object. It uses the center method from operate.Move
-        to center the molecule. 
+        to center the molecule.
         The present method is designated for the non-linear system with
         non-singular moment of inertia matrix only. For the linear systems, it
         will return eigenvectors and I as None.  Testing for non-None return
@@ -261,16 +268,16 @@ class Calculate(object):
 
         Parameters
         ----------
-        frame 
+        frame
             integer : trajectory frame number to use
 
-        kwargs 
+        kwargs
             optional future arguments
-                                                                                     
+
         Returns
         -------
-        tuple of numpy arrays 
-            principle moments of inertia of object :
+        tuple of numpy arrays
+            principal moments of inertia of object :
             eigenvalues, eigenvectors, and I
 
         Examples
@@ -278,49 +285,26 @@ class Calculate(object):
 
         >>> import sasmol.system as system
         >>> molecule = system.Molecule('hiv1_gag.pdb')
-        >>> molecule.calculate_principle_moments_of_inetia(0)
-        (array([  1.30834716e+07,   1.91993314e+08,   1.85015201e+08]), 
+        >>> molecule.calculate_principal_moments_of_inetia(0)
+        (array([  1.30834716e+07,   1.91993314e+08,   1.85015201e+08]),
         array([[-0.08711655, -0.97104917,  0.22242802],
                [-0.512547  ,  0.23514759,  0.82583363],
-               [ 0.85422847,  0.04206103,  0.51819358]]), 
+               [ 0.85422847,  0.04206103,  0.51819358]]),
         array([[  1.90290278e+08,  -9.27036144e+06,   1.25097100e+07],
                [ -9.27036144e+06,   1.40233826e+08,   7.53462715e+07],
-               [  1.25097100e+07,   7.53462715e+07,   5.95678834e+07]])) 
-        
+               [  1.25097100e+07,   7.53462715e+07,   5.95678834e+07]]))
+
         '''
 
+        n_atoms = self._natoms
         com = self.calculate_center_of_mass(frame)
-
         operate.Move.center(self, frame)
-
-        Ixx = 0.0
-        Iyy = 0.0
-        Izz = 0.0
-        Ixy = 0.0
-        Ixz = 0.0
-        Iyz = 0.0
-        Iyx = 0.0
-        Izx = 0.0
-        Izy = 0.0
-
-        for i in range(self._natoms):
-
-            xp = self._coor[frame, i, 0]
-            yp = self._coor[frame, i, 1]
-            zp = self._coor[frame, i, 2]
-
-            Ixx = Ixx + self._mass[i] * (yp * yp + zp * zp)
-            Iyy = Iyy + self._mass[i] * (xp * xp + zp * zp)
-            Izz = Izz + self._mass[i] * (xp * xp + yp * yp)
-
-            Ixy = Ixy - self._mass[i] * xp * yp
-            Ixz = Ixz - self._mass[i] * xp * zp
-            Iyz = Iyz - self._mass[i] * yp * zp
-            Iyx = Iyx - self._mass[i] * yp * xp
-            Izx = Izx - self._mass[i] * zp * xp
-            Izy = Izy - self._mass[i] * zp * yp
-
-        I = numpy.array([[Ixx, Ixy, Ixz], [Iyx, Iyy, Iyz], [Izx, Izy, Izz]])
+        coor = self._coor[frame].astype(config.CALC_DTYPE)
+        m = self._mass.astype(config.CALC_DTYPE).reshape(n_atoms, -1)
+        m_coor = m * coor
+        m_coor2 = numpy.dot(coor.T, m_coor)
+        numpy.fill_diagonal(m_coor2, m_coor2.diagonal() - m_coor2.trace())
+        I = -m_coor2
 
         if numpy.linalg.matrix_rank(I) < 3:
             print("You are requesting the pmi calculation for a singular system.")
@@ -331,13 +315,16 @@ class Calculate(object):
             I = None
         else:
             uk, ak = numpy.linalg.eig(I)
+            order = uk.argsort()
+            uk = uk[order]
+            ak = ak[:, order]
 
         operate.Move.translate(self, frame, com, point=True)
 
         return uk, ak, I
 
     def calculate_minimum_and_maximum(self, **kwargs):
-        '''	
+        '''
         This method calculates the minimum and maximum values
         of of the object in (x,y,z)
 
@@ -348,13 +335,13 @@ class Calculate(object):
 
         Parameters
         ----------
-        kwargs 
-           frames = [] : integer list of frames to process 
-                                                                                     
+        kwargs
+           frames = [] : integer list of frames to process
+
         Returns
         -------
-        numpy array 
-            nested list of minimum and maximum values 
+        numpy array
+            nested list of minimum and maximum values
             [ [ min_x, min_y, min_z ], [max_x, max_y, max_z] ]
 
         Examples
@@ -363,55 +350,134 @@ class Calculate(object):
         >>> import sasmol.system as system
         >>> molecule = system.Molecule('hiv1_gag.pdb')
         >>> molecule.calculate_minimum_and_maximum()
-        [array([-31.29899979, -93.23899841, -85.81900024]), array([ 19.64699936,  30.37800026,  99.52999878])] 
-      
+        [array([-31.29899979, -93.23899841, -85.81900024]), array([ 19.64699936,  30.37800026,  99.52999878])]
+
         >>> import sasmol.system as system
         >>> molecule = system.Molecule('hiv1_gag.pdb')
         >>> molecule.read_dcd('hiv1_gag_200_frames')
         >>> molecule.calculate_minimum_and_maximum()
         [array([ -94.47146606, -121.88082886,  -99.94940948]), array([  52.85133362,   65.53725433,  100.76850891])]
         >>> molecule.calculate_minimum_and_maximum(frames=[0,1,2,3])
-        [array([-30.9330883 , -92.68256378, -84.51082611]), array([ 20.98281288,  38.45230484,  99.91564178])] 
-      
-       
+        [array([-30.9330883 , -92.68256378, -84.51082611]), array([ 20.98281288,  38.45230484,  99.91564178])]
+
+
         '''
-        
-        try: 
+
+        try:
             frames = kwargs['frames']
         except:
-            frames = [x for x in xrange(self.number_of_frames())]
+            frames = [x for x in range(self.number_of_frames())]
 
-        first_flag = True        
+        first_flag = True
 
         for frame in frames:
 
-            this_min_x=numpy.min(self._coor[frame,:,0])
-            this_max_x=numpy.max(self._coor[frame,:,0])		
-            this_min_y=numpy.min(self._coor[frame,:,1])
-            this_max_y=numpy.max(self._coor[frame,:,1])		
-            this_min_z=numpy.min(self._coor[frame,:,2])
-            this_max_z=numpy.max(self._coor[frame,:,2])		
+            this_min_x = numpy.min(self._coor[frame, :, 0])
+            this_max_x = numpy.max(self._coor[frame, :, 0])
+            this_min_y = numpy.min(self._coor[frame, :, 1])
+            this_max_y = numpy.max(self._coor[frame, :, 1])
+            this_min_z = numpy.min(self._coor[frame, :, 2])
+            this_max_z = numpy.max(self._coor[frame, :, 2])
 
-            if(first_flag or (this_min_x < min_x)):
+            if (first_flag or (this_min_x < min_x)):
                 min_x = this_min_x
-            if(first_flag or (this_min_y < min_y)):
+            if (first_flag or (this_min_y < min_y)):
                 min_y = this_min_y
-            if(first_flag or (this_min_z < min_z)):
+            if (first_flag or (this_min_z < min_z)):
                 min_z = this_min_z
 
-            if(first_flag or (this_max_x > max_x)):
+            if (first_flag or (this_max_x > max_x)):
                 max_x = this_max_x
-            if(first_flag or (this_max_y > max_y)):
+            if (first_flag or (this_max_y > max_y)):
                 max_y = this_max_y
-            if(first_flag or (this_max_z > max_z)):
+            if (first_flag or (this_max_z > max_z)):
                 max_z = this_max_z
-    
+
             first_flag = False
 
         self._minimum = numpy.array([min_x, min_y, min_z])
         self._maximum = numpy.array([max_x, max_y, max_z])
 
         return [self._minimum, self._maximum]
+
+    def calculate_minimum_and_maximum_all_steps(self, trajectory_filename=None,
+                                                **kwargs):
+        '''
+        Calculate the global minimum and maximum values in (x, y, z)
+        by streaming over all frames in a trajectory or all loaded frames
+        already present in memory.
+
+        Parameters
+        ----------
+        trajectory_filename
+            string : optional DCD filename to stream frame-by-frame
+
+        kwargs
+            `pdb=True` : iterate over already loaded frames instead of a DCD
+
+        Returns
+        -------
+        numpy array
+            nested list of minimum and maximum values
+            [ [ min_x, min_y, min_z ], [max_x, max_y, max_z] ]
+        '''
+
+        if 'pdb' in kwargs:
+            file_type = 'pdb'
+            number_of_frames = self.number_of_frames()
+        else:
+            file_type = 'dcd'
+            dcdfilepointer_array = self.open_dcd_read(trajectory_filename)
+            dcdfile = dcdfilepointer_array[0]
+            number_of_frames = dcdfilepointer_array[2]
+
+        min_x = None
+        min_y = None
+        min_z = None
+        max_x = None
+        max_y = None
+        max_z = None
+
+        for i in range(number_of_frames):
+
+            if file_type == 'dcd':
+                self.read_dcd_step(dcdfilepointer_array, i)
+                this_minmax = self.calculate_minimum_and_maximum(frames=[0])
+            else:
+                this_minmax = self.calculate_minimum_and_maximum(frames=[i])
+
+            this_min_x = this_minmax[0][0]
+            this_max_x = this_minmax[1][0]
+            this_min_y = this_minmax[0][1]
+            this_max_y = this_minmax[1][1]
+            this_min_z = this_minmax[0][2]
+            this_max_z = this_minmax[1][2]
+
+            if (min_x is None) or (this_min_x < min_x):
+                min_x = this_min_x
+            if (min_y is None) or (this_min_y < min_y):
+                min_y = this_min_y
+            if (min_z is None) or (this_min_z < min_z):
+                min_z = this_min_z
+
+            if (max_x is None) or (this_max_x > max_x):
+                max_x = this_max_x
+            if (max_y is None) or (this_max_y > max_y):
+                max_y = this_max_y
+            if (max_z is None) or (this_max_z > max_z):
+                max_z = this_max_z
+
+        if file_type == 'dcd':
+            self.close_dcd_read(dcdfile)
+
+        self._minimum = numpy.array([min_x, min_y, min_z])
+        self._maximum = numpy.array([max_x, max_y, max_z])
+
+        return [self._minimum, self._maximum]
+
+    def calc_minmax_all_steps(self, dcdfilename, **kwargs):
+        return self.calculate_minimum_and_maximum_all_steps(dcdfilename,
+                                                            **kwargs)
 
     def calculate_residue_charge(self, **kwargs):
         '''
@@ -421,13 +487,13 @@ class Calculate(object):
 
         Note
         ----------
-        Requires that the atom_charge() attribute of object is complete        
+        Requires that the atom_charge() attribute of object is complete
 
         Parameters
         ----------
-        kwargs 
+        kwargs
             optional future arguments
-                                                                                     
+
         Returns
         -------
         float
@@ -454,32 +520,19 @@ class Calculate(object):
 
         atom_charge = self.atom_charge()
 
-        charge_sum = 0.0
-        charge_residue_sum = []
-        last_resid = resid[0]
+        atom_charge = numpy.asarray(atom_charge, config.CALC_DTYPE)
+        charge_residue_sum = {}
 
-        for i in xrange(natoms):
+        for i in range(natoms):
             this_resid = resid[i]
-            this_charge = atom_charge[i]
+            if this_resid not in charge_residue_sum:
+                charge_residue_sum[this_resid] = config.CALC_DTYPE(0.0)
+            charge_residue_sum[this_resid] += atom_charge[i]
 
-            if(this_resid != last_resid or i == natoms - 1):
-                charge_residue_sum.append([last_resid, charge_sum])
-                charge_sum = this_charge
-                last_resid = this_resid
-            else:
-                charge_sum += this_charge
+        charge_residue = [charge_residue_sum[this_resid]
+                          for this_resid in resid]
 
-        last_resid = resid[0]
-        charge_residue = []
-
-        for i in xrange(natoms):
-            this_resid = resid[i]
-            for j in xrange(len(charge_residue_sum)):
-                if(this_resid == charge_residue_sum[j][0]):
-                    charge_residue.append(charge_residue_sum[j][1])
-                    continue
-
-        self.setResidue_charge(numpy.array(charge_residue, numpy.float32))
+        self.setResidue_charge(numpy.array(charge_residue, config.CALC_DTYPE))
 
         return
 
@@ -490,14 +543,14 @@ class Calculate(object):
 
         Parameters
         ----------
-        kwargs 
+        kwargs
             optional future arguments
-                                                                                     
+
         Returns
         -------
         dictionary
             {element : integer number, ... }
-        
+
         Examples
         -------
 

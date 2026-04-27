@@ -7,7 +7,7 @@ import time
 import pkg_resources
 import json
 
-import config as config
+from . import config as config
 
 if config.__logging_level__ == "DEBUG":
     DEBUG = True
@@ -157,7 +157,7 @@ class run_utils():
         self.logger.info(message)
         self.txtOutput.put(message)
         if DEBUG:
-            print message
+            print(message)
 
     def clean_up(self, log):
         '''

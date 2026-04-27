@@ -21,7 +21,7 @@ except AttributeError:
     numpy_include = numpy.get_numpy_include()
 
 # simple extension module
-matrix_math = Extension(name="matrix_math",sources=['./matrix_math.f'],
+matrix_math = Extension(name="matrix_math",sources=['./matrix_math.c'],
                    include_dirs = [numpy_include],
                    )
 
