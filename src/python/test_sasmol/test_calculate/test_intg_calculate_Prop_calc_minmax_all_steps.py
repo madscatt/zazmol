@@ -80,6 +80,16 @@ class Test_sascalc_Prop_calc_minmax_all_steps(unittest.TestCase):
         self.assert_list_almost_equal(expected_minmax[1], result_minmax[1])
         self.assert_list_almost_equal(expected_minmax[1], result_minmax[1])
 
+    def test_calc_minmax_all_steps_alias_matches_primary_method(self):
+        self.o.read_pdb(DataPath+'1ATM.pdb')
+
+        primary = self.o.calculate_minimum_and_maximum_all_steps(
+            dcdDataPath+'1ATM.dcd')
+        alias = self.o.calc_minmax_all_steps(dcdDataPath+'1ATM.dcd')
+
+        self.assert_list_almost_equal(primary[0], alias[0])
+        self.assert_list_almost_equal(primary[1], alias[1])
+
     @skipIf(os.environ['SASMOL_HUGETEST'] == 'n', "I am not testing huge files")
     def test_rna_0point8g(self):
         self.o.read_pdb(DataPath+'rna.pdb')
