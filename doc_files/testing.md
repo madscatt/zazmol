@@ -82,6 +82,28 @@ See the project dtype contract for the full policy:
 
 - [`dtype contract`](dtype_contract.md)
 
+#### Recent Coverage Additions
+
+Focused Python 3 parity coverage was added for stable public behavior in:
+
+- `calculate.calculate_molecular_formula`
+- `calculate.calc_minmax_all_steps` alias parity against
+  `calculate_minimum_and_maximum_all_steps`
+- `subset.set_coor_using_mask`
+- `pdb_io` helper behavior:
+  `check_for_all_zero_columns`, `create_conect_pdb_lines`
+- `utilities.parse_fasta`
+- `utilities.check_integrity`
+
+These additions intentionally avoid questionable legacy aliases and
+experimental internals so tests improve confidence without freezing uncertain
+behavior.
+
+#### Runner Note
+
+`development_tools/test_runner.py` does not currently expose a `utilities`
+suite selector. Run utility tests directly with `unittest` when needed.
+
 #### Current Intentional Exclusions
 
 These legacy areas are not part of the active parity target right now:

@@ -33,6 +33,16 @@ Current expanded validation status:
 - `large` suite passes
 - `huge` suite passes
 
+Recent targeted parity/coverage additions completed:
+
+- direct tests for `calculate_molecular_formula`
+- alias parity test for `calc_minmax_all_steps` vs
+  `calculate_minimum_and_maximum_all_steps`
+- focused behavior tests for `subset.set_coor_using_mask`
+- focused helper tests for `pdb_io`:
+  `check_for_all_zero_columns`, `create_conect_pdb_lines`
+- utility tests for `parse_fasta` and `check_integrity`
+
 #### Ported And Passing
 
 The following active Python areas have been reviewed against legacy behavior,
@@ -170,6 +180,12 @@ The old `type()` / `setType()`, `molcharge()`, and `corr()` APIs remain reviewed
 and not restored. If a downstream SASSIE audit finds active caller reliance,
 that should become a targeted compatibility issue rather than a broad
 port-completion blocker.
+
+4. Test-runner suite naming gap
+
+`development_tools/test_runner.py` does not currently provide a `utilities`
+suite selector. Utility coverage is validated via direct `unittest` module
+execution in the current workflow.
 
 #### Practical Definition Of "Base Port Complete"
 
