@@ -21,24 +21,36 @@ It does not claim:
 
 The active Python suite passes from the build tree:
 
-- `736` tests run
+- `830` tests run
 - `77` skipped
 
-The skipped tests are primarily size-gated `large` and `huge` cases controlled
-through `SASMOL_LARGETEST` and `SASMOL_HUGETEST`.
+The skipped tests are size-gated `large` and `huge` cases controlled through
+`SASMOL_LARGETEST` and `SASMOL_HUGETEST`.
+
+Current expanded validation status:
+
+- normal suite passes
+- `large` suite passes
+- `huge` suite passes
 
 #### Ported And Passing
 
 The following active Python areas have been reviewed against legacy behavior,
 repaired where needed, and validated through the current suite:
 
-- `system`
-- `file_io`
 - `calculate`
-- `operate`
-- `subset`
-- `properties`
+- `charmm_topology`
+- `dcd_io`
+- `file_io`
 - `linear_algebra`
+- `operate`
+- `pdb_io`
+- `properties`
+- `subset`
+- `system`
+- `topology`
+- `utilities`
+- `view`
 
 Notable restored or repaired parity items include:
 
@@ -73,6 +85,9 @@ Notable restored or repaired parity items include:
 - unconditional DCD success-path stdout noise removed
 - historical DCD progress dots moved behind the Python-side `DEBUG` setting
 - Python-side logging defaults changed to quiet mode
+- explicit dtype contract added:
+  - coordinate storage and transfer buffers use `config.COORD_DTYPE`
+  - derived calculations and reductions use `config.CALC_DTYPE`
 
 #### Moved Or Renamed By Design
 
@@ -120,6 +135,9 @@ Rationale:
 
 #### Remaining Important Unknowns
 
+No known active, in-repo, non-extension core-package parity gap remains open
+after the current normal, large, and huge suite passes.
+
 The largest remaining parity risk is outside this repo:
 
 1. External SASSIE caller audit
@@ -145,6 +163,13 @@ What is not yet claimed:
 
 At present, this is optional hardening, not a blocker for the base Python 3
 port.
+
+3. Historical low-value or unused legacy APIs
+
+The old `type()` / `setType()`, `molcharge()`, and `corr()` APIs remain reviewed
+and not restored. If a downstream SASSIE audit finds active caller reliance,
+that should become a targeted compatibility issue rather than a broad
+port-completion blocker.
 
 #### Practical Definition Of "Base Port Complete"
 

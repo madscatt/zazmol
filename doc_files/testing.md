@@ -59,6 +59,16 @@ Do not change casually:
 
 When a numerical or scientific test fails, compare to legacy behavior where possible and report the cause before changing code or tests.
 
+#### Dtype Contract
+
+Coordinate storage and coordinate-transfer buffers use `config.COORD_DTYPE`
+(`numpy.float32`). Derived calculations and reductions use `config.CALC_DTYPE`
+(`numpy.float64`).
+
+See the project dtype contract for the full policy:
+
+- [`dtype contract`](dtype_contract.md)
+
 #### Current Intentional Exclusions
 
 These legacy areas are not part of the active parity target right now:

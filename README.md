@@ -1,5 +1,5 @@
 
-# ZAZMOL
+# SASMOL
 # ======
 
 import sasmol.system as system
@@ -13,20 +13,16 @@ python setup.py install
 
 dependencies:
 
-numpy,
-mocker
+- Python
+- NumPy
 
 ***
 
 # [`basic usage`](doc_files/basic_usage.md)
 
-# [`testing and parity`](doc_files/testing.md)
-
-# [`python 3 parity ledger`](doc_files/parity_ledger.md)
-
 # [`library documentation`](https://madscatt.github.io/zazmol/index.html)
 
-# [`developer notes`](development_tools/notes.md)
+# [`developer notes`](doc_files/developer_notes.md)
 
 ***
 
