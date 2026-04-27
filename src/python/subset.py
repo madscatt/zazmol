@@ -452,7 +452,8 @@ class Mask(object):
 
             coor[frame, 0:natoms1, :] = mol1.coor()[frame, :, :]
         except:
-            error.append('failed in merge_two_molecules when assigning coordinates')
+            error.append(
+                'failed in merge_two_molecules when assigning coordinates')
             return error
 
         if natoms2 > 0:
@@ -464,7 +465,8 @@ class Mask(object):
 
                 coor[frame, natoms1:natoms, :] = mol2.coor()[frame, :, :]
             except:
-                error.append('failed in merge_two_molecules when assigning coordinates')
+                error.append(
+                    'failed in merge_two_molecules when assigning coordinates')
                 return error
 
         self._index = index
@@ -491,7 +493,7 @@ class Mask(object):
 
         for field in optional_array_fields:
             if report_missing_descriptor(field):
-                values = merge_descriptor(field, float)
+                values = merge_descriptor(field, config.CALC_DTYPE)
 
                 if len(error) > 0:
                     return error
@@ -836,7 +838,7 @@ class Mask(object):
         >>> frame = 0
         >>> error, coor = molecule.get_coor_using_mask(frame, mask)
         >>> coor[0][0]
-        array([-21.72500038, -66.91000366,  85.45700073], dtype=float)
+        array([-21.72500038, -66.91000366,  85.45700073], dtype=COORD_DTYPE)
 
         '''
         error = []
@@ -847,7 +849,6 @@ class Mask(object):
 
         this_frame_coor = self._coor[frame, :, :]
 
-        # coor = numpy.zeros((1, len(indicies), 3), float)
         coor = numpy.zeros((1, len(indicies), 3), config.COORD_DTYPE)
 
         try:

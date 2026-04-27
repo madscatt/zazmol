@@ -246,7 +246,6 @@ class DCD(object):
         # print('done with read dcd header')
 
         coor = numpy.zeros((1, nnatoms, 3), config.COORD_DTYPE)
-        # coor=numpy.zeros((1,nnatoms,3),float)
 
         tx = numpy.zeros(nnatoms, dtype=config.COORD_DTYPE)
         ty = numpy.zeros(nnatoms, dtype=config.COORD_DTYPE)
@@ -260,7 +259,6 @@ class DCD(object):
 
         # print('result = ',result)
 
-        # coor[0,:,0]=tx.astype(numpy.float) ; coor[0,:,1]=ty.astype(numpy.float) ; coor[0,:,2]=tz.astype(numpy.float)
         coor[0, :, 0] = tx
         coor[0, :, 1] = ty
         coor[0, :, 2] = tz
@@ -292,7 +290,6 @@ class DCD(object):
         result = dcdio.read_dcdstep(
             filepointer, nnatoms, tx, ty, tz, num_fixed, frame, reverseEndian, charmm)
 
-        # self._coor[0,:,0]=tx.astype(numpy.float) ; self._coor[0,:,1]=ty.astype(numpy.float) ; self._coor[0,:,2]=tz.astype(numpy.float)
         self._coor[0, :, 0] = tx
         self._coor[0, :, 1] = ty
         self._coor[0, :, 2] = tz

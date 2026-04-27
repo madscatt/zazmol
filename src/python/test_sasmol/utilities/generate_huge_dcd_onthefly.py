@@ -1,6 +1,7 @@
 import os
 
 import numpy as np
+import sasmol.config as config
 import sasmol.system as system
 import sasmol._dcdio as dcdio
 
@@ -39,9 +40,9 @@ def generate(fin='rna.pdb', fout='rna.dcd', frames=1000):
     nsavc = 1
     delta = 1.0
     o.write_dcd_header(outfile, frames)
-    tx = o.coor()[0, :, 0].astype(np.float32)
-    ty = o.coor()[0, :, 1].astype(np.float32)
-    tz = o.coor()[0, :, 2].astype(np.float32)
+    tx = o.coor()[0, :, 0].astype(config.COORD_DTYPE)
+    ty = o.coor()[0, :, 1].astype(config.COORD_DTYPE)
+    tz = o.coor()[0, :, 2].astype(config.COORD_DTYPE)
     for i in range(frames):
         dcdio.write_dcdstep(outfile, natoms, tx, ty, tz, i+1)
     o.close_dcd_write(outfile)

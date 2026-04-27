@@ -28,6 +28,7 @@
 import sys
 import numpy
 import math
+import sasmol.config as config
 import sasmol.matrix_math as matrix_math
 
 
@@ -112,7 +113,7 @@ def matrix_multiply(a, b):
     except IndexError:
         dim_b2 = 1
 
-    c = numpy.zeros((dim_a1, dim_b2), numpy.float32)
+    c = numpy.zeros((dim_a1, dim_b2), config.CALC_DTYPE)
     if (dim_a2 != dim_b1):
         message = 'incompatible matrices'
         error.append(message)
@@ -158,7 +159,7 @@ def find_u(x, y):
 
     '''
 
-    b = numpy.zeros(9, numpy.float32)
+    b = numpy.zeros(9, config.CALC_DTYPE)
     k = 0
     for i in range(3):
         for j in range(3):
@@ -197,11 +198,11 @@ def find_u(x, y):
         urak1 = (1.0 / math.sqrt(abs(uk[1]))) * rak1
 
     urak2 = numpy.cross(urak0, urak1)
-    bk = numpy.zeros((3, 3), numpy.float32)
+    bk = numpy.zeros((3, 3), config.CALC_DTYPE)
     bk[0] = urak0
     bk[1] = urak1
     bk[2] = urak2
-    lu = numpy.zeros(9, numpy.float32)
+    lu = numpy.zeros(9, config.CALC_DTYPE)
     lk = 0
     for j in range(3):
         for i in range(3):
@@ -367,10 +368,10 @@ def dihedral_angle(a1, a2, a3, a4):
 
     '''
 
-    r1 = numpy.zeros(3, numpy.float32)
-    r2 = numpy.zeros(3, numpy.float32)
-    r3 = numpy.zeros(3, numpy.float32)
-    r4 = numpy.zeros(3, numpy.float32)
+    r1 = numpy.zeros(3, config.CALC_DTYPE)
+    r2 = numpy.zeros(3, config.CALC_DTYPE)
+    r3 = numpy.zeros(3, config.CALC_DTYPE)
+    r4 = numpy.zeros(3, config.CALC_DTYPE)
 
     r1 = a1 - a2
     r2 = a3 - a2

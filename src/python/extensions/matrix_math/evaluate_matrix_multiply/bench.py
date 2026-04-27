@@ -3,6 +3,7 @@ import time
 import matrix_math
 import matplotlib.pyplot as plt
 import ctypes
+import sasmol.config as config
 from sasmol.linear_algebra import matrix_multiply as linear_algebra_matrix_multiply  # Import the C extension method
 import fmatrix_math  # Import the Fortran matrix multiplication module
 
@@ -19,8 +20,8 @@ def benchmark_and_compare(size):
     print(f"Benchmarking for size: {size}x{size}")
 
     # Create random matrices of the given size
-    a = np.random.rand(size, size).astype(np.float32)
-    b = np.random.rand(size, size).astype(np.float32)
+    a = np.random.rand(size, size).astype(config.COORD_DTYPE)
+    b = np.random.rand(size, size).astype(config.COORD_DTYPE)
 
     # Benchmark the first implementation (NumPy's dot)
     start_time = time.time()
@@ -37,7 +38,7 @@ def benchmark_and_compare(size):
     print(f"C extension time: {time2:.6f} seconds")
 
     # Benchmark the third implementation (C function via ctypes)
-    result3 = np.zeros((size, size), dtype=np.float32)
+    result3 = np.zeros((size, size), dtype=config.COORD_DTYPE)
     start_time = time.time()
     lib.matrix_multiply_c(size, size, size,
                           a.ctypes.data_as(ctypes.POINTER(ctypes.c_float)),
