@@ -36,6 +36,7 @@ from __future__ import print_function
 
 import sys
 import numpy
+import sasmol.config as config
 import sasmol.operate as operate
 
 
@@ -108,7 +109,7 @@ class Calculate(object):
 
         standard_atomic_weight = self.amu()
         self._total_mass = 0.0
-        self._mass = numpy.zeros(len(self._element), float)
+        self._mass = numpy.zeros(len(self._element), config.CALC_DTYPE)
 
         count = 0
 
@@ -156,15 +157,20 @@ class Calculate(object):
         if (self._total_mass <= 0.0):
             self.calculate_mass()
 
-        x = self._coor[frame, :, 0]
-        y = self._coor[frame, :, 1]
-        z = self._coor[frame, :, 2]
+        coordinates = self._coor[frame].astype(config.CALC_DTYPE)
+        x = coordinates[:, 0]
+        y = coordinates[:, 1]
+        z = coordinates[:, 2]
 
-        comx = numpy.sum(self._mass * x) / self._total_mass
-        comy = numpy.sum(self._mass * y) / self._total_mass
-        comz = numpy.sum(self._mass * z) / self._total_mass
+        mass = self._mass.astype(config.CALC_DTYPE)
+        total_mass = config.CALC_DTYPE(self._total_mass)
 
-        self._center_of_mass = numpy.array([comx, comy, comz], float)
+        comx = numpy.sum(mass * x, dtype=config.CALC_DTYPE) / total_mass
+        comy = numpy.sum(mass * y, dtype=config.CALC_DTYPE) / total_mass
+        comz = numpy.sum(mass * z, dtype=config.CALC_DTYPE) / total_mass
+
+        self._center_of_mass = numpy.array(
+            [comx, comy, comz], config.CALC_DTYPE)
 
         return self._center_of_mass
 
@@ -290,14 +296,13 @@ class Calculate(object):
 
         '''
 
-        com = self.calculate_center_of_mass(frame)
-
-        operate.Move.center(self, frame)
-
         n_atoms = self._natoms
-        m = self._mass.reshape(n_atoms, -1)
-        m_coor = m * self._coor[frame]
-        m_coor2 = numpy.dot(self._coor[frame].T, m_coor)
+        com = self.calculate_center_of_mass(frame)
+        operate.Move.center(self, frame)
+        coor = self._coor[frame].astype(config.CALC_DTYPE)
+        m = self._mass.astype(config.CALC_DTYPE).reshape(n_atoms, -1)
+        m_coor = m * coor
+        m_coor2 = numpy.dot(coor.T, m_coor)
         numpy.fill_diagonal(m_coor2, m_coor2.diagonal() - m_coor2.trace())
         I = -m_coor2
 
@@ -515,32 +520,19 @@ class Calculate(object):
 
         atom_charge = self.atom_charge()
 
-        charge_sum = 0.0
-        charge_residue_sum = []
-        last_resid = resid[0]
+        atom_charge = numpy.asarray(atom_charge, config.CALC_DTYPE)
+        charge_residue_sum = {}
 
         for i in range(natoms):
             this_resid = resid[i]
-            this_charge = atom_charge[i]
+            if this_resid not in charge_residue_sum:
+                charge_residue_sum[this_resid] = config.CALC_DTYPE(0.0)
+            charge_residue_sum[this_resid] += atom_charge[i]
 
-            if (this_resid != last_resid or i == natoms - 1):
-                charge_residue_sum.append([last_resid, charge_sum])
-                charge_sum = this_charge
-                last_resid = this_resid
-            else:
-                charge_sum += this_charge
+        charge_residue = [charge_residue_sum[this_resid]
+                          for this_resid in resid]
 
-        last_resid = resid[0]
-        charge_residue = []
-
-        for i in range(natoms):
-            this_resid = resid[i]
-            for j in range(len(charge_residue_sum)):
-                if (this_resid == charge_residue_sum[j][0]):
-                    charge_residue.append(charge_residue_sum[j][1])
-                    continue
-
-        self.setResidue_charge(numpy.array(charge_residue, float32))
+        self.setResidue_charge(numpy.array(charge_residue, config.CALC_DTYPE))
 
         return
 

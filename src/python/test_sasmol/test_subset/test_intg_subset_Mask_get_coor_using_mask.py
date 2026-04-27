@@ -19,6 +19,7 @@ from unittest import main, skipIf
 import sasmol.subset as subset
 import os
 import numpy
+import sasmol.config as config
 import sasmol.system as system
 import unittest
 from sasmol.test_sasmol.utilities import env
@@ -134,7 +135,7 @@ class Test_subset_Mask_get_coor_using_mask(unittest.TestCase):
         expecting_error = False
         mask = [0]
         expected_coor = numpy.array(
-            [[y for (x, y) in zip(mask, self.o.coor()[frame]) if x == 1]], numpy.float32)
+            [[y for (x, y) in zip(mask, self.o.coor()[frame]) if x == 1]], config.COORD_DTYPE)
         #
         error, result_coor = self.o.get_coor_using_mask(frame, mask)
         #
@@ -153,7 +154,7 @@ class Test_subset_Mask_get_coor_using_mask(unittest.TestCase):
         expecting_error = False
         mask = [1]
         expected_coor = numpy.array(
-            [[y for (x, y) in zip(mask, self.o.coor()[frame]) if x == 1]], numpy.float32)
+            [[y for (x, y) in zip(mask, self.o.coor()[frame]) if x == 1]], config.COORD_DTYPE)
         #
         error, result_coor = self.o.get_coor_using_mask(frame, mask)
         #
@@ -172,7 +173,7 @@ class Test_subset_Mask_get_coor_using_mask(unittest.TestCase):
         expecting_error = False
         mask = [0]
         expected_coor = numpy.array(
-            [[y for (x, y) in zip(mask, self.o.coor()[frame]) if x == 1]], numpy.float32)
+            [[y for (x, y) in zip(mask, self.o.coor()[frame]) if x == 1]], config.COORD_DTYPE)
         #
         error, result_coor = self.o.get_coor_using_mask(frame, mask)
         #
@@ -191,7 +192,7 @@ class Test_subset_Mask_get_coor_using_mask(unittest.TestCase):
         expecting_error = False
         mask = [1]
         expected_coor = numpy.array(
-            [[y for (x, y) in zip(mask, self.o.coor()[frame]) if x == 1]], numpy.float32)
+            [[y for (x, y) in zip(mask, self.o.coor()[frame]) if x == 1]], config.COORD_DTYPE)
         #
         error, result_coor = self.o.get_coor_using_mask(frame, mask)
         #
@@ -211,7 +212,7 @@ class Test_subset_Mask_get_coor_using_mask(unittest.TestCase):
         expecting_error = False
         errortmp, mask = self.o.get_subset_mask(basis_filter)
         expected_coor = numpy.array(
-            [[y for (x, y) in zip(mask, self.o.coor()[frame]) if x == 1]], numpy.float32)
+            [[y for (x, y) in zip(mask, self.o.coor()[frame]) if x == 1]], config.COORD_DTYPE)
         #
         error, result_coor = self.o.get_coor_using_mask(frame, mask)
         #
@@ -513,7 +514,7 @@ class Test_subset_Mask_get_coor_using_mask(unittest.TestCase):
         expecting_error = False
         errortmp, mask = self.o.get_subset_mask(basis_filter)
         expected_coor = numpy.array(
-            [[y for (x, y) in zip(mask, self.o.coor()[frame]) if x == 1]], numpy.float32)
+            [[y for (x, y) in zip(mask, self.o.coor()[frame]) if x == 1]], config.COORD_DTYPE)
         #
         error, result_coor = self.o.get_coor_using_mask(frame, mask)
         #
@@ -534,7 +535,7 @@ class Test_subset_Mask_get_coor_using_mask(unittest.TestCase):
         expecting_error = False
         errortmp, mask = self.o.get_subset_mask(basis_filter)
         expected_coor = numpy.array(
-            [[y for (x, y) in zip(mask, self.o.coor()[frame]) if x == 1]], numpy.float32)
+            [[y for (x, y) in zip(mask, self.o.coor()[frame]) if x == 1]], config.COORD_DTYPE)
         #
         error, result_coor = self.o.get_coor_using_mask(frame, mask)
         #

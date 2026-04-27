@@ -20,6 +20,7 @@ from unittest import mock
 
 import numpy
 
+import sasmol.config as config
 import sasmol.system as system
 import sasmol.view_vmd as view_vmd
 
@@ -30,7 +31,7 @@ class Test_intg_system_Atom_send_coordinates_to_vmd(unittest.TestCase):
     def test_send_coordinates_to_vmd_passes_float32_coordinates(self, mock_send):
         molecule = system.Molecule(0)
         molecule.setCoor(numpy.array(
-            [[[1.25, 2.5, 3.75], [4.0, 5.5, 6.75]]], numpy.float64
+            [[[1.25, 2.5, 3.75], [4.0, 5.5, 6.75]]], config.CALC_DTYPE
         ))
 
         molecule.send_coordinates_to_vmd(1085, False)
@@ -40,28 +41,28 @@ class Test_intg_system_Atom_send_coordinates_to_vmd(unittest.TestCase):
 
         self.assertEqual(port, 1085)
         self.assertFalse(flag)
-        self.assertEqual(tx.dtype, numpy.float32)
-        self.assertEqual(ty.dtype, numpy.float32)
-        self.assertEqual(tz.dtype, numpy.float32)
+        self.assertEqual(tx.dtype, config.COORD_DTYPE)
+        self.assertEqual(ty.dtype, config.COORD_DTYPE)
+        self.assertEqual(tz.dtype, config.COORD_DTYPE)
         self.assertTrue(numpy.array_equal(
-            tx, numpy.array([1.25, 4.0], numpy.float32)))
+            tx, numpy.array([1.25, 4.0], config.COORD_DTYPE)))
         self.assertTrue(numpy.array_equal(
-            ty, numpy.array([2.5, 5.5], numpy.float32)))
+            ty, numpy.array([2.5, 5.5], config.COORD_DTYPE)))
         self.assertTrue(numpy.array_equal(
-            tz, numpy.array([3.75, 6.75], numpy.float32)))
+            tz, numpy.array([3.75, 6.75], config.COORD_DTYPE)))
 
     def test_view_vmd_rejects_mismatched_array_lengths(self):
-        x = numpy.array([1.0], numpy.float32)
-        y = numpy.array([2.0, 3.0], numpy.float32)
-        z = numpy.array([4.0], numpy.float32)
+        x = numpy.array([1.0], config.COORD_DTYPE)
+        y = numpy.array([2.0, 3.0], config.COORD_DTYPE)
+        z = numpy.array([4.0], config.COORD_DTYPE)
 
         with self.assertRaisesRegex(ValueError, r"Arrays of lengths \(1,2,1\) given"):
             view_vmd.send_coordinates_to_vmd(x, y, z, 1085, False)
 
     def test_view_vmd_rejects_non_float32_arrays(self):
-        x = numpy.array([1.0], numpy.float64)
-        y = numpy.array([2.0], numpy.float64)
-        z = numpy.array([3.0], numpy.float64)
+        x = numpy.array([1.0], config.CALC_DTYPE)
+        y = numpy.array([2.0], config.CALC_DTYPE)
+        z = numpy.array([3.0], config.CALC_DTYPE)
 
         with self.assertRaisesRegex(TypeError, r"Coordinate arrays must have dtype float32"):
             view_vmd.send_coordinates_to_vmd(x, y, z, 1085, False)

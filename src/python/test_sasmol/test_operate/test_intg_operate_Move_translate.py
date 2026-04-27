@@ -20,6 +20,7 @@ from sasmol.test_sasmol.utilities import env
 from unittest import main, skipIf
 import unittest
 import sasmol.system as system
+import sasmol.config as config
 import sasmol.operate as operate
 
 import numpy
@@ -92,7 +93,7 @@ class Test_intg_operate_Move_translate(unittest.TestCase):
         self.o.read_pdb(DataPath+'rna.pdb')
         value = numpy.array([1.0, 3.0, 6.0], floattype)
         self.o.translate(0, value)
-        result_coor_sum = sum(sum(sum(self.o.coor())))
+        result_coor_sum = numpy.sum(self.o.coor(), dtype=config.CALC_DTYPE)
         expected_coor_sum = 165825.827
         self.assertAlmostEqual(expected_coor_sum, result_coor_sum, self.tol)
 
@@ -100,7 +101,7 @@ class Test_intg_operate_Move_translate(unittest.TestCase):
         self.o.read_pdb(DataPath+'1CRN.pdb')
         value = numpy.array([1.0, 3.0, 6.0], floattype)
         self.o.translate(0, value)
-        result_coor_sum = sum(sum(sum(self.o.coor())))
+        result_coor_sum = numpy.sum(self.o.coor(), dtype=config.CALC_DTYPE)
         expected_coor_sum = 11779.587
         self.assertAlmostEqual(expected_coor_sum, result_coor_sum, self.tol)
 
@@ -109,8 +110,10 @@ class Test_intg_operate_Move_translate(unittest.TestCase):
         self.o.read_pdb(DataPath+'1KP8.pdb')
         value = numpy.array([1.0, 3.0, 6.0], floattype)
         self.o.translate(0, value)
-        result_coor_sum = sum(sum(sum(self.o.coor())))
-        expected_coor_sum = 6840020.261
+        result_coor_sum = numpy.sum(self.o.coor(), dtype=config.CALC_DTYPE)
+        # Expected value reflects float32 coordinate storage with float64
+        # summation.
+        expected_coor_sum = 6840020.260054469
         self.assertAlmostEqual(expected_coor_sum, result_coor_sum, self.tol)
 
     def tearDown(self):

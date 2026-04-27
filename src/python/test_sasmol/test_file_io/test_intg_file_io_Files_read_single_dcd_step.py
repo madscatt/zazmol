@@ -20,6 +20,7 @@ from sasmol.test_sasmol.utilities import env
 from unittest import main, skipIf
 import unittest
 
+import sasmol.config as config
 import sasmol.system as system
 
 import numpy
@@ -40,7 +41,7 @@ class Test_intg_file_io_Files_read_single_dcd_step(unittest.TestCase):
         reference = system.Molecule(0)
         reference.read_pdb(pdb_file)
         cls.huge_rna_reference_coor = numpy.array([reference.coor()[0]],
-                                                  numpy.float32)
+                                                  config.COORD_DTYPE)
         cls.huge_rna_sample_coor = cls.huge_rna_reference_coor[0][10631]
         cls.huge_rna_sum = sum(sum(sum(cls.huge_rna_reference_coor)))
 

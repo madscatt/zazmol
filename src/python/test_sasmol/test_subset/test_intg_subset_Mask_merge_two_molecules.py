@@ -63,6 +63,7 @@ from unittest import main,skipIf
 import unittest
 
 import sasmol.system as system
+import sasmol.config as config
 import sasmol.subset as subset
 
 import numpy
@@ -647,9 +648,9 @@ class Test_subset_Mask_merge_two_molecules(unittest.TestCase):
       self.assertEqual(self.o3.coor().shape, (1, 4, 3))
 
 
-   def test_molecule_maker_coordinate_dtype_current_behavior(self):
+   def test_molecule_maker_coordinate_dtype(self):
       '''
-      characterize current merge coordinate dtype behavior
+      merge stores coordinates as single precision
       '''
       #
       self.o1 = system.Molecule_Maker(1)
@@ -658,9 +659,9 @@ class Test_subset_Mask_merge_two_molecules(unittest.TestCase):
       error = self.o3.merge_two_molecules(self.o1, self.o2)
       #
       self.assertEqual(error, [])
-      self.assertEqual(self.o1.coor().dtype, numpy.float32)
-      self.assertEqual(self.o2.coor().dtype, numpy.float32)
-      self.assertEqual(self.o3.coor().dtype, numpy.dtype(float))
+      self.assertEqual(self.o1.coor().dtype, config.COORD_DTYPE)
+      self.assertEqual(self.o2.coor().dtype, config.COORD_DTYPE)
+      self.assertEqual(self.o3.coor().dtype, config.COORD_DTYPE)
 
 
    def test_missing_descriptor_is_skipped(self):
@@ -738,7 +739,7 @@ class Test_subset_Mask_merge_two_molecules(unittest.TestCase):
       #
       self.o1 = system.Molecule_Maker(2)
       self.o2 = system.Molecule_Maker(1)
-      self.o1.setCoor(numpy.zeros((1, 1, 3), numpy.float32))
+      self.o1.setCoor(numpy.zeros((1, 1, 3), config.COORD_DTYPE))
       #
       error = self.o3.merge_two_molecules(self.o1, self.o2)
       #

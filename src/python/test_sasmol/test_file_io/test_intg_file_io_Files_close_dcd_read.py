@@ -23,6 +23,7 @@ import unittest
 import warnings
 import numpy
 
+import sasmol.config as config
 import sasmol.system as system
 import sasmol._dcdio as dcdio
 
@@ -89,7 +90,7 @@ class Test_intg_sasio_Files_close_dcd_read(unittest.TestCase):
         filename = '1ATM.dcd'
         dcdFileName = DataPath+filename
         dcdFile = self.o.open_dcd_read(dcdFileName)
-        self.o._coor = numpy.zeros((1, dcdFile[1], 3), numpy.float32)
+        self.o._coor = numpy.zeros((1, dcdFile[1], 3), config.COORD_DTYPE)
 
         self.o.read_dcd_step(dcdFile, 0, no_print=True)
         self.o.close_dcd_read(dcdFile)

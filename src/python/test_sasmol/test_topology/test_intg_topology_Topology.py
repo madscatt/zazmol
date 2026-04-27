@@ -23,6 +23,7 @@ import unittest
 import os
 
 import numpy
+import sasmol.config as config
 import sasmol.system as system
 
 
@@ -60,7 +61,7 @@ class Test_intg_topology_Topology(unittest.TestCase):
         molecule.setResname(['ALA', 'ALA', 'ADE', 'HOH'])
         molecule.setResid(numpy.array([1, 1, 2, 3], numpy.int32))
         molecule.setChain(['A', 'A', 'B', 'W'])
-        molecule.setCoor(numpy.zeros((1, 4, 3), numpy.float32))
+        molecule.setCoor(numpy.zeros((1, 4, 3), config.COORD_DTYPE))
         molecule.setRescode([' ', ' ', ' ', ' '])
         molecule.setSegname(['SEG1', 'SEG1', 'SEG2', 'WAT'])
         molecule.setElement(['N', 'H', 'P', 'O'])

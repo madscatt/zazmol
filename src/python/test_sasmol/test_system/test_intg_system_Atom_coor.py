@@ -17,6 +17,9 @@
 
 import unittest 
 
+import numpy
+
+import sasmol.config as config
 import sasmol.system as system
 
 import os
@@ -38,7 +41,7 @@ class Test_intg_system_Atom_coor(unittest.TestCase):
       self.o.read_pdb(DataPath+'1CRN-3frames.pdb')
       #
       result = self.o.coor()
-      result_sum = sum(sum(sum(result)))
+      result_sum = numpy.sum(result, dtype=config.CALC_DTYPE)
       #
       self.assertAlmostEqual(expected_sum, result_sum,3)
 
@@ -50,4 +53,3 @@ class Test_intg_system_Atom_coor(unittest.TestCase):
    
 if __name__ == '__main__': 
    unittest.main() 
-

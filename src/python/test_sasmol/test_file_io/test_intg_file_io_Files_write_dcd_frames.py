@@ -20,6 +20,7 @@ from sasmol.test_sasmol.utilities import env
 from unittest import main,skipIf
 import unittest
 import sasmol.system as system
+import sasmol.config as config
 
 import numpy
 import os
@@ -61,7 +62,7 @@ class Test_intg_file_io_Files_write_dcd(unittest.TestCase):
       o1 = system.Molecule(0)
       o1.read_dcd(dcdFile)
       result_coor = o1.coor()
-      sum_result_coor = sum(sum(sum(result_coor)))
+      sum_result_coor = numpy.sum(result_coor, dtype=config.CALC_DTYPE)
       #print('\nresult_coor \n',result_coor,'\nsum of result_coor\n',sum_result_coor)
       os.remove(dcdFile)
       #
@@ -86,7 +87,7 @@ class Test_intg_file_io_Files_write_dcd(unittest.TestCase):
       o1 = system.Molecule(0)
       o1.read_dcd(dcdFile)
       result_coor = o1.coor()
-      sum_result_coor = sum(sum(sum(result_coor)))
+      sum_result_coor = numpy.sum(result_coor, dtype=config.CALC_DTYPE)
       #print('\nresult_coor \n',result_coor,'\nsum of result_coor\n',sum_result_coor)
       os.remove(dcdFile)
       #
@@ -111,7 +112,7 @@ class Test_intg_file_io_Files_write_dcd(unittest.TestCase):
       o1 = system.Molecule(0)
       o1.read_dcd(dcdFile)
       result_coor = o1.coor()
-      sum_result_coor = sum(sum(sum(result_coor)))
+      sum_result_coor = numpy.sum(result_coor, dtype=config.CALC_DTYPE)
       #print('\nresult_coor \n',result_coor,'\nsum of result_coor\n',sum_result_coor)
       os.remove(dcdFile)
       #
@@ -136,7 +137,7 @@ class Test_intg_file_io_Files_write_dcd(unittest.TestCase):
       o1 = system.Molecule(0)
       o1.read_dcd(dcdFile)
       result_coor = o1.coor()
-      sum_result_coor = sum(sum(sum(result_coor)))
+      sum_result_coor = numpy.sum(result_coor, dtype=config.CALC_DTYPE)
       #print('\nresult_coor \n',result_coor,'\nsum of result_coor\n',sum_result_coor)
       os.remove(dcdFile)
       #
@@ -163,7 +164,7 @@ class Test_intg_file_io_Files_write_dcd(unittest.TestCase):
       o1 = system.Molecule(0)
       o1.read_dcd(dcdFile)
       result_coor = o1.coor()
-      sum_result_coor = sum(sum(sum(result_coor)))
+      sum_result_coor = numpy.sum(result_coor, dtype=config.CALC_DTYPE)
       #print('\nresult_coor \n',result_coor,'\nsum of result_coor\n',sum_result_coor)
       os.remove(dcdFile)
       #
@@ -189,7 +190,7 @@ class Test_intg_file_io_Files_write_dcd(unittest.TestCase):
       o1 = system.Molecule(0)
       o1.read_dcd(dcdFile)
       result_coor = o1.coor()
-      sum_result_coor = sum(sum(sum(result_coor)))
+      sum_result_coor = numpy.sum(result_coor, dtype=config.CALC_DTYPE)
       #print('\nresult_coor \n',result_coor,'\nsum of result_coor\n',sum_result_coor)
       os.remove(dcdFile)
       #
@@ -215,7 +216,7 @@ class Test_intg_file_io_Files_write_dcd(unittest.TestCase):
       o1 = system.Molecule(0)
       o1.read_dcd(dcdFile)
       result_coor = o1.coor()
-      sum_result_coor = sum(sum(sum(result_coor)))
+      sum_result_coor = numpy.sum(result_coor, dtype=config.CALC_DTYPE)
       #print('\nresult_coor \n',result_coor,'\nsum of result_coor\n',sum_result_coor)
       os.remove(dcdFile)
       #
@@ -241,7 +242,7 @@ class Test_intg_file_io_Files_write_dcd(unittest.TestCase):
       o1 = system.Molecule(0)
       o1.read_dcd(dcdFile)
       result_coor = o1.coor()
-      sum_result_coor = sum(sum(sum(result_coor)))
+      sum_result_coor = numpy.sum(result_coor, dtype=config.CALC_DTYPE)
       #print('\nresult_coor \n',result_coor,'\nsum of result_coor\n',sum_result_coor)
       os.remove(dcdFile)
       #

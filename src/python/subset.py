@@ -34,6 +34,7 @@ import locale
 import struct
 import numpy
 import time
+import sasmol.config as config
 import sasmol.mask
 import sasmol.utilities as utilities
 import random
@@ -441,7 +442,7 @@ class Mask(object):
         index = list(mol1._index) + list(range(last_index_mol1 + 1,
                                                last_index_mol1 + natoms2 + 1))
 
-        coor = numpy.zeros((1, natoms, 3), float)
+        coor = numpy.zeros((1, natoms, 3), config.COORD_DTYPE)
 
         try:
             if mol1.coor().shape[1] != natoms1:
@@ -677,8 +678,8 @@ class Mask(object):
         other.setNatoms(len(index))
         other.setResidue_flag(residue_flag)
 
-        other.setAtom_charge(numpy.array(atom_charge, float))
-        other.setAtom_vdw(numpy.array(atom_vdw, float))
+        other.setAtom_charge(numpy.array(atom_charge, config.CALC_DTYPE))
+        other.setAtom_vdw(numpy.array(atom_vdw, config.CALC_DTYPE))
 
         other._number_of_names = len(unique_names)
         other._names = unique_names
@@ -847,7 +848,7 @@ class Mask(object):
         this_frame_coor = self._coor[frame, :, :]
 
         # coor = numpy.zeros((1, len(indicies), 3), float)
-        coor = numpy.zeros((1, len(indicies), 3), numpy.float32)
+        coor = numpy.zeros((1, len(indicies), 3), config.COORD_DTYPE)
 
         try:
             coor[0] = numpy.take(this_frame_coor[:, :], indicies, 0)

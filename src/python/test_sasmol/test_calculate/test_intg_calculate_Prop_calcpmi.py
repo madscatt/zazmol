@@ -103,12 +103,12 @@ class Test_sascalc_Prop_calcpmi(unittest.TestCase):
         result_I = result[2]
         result_eigenvalues, result_eigenvectors = self.reorder_eigens(
             result_eigenvalues, result_eigenvectors)
-        # expected_I = numpy.array([numpy.array([ 589.53374631,  -64.32846157, -439.3753857 ]), numpy.array([  -64.32846157,  1532.13560848,   -65.3989943 ]), numpy.array([ -439.3753857 ,   -65.3989943 ,  1407.58300946])], floattype)
-        expected_I = numpy.array([numpy.array([589.53384524,  -64.32829746, -439.3755768]), numpy.array(
-            [-64.32829746, 1532.13640887,  -65.39893329]), numpy.array([-439.3755768,   -65.39893329, 1407.58353235])], floattype)
-        # expected_eigenvalues = numpy.array([1614.281458830048, 1523.0603348786992, 391.91057054356725], floattype)
+        # Expected values reflect float32 coordinate storage with float64
+        # calculation intermediates.
+        expected_I = numpy.array([numpy.array([589.533746311651,  -64.328461565902, -439.375385704833]), numpy.array(
+            [-64.328461565902, 1532.135608483722,  -65.398994295632]), numpy.array([-439.375385704833,   -65.398994295632, 1407.583009456943])], floattype)
         expected_eigenvalues = numpy.array(
-            [1614.28209245, 1523.0610665,  391.91062751], floattype)
+            [1614.281458831898, 1523.060334881807,  391.910570545354], floattype)
         # expected_eigenvectors = numpy.array([numpy.array([ 0.33751536,  0.41020629, -0.84723915]), numpy.array([ 0.22717091, -0.90894656, -0.3495848 ]), numpy.array([-0.913497  , -0.07447786, -0.39997036])],floattype)
         expected_eigenvectors = numpy.array([numpy.array([0.33751523,  0.41020703, -0.84723885]), numpy.array(
             [0.22717101, -0.90894624, -0.34958556]), numpy.array([-0.91349702, -0.07447765, -0.39997034])], floattype)
@@ -131,11 +131,12 @@ class Test_sascalc_Prop_calcpmi(unittest.TestCase):
         result_I = result[2]
         result_eigenvalues, result_eigenvectors = self.reorder_eigens(
             result_eigenvalues, result_eigenvectors)
-        expected_I = numpy.array([numpy.array([3.04411898e+08,   4.04333713e+07,   4.06520707e+07]), numpy.array(
-            [4.04333713e+07,   3.08529104e+08,  -4.59336765e+07]), numpy.array([4.06520707e+07,  -4.59336765e+07,   3.02196582e+08])], floattype)
-        # expected_eigenvalues = numpy.array([351687532.76625204, 343174952.58514869, 220275098.79483908], floattype)
+        # Expected values reflect float32 coordinate storage with float64
+        # calculation intermediates.
+        expected_I = numpy.array([numpy.array([3.044118942442e+08,   4.043337055251e+07,   4.065207099889e+07]), numpy.array(
+            [4.043337055251e+07,   3.085291059812e+08,  -4.593367594306e+07]), numpy.array([4.065207099889e+07,  -4.593367594306e+07,   3.021965836672e+08])], floattype)
         expected_eigenvalues = numpy.array(
-            [3.516875330243e+08, 3.431749527893e+08, 2.202750990186e+08], floattype)
+            [3.516875335607e+08, 3.431749508626e+08, 2.202750994692e+08], floattype)
         expected_eigenvectors = numpy.array([numpy.array([-0.1525973, -0.78373478,  0.60205802]), numpy.array(
             [0.8122177,  0.24761209,  0.52819567]), numpy.array([0.56304216, -0.56960341, -0.59877832])], floattype)
         # print(f"{numpy.array2string(result_eigenvalues, precision=12, floatmode='fixed')}")
@@ -155,12 +156,12 @@ class Test_sascalc_Prop_calcpmi(unittest.TestCase):
         result_I = result[2]
         result_eigenvalues, result_eigenvectors = self.reorder_eigens(
             result_eigenvalues, result_eigenvectors)
-        # print(f"{numpy.array2string(result_I, precision=12, floatmode='fixed')}")
-        # print(f"{numpy.array2string(result_eigenvalues, precision=12, floatmode='fixed')}")
-        expected_I = numpy.array([numpy.array([258450.061183417245, -45258.198732834389, -67627.064876897915]), numpy.array([-45258.198732834375,
-                                 311061.101254460926,  -3089.063296428169]), numpy.array([-67627.064876897915,  -3089.063296428170, 244380.694520889461])], floattype)
+        # Expected values reflect float32 coordinate storage with float64
+        # calculation intermediates.
+        expected_I = numpy.array([numpy.array([258450.066403634846, -45258.199576749066, -67627.065565671233]), numpy.array([-45258.199576749066,
+                                 311061.104958547745,  -3089.063300746677]), numpy.array([-67627.065565671233,  -3089.063300746676, 244380.695794588071])], floattype)
         expected_eigenvalues = numpy.array(
-            [349987.994974008936, 288718.589440172946, 175185.272544585750], floattype)
+            [349987.999953595398, 288718.592304701044, 175185.274898475007], floattype)
         expected_eigenvectors = numpy.array([numpy.array([0.61882991, -0.68963421, -0.37610398]), numpy.array(
             [-0.37918551, -0.68156978,  0.62584422]), numpy.array([-0.68794469, -0.24467794, -0.68327506])], floattype)
         self.assert_list_almost_equal_flip_sign_allowed(
@@ -180,12 +181,14 @@ class Test_sascalc_Prop_calcpmi(unittest.TestCase):
         result_I = result[2]
         result_eigenvalues, result_eigenvectors = self.reorder_eigens(
             result_eigenvalues, result_eigenvectors)
-        expected_I = numpy.array([numpy.array([2.118857177165e+09, -5.073117049603e+06, -6.581598196332e+06]), numpy.array(
-            [-5.073117049603e+06, 2.118487347818e+09, 7.279001499270e+06]), numpy.array([-6.581598196332e+06, 7.279001499270e+06, 1.903425055550e+09])], floattype)
+        # Expected values reflect float32 coordinate storage with float64
+        # calculation intermediates.
+        expected_I = numpy.array([numpy.array([2.118857176574e+09, -5.073118355158e+06, -6.581597703808e+06]), numpy.array(
+            [-5.073118355158e+06, 2.118487346086e+09, 7.279001798601e+06]), numpy.array([-6.581597703808e+06, 7.279001798601e+06, 1.903425054207e+09])], floattype)
         expected_eigenvalues = numpy.array(
-            [2.124183019413e+09, 2.113597830236e+09, 1.902988730883e+09], floattype)
+            [2.124183019558e+09, 2.113597827755e+09, 1.902988729553e+09], floattype)
         expected_eigenvectors = numpy.array([numpy.array([0.717208918858, -0.695447830514, -0.044313448795]), numpy.array(
-            [-0.696225776128, -0.717816353465, -0.003057998362]), numpy.array([-0.029682239897, 0.033045388979, -0.999012996363])], floattype)
+            [-0.696225741993, -0.717816386552, -0.003058003247]), numpy.array([-0.029682237286, 0.033045390311, -0.999012996396])], floattype)
         self.assert_list_almost_equal_flip_sign_allowed(
             expected_I, result_I, -2)
         self.assert_list_almost_equal_flip_sign_allowed(

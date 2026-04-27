@@ -121,9 +121,9 @@ class DCD(object):
 
         natoms = self._coor[0, :, 0].shape[0]
 
-        tx = self._coor[frame, :, 0].astype(numpy.float32)
-        ty = self._coor[frame, :, 1].astype(numpy.float32)
-        tz = self._coor[frame, :, 2].astype(numpy.float32)
+        tx = self._coor[frame, :, 0].astype(config.COORD_DTYPE)
+        ty = self._coor[frame, :, 1].astype(config.COORD_DTYPE)
+        tz = self._coor[frame, :, 2].astype(config.COORD_DTYPE)
 
         stepresult = dcdio.write_dcdstep(filepointer, natoms, tx, ty, tz, step)
 
@@ -153,9 +153,9 @@ class DCD(object):
                 print(".",)
                 sys.stdout.flush()
 
-            tx = self._coor[frame, :, 0].astype(numpy.float32)
-            ty = self._coor[frame, :, 1].astype(numpy.float32)
-            tz = self._coor[frame, :, 2].astype(numpy.float32)
+            tx = self._coor[frame, :, 0].astype(config.COORD_DTYPE)
+            ty = self._coor[frame, :, 1].astype(config.COORD_DTYPE)
+            tz = self._coor[frame, :, 2].astype(config.COORD_DTYPE)
 
             stepresult = dcdio.write_dcdstep(outfile, natoms, tx, ty, tz, i+1)
             i += 1
@@ -212,9 +212,9 @@ class DCD(object):
                 print(".",)
                 sys.stdout.flush()
 
-            tx = self._coor[frame, :, 0].astype(numpy.float32)
-            ty = self._coor[frame, :, 1].astype(numpy.float32)
-            tz = self._coor[frame, :, 2].astype(numpy.float32)
+            tx = self._coor[frame, :, 0].astype(config.COORD_DTYPE)
+            ty = self._coor[frame, :, 1].astype(config.COORD_DTYPE)
+            tz = self._coor[frame, :, 2].astype(config.COORD_DTYPE)
 
             stepresult = dcdio.write_dcdstep(
                 outfile, natoms, tx, ty, tz, frame+1)
@@ -245,12 +245,12 @@ class DCD(object):
 
         # print('done with read dcd header')
 
-        coor = numpy.zeros((1, nnatoms, 3), numpy.float32)
+        coor = numpy.zeros((1, nnatoms, 3), config.COORD_DTYPE)
         # coor=numpy.zeros((1,nnatoms,3),float)
 
-        tx = numpy.zeros(nnatoms, dtype=numpy.float32)
-        ty = numpy.zeros(nnatoms, dtype=numpy.float32)
-        tz = numpy.zeros(nnatoms, dtype=numpy.float32)
+        tx = numpy.zeros(nnatoms, dtype=config.COORD_DTYPE)
+        ty = numpy.zeros(nnatoms, dtype=config.COORD_DTYPE)
+        tz = numpy.zeros(nnatoms, dtype=config.COORD_DTYPE)
 
         first = 1  # since num_fixed = 0 ; the "first" variable is inconsequential
 
@@ -261,9 +261,9 @@ class DCD(object):
         # print('result = ',result)
 
         # coor[0,:,0]=tx.astype(numpy.float) ; coor[0,:,1]=ty.astype(numpy.float) ; coor[0,:,2]=tz.astype(numpy.float)
-        coor[0, :, 0] = tx.astype(float)
-        coor[0, :, 1] = ty.astype(float)
-        coor[0, :, 2] = tz.astype(float)
+        coor[0, :, 0] = tx
+        coor[0, :, 1] = ty
+        coor[0, :, 2] = tz
 
         result = dcdio.close_dcd_read(infile)
         self._coor = numpy.array(coor)
@@ -285,17 +285,17 @@ class DCD(object):
         reverseEndian = dcdfile[3]
         charmm = dcdfile[4]
 
-        tx = numpy.zeros(nnatoms, dtype=numpy.float32)
-        ty = numpy.zeros(nnatoms, dtype=numpy.float32)
-        tz = numpy.zeros(nnatoms, dtype=numpy.float32)
+        tx = numpy.zeros(nnatoms, dtype=config.COORD_DTYPE)
+        ty = numpy.zeros(nnatoms, dtype=config.COORD_DTYPE)
+        tz = numpy.zeros(nnatoms, dtype=config.COORD_DTYPE)
 
         result = dcdio.read_dcdstep(
             filepointer, nnatoms, tx, ty, tz, num_fixed, frame, reverseEndian, charmm)
 
         # self._coor[0,:,0]=tx.astype(numpy.float) ; self._coor[0,:,1]=ty.astype(numpy.float) ; self._coor[0,:,2]=tz.astype(numpy.float)
-        self._coor[0, :, 0] = tx.astype(float)
-        self._coor[0, :, 1] = ty.astype(float)
-        self._coor[0, :, 2] = tz.astype(float)
+        self._coor[0, :, 0] = tx
+        self._coor[0, :, 1] = ty
+        self._coor[0, :, 2] = tz
 
         # Historically this printed per-frame progress during long DCD reads.
         if DEBUG:
@@ -328,7 +328,7 @@ class DCD(object):
 
         readheaderresult, filepointer, nnatoms, nset, istart, nsavc, delta, namnf, reverseEndian, charmm = dcdio.read_dcdheader(
             infile)
-        coor = numpy.zeros((nset, nnatoms, 3), float)
+        coor = numpy.zeros((nset, nnatoms, 3), config.COORD_DTYPE)
 
         num_fixed = 0
         result = 1
@@ -341,9 +341,9 @@ class DCD(object):
                 sys.stdout.flush()
             read_start_time = time.time()
 
-            tx = numpy.zeros(nnatoms, dtype=numpy.float32)
-            ty = numpy.zeros(nnatoms, dtype=numpy.float32)
-            tz = numpy.zeros(nnatoms, dtype=numpy.float32)
+            tx = numpy.zeros(nnatoms, dtype=config.COORD_DTYPE)
+            ty = numpy.zeros(nnatoms, dtype=config.COORD_DTYPE)
+            tz = numpy.zeros(nnatoms, dtype=config.COORD_DTYPE)
 
             result = dcdio.read_dcdstep(
                 infile, nnatoms, tx, ty, tz, num_fixed, i, reverseEndian, charmm)
@@ -351,9 +351,9 @@ class DCD(object):
 
             sum += read_end_time-read_start_time
 
-            coor[i, :, 0] = tx.astype(float)
-            coor[i, :, 1] = ty.astype(float)
-            coor[i, :, 2] = tz.astype(float)
+            coor[i, :, 0] = tx
+            coor[i, :, 1] = ty
+            coor[i, :, 2] = tz
 
         result = dcdio.close_dcd_read(infile)
         self._coor = numpy.array(coor)

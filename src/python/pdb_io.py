@@ -499,7 +499,7 @@ class PDB(object):
 
         true_index = 0
 	
-        coor=numpy.zeros((num_frames,num_atoms,3),float)	
+        coor=numpy.zeros((num_frames,num_atoms,3),config.COORD_DTYPE)
 
         unique_names = [] ; unique_resnames = [] ; unique_resids = [] ; unique_chains = [] 
         unique_occupancies = [] ; unique_betas = [] ; unique_segnames = [] ; unique_moltypes = []
@@ -643,10 +643,10 @@ class PDB(object):
                     resid=numpy.array(resid,int)
                     original_resid=numpy.array(original_resid,int)
 
-                    x=numpy.array(x,float)
-                    y=numpy.array(y,float)
-                    z=numpy.array(z,float)
-                    coor[0,:,0]=x.astype(float) ; coor[0,:,1]=y.astype(float) ; coor[0,:,2]=z.astype(float)
+                    x=numpy.array(x,config.COORD_DTYPE)
+                    y=numpy.array(y,config.COORD_DTYPE)
+                    z=numpy.array(z,config.COORD_DTYPE)
+                    coor[0,:,0]=x ; coor[0,:,1]=y ; coor[0,:,2]=z
                     true_index = 0
                     x=[] ; y=[] ; z=[]
                     if(this_frame == 1):
@@ -679,9 +679,9 @@ class PDB(object):
 		
                 if(true_index == num_atoms):
                     if(printme): print('finished reading frame = ',this_frame)
-                    x=numpy.array(x,float)
-                    y=numpy.array(y,float)
-                    z=numpy.array(z,float)
+                    x=numpy.array(x,config.COORD_DTYPE)
+                    y=numpy.array(y,config.COORD_DTYPE)
+                    z=numpy.array(z,config.COORD_DTYPE)
                     coor[this_frame-1,:,0]=x ; coor[this_frame-1,:,1]=y ; coor[this_frame-1,:,2]=z
                     true_index = 0
                     this_frame += 1		

@@ -18,6 +18,7 @@
 from unittest import main, skipIf
 import os
 import numpy
+import sasmol.config as config
 import sasmol.subset as subset
 import sasmol.system as system
 import unittest
@@ -116,7 +117,7 @@ class Test_subset_Mask_copy_molecule_using_mask(unittest.TestCase):
             [y for (x, y) in zip(mask, self.o.charge()) if x == 1])
         selected_coor = [y for (x, y) in zip(
             mask, self.o.coor()[frame]) if x == 1]
-        self.o_expected.setCoor(numpy.array([selected_coor], numpy.float32))
+        self.o_expected.setCoor(numpy.array([selected_coor], config.COORD_DTYPE))
         self.o_expected.setNatoms(len(self.o_expected.index()))
 
     def assert_pdb(self, o1, o2):

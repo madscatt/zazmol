@@ -47,6 +47,7 @@ import locale
 import struct
 import numpy
 import time
+import sasmol.config as config
 import sasmol.view_vmd as view_vmd
 
 
@@ -126,9 +127,9 @@ class View(object):
 
         natoms = self._coor[0, :, 0].shape[0]
         frame = 0
-        tx = self._coor[frame, :, 0].astype(numpy.float32)
-        ty = self._coor[frame, :, 1].astype(numpy.float32)
-        tz = self._coor[frame, :, 2].astype(numpy.float32)
+        tx = self._coor[frame, :, 0].astype(config.COORD_DTYPE)
+        ty = self._coor[frame, :, 1].astype(config.COORD_DTYPE)
+        tz = self._coor[frame, :, 2].astype(config.COORD_DTYPE)
 
         result = view_vmd.send_coordinates_to_vmd(tx, ty, tz, port, flag)
 

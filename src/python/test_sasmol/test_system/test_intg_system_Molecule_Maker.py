@@ -19,6 +19,7 @@ import unittest
 
 import numpy
 
+import sasmol.config as config
 import sasmol.system as system
 
 
@@ -43,7 +44,7 @@ class Test_intg_system_Molecule_Maker(unittest.TestCase):
         self.assertEqual(list(molecule.resid()), [1, 2, 3])
         self.assertEqual(molecule.rescode(), [' ', ' ', ' '])
         self.assertEqual(molecule.coor().shape, (1, natoms, 3))
-        self.assertEqual(molecule.coor().dtype, numpy.float32)
+        self.assertEqual(molecule.coor().dtype, config.COORD_DTYPE)
         self.assertEqual(molecule.occupancy(), ['0.00', '0.00', '0.00'])
         self.assertEqual(molecule.beta(), ['0.00', '0.00', '0.00'])
         self.assertEqual(molecule.charge(), [' ', ' ', ' '])
@@ -122,7 +123,7 @@ class Test_intg_system_Molecule_Maker(unittest.TestCase):
         index = numpy.array([10, 11], numpy.int32)
         resid = [20, 21]
         coor = numpy.array([[[1.0, 2.0, 3.0],
-                             [4.0, 5.0, 6.0]]], numpy.float32)
+                             [4.0, 5.0, 6.0]]], config.COORD_DTYPE)
 
         molecule = system.Molecule_Maker(
             2, index=index, resid=resid, coor=coor)

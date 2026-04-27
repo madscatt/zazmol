@@ -1012,7 +1012,7 @@ class Molecule_Maker(Atom):
         if coor is not None:
             self._coor = coor
         else:
-            self._coor = numpy.zeros((1, natoms, 3), numpy.float32)
+            self._coor = numpy.zeros((1, natoms, 3), config.COORD_DTYPE)
 
         self._occupancy = self._expand_constructor_value(
             'occupancy', occupancy, natoms)
