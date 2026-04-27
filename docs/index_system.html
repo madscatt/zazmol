@@ -1,95 +1,83 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
+<!DOCTYPE html>
 
-<html xmlns="http://www.w3.org/1999/xhtml">
+<html>
   <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    
-    <title>System &mdash; sasmol 1.0 documentation</title>
-    
-    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
-    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-    
-    <script type="text/javascript">
-      var DOCUMENTATION_OPTIONS = {
-        URL_ROOT:    './',
-        VERSION:     '1.0',
-        COLLAPSE_INDEX: false,
-        FILE_SUFFIX: '.html',
-        HAS_SOURCE:  true
-      };
-    </script>
-    <script type="text/javascript" src="_static/jquery.js"></script>
-    <script type="text/javascript" src="_static/underscore.js"></script>
-    <script type="text/javascript" src="_static/doctools.js"></script>
-    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
-    <link rel="top" title="sasmol 1.0 documentation" href="index.html" />
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+    <title>System &#8212; sasmol 1.0 documentation</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="_static/alabaster.css" />
+    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/doctools.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="Topology" href="index_topology.html" />
-    <link rel="prev" title="Properties" href="index_properties.html" />
-   
+    <link rel="prev" title="Subset" href="index_subset.html" />
+
   <link rel="stylesheet" href="_static/custom.css" type="text/css" />
-  
+
+
   <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
 
-  </head>
-  <body role="document">
-  
+  </head><body>
+
 
     <div class="document">
       <div class="documentwrapper">
         <div class="bodywrapper">
+
+
           <div class="body" role="main">
-            
-  <div class="section" id="system">
+
+  <section id="system">
 <h1>System<a class="headerlink" href="#system" title="Permalink to this headline">¶</a></h1>
-<div class="section" id="id1">
-<h2><code class="xref py py-mod docutils literal"><span class="pre">System</span></code><a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h2>
-<span class="target" id="module-system"></span><dl class="class">
-<dt id="system.Atom">
-<em class="property">class </em><code class="descclassname">system.</code><code class="descname">Atom</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/system.html#Atom"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#system.Atom" title="Permalink to this definition">¶</a></dt>
+<section id="id1">
+<h2><code class="xref py py-mod docutils literal notranslate"><span class="pre">System</span></code><a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h2>
+<span class="target" id="module-sasmol.system"></span><dl class="py class">
+<dt class="sig sig-object py" id="sasmol.system.Atom">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">sasmol.system.</span></span><span class="sig-name descname"><span class="pre">Atom</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sasmol/system.html#Atom"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sasmol.system.Atom" title="Permalink to this definition">¶</a></dt>
 <dd><p>Base class containing methods to define system objects.</p>
 <p>Atom is the base class to build and deal with molecular systems.
 The class inherits file input/output, calcuation, manipulation, subset,
 atom properties, topology, and viewing from other samsol classes.</p>
 <p>Class has several initialization options</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>args</strong> &#8211; optional integer : self._id</li>
-<li><strong>kwargs</strong> &#8211; <dl class="docutils">
-<dt>optional keyword arguments</dt>
-<dd>string filename (filename = &#8216;hiv1_gag.pdb&#8217;) : default = None
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>args</strong> – optional integer : self._id</p></li>
+<li><p><strong>kwargs</strong> – <dl class="simple">
+<dt>optional keyword arguments</dt><dd><p>string filename (filename = ‘hiv1_gag.pdb’) : default = None
 integet id (id=3) : default = 0
-boolean debug (debug = True) : default = None</dd>
+boolean debug (debug = True) : default = None</p>
+</dd>
 </dl>
-</li>
+</p></li>
 </ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">if called with string (or with filename kwarg) returns
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>if called with string (or with filename kwarg) returns
 an initialized system object with data read in using
 file_io.read_pdb()</p>
-</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">system object</p>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>system object</p>
+</dd>
+</dl>
 <p class="rubric">Examples</p>
 <p>Since subsequent classes in this file inherit from Atom and the
 common use case involves molecules, examples will use the Molecule()
 class instead of Atom.</p>
 <p>Define instance of class and read in PDB file at same time</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">sasmol.system</span> <span class="k">as</span> <span class="nn">system</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">sasmol.system</span> <span class="k">as</span> <span class="nn">system</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">molecule</span> <span class="o">=</span> <span class="n">system</span><span class="o">.</span><span class="n">Molecule</span><span class="p">(</span><span class="n">filename</span><span class="o">=</span><span class="s1">&#39;hiv1_gag.pdb&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>Other instance definition examples (not-exhaustive)</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">molecule</span> <span class="o">=</span> <span class="n">system</span><span class="o">.</span><span class="n">Molecule</span><span class="p">()</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">molecule</span> <span class="o">=</span> <span class="n">system</span><span class="o">.</span><span class="n">Molecule</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">molecule</span> <span class="o">=</span> <span class="n">system</span><span class="o">.</span><span class="n">Molecule</span><span class="p">(</span><span class="nb">id</span><span class="o">=</span><span class="mi">7</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">molecule</span> <span class="o">=</span> <span class="n">system</span><span class="o">.</span><span class="n">Molecule</span><span class="p">(</span><span class="n">debug</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">molecule</span> <span class="o">=</span> <span class="n">system</span><span class="o">.</span><span class="n">Molecule</span><span class="p">(</span><span class="s1">&#39;hiv1_gag.pdb&#39;</span><span class="p">)</span>
@@ -99,342 +87,392 @@ class instead of Atom.</p>
 <p>Example of how setters and getters work.  Below, the original index
 values are adjusted by a value (-10) and setIndex() is used to assign
 the new list to the molecule</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">molecule</span><span class="o">.</span><span class="n">index</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">molecule</span><span class="o">.</span><span class="n">index</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
 <span class="go">1</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">offset</span> <span class="o">=</span> <span class="o">-</span><span class="mi">10</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">index</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span> <span class="o">+</span> <span class="n">offset</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">xrange</span><span class="p">(</span><span class="n">molecule</span><span class="o">.</span><span class="n">natoms</span><span class="p">())]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">index</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span> <span class="o">+</span> <span class="n">offset</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">molecule</span><span class="o">.</span><span class="n">natoms</span><span class="p">())]</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">molecule</span><span class="o">.</span><span class="n">setIndex</span><span class="p">(</span><span class="n">index</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">molecule</span><span class="o">.</span><span class="n">index</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
 <span class="go">-10</span>
 </pre></div>
 </div>
 <div class="admonition note">
-<p class="first admonition-title">Note</p>
-<p class="last"><cite>self</cite> parameter is not shown in the <code class="docutils literal"><span class="pre">Parameters</span></code> section in the documentation</p>
+<p class="admonition-title">Note</p>
+<p><cite>self</cite> parameter is not shown in the <code class="docutils literal notranslate"><span class="pre">Parameters</span></code> section in the documentation</p>
 </div>
-<p>Many &#8220;setters&#8221; and &#8220;getters&#8221; methods are defined in this class.  See source
+<p>Many “setters” and “getters” methods are defined in this class.  See source
 code for details.</p>
 <p>### attributes of len(natoms):</p>
 <blockquote>
 <div><p># python lists:</p>
 <blockquote>
-<div>list_keys = [&#8216;_residue_flag&#8217;, &#8216;_occupancy&#8217;, &#8216;_charge&#8217;, &#8216;_atom&#8217;, &#8216;_chain&#8217;, &#8216;_segname&#8217;, &#8216;_beta&#8217;, &#8216;_loc&#8217;, &#8216;_element&#8217;, &#8216;_name&#8217;, &#8216;_rescode&#8217;, &#8216;_moltype&#8217;, &#8216;_resname&#8217;, &#8216;_charmm_type&#8217;, &#8216;_atom_charge&#8217;, &#8216;_atom_vdw&#8217;, &#8216;_residue_charge&#8217;, &#8216;_one_letter_resname&#8217; ]</div></blockquote>
+<div><p>list_keys = [‘_residue_flag’, ‘_occupancy’, ‘_charge’, ‘_atom’, ‘_chain’, ‘_segname’, ‘_beta’, ‘_loc’, ‘_element’, ‘_name’, ‘_rescode’, ‘_moltype’, ‘_resname’, ‘_charmm_type’, ‘_atom_charge’, ‘_atom_vdw’, ‘_residue_charge’, ‘_one_letter_resname’ ]</p>
+</div></blockquote>
 <p># numpy arrays: (note that _coor has array dimensions (number of frames, natoms, 3)</p>
-<p>numpy_keys = [&#8216;_original_index&#8217;, &#8216;_original_resid&#8217;, &#8216;_index&#8217;, &#8216;_resid&#8217;, &#8216;_mass&#8217;, &#8216;_coor&#8217;, &#8216;_minimum&#8217;, &#8216;_maximum&#8217;, &#8216;_pmi&#8217;]</p>
+<p>numpy_keys = [‘_original_index’, ‘_original_resid’, ‘_index’, ‘_resid’, ‘_mass’, ‘_coor’, ‘_minimum’, ‘_maximum’, ‘_pmi’]</p>
 </div></blockquote>
 <p>### attributes with variable list lenghts:</p>
 <blockquote>
 <div><p>#python lists:</p>
-<p>short_keys = [&#8216;_resnames&#8217;, &#8216;_chains&#8217;, &#8216;_resids&#8217;, &#8216;_elements&#8217;, &#8216;_segnames&#8217;, &#8216;_betas&#8217;, &#8216;_names&#8217;, &#8216;_moltypes&#8217;, &#8216;_occupancies&#8217; ]
+<p>short_keys = [‘_resnames’, ‘_chains’, ‘_resids’, ‘_elements’, ‘_segnames’, ‘_betas’, ‘_names’, ‘_moltypes’, ‘_occupancies’ ]
 # numpy arrays</p>
-<p>numpy_short_keys = [&#8216;_names_mask&#8217;, &#8216;_resnames_mask&#8217;, &#8216;_resids_mask&#8217;, &#8216;_chains_mask&#8217;, &#8216;_occupancies_mask&#8217;, &#8216;_betas_mask&#8217;, &#8216;_elements_mask&#8217;, &#8216;_segnames_mask&#8217;]</p>
+<p>numpy_short_keys = [‘_names_mask’, ‘_resnames_mask’, ‘_resids_mask’, ‘_chains_mask’, ‘_occupancies_mask’, ‘_betas_mask’, ‘_elements_mask’, ‘_segnames_mask’]</p>
 </div></blockquote>
 <p>### integer attributes</p>
 <blockquote>
-<div>int_keys = [&#8216;_number_of_chains&#8217;, &#8216;_number_of_betas&#8217;, &#8216;_number_of_resids&#8217;, &#8216;_number_of_names&#8217;, &#8216;_number_of_moltypes&#8217;, &#8216;_number_of_resnames&#8217;, &#8216;_number_of_segnames&#8217;, &#8216;_number_of_elements&#8217;, &#8216;_id&#8217;, &#8216;_number_of_occupancies&#8217;, &#8216;_number_of_frames&#8217;, &#8216;_natoms&#8217; ]</div></blockquote>
+<div><p>int_keys = [‘_number_of_chains’, ‘_number_of_betas’, ‘_number_of_resids’, ‘_number_of_names’, ‘_number_of_moltypes’, ‘_number_of_resnames’, ‘_number_of_segnames’, ‘_number_of_elements’, ‘_id’, ‘_number_of_occupancies’, ‘_number_of_frames’, ‘_natoms’ ]</p>
+</div></blockquote>
 <p>### float attributes</p>
 <blockquote>
-<div>float_keys = [&#8216;_total_mass&#8217;, &#8216;_com&#8217;, &#8216;_rg&#8217;]</div></blockquote>
+<div><p>float_keys = [‘_total_mass’, ‘_center_of_mass’, ‘_rg’]</p>
+</div></blockquote>
 <p>### strings, dictionaries, and flags</p>
 <blockquote>
-<div>other_keys = [&#8216;_fasta&#8217;, &#8216;_header&#8217;, &#8216;_conect&#8217;, &#8216;_debug&#8217;, &#8216;_formula&#8217;, &#8216;_unitcell&#8217;]</div></blockquote>
-<dl class="method">
-<dt id="system.Atom.atom">
-<code class="descname">atom</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/system.html#Atom.atom"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#system.Atom.atom" title="Permalink to this definition">¶</a></dt>
+<div><p>other_keys = [‘_fasta’, ‘_header’, ‘_conect’, ‘_debug’, ‘_formula’, ‘_unitcell’]</p>
+</div></blockquote>
+<dl class="py method">
+<dt class="sig sig-object py" id="sasmol.system.Atom.altloc">
+<span class="sig-name descname"><span class="pre">altloc</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/sasmol/system.html#Atom.altloc"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sasmol.system.Atom.altloc" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="method">
-<dt id="system.Atom.atom_charge">
-<code class="descname">atom_charge</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/system.html#Atom.atom_charge"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#system.Atom.atom_charge" title="Permalink to this definition">¶</a></dt>
+<dl class="py method">
+<dt class="sig sig-object py" id="sasmol.system.Atom.atom">
+<span class="sig-name descname"><span class="pre">atom</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/sasmol/system.html#Atom.atom"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sasmol.system.Atom.atom" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="method">
-<dt id="system.Atom.atom_vdw">
-<code class="descname">atom_vdw</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/system.html#Atom.atom_vdw"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#system.Atom.atom_vdw" title="Permalink to this definition">¶</a></dt>
+<dl class="py method">
+<dt class="sig sig-object py" id="sasmol.system.Atom.atom_charge">
+<span class="sig-name descname"><span class="pre">atom_charge</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/sasmol/system.html#Atom.atom_charge"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sasmol.system.Atom.atom_charge" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="method">
-<dt id="system.Atom.beta">
-<code class="descname">beta</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/system.html#Atom.beta"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#system.Atom.beta" title="Permalink to this definition">¶</a></dt>
+<dl class="py method">
+<dt class="sig sig-object py" id="sasmol.system.Atom.atom_vdw">
+<span class="sig-name descname"><span class="pre">atom_vdw</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/sasmol/system.html#Atom.atom_vdw"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sasmol.system.Atom.atom_vdw" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="method">
-<dt id="system.Atom.chain">
-<code class="descname">chain</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/system.html#Atom.chain"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#system.Atom.chain" title="Permalink to this definition">¶</a></dt>
+<dl class="py method">
+<dt class="sig sig-object py" id="sasmol.system.Atom.beta">
+<span class="sig-name descname"><span class="pre">beta</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/sasmol/system.html#Atom.beta"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sasmol.system.Atom.beta" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="method">
-<dt id="system.Atom.charge">
-<code class="descname">charge</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/system.html#Atom.charge"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#system.Atom.charge" title="Permalink to this definition">¶</a></dt>
+<dl class="py method">
+<dt class="sig sig-object py" id="sasmol.system.Atom.chain">
+<span class="sig-name descname"><span class="pre">chain</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/sasmol/system.html#Atom.chain"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sasmol.system.Atom.chain" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="method">
-<dt id="system.Atom.coor">
-<code class="descname">coor</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/system.html#Atom.coor"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#system.Atom.coor" title="Permalink to this definition">¶</a></dt>
+<dl class="py method">
+<dt class="sig sig-object py" id="sasmol.system.Atom.charge">
+<span class="sig-name descname"><span class="pre">charge</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/sasmol/system.html#Atom.charge"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sasmol.system.Atom.charge" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="method">
-<dt id="system.Atom.element">
-<code class="descname">element</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/system.html#Atom.element"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#system.Atom.element" title="Permalink to this definition">¶</a></dt>
+<dl class="py method">
+<dt class="sig sig-object py" id="sasmol.system.Atom.check_integrity">
+<span class="sig-name descname"><span class="pre">check_integrity</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fast_check</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sasmol/system.html#Atom.check_integrity"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sasmol.system.Atom.check_integrity" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="method">
-<dt id="system.Atom.formula">
-<code class="descname">formula</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/system.html#Atom.formula"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#system.Atom.formula" title="Permalink to this definition">¶</a></dt>
+<dl class="py method">
+<dt class="sig sig-object py" id="sasmol.system.Atom.coor">
+<span class="sig-name descname"><span class="pre">coor</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/sasmol/system.html#Atom.coor"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sasmol.system.Atom.coor" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="method">
-<dt id="system.Atom.id">
-<code class="descname">id</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/system.html#Atom.id"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#system.Atom.id" title="Permalink to this definition">¶</a></dt>
+<dl class="py method">
+<dt class="sig sig-object py" id="sasmol.system.Atom.element">
+<span class="sig-name descname"><span class="pre">element</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/sasmol/system.html#Atom.element"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sasmol.system.Atom.element" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="method">
-<dt id="system.Atom.index">
-<code class="descname">index</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/system.html#Atom.index"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#system.Atom.index" title="Permalink to this definition">¶</a></dt>
+<dl class="py method">
+<dt class="sig sig-object py" id="sasmol.system.Atom.filename">
+<span class="sig-name descname"><span class="pre">filename</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/sasmol/system.html#Atom.filename"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sasmol.system.Atom.filename" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="method">
-<dt id="system.Atom.loc">
-<code class="descname">loc</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/system.html#Atom.loc"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#system.Atom.loc" title="Permalink to this definition">¶</a></dt>
+<dl class="py method">
+<dt class="sig sig-object py" id="sasmol.system.Atom.formula">
+<span class="sig-name descname"><span class="pre">formula</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/sasmol/system.html#Atom.formula"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sasmol.system.Atom.formula" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="method">
-<dt id="system.Atom.mass">
-<code class="descname">mass</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/system.html#Atom.mass"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#system.Atom.mass" title="Permalink to this definition">¶</a></dt>
+<dl class="py method">
+<dt class="sig sig-object py" id="sasmol.system.Atom.icode">
+<span class="sig-name descname"><span class="pre">icode</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/sasmol/system.html#Atom.icode"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sasmol.system.Atom.icode" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="method">
-<dt id="system.Atom.moltype">
-<code class="descname">moltype</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/system.html#Atom.moltype"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#system.Atom.moltype" title="Permalink to this definition">¶</a></dt>
+<dl class="py method">
+<dt class="sig sig-object py" id="sasmol.system.Atom.id">
+<span class="sig-name descname"><span class="pre">id</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/sasmol/system.html#Atom.id"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sasmol.system.Atom.id" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="method">
-<dt id="system.Atom.name">
-<code class="descname">name</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/system.html#Atom.name"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#system.Atom.name" title="Permalink to this definition">¶</a></dt>
+<dl class="py method">
+<dt class="sig sig-object py" id="sasmol.system.Atom.index">
+<span class="sig-name descname"><span class="pre">index</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/sasmol/system.html#Atom.index"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sasmol.system.Atom.index" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="method">
-<dt id="system.Atom.natoms">
-<code class="descname">natoms</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/system.html#Atom.natoms"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#system.Atom.natoms" title="Permalink to this definition">¶</a></dt>
+<dl class="py method">
+<dt class="sig sig-object py" id="sasmol.system.Atom.loc">
+<span class="sig-name descname"><span class="pre">loc</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/sasmol/system.html#Atom.loc"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sasmol.system.Atom.loc" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="method">
-<dt id="system.Atom.number_of_atoms">
-<code class="descname">number_of_atoms</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/system.html#Atom.number_of_atoms"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#system.Atom.number_of_atoms" title="Permalink to this definition">¶</a></dt>
+<dl class="py method">
+<dt class="sig sig-object py" id="sasmol.system.Atom.mass">
+<span class="sig-name descname"><span class="pre">mass</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/sasmol/system.html#Atom.mass"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sasmol.system.Atom.mass" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="method">
-<dt id="system.Atom.number_of_frames">
-<code class="descname">number_of_frames</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/system.html#Atom.number_of_frames"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#system.Atom.number_of_frames" title="Permalink to this definition">¶</a></dt>
+<dl class="py method">
+<dt class="sig sig-object py" id="sasmol.system.Atom.moltype">
+<span class="sig-name descname"><span class="pre">moltype</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/sasmol/system.html#Atom.moltype"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sasmol.system.Atom.moltype" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="method">
-<dt id="system.Atom.occupancy">
-<code class="descname">occupancy</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/system.html#Atom.occupancy"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#system.Atom.occupancy" title="Permalink to this definition">¶</a></dt>
+<dl class="py method">
+<dt class="sig sig-object py" id="sasmol.system.Atom.name">
+<span class="sig-name descname"><span class="pre">name</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/sasmol/system.html#Atom.name"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sasmol.system.Atom.name" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="method">
-<dt id="system.Atom.original_index">
-<code class="descname">original_index</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/system.html#Atom.original_index"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#system.Atom.original_index" title="Permalink to this definition">¶</a></dt>
+<dl class="py method">
+<dt class="sig sig-object py" id="sasmol.system.Atom.natoms">
+<span class="sig-name descname"><span class="pre">natoms</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/sasmol/system.html#Atom.natoms"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sasmol.system.Atom.natoms" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="method">
-<dt id="system.Atom.original_resid">
-<code class="descname">original_resid</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/system.html#Atom.original_resid"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#system.Atom.original_resid" title="Permalink to this definition">¶</a></dt>
+<dl class="py method">
+<dt class="sig sig-object py" id="sasmol.system.Atom.number_of_atoms">
+<span class="sig-name descname"><span class="pre">number_of_atoms</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/sasmol/system.html#Atom.number_of_atoms"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sasmol.system.Atom.number_of_atoms" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="method">
-<dt id="system.Atom.rescode">
-<code class="descname">rescode</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/system.html#Atom.rescode"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#system.Atom.rescode" title="Permalink to this definition">¶</a></dt>
+<dl class="py method">
+<dt class="sig sig-object py" id="sasmol.system.Atom.number_of_frames">
+<span class="sig-name descname"><span class="pre">number_of_frames</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/sasmol/system.html#Atom.number_of_frames"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sasmol.system.Atom.number_of_frames" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="method">
-<dt id="system.Atom.resid">
-<code class="descname">resid</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/system.html#Atom.resid"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#system.Atom.resid" title="Permalink to this definition">¶</a></dt>
+<dl class="py method">
+<dt class="sig sig-object py" id="sasmol.system.Atom.occupancy">
+<span class="sig-name descname"><span class="pre">occupancy</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/sasmol/system.html#Atom.occupancy"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sasmol.system.Atom.occupancy" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="method">
-<dt id="system.Atom.resname">
-<code class="descname">resname</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/system.html#Atom.resname"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#system.Atom.resname" title="Permalink to this definition">¶</a></dt>
+<dl class="py method">
+<dt class="sig sig-object py" id="sasmol.system.Atom.original_index">
+<span class="sig-name descname"><span class="pre">original_index</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/sasmol/system.html#Atom.original_index"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sasmol.system.Atom.original_index" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="method">
-<dt id="system.Atom.segname">
-<code class="descname">segname</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/system.html#Atom.segname"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#system.Atom.segname" title="Permalink to this definition">¶</a></dt>
+<dl class="py method">
+<dt class="sig sig-object py" id="sasmol.system.Atom.original_resid">
+<span class="sig-name descname"><span class="pre">original_resid</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/sasmol/system.html#Atom.original_resid"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sasmol.system.Atom.original_resid" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="method">
-<dt id="system.Atom.setAtom">
-<code class="descname">setAtom</code><span class="sig-paren">(</span><em>newValue</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/system.html#Atom.setAtom"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#system.Atom.setAtom" title="Permalink to this definition">¶</a></dt>
+<dl class="py method">
+<dt class="sig sig-object py" id="sasmol.system.Atom.record">
+<span class="sig-name descname"><span class="pre">record</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/sasmol/system.html#Atom.record"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sasmol.system.Atom.record" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="method">
-<dt id="system.Atom.setAtom_charge">
-<code class="descname">setAtom_charge</code><span class="sig-paren">(</span><em>newValue</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/system.html#Atom.setAtom_charge"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#system.Atom.setAtom_charge" title="Permalink to this definition">¶</a></dt>
+<dl class="py method">
+<dt class="sig sig-object py" id="sasmol.system.Atom.rescode">
+<span class="sig-name descname"><span class="pre">rescode</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/sasmol/system.html#Atom.rescode"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sasmol.system.Atom.rescode" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="method">
-<dt id="system.Atom.setAtom_vdw">
-<code class="descname">setAtom_vdw</code><span class="sig-paren">(</span><em>newValue</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/system.html#Atom.setAtom_vdw"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#system.Atom.setAtom_vdw" title="Permalink to this definition">¶</a></dt>
+<dl class="py method">
+<dt class="sig sig-object py" id="sasmol.system.Atom.resid">
+<span class="sig-name descname"><span class="pre">resid</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/sasmol/system.html#Atom.resid"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sasmol.system.Atom.resid" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="method">
-<dt id="system.Atom.setBeta">
-<code class="descname">setBeta</code><span class="sig-paren">(</span><em>newValue</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/system.html#Atom.setBeta"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#system.Atom.setBeta" title="Permalink to this definition">¶</a></dt>
+<dl class="py method">
+<dt class="sig sig-object py" id="sasmol.system.Atom.resname">
+<span class="sig-name descname"><span class="pre">resname</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/sasmol/system.html#Atom.resname"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sasmol.system.Atom.resname" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="method">
-<dt id="system.Atom.setChain">
-<code class="descname">setChain</code><span class="sig-paren">(</span><em>newValue</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/system.html#Atom.setChain"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#system.Atom.setChain" title="Permalink to this definition">¶</a></dt>
+<dl class="py method">
+<dt class="sig sig-object py" id="sasmol.system.Atom.segname">
+<span class="sig-name descname"><span class="pre">segname</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/sasmol/system.html#Atom.segname"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sasmol.system.Atom.segname" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="method">
-<dt id="system.Atom.setCharge">
-<code class="descname">setCharge</code><span class="sig-paren">(</span><em>newValue</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/system.html#Atom.setCharge"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#system.Atom.setCharge" title="Permalink to this definition">¶</a></dt>
+<dl class="py method">
+<dt class="sig sig-object py" id="sasmol.system.Atom.setAltloc">
+<span class="sig-name descname"><span class="pre">setAltloc</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">newValue</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sasmol/system.html#Atom.setAltloc"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sasmol.system.Atom.setAltloc" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="method">
-<dt id="system.Atom.setCoor">
-<code class="descname">setCoor</code><span class="sig-paren">(</span><em>newValue</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/system.html#Atom.setCoor"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#system.Atom.setCoor" title="Permalink to this definition">¶</a></dt>
+<dl class="py method">
+<dt class="sig sig-object py" id="sasmol.system.Atom.setAtom">
+<span class="sig-name descname"><span class="pre">setAtom</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">newValue</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sasmol/system.html#Atom.setAtom"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sasmol.system.Atom.setAtom" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="method">
-<dt id="system.Atom.setElement">
-<code class="descname">setElement</code><span class="sig-paren">(</span><em>newValue</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/system.html#Atom.setElement"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#system.Atom.setElement" title="Permalink to this definition">¶</a></dt>
+<dl class="py method">
+<dt class="sig sig-object py" id="sasmol.system.Atom.setAtom_charge">
+<span class="sig-name descname"><span class="pre">setAtom_charge</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">newValue</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sasmol/system.html#Atom.setAtom_charge"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sasmol.system.Atom.setAtom_charge" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="method">
-<dt id="system.Atom.setFormula">
-<code class="descname">setFormula</code><span class="sig-paren">(</span><em>newValue</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/system.html#Atom.setFormula"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#system.Atom.setFormula" title="Permalink to this definition">¶</a></dt>
+<dl class="py method">
+<dt class="sig sig-object py" id="sasmol.system.Atom.setAtom_vdw">
+<span class="sig-name descname"><span class="pre">setAtom_vdw</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">newValue</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sasmol/system.html#Atom.setAtom_vdw"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sasmol.system.Atom.setAtom_vdw" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="method">
-<dt id="system.Atom.setId">
-<code class="descname">setId</code><span class="sig-paren">(</span><em>newValue</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/system.html#Atom.setId"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#system.Atom.setId" title="Permalink to this definition">¶</a></dt>
+<dl class="py method">
+<dt class="sig sig-object py" id="sasmol.system.Atom.setBeta">
+<span class="sig-name descname"><span class="pre">setBeta</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">newValue</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sasmol/system.html#Atom.setBeta"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sasmol.system.Atom.setBeta" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="method">
-<dt id="system.Atom.setIndex">
-<code class="descname">setIndex</code><span class="sig-paren">(</span><em>newValue</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/system.html#Atom.setIndex"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#system.Atom.setIndex" title="Permalink to this definition">¶</a></dt>
+<dl class="py method">
+<dt class="sig sig-object py" id="sasmol.system.Atom.setChain">
+<span class="sig-name descname"><span class="pre">setChain</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">newValue</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sasmol/system.html#Atom.setChain"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sasmol.system.Atom.setChain" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="method">
-<dt id="system.Atom.setLoc">
-<code class="descname">setLoc</code><span class="sig-paren">(</span><em>newValue</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/system.html#Atom.setLoc"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#system.Atom.setLoc" title="Permalink to this definition">¶</a></dt>
+<dl class="py method">
+<dt class="sig sig-object py" id="sasmol.system.Atom.setCharge">
+<span class="sig-name descname"><span class="pre">setCharge</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">newValue</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sasmol/system.html#Atom.setCharge"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sasmol.system.Atom.setCharge" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="method">
-<dt id="system.Atom.setMass">
-<code class="descname">setMass</code><span class="sig-paren">(</span><em>newValue</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/system.html#Atom.setMass"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#system.Atom.setMass" title="Permalink to this definition">¶</a></dt>
+<dl class="py method">
+<dt class="sig sig-object py" id="sasmol.system.Atom.setCoor">
+<span class="sig-name descname"><span class="pre">setCoor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">newValue</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sasmol/system.html#Atom.setCoor"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sasmol.system.Atom.setCoor" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="method">
-<dt id="system.Atom.setMoltype">
-<code class="descname">setMoltype</code><span class="sig-paren">(</span><em>newValue</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/system.html#Atom.setMoltype"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#system.Atom.setMoltype" title="Permalink to this definition">¶</a></dt>
+<dl class="py method">
+<dt class="sig sig-object py" id="sasmol.system.Atom.setElement">
+<span class="sig-name descname"><span class="pre">setElement</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">newValue</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sasmol/system.html#Atom.setElement"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sasmol.system.Atom.setElement" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="method">
-<dt id="system.Atom.setName">
-<code class="descname">setName</code><span class="sig-paren">(</span><em>newValue</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/system.html#Atom.setName"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#system.Atom.setName" title="Permalink to this definition">¶</a></dt>
+<dl class="py method">
+<dt class="sig sig-object py" id="sasmol.system.Atom.setFilename">
+<span class="sig-name descname"><span class="pre">setFilename</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">newValue</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sasmol/system.html#Atom.setFilename"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sasmol.system.Atom.setFilename" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="method">
-<dt id="system.Atom.setNatoms">
-<code class="descname">setNatoms</code><span class="sig-paren">(</span><em>newValue</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/system.html#Atom.setNatoms"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#system.Atom.setNatoms" title="Permalink to this definition">¶</a></dt>
+<dl class="py method">
+<dt class="sig sig-object py" id="sasmol.system.Atom.setFormula">
+<span class="sig-name descname"><span class="pre">setFormula</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">newValue</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sasmol/system.html#Atom.setFormula"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sasmol.system.Atom.setFormula" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="method">
-<dt id="system.Atom.setNumber_of_atoms">
-<code class="descname">setNumber_of_atoms</code><span class="sig-paren">(</span><em>newValue</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/system.html#Atom.setNumber_of_atoms"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#system.Atom.setNumber_of_atoms" title="Permalink to this definition">¶</a></dt>
+<dl class="py method">
+<dt class="sig sig-object py" id="sasmol.system.Atom.setIcode">
+<span class="sig-name descname"><span class="pre">setIcode</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">newValue</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sasmol/system.html#Atom.setIcode"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sasmol.system.Atom.setIcode" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="method">
-<dt id="system.Atom.setNumber_of_frames">
-<code class="descname">setNumber_of_frames</code><span class="sig-paren">(</span><em>newValue</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/system.html#Atom.setNumber_of_frames"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#system.Atom.setNumber_of_frames" title="Permalink to this definition">¶</a></dt>
+<dl class="py method">
+<dt class="sig sig-object py" id="sasmol.system.Atom.setId">
+<span class="sig-name descname"><span class="pre">setId</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">newValue</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sasmol/system.html#Atom.setId"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sasmol.system.Atom.setId" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="method">
-<dt id="system.Atom.setOccupancy">
-<code class="descname">setOccupancy</code><span class="sig-paren">(</span><em>newValue</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/system.html#Atom.setOccupancy"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#system.Atom.setOccupancy" title="Permalink to this definition">¶</a></dt>
+<dl class="py method">
+<dt class="sig sig-object py" id="sasmol.system.Atom.setIndex">
+<span class="sig-name descname"><span class="pre">setIndex</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">newValue</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sasmol/system.html#Atom.setIndex"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sasmol.system.Atom.setIndex" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="method">
-<dt id="system.Atom.setOriginal_index">
-<code class="descname">setOriginal_index</code><span class="sig-paren">(</span><em>newValue</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/system.html#Atom.setOriginal_index"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#system.Atom.setOriginal_index" title="Permalink to this definition">¶</a></dt>
+<dl class="py method">
+<dt class="sig sig-object py" id="sasmol.system.Atom.setLoc">
+<span class="sig-name descname"><span class="pre">setLoc</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">newValue</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sasmol/system.html#Atom.setLoc"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sasmol.system.Atom.setLoc" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="method">
-<dt id="system.Atom.setOriginal_resid">
-<code class="descname">setOriginal_resid</code><span class="sig-paren">(</span><em>newValue</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/system.html#Atom.setOriginal_resid"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#system.Atom.setOriginal_resid" title="Permalink to this definition">¶</a></dt>
+<dl class="py method">
+<dt class="sig sig-object py" id="sasmol.system.Atom.setMass">
+<span class="sig-name descname"><span class="pre">setMass</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">newValue</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sasmol/system.html#Atom.setMass"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sasmol.system.Atom.setMass" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="method">
-<dt id="system.Atom.setRescode">
-<code class="descname">setRescode</code><span class="sig-paren">(</span><em>newValue</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/system.html#Atom.setRescode"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#system.Atom.setRescode" title="Permalink to this definition">¶</a></dt>
+<dl class="py method">
+<dt class="sig sig-object py" id="sasmol.system.Atom.setMoltype">
+<span class="sig-name descname"><span class="pre">setMoltype</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">newValue</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sasmol/system.html#Atom.setMoltype"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sasmol.system.Atom.setMoltype" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="method">
-<dt id="system.Atom.setResid">
-<code class="descname">setResid</code><span class="sig-paren">(</span><em>newValue</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/system.html#Atom.setResid"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#system.Atom.setResid" title="Permalink to this definition">¶</a></dt>
+<dl class="py method">
+<dt class="sig sig-object py" id="sasmol.system.Atom.setName">
+<span class="sig-name descname"><span class="pre">setName</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">newValue</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sasmol/system.html#Atom.setName"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sasmol.system.Atom.setName" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="method">
-<dt id="system.Atom.setResname">
-<code class="descname">setResname</code><span class="sig-paren">(</span><em>newValue</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/system.html#Atom.setResname"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#system.Atom.setResname" title="Permalink to this definition">¶</a></dt>
+<dl class="py method">
+<dt class="sig sig-object py" id="sasmol.system.Atom.setNatoms">
+<span class="sig-name descname"><span class="pre">setNatoms</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">newValue</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sasmol/system.html#Atom.setNatoms"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sasmol.system.Atom.setNatoms" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="method">
-<dt id="system.Atom.setSegname">
-<code class="descname">setSegname</code><span class="sig-paren">(</span><em>newValue</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/system.html#Atom.setSegname"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#system.Atom.setSegname" title="Permalink to this definition">¶</a></dt>
+<dl class="py method">
+<dt class="sig sig-object py" id="sasmol.system.Atom.setNumber_of_atoms">
+<span class="sig-name descname"><span class="pre">setNumber_of_atoms</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">newValue</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sasmol/system.html#Atom.setNumber_of_atoms"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sasmol.system.Atom.setNumber_of_atoms" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="method">
-<dt id="system.Atom.setTotal_mass">
-<code class="descname">setTotal_mass</code><span class="sig-paren">(</span><em>newValue</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/system.html#Atom.setTotal_mass"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#system.Atom.setTotal_mass" title="Permalink to this definition">¶</a></dt>
+<dl class="py method">
+<dt class="sig sig-object py" id="sasmol.system.Atom.setNumber_of_frames">
+<span class="sig-name descname"><span class="pre">setNumber_of_frames</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">newValue</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sasmol/system.html#Atom.setNumber_of_frames"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sasmol.system.Atom.setNumber_of_frames" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="method">
-<dt id="system.Atom.total_mass">
-<code class="descname">total_mass</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/system.html#Atom.total_mass"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#system.Atom.total_mass" title="Permalink to this definition">¶</a></dt>
+<dl class="py method">
+<dt class="sig sig-object py" id="sasmol.system.Atom.setOccupancy">
+<span class="sig-name descname"><span class="pre">setOccupancy</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">newValue</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sasmol/system.html#Atom.setOccupancy"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sasmol.system.Atom.setOccupancy" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="sasmol.system.Atom.setOriginal_index">
+<span class="sig-name descname"><span class="pre">setOriginal_index</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">newValue</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sasmol/system.html#Atom.setOriginal_index"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sasmol.system.Atom.setOriginal_index" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="sasmol.system.Atom.setOriginal_resid">
+<span class="sig-name descname"><span class="pre">setOriginal_resid</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">newValue</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sasmol/system.html#Atom.setOriginal_resid"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sasmol.system.Atom.setOriginal_resid" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="sasmol.system.Atom.setRecord">
+<span class="sig-name descname"><span class="pre">setRecord</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">newValue</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sasmol/system.html#Atom.setRecord"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sasmol.system.Atom.setRecord" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="sasmol.system.Atom.setRescode">
+<span class="sig-name descname"><span class="pre">setRescode</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">newValue</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sasmol/system.html#Atom.setRescode"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sasmol.system.Atom.setRescode" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="sasmol.system.Atom.setResid">
+<span class="sig-name descname"><span class="pre">setResid</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">newValue</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sasmol/system.html#Atom.setResid"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sasmol.system.Atom.setResid" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="sasmol.system.Atom.setResname">
+<span class="sig-name descname"><span class="pre">setResname</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">newValue</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sasmol/system.html#Atom.setResname"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sasmol.system.Atom.setResname" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="sasmol.system.Atom.setSegname">
+<span class="sig-name descname"><span class="pre">setSegname</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">newValue</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sasmol/system.html#Atom.setSegname"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sasmol.system.Atom.setSegname" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="sasmol.system.Atom.setTotal_mass">
+<span class="sig-name descname"><span class="pre">setTotal_mass</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">newValue</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sasmol/system.html#Atom.setTotal_mass"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sasmol.system.Atom.setTotal_mass" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="sasmol.system.Atom.total_mass">
+<span class="sig-name descname"><span class="pre">total_mass</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/sasmol/system.html#Atom.total_mass"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sasmol.system.Atom.total_mass" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="sasmol.system.Atom.validate_integrity">
+<span class="sig-name descname"><span class="pre">validate_integrity</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fast_check</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sasmol/system.html#Atom.validate_integrity"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sasmol.system.Atom.validate_integrity" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
 
-<dl class="class">
-<dt id="system.Molecule">
-<em class="property">class </em><code class="descclassname">system.</code><code class="descname">Molecule</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/system.html#Molecule"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#system.Molecule" title="Permalink to this definition">¶</a></dt>
+<dl class="py class">
+<dt class="sig sig-object py" id="sasmol.system.Molecule">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">sasmol.system.</span></span><span class="sig-name descname"><span class="pre">Molecule</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sasmol/system.html#Molecule"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sasmol.system.Molecule" title="Permalink to this definition">¶</a></dt>
 <dd><p>Molecule is a class that is used to describe molecules. It inherits
 all of attributes from Atom.  An example of a molecule is
 a single protein, a single nucleic acid strand.</p>
 <p>Class has several initialization options</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>args</strong> &#8211; optional integer : self._id</li>
-<li><strong>kwargs</strong> &#8211; <dl class="docutils">
-<dt>optional keyword arguments</dt>
-<dd>string filename (filename = &#8216;hiv1_gag.pdb&#8217;) : default = None
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>args</strong> – optional integer : self._id</p></li>
+<li><p><strong>kwargs</strong> – <dl class="simple">
+<dt>optional keyword arguments</dt><dd><p>string filename (filename = ‘hiv1_gag.pdb’) : default = None
 integet id (id=3) : default = 0
-boolean debug (debug = True) : default = None</dd>
+boolean debug (debug = True) : default = None</p>
+</dd>
 </dl>
-</li>
+</p></li>
 </ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">if called with string (or with filename kwarg) returns
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>if called with string (or with filename kwarg) returns
 an initialized system object with data read in using
 file_io.read_pdb()</p>
-</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">system object</p>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>system object</p>
+</dd>
+</dl>
 <p class="rubric">Examples</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">sasmol.system</span> <span class="k">as</span> <span class="nn">system</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">sasmol.system</span> <span class="k">as</span> <span class="nn">system</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">molecule</span> <span class="o">=</span> <span class="n">system</span><span class="o">.</span><span class="n">Molecule</span><span class="p">(</span><span class="n">filename</span><span class="o">=</span><span class="s1">&#39;hiv1_gag.pdb&#39;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">molecule</span> <span class="o">=</span> <span class="n">system</span><span class="o">.</span><span class="n">Molecule</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">molecule</span> <span class="o">=</span> <span class="n">system</span><span class="o">.</span><span class="n">Molecule</span><span class="p">(</span><span class="nb">id</span><span class="o">=</span><span class="mi">7</span><span class="p">)</span>
@@ -443,500 +481,499 @@ file_io.read_pdb()</p>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">molecule</span> <span class="o">=</span> <span class="n">system</span><span class="o">.</span><span class="n">Molecule</span><span class="p">(</span><span class="n">filename</span><span class="o">=</span><span class="s1">&#39;hiv1_gag.pdb&#39;</span><span class="p">,</span> <span class="nb">id</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">debug</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 </pre></div>
 </div>
-<dl class="method">
-<dt id="system.Molecule.betas">
-<code class="descname">betas</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/system.html#Molecule.betas"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#system.Molecule.betas" title="Permalink to this definition">¶</a></dt>
+<dl class="py method">
+<dt class="sig sig-object py" id="sasmol.system.Molecule.betas">
+<span class="sig-name descname"><span class="pre">betas</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/sasmol/system.html#Molecule.betas"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sasmol.system.Molecule.betas" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="method">
-<dt id="system.Molecule.betas_mask">
-<code class="descname">betas_mask</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/system.html#Molecule.betas_mask"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#system.Molecule.betas_mask" title="Permalink to this definition">¶</a></dt>
+<dl class="py method">
+<dt class="sig sig-object py" id="sasmol.system.Molecule.betas_mask">
+<span class="sig-name descname"><span class="pre">betas_mask</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/sasmol/system.html#Molecule.betas_mask"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sasmol.system.Molecule.betas_mask" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="method">
-<dt id="system.Molecule.center_of_mass">
-<code class="descname">center_of_mass</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/system.html#Molecule.center_of_mass"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#system.Molecule.center_of_mass" title="Permalink to this definition">¶</a></dt>
+<dl class="py method">
+<dt class="sig sig-object py" id="sasmol.system.Molecule.center_of_mass">
+<span class="sig-name descname"><span class="pre">center_of_mass</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/sasmol/system.html#Molecule.center_of_mass"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sasmol.system.Molecule.center_of_mass" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="method">
-<dt id="system.Molecule.chains">
-<code class="descname">chains</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/system.html#Molecule.chains"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#system.Molecule.chains" title="Permalink to this definition">¶</a></dt>
+<dl class="py method">
+<dt class="sig sig-object py" id="sasmol.system.Molecule.chains">
+<span class="sig-name descname"><span class="pre">chains</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/sasmol/system.html#Molecule.chains"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sasmol.system.Molecule.chains" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="method">
-<dt id="system.Molecule.chains_mask">
-<code class="descname">chains_mask</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/system.html#Molecule.chains_mask"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#system.Molecule.chains_mask" title="Permalink to this definition">¶</a></dt>
+<dl class="py method">
+<dt class="sig sig-object py" id="sasmol.system.Molecule.chains_mask">
+<span class="sig-name descname"><span class="pre">chains_mask</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/sasmol/system.html#Molecule.chains_mask"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sasmol.system.Molecule.chains_mask" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="method">
-<dt id="system.Molecule.charmm_type">
-<code class="descname">charmm_type</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/system.html#Molecule.charmm_type"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#system.Molecule.charmm_type" title="Permalink to this definition">¶</a></dt>
+<dl class="py method">
+<dt class="sig sig-object py" id="sasmol.system.Molecule.charmm_type">
+<span class="sig-name descname"><span class="pre">charmm_type</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/sasmol/system.html#Molecule.charmm_type"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sasmol.system.Molecule.charmm_type" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="method">
-<dt id="system.Molecule.com">
-<code class="descname">com</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/system.html#Molecule.com"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#system.Molecule.com" title="Permalink to this definition">¶</a></dt>
+<dl class="py method">
+<dt class="sig sig-object py" id="sasmol.system.Molecule.conect">
+<span class="sig-name descname"><span class="pre">conect</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/sasmol/system.html#Molecule.conect"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sasmol.system.Molecule.conect" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="method">
-<dt id="system.Molecule.conect">
-<code class="descname">conect</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/system.html#Molecule.conect"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#system.Molecule.conect" title="Permalink to this definition">¶</a></dt>
+<dl class="py method">
+<dt class="sig sig-object py" id="sasmol.system.Molecule.elements">
+<span class="sig-name descname"><span class="pre">elements</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/sasmol/system.html#Molecule.elements"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sasmol.system.Molecule.elements" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="method">
-<dt id="system.Molecule.elements">
-<code class="descname">elements</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/system.html#Molecule.elements"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#system.Molecule.elements" title="Permalink to this definition">¶</a></dt>
+<dl class="py method">
+<dt class="sig sig-object py" id="sasmol.system.Molecule.elements_mask">
+<span class="sig-name descname"><span class="pre">elements_mask</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/sasmol/system.html#Molecule.elements_mask"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sasmol.system.Molecule.elements_mask" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="method">
-<dt id="system.Molecule.elements_mask">
-<code class="descname">elements_mask</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/system.html#Molecule.elements_mask"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#system.Molecule.elements_mask" title="Permalink to this definition">¶</a></dt>
+<dl class="py method">
+<dt class="sig sig-object py" id="sasmol.system.Molecule.fasta">
+<span class="sig-name descname"><span class="pre">fasta</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/sasmol/system.html#Molecule.fasta"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sasmol.system.Molecule.fasta" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="method">
-<dt id="system.Molecule.fasta">
-<code class="descname">fasta</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/system.html#Molecule.fasta"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#system.Molecule.fasta" title="Permalink to this definition">¶</a></dt>
+<dl class="py method">
+<dt class="sig sig-object py" id="sasmol.system.Molecule.header">
+<span class="sig-name descname"><span class="pre">header</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/sasmol/system.html#Molecule.header"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sasmol.system.Molecule.header" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="method">
-<dt id="system.Molecule.header">
-<code class="descname">header</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/system.html#Molecule.header"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#system.Molecule.header" title="Permalink to this definition">¶</a></dt>
+<dl class="py method">
+<dt class="sig sig-object py" id="sasmol.system.Molecule.maximum">
+<span class="sig-name descname"><span class="pre">maximum</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/sasmol/system.html#Molecule.maximum"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sasmol.system.Molecule.maximum" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="method">
-<dt id="system.Molecule.maximum">
-<code class="descname">maximum</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/system.html#Molecule.maximum"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#system.Molecule.maximum" title="Permalink to this definition">¶</a></dt>
+<dl class="py method">
+<dt class="sig sig-object py" id="sasmol.system.Molecule.minimum">
+<span class="sig-name descname"><span class="pre">minimum</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/sasmol/system.html#Molecule.minimum"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sasmol.system.Molecule.minimum" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="method">
-<dt id="system.Molecule.minimum">
-<code class="descname">minimum</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/system.html#Molecule.minimum"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#system.Molecule.minimum" title="Permalink to this definition">¶</a></dt>
+<dl class="py method">
+<dt class="sig sig-object py" id="sasmol.system.Molecule.moltypes">
+<span class="sig-name descname"><span class="pre">moltypes</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/sasmol/system.html#Molecule.moltypes"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sasmol.system.Molecule.moltypes" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="method">
-<dt id="system.Molecule.moltypes">
-<code class="descname">moltypes</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/system.html#Molecule.moltypes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#system.Molecule.moltypes" title="Permalink to this definition">¶</a></dt>
+<dl class="py method">
+<dt class="sig sig-object py" id="sasmol.system.Molecule.names">
+<span class="sig-name descname"><span class="pre">names</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/sasmol/system.html#Molecule.names"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sasmol.system.Molecule.names" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="method">
-<dt id="system.Molecule.names">
-<code class="descname">names</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/system.html#Molecule.names"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#system.Molecule.names" title="Permalink to this definition">¶</a></dt>
+<dl class="py method">
+<dt class="sig sig-object py" id="sasmol.system.Molecule.names_mask">
+<span class="sig-name descname"><span class="pre">names_mask</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/sasmol/system.html#Molecule.names_mask"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sasmol.system.Molecule.names_mask" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="method">
-<dt id="system.Molecule.names_mask">
-<code class="descname">names_mask</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/system.html#Molecule.names_mask"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#system.Molecule.names_mask" title="Permalink to this definition">¶</a></dt>
+<dl class="py method">
+<dt class="sig sig-object py" id="sasmol.system.Molecule.number_of_betas">
+<span class="sig-name descname"><span class="pre">number_of_betas</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/sasmol/system.html#Molecule.number_of_betas"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sasmol.system.Molecule.number_of_betas" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="method">
-<dt id="system.Molecule.number_of_betas">
-<code class="descname">number_of_betas</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/system.html#Molecule.number_of_betas"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#system.Molecule.number_of_betas" title="Permalink to this definition">¶</a></dt>
+<dl class="py method">
+<dt class="sig sig-object py" id="sasmol.system.Molecule.number_of_chains">
+<span class="sig-name descname"><span class="pre">number_of_chains</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/sasmol/system.html#Molecule.number_of_chains"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sasmol.system.Molecule.number_of_chains" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="method">
-<dt id="system.Molecule.number_of_chains">
-<code class="descname">number_of_chains</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/system.html#Molecule.number_of_chains"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#system.Molecule.number_of_chains" title="Permalink to this definition">¶</a></dt>
+<dl class="py method">
+<dt class="sig sig-object py" id="sasmol.system.Molecule.number_of_elements">
+<span class="sig-name descname"><span class="pre">number_of_elements</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/sasmol/system.html#Molecule.number_of_elements"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sasmol.system.Molecule.number_of_elements" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="method">
-<dt id="system.Molecule.number_of_elements">
-<code class="descname">number_of_elements</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/system.html#Molecule.number_of_elements"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#system.Molecule.number_of_elements" title="Permalink to this definition">¶</a></dt>
+<dl class="py method">
+<dt class="sig sig-object py" id="sasmol.system.Molecule.number_of_moltypes">
+<span class="sig-name descname"><span class="pre">number_of_moltypes</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/sasmol/system.html#Molecule.number_of_moltypes"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sasmol.system.Molecule.number_of_moltypes" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="method">
-<dt id="system.Molecule.number_of_moltypes">
-<code class="descname">number_of_moltypes</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/system.html#Molecule.number_of_moltypes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#system.Molecule.number_of_moltypes" title="Permalink to this definition">¶</a></dt>
+<dl class="py method">
+<dt class="sig sig-object py" id="sasmol.system.Molecule.number_of_names">
+<span class="sig-name descname"><span class="pre">number_of_names</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/sasmol/system.html#Molecule.number_of_names"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sasmol.system.Molecule.number_of_names" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="method">
-<dt id="system.Molecule.number_of_names">
-<code class="descname">number_of_names</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/system.html#Molecule.number_of_names"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#system.Molecule.number_of_names" title="Permalink to this definition">¶</a></dt>
+<dl class="py method">
+<dt class="sig sig-object py" id="sasmol.system.Molecule.number_of_occupancies">
+<span class="sig-name descname"><span class="pre">number_of_occupancies</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/sasmol/system.html#Molecule.number_of_occupancies"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sasmol.system.Molecule.number_of_occupancies" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="method">
-<dt id="system.Molecule.number_of_occupancies">
-<code class="descname">number_of_occupancies</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/system.html#Molecule.number_of_occupancies"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#system.Molecule.number_of_occupancies" title="Permalink to this definition">¶</a></dt>
+<dl class="py method">
+<dt class="sig sig-object py" id="sasmol.system.Molecule.number_of_resids">
+<span class="sig-name descname"><span class="pre">number_of_resids</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/sasmol/system.html#Molecule.number_of_resids"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sasmol.system.Molecule.number_of_resids" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="method">
-<dt id="system.Molecule.number_of_resids">
-<code class="descname">number_of_resids</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/system.html#Molecule.number_of_resids"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#system.Molecule.number_of_resids" title="Permalink to this definition">¶</a></dt>
+<dl class="py method">
+<dt class="sig sig-object py" id="sasmol.system.Molecule.number_of_resnames">
+<span class="sig-name descname"><span class="pre">number_of_resnames</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/sasmol/system.html#Molecule.number_of_resnames"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sasmol.system.Molecule.number_of_resnames" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="method">
-<dt id="system.Molecule.number_of_resnames">
-<code class="descname">number_of_resnames</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/system.html#Molecule.number_of_resnames"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#system.Molecule.number_of_resnames" title="Permalink to this definition">¶</a></dt>
+<dl class="py method">
+<dt class="sig sig-object py" id="sasmol.system.Molecule.number_of_segnames">
+<span class="sig-name descname"><span class="pre">number_of_segnames</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/sasmol/system.html#Molecule.number_of_segnames"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sasmol.system.Molecule.number_of_segnames" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="method">
-<dt id="system.Molecule.number_of_segnames">
-<code class="descname">number_of_segnames</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/system.html#Molecule.number_of_segnames"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#system.Molecule.number_of_segnames" title="Permalink to this definition">¶</a></dt>
+<dl class="py method">
+<dt class="sig sig-object py" id="sasmol.system.Molecule.occupancies">
+<span class="sig-name descname"><span class="pre">occupancies</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/sasmol/system.html#Molecule.occupancies"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sasmol.system.Molecule.occupancies" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="method">
-<dt id="system.Molecule.occupancies">
-<code class="descname">occupancies</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/system.html#Molecule.occupancies"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#system.Molecule.occupancies" title="Permalink to this definition">¶</a></dt>
+<dl class="py method">
+<dt class="sig sig-object py" id="sasmol.system.Molecule.occupancies_mask">
+<span class="sig-name descname"><span class="pre">occupancies_mask</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/sasmol/system.html#Molecule.occupancies_mask"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sasmol.system.Molecule.occupancies_mask" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="method">
-<dt id="system.Molecule.occupancies_mask">
-<code class="descname">occupancies_mask</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/system.html#Molecule.occupancies_mask"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#system.Molecule.occupancies_mask" title="Permalink to this definition">¶</a></dt>
+<dl class="py method">
+<dt class="sig sig-object py" id="sasmol.system.Molecule.one_letter_resname">
+<span class="sig-name descname"><span class="pre">one_letter_resname</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/sasmol/system.html#Molecule.one_letter_resname"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sasmol.system.Molecule.one_letter_resname" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="method">
-<dt id="system.Molecule.one_letter_resname">
-<code class="descname">one_letter_resname</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/system.html#Molecule.one_letter_resname"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#system.Molecule.one_letter_resname" title="Permalink to this definition">¶</a></dt>
+<dl class="py method">
+<dt class="sig sig-object py" id="sasmol.system.Molecule.pmi">
+<span class="sig-name descname"><span class="pre">pmi</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/sasmol/system.html#Molecule.pmi"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sasmol.system.Molecule.pmi" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="method">
-<dt id="system.Molecule.pmi">
-<code class="descname">pmi</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/system.html#Molecule.pmi"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#system.Molecule.pmi" title="Permalink to this definition">¶</a></dt>
+<dl class="py method">
+<dt class="sig sig-object py" id="sasmol.system.Molecule.resids">
+<span class="sig-name descname"><span class="pre">resids</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/sasmol/system.html#Molecule.resids"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sasmol.system.Molecule.resids" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="method">
-<dt id="system.Molecule.resids">
-<code class="descname">resids</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/system.html#Molecule.resids"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#system.Molecule.resids" title="Permalink to this definition">¶</a></dt>
+<dl class="py method">
+<dt class="sig sig-object py" id="sasmol.system.Molecule.resids_mask">
+<span class="sig-name descname"><span class="pre">resids_mask</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/sasmol/system.html#Molecule.resids_mask"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sasmol.system.Molecule.resids_mask" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="method">
-<dt id="system.Molecule.resids_mask">
-<code class="descname">resids_mask</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/system.html#Molecule.resids_mask"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#system.Molecule.resids_mask" title="Permalink to this definition">¶</a></dt>
+<dl class="py method">
+<dt class="sig sig-object py" id="sasmol.system.Molecule.residue_charge">
+<span class="sig-name descname"><span class="pre">residue_charge</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/sasmol/system.html#Molecule.residue_charge"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sasmol.system.Molecule.residue_charge" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="method">
-<dt id="system.Molecule.residue_charge">
-<code class="descname">residue_charge</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/system.html#Molecule.residue_charge"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#system.Molecule.residue_charge" title="Permalink to this definition">¶</a></dt>
+<dl class="py method">
+<dt class="sig sig-object py" id="sasmol.system.Molecule.residue_flag">
+<span class="sig-name descname"><span class="pre">residue_flag</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/sasmol/system.html#Molecule.residue_flag"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sasmol.system.Molecule.residue_flag" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="method">
-<dt id="system.Molecule.residue_flag">
-<code class="descname">residue_flag</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/system.html#Molecule.residue_flag"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#system.Molecule.residue_flag" title="Permalink to this definition">¶</a></dt>
+<dl class="py method">
+<dt class="sig sig-object py" id="sasmol.system.Molecule.resnames">
+<span class="sig-name descname"><span class="pre">resnames</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/sasmol/system.html#Molecule.resnames"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sasmol.system.Molecule.resnames" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="method">
-<dt id="system.Molecule.resnames">
-<code class="descname">resnames</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/system.html#Molecule.resnames"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#system.Molecule.resnames" title="Permalink to this definition">¶</a></dt>
+<dl class="py method">
+<dt class="sig sig-object py" id="sasmol.system.Molecule.resnames_mask">
+<span class="sig-name descname"><span class="pre">resnames_mask</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/sasmol/system.html#Molecule.resnames_mask"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sasmol.system.Molecule.resnames_mask" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="method">
-<dt id="system.Molecule.resnames_mask">
-<code class="descname">resnames_mask</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/system.html#Molecule.resnames_mask"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#system.Molecule.resnames_mask" title="Permalink to this definition">¶</a></dt>
+<dl class="py method">
+<dt class="sig sig-object py" id="sasmol.system.Molecule.rg">
+<span class="sig-name descname"><span class="pre">rg</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/sasmol/system.html#Molecule.rg"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sasmol.system.Molecule.rg" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="method">
-<dt id="system.Molecule.rg">
-<code class="descname">rg</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/system.html#Molecule.rg"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#system.Molecule.rg" title="Permalink to this definition">¶</a></dt>
+<dl class="py method">
+<dt class="sig sig-object py" id="sasmol.system.Molecule.segnames">
+<span class="sig-name descname"><span class="pre">segnames</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/sasmol/system.html#Molecule.segnames"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sasmol.system.Molecule.segnames" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="method">
-<dt id="system.Molecule.segnames">
-<code class="descname">segnames</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/system.html#Molecule.segnames"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#system.Molecule.segnames" title="Permalink to this definition">¶</a></dt>
+<dl class="py method">
+<dt class="sig sig-object py" id="sasmol.system.Molecule.segnames_mask">
+<span class="sig-name descname"><span class="pre">segnames_mask</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/sasmol/system.html#Molecule.segnames_mask"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sasmol.system.Molecule.segnames_mask" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="method">
-<dt id="system.Molecule.segnames_mask">
-<code class="descname">segnames_mask</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/system.html#Molecule.segnames_mask"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#system.Molecule.segnames_mask" title="Permalink to this definition">¶</a></dt>
+<dl class="py method">
+<dt class="sig sig-object py" id="sasmol.system.Molecule.setBetas">
+<span class="sig-name descname"><span class="pre">setBetas</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">newValue</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sasmol/system.html#Molecule.setBetas"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sasmol.system.Molecule.setBetas" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="method">
-<dt id="system.Molecule.setBetas">
-<code class="descname">setBetas</code><span class="sig-paren">(</span><em>newValue</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/system.html#Molecule.setBetas"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#system.Molecule.setBetas" title="Permalink to this definition">¶</a></dt>
+<dl class="py method">
+<dt class="sig sig-object py" id="sasmol.system.Molecule.setBetas_mask">
+<span class="sig-name descname"><span class="pre">setBetas_mask</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">newValue</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sasmol/system.html#Molecule.setBetas_mask"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sasmol.system.Molecule.setBetas_mask" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="method">
-<dt id="system.Molecule.setBetas_mask">
-<code class="descname">setBetas_mask</code><span class="sig-paren">(</span><em>newValue</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/system.html#Molecule.setBetas_mask"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#system.Molecule.setBetas_mask" title="Permalink to this definition">¶</a></dt>
+<dl class="py method">
+<dt class="sig sig-object py" id="sasmol.system.Molecule.setCenter_of_mass">
+<span class="sig-name descname"><span class="pre">setCenter_of_mass</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">newValue</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sasmol/system.html#Molecule.setCenter_of_mass"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sasmol.system.Molecule.setCenter_of_mass" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="method">
-<dt id="system.Molecule.setCenter_of_mass">
-<code class="descname">setCenter_of_mass</code><span class="sig-paren">(</span><em>newValue</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/system.html#Molecule.setCenter_of_mass"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#system.Molecule.setCenter_of_mass" title="Permalink to this definition">¶</a></dt>
+<dl class="py method">
+<dt class="sig sig-object py" id="sasmol.system.Molecule.setChains">
+<span class="sig-name descname"><span class="pre">setChains</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">newValue</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sasmol/system.html#Molecule.setChains"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sasmol.system.Molecule.setChains" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="method">
-<dt id="system.Molecule.setChains">
-<code class="descname">setChains</code><span class="sig-paren">(</span><em>newValue</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/system.html#Molecule.setChains"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#system.Molecule.setChains" title="Permalink to this definition">¶</a></dt>
+<dl class="py method">
+<dt class="sig sig-object py" id="sasmol.system.Molecule.setChains_mask">
+<span class="sig-name descname"><span class="pre">setChains_mask</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">newValue</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sasmol/system.html#Molecule.setChains_mask"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sasmol.system.Molecule.setChains_mask" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="method">
-<dt id="system.Molecule.setChains_mask">
-<code class="descname">setChains_mask</code><span class="sig-paren">(</span><em>newValue</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/system.html#Molecule.setChains_mask"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#system.Molecule.setChains_mask" title="Permalink to this definition">¶</a></dt>
+<dl class="py method">
+<dt class="sig sig-object py" id="sasmol.system.Molecule.setCharmm_type">
+<span class="sig-name descname"><span class="pre">setCharmm_type</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">newValue</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sasmol/system.html#Molecule.setCharmm_type"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sasmol.system.Molecule.setCharmm_type" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="method">
-<dt id="system.Molecule.setCharmm_type">
-<code class="descname">setCharmm_type</code><span class="sig-paren">(</span><em>newValue</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/system.html#Molecule.setCharmm_type"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#system.Molecule.setCharmm_type" title="Permalink to this definition">¶</a></dt>
+<dl class="py method">
+<dt class="sig sig-object py" id="sasmol.system.Molecule.setConect">
+<span class="sig-name descname"><span class="pre">setConect</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">newValue</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sasmol/system.html#Molecule.setConect"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sasmol.system.Molecule.setConect" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="method">
-<dt id="system.Molecule.setCom">
-<code class="descname">setCom</code><span class="sig-paren">(</span><em>newValue</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/system.html#Molecule.setCom"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#system.Molecule.setCom" title="Permalink to this definition">¶</a></dt>
+<dl class="py method">
+<dt class="sig sig-object py" id="sasmol.system.Molecule.setElements">
+<span class="sig-name descname"><span class="pre">setElements</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">newValue</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sasmol/system.html#Molecule.setElements"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sasmol.system.Molecule.setElements" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="method">
-<dt id="system.Molecule.setConect">
-<code class="descname">setConect</code><span class="sig-paren">(</span><em>newValue</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/system.html#Molecule.setConect"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#system.Molecule.setConect" title="Permalink to this definition">¶</a></dt>
+<dl class="py method">
+<dt class="sig sig-object py" id="sasmol.system.Molecule.setElements_mask">
+<span class="sig-name descname"><span class="pre">setElements_mask</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">newValue</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sasmol/system.html#Molecule.setElements_mask"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sasmol.system.Molecule.setElements_mask" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="method">
-<dt id="system.Molecule.setElements">
-<code class="descname">setElements</code><span class="sig-paren">(</span><em>newValue</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/system.html#Molecule.setElements"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#system.Molecule.setElements" title="Permalink to this definition">¶</a></dt>
+<dl class="py method">
+<dt class="sig sig-object py" id="sasmol.system.Molecule.setFasta">
+<span class="sig-name descname"><span class="pre">setFasta</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">newValue</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sasmol/system.html#Molecule.setFasta"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sasmol.system.Molecule.setFasta" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="method">
-<dt id="system.Molecule.setElements_mask">
-<code class="descname">setElements_mask</code><span class="sig-paren">(</span><em>newValue</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/system.html#Molecule.setElements_mask"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#system.Molecule.setElements_mask" title="Permalink to this definition">¶</a></dt>
+<dl class="py method">
+<dt class="sig sig-object py" id="sasmol.system.Molecule.setHeader">
+<span class="sig-name descname"><span class="pre">setHeader</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">newValue</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sasmol/system.html#Molecule.setHeader"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sasmol.system.Molecule.setHeader" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="method">
-<dt id="system.Molecule.setFasta">
-<code class="descname">setFasta</code><span class="sig-paren">(</span><em>newValue</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/system.html#Molecule.setFasta"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#system.Molecule.setFasta" title="Permalink to this definition">¶</a></dt>
+<dl class="py method">
+<dt class="sig sig-object py" id="sasmol.system.Molecule.setMaximum">
+<span class="sig-name descname"><span class="pre">setMaximum</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">newValue</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sasmol/system.html#Molecule.setMaximum"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sasmol.system.Molecule.setMaximum" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="method">
-<dt id="system.Molecule.setHeader">
-<code class="descname">setHeader</code><span class="sig-paren">(</span><em>newValue</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/system.html#Molecule.setHeader"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#system.Molecule.setHeader" title="Permalink to this definition">¶</a></dt>
+<dl class="py method">
+<dt class="sig sig-object py" id="sasmol.system.Molecule.setMinimum">
+<span class="sig-name descname"><span class="pre">setMinimum</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">newValue</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sasmol/system.html#Molecule.setMinimum"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sasmol.system.Molecule.setMinimum" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="method">
-<dt id="system.Molecule.setMaximum">
-<code class="descname">setMaximum</code><span class="sig-paren">(</span><em>newValue</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/system.html#Molecule.setMaximum"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#system.Molecule.setMaximum" title="Permalink to this definition">¶</a></dt>
+<dl class="py method">
+<dt class="sig sig-object py" id="sasmol.system.Molecule.setMoltypes">
+<span class="sig-name descname"><span class="pre">setMoltypes</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">newValue</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sasmol/system.html#Molecule.setMoltypes"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sasmol.system.Molecule.setMoltypes" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="method">
-<dt id="system.Molecule.setMinimum">
-<code class="descname">setMinimum</code><span class="sig-paren">(</span><em>newValue</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/system.html#Molecule.setMinimum"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#system.Molecule.setMinimum" title="Permalink to this definition">¶</a></dt>
+<dl class="py method">
+<dt class="sig sig-object py" id="sasmol.system.Molecule.setNames">
+<span class="sig-name descname"><span class="pre">setNames</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">newValue</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sasmol/system.html#Molecule.setNames"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sasmol.system.Molecule.setNames" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="method">
-<dt id="system.Molecule.setMoltypes">
-<code class="descname">setMoltypes</code><span class="sig-paren">(</span><em>newValue</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/system.html#Molecule.setMoltypes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#system.Molecule.setMoltypes" title="Permalink to this definition">¶</a></dt>
+<dl class="py method">
+<dt class="sig sig-object py" id="sasmol.system.Molecule.setNames_mask">
+<span class="sig-name descname"><span class="pre">setNames_mask</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">newValue</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sasmol/system.html#Molecule.setNames_mask"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sasmol.system.Molecule.setNames_mask" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="method">
-<dt id="system.Molecule.setNames">
-<code class="descname">setNames</code><span class="sig-paren">(</span><em>newValue</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/system.html#Molecule.setNames"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#system.Molecule.setNames" title="Permalink to this definition">¶</a></dt>
+<dl class="py method">
+<dt class="sig sig-object py" id="sasmol.system.Molecule.setNumber_of_betas">
+<span class="sig-name descname"><span class="pre">setNumber_of_betas</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">newValue</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sasmol/system.html#Molecule.setNumber_of_betas"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sasmol.system.Molecule.setNumber_of_betas" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="method">
-<dt id="system.Molecule.setNames_mask">
-<code class="descname">setNames_mask</code><span class="sig-paren">(</span><em>newValue</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/system.html#Molecule.setNames_mask"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#system.Molecule.setNames_mask" title="Permalink to this definition">¶</a></dt>
+<dl class="py method">
+<dt class="sig sig-object py" id="sasmol.system.Molecule.setNumber_of_chains">
+<span class="sig-name descname"><span class="pre">setNumber_of_chains</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">newValue</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sasmol/system.html#Molecule.setNumber_of_chains"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sasmol.system.Molecule.setNumber_of_chains" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="method">
-<dt id="system.Molecule.setNumber_of_betas">
-<code class="descname">setNumber_of_betas</code><span class="sig-paren">(</span><em>newValue</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/system.html#Molecule.setNumber_of_betas"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#system.Molecule.setNumber_of_betas" title="Permalink to this definition">¶</a></dt>
+<dl class="py method">
+<dt class="sig sig-object py" id="sasmol.system.Molecule.setNumber_of_elements">
+<span class="sig-name descname"><span class="pre">setNumber_of_elements</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">newValue</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sasmol/system.html#Molecule.setNumber_of_elements"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sasmol.system.Molecule.setNumber_of_elements" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="method">
-<dt id="system.Molecule.setNumber_of_chains">
-<code class="descname">setNumber_of_chains</code><span class="sig-paren">(</span><em>newValue</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/system.html#Molecule.setNumber_of_chains"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#system.Molecule.setNumber_of_chains" title="Permalink to this definition">¶</a></dt>
+<dl class="py method">
+<dt class="sig sig-object py" id="sasmol.system.Molecule.setNumber_of_moltypes">
+<span class="sig-name descname"><span class="pre">setNumber_of_moltypes</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">newValue</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sasmol/system.html#Molecule.setNumber_of_moltypes"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sasmol.system.Molecule.setNumber_of_moltypes" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="method">
-<dt id="system.Molecule.setNumber_of_elements">
-<code class="descname">setNumber_of_elements</code><span class="sig-paren">(</span><em>newValue</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/system.html#Molecule.setNumber_of_elements"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#system.Molecule.setNumber_of_elements" title="Permalink to this definition">¶</a></dt>
+<dl class="py method">
+<dt class="sig sig-object py" id="sasmol.system.Molecule.setNumber_of_names">
+<span class="sig-name descname"><span class="pre">setNumber_of_names</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">newValue</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sasmol/system.html#Molecule.setNumber_of_names"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sasmol.system.Molecule.setNumber_of_names" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="method">
-<dt id="system.Molecule.setNumber_of_moltypes">
-<code class="descname">setNumber_of_moltypes</code><span class="sig-paren">(</span><em>newValue</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/system.html#Molecule.setNumber_of_moltypes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#system.Molecule.setNumber_of_moltypes" title="Permalink to this definition">¶</a></dt>
+<dl class="py method">
+<dt class="sig sig-object py" id="sasmol.system.Molecule.setNumber_of_occupancies">
+<span class="sig-name descname"><span class="pre">setNumber_of_occupancies</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">newValue</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sasmol/system.html#Molecule.setNumber_of_occupancies"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sasmol.system.Molecule.setNumber_of_occupancies" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="method">
-<dt id="system.Molecule.setNumber_of_names">
-<code class="descname">setNumber_of_names</code><span class="sig-paren">(</span><em>newValue</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/system.html#Molecule.setNumber_of_names"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#system.Molecule.setNumber_of_names" title="Permalink to this definition">¶</a></dt>
+<dl class="py method">
+<dt class="sig sig-object py" id="sasmol.system.Molecule.setNumber_of_resids">
+<span class="sig-name descname"><span class="pre">setNumber_of_resids</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">newValue</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sasmol/system.html#Molecule.setNumber_of_resids"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sasmol.system.Molecule.setNumber_of_resids" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="method">
-<dt id="system.Molecule.setNumber_of_occupancies">
-<code class="descname">setNumber_of_occupancies</code><span class="sig-paren">(</span><em>newValue</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/system.html#Molecule.setNumber_of_occupancies"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#system.Molecule.setNumber_of_occupancies" title="Permalink to this definition">¶</a></dt>
+<dl class="py method">
+<dt class="sig sig-object py" id="sasmol.system.Molecule.setNumber_of_resnames">
+<span class="sig-name descname"><span class="pre">setNumber_of_resnames</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">newValue</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sasmol/system.html#Molecule.setNumber_of_resnames"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sasmol.system.Molecule.setNumber_of_resnames" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="method">
-<dt id="system.Molecule.setNumber_of_resids">
-<code class="descname">setNumber_of_resids</code><span class="sig-paren">(</span><em>newValue</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/system.html#Molecule.setNumber_of_resids"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#system.Molecule.setNumber_of_resids" title="Permalink to this definition">¶</a></dt>
+<dl class="py method">
+<dt class="sig sig-object py" id="sasmol.system.Molecule.setNumber_of_segnames">
+<span class="sig-name descname"><span class="pre">setNumber_of_segnames</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">newValue</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sasmol/system.html#Molecule.setNumber_of_segnames"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sasmol.system.Molecule.setNumber_of_segnames" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="method">
-<dt id="system.Molecule.setNumber_of_resnames">
-<code class="descname">setNumber_of_resnames</code><span class="sig-paren">(</span><em>newValue</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/system.html#Molecule.setNumber_of_resnames"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#system.Molecule.setNumber_of_resnames" title="Permalink to this definition">¶</a></dt>
+<dl class="py method">
+<dt class="sig sig-object py" id="sasmol.system.Molecule.setOccupancies">
+<span class="sig-name descname"><span class="pre">setOccupancies</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">newValue</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sasmol/system.html#Molecule.setOccupancies"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sasmol.system.Molecule.setOccupancies" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="method">
-<dt id="system.Molecule.setNumber_of_segnames">
-<code class="descname">setNumber_of_segnames</code><span class="sig-paren">(</span><em>newValue</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/system.html#Molecule.setNumber_of_segnames"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#system.Molecule.setNumber_of_segnames" title="Permalink to this definition">¶</a></dt>
+<dl class="py method">
+<dt class="sig sig-object py" id="sasmol.system.Molecule.setOccupancies_mask">
+<span class="sig-name descname"><span class="pre">setOccupancies_mask</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">newValue</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sasmol/system.html#Molecule.setOccupancies_mask"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sasmol.system.Molecule.setOccupancies_mask" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="method">
-<dt id="system.Molecule.setOccupancies">
-<code class="descname">setOccupancies</code><span class="sig-paren">(</span><em>newValue</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/system.html#Molecule.setOccupancies"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#system.Molecule.setOccupancies" title="Permalink to this definition">¶</a></dt>
+<dl class="py method">
+<dt class="sig sig-object py" id="sasmol.system.Molecule.setOne_letter_resname">
+<span class="sig-name descname"><span class="pre">setOne_letter_resname</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">newValue</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sasmol/system.html#Molecule.setOne_letter_resname"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sasmol.system.Molecule.setOne_letter_resname" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="method">
-<dt id="system.Molecule.setOccupancies_mask">
-<code class="descname">setOccupancies_mask</code><span class="sig-paren">(</span><em>newValue</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/system.html#Molecule.setOccupancies_mask"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#system.Molecule.setOccupancies_mask" title="Permalink to this definition">¶</a></dt>
+<dl class="py method">
+<dt class="sig sig-object py" id="sasmol.system.Molecule.setPmi">
+<span class="sig-name descname"><span class="pre">setPmi</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">newValue</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sasmol/system.html#Molecule.setPmi"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sasmol.system.Molecule.setPmi" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="method">
-<dt id="system.Molecule.setOne_letter_resname">
-<code class="descname">setOne_letter_resname</code><span class="sig-paren">(</span><em>newValue</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/system.html#Molecule.setOne_letter_resname"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#system.Molecule.setOne_letter_resname" title="Permalink to this definition">¶</a></dt>
+<dl class="py method">
+<dt class="sig sig-object py" id="sasmol.system.Molecule.setResids">
+<span class="sig-name descname"><span class="pre">setResids</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">newValue</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sasmol/system.html#Molecule.setResids"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sasmol.system.Molecule.setResids" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="method">
-<dt id="system.Molecule.setPmi">
-<code class="descname">setPmi</code><span class="sig-paren">(</span><em>newValue</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/system.html#Molecule.setPmi"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#system.Molecule.setPmi" title="Permalink to this definition">¶</a></dt>
+<dl class="py method">
+<dt class="sig sig-object py" id="sasmol.system.Molecule.setResids_mask">
+<span class="sig-name descname"><span class="pre">setResids_mask</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">newValue</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sasmol/system.html#Molecule.setResids_mask"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sasmol.system.Molecule.setResids_mask" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="method">
-<dt id="system.Molecule.setResids">
-<code class="descname">setResids</code><span class="sig-paren">(</span><em>newValue</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/system.html#Molecule.setResids"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#system.Molecule.setResids" title="Permalink to this definition">¶</a></dt>
+<dl class="py method">
+<dt class="sig sig-object py" id="sasmol.system.Molecule.setResidue_charge">
+<span class="sig-name descname"><span class="pre">setResidue_charge</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">newValue</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sasmol/system.html#Molecule.setResidue_charge"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sasmol.system.Molecule.setResidue_charge" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="method">
-<dt id="system.Molecule.setResids_mask">
-<code class="descname">setResids_mask</code><span class="sig-paren">(</span><em>newValue</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/system.html#Molecule.setResids_mask"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#system.Molecule.setResids_mask" title="Permalink to this definition">¶</a></dt>
+<dl class="py method">
+<dt class="sig sig-object py" id="sasmol.system.Molecule.setResidue_flag">
+<span class="sig-name descname"><span class="pre">setResidue_flag</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">newValue</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sasmol/system.html#Molecule.setResidue_flag"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sasmol.system.Molecule.setResidue_flag" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="method">
-<dt id="system.Molecule.setResidue_charge">
-<code class="descname">setResidue_charge</code><span class="sig-paren">(</span><em>newValue</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/system.html#Molecule.setResidue_charge"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#system.Molecule.setResidue_charge" title="Permalink to this definition">¶</a></dt>
+<dl class="py method">
+<dt class="sig sig-object py" id="sasmol.system.Molecule.setResnames">
+<span class="sig-name descname"><span class="pre">setResnames</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">newValue</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sasmol/system.html#Molecule.setResnames"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sasmol.system.Molecule.setResnames" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="method">
-<dt id="system.Molecule.setResidue_flag">
-<code class="descname">setResidue_flag</code><span class="sig-paren">(</span><em>newValue</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/system.html#Molecule.setResidue_flag"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#system.Molecule.setResidue_flag" title="Permalink to this definition">¶</a></dt>
+<dl class="py method">
+<dt class="sig sig-object py" id="sasmol.system.Molecule.setResnames_mask">
+<span class="sig-name descname"><span class="pre">setResnames_mask</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">newValue</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sasmol/system.html#Molecule.setResnames_mask"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sasmol.system.Molecule.setResnames_mask" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="method">
-<dt id="system.Molecule.setResnames">
-<code class="descname">setResnames</code><span class="sig-paren">(</span><em>newValue</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/system.html#Molecule.setResnames"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#system.Molecule.setResnames" title="Permalink to this definition">¶</a></dt>
+<dl class="py method">
+<dt class="sig sig-object py" id="sasmol.system.Molecule.setRg">
+<span class="sig-name descname"><span class="pre">setRg</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">newValue</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sasmol/system.html#Molecule.setRg"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sasmol.system.Molecule.setRg" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="method">
-<dt id="system.Molecule.setResnames_mask">
-<code class="descname">setResnames_mask</code><span class="sig-paren">(</span><em>newValue</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/system.html#Molecule.setResnames_mask"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#system.Molecule.setResnames_mask" title="Permalink to this definition">¶</a></dt>
+<dl class="py method">
+<dt class="sig sig-object py" id="sasmol.system.Molecule.setSegnames">
+<span class="sig-name descname"><span class="pre">setSegnames</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">newValue</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sasmol/system.html#Molecule.setSegnames"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sasmol.system.Molecule.setSegnames" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="method">
-<dt id="system.Molecule.setRg">
-<code class="descname">setRg</code><span class="sig-paren">(</span><em>newValue</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/system.html#Molecule.setRg"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#system.Molecule.setRg" title="Permalink to this definition">¶</a></dt>
+<dl class="py method">
+<dt class="sig sig-object py" id="sasmol.system.Molecule.setSegnames_mask">
+<span class="sig-name descname"><span class="pre">setSegnames_mask</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">newValue</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sasmol/system.html#Molecule.setSegnames_mask"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sasmol.system.Molecule.setSegnames_mask" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="method">
-<dt id="system.Molecule.setSegnames">
-<code class="descname">setSegnames</code><span class="sig-paren">(</span><em>newValue</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/system.html#Molecule.setSegnames"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#system.Molecule.setSegnames" title="Permalink to this definition">¶</a></dt>
+<dl class="py method">
+<dt class="sig sig-object py" id="sasmol.system.Molecule.setUnitcell">
+<span class="sig-name descname"><span class="pre">setUnitcell</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">newValue</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sasmol/system.html#Molecule.setUnitcell"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sasmol.system.Molecule.setUnitcell" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="method">
-<dt id="system.Molecule.setSegnames_mask">
-<code class="descname">setSegnames_mask</code><span class="sig-paren">(</span><em>newValue</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/system.html#Molecule.setSegnames_mask"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#system.Molecule.setSegnames_mask" title="Permalink to this definition">¶</a></dt>
+<dl class="py method">
+<dt class="sig sig-object py" id="sasmol.system.Molecule.set_average_vdw">
+<span class="sig-name descname"><span class="pre">set_average_vdw</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/sasmol/system.html#Molecule.set_average_vdw"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sasmol.system.Molecule.set_average_vdw" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="method">
-<dt id="system.Molecule.setUnitcell">
-<code class="descname">setUnitcell</code><span class="sig-paren">(</span><em>newValue</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/system.html#Molecule.setUnitcell"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#system.Molecule.setUnitcell" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="system.Molecule.unitcell">
-<code class="descname">unitcell</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/system.html#Molecule.unitcell"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#system.Molecule.unitcell" title="Permalink to this definition">¶</a></dt>
+<dl class="py method">
+<dt class="sig sig-object py" id="sasmol.system.Molecule.unitcell">
+<span class="sig-name descname"><span class="pre">unitcell</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/sasmol/system.html#Molecule.unitcell"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sasmol.system.Molecule.unitcell" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
 
-<dl class="class">
-<dt id="system.Molecule_Maker">
-<em class="property">class </em><code class="descclassname">system.</code><code class="descname">Molecule_Maker</code><span class="sig-paren">(</span><em>natoms</em>, <em>atom='ATOM'</em>, <em>index=None</em>, <em>name='C'</em>, <em>loc=' '</em>, <em>resname='DUM'</em>, <em>chain='A'</em>, <em>resid=None</em>, <em>rescode=' '</em>, <em>coor=None</em>, <em>occupancy='0.00'</em>, <em>beta='0.00'</em>, <em>segname='DUM'</em>, <em>element='C'</em>, <em>charge=' '</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/system.html#Molecule_Maker"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#system.Molecule_Maker" title="Permalink to this definition">¶</a></dt>
+<dl class="py class">
+<dt class="sig sig-object py" id="sasmol.system.Molecule_Maker">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">sasmol.system.</span></span><span class="sig-name descname"><span class="pre">Molecule_Maker</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">natoms</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">atom</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'ATOM'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">index</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'C'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">loc</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'</span> <span class="pre">'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">resname</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'DUM'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">chain</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'A'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">resid</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rescode</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'</span> <span class="pre">'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">coor</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">occupancy</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'0.00'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">beta</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'0.00'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">segname</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'DUM'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">element</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'C'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">charge</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'</span> <span class="pre">'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">moltype</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'protein'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">residue_flag</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sasmol/system.html#Molecule_Maker"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sasmol.system.Molecule_Maker" title="Permalink to this definition">¶</a></dt>
 <dd><p>This class is used to define the minimum number of fields required to
 use within sasmol to use read_pdb() and write_pdb() methods in file_io.</p>
 <p>Default inputs are listed in the variables in __init__ and itemized below.
-The values are assigned to all atoms in the molecule.</p>
+Scalar values are assigned to all atoms in the molecule.  Per-atom
+lists, tuples, or arrays may also be supplied, and must have one value
+for each atom.</p>
 <p>Once defined, attributes can be set using setters in the Atom class.</p>
 <p>Class has several initialization options</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>natoms</strong> &#8211; integer : number of atoms in the molecule</li>
-<li><strong>atom</strong> &#8211; string  : name of ATOM keyword, typically either ATOM or HETATM</li>
-<li><strong>index</strong> &#8211; integer list : atom number</li>
-<li><strong>name</strong> &#8211; string : atom name</li>
-<li><strong>loc</strong> &#8211; string : alt loc</li>
-<li><strong>resname</strong> &#8211; string  : residue name</li>
-<li><strong>chain</strong> &#8211; string  : chain name</li>
-<li><strong>resid</strong> &#8211; integer list : residue number</li>
-<li><strong>rescode</strong> &#8211; string  : residue code</li>
-<li><strong>coor</strong> &#8211; numpy float array : x, y, z coordinates</li>
-<li><strong>occupancy</strong> &#8211; string  : occupancy value</li>
-<li><strong>beta</strong> &#8211; string  : beta value</li>
-<li><strong>segname</strong> &#8211; string  : segment name</li>
-<li><strong>element</strong> &#8211; string  : element name</li>
-<li><strong>charge</strong> &#8211; string  : element charge</li>
-<li><strong>kwargs</strong> &#8211; optional future arguments</li>
+<p>For most atom fields, pass a scalar value to use the same value for
+every atom, or pass a list, tuple, or numpy array with one value per
+atom.  Per-atom inputs must match natoms exactly.  Partial lists are
+not expanded or repeated.  The coor argument remains a coordinate
+array and is not interpreted as a per-atom constructor template.  Use
+validate_integrity() after later setter calls to raise a ValueError if
+core per-atom fields no longer match natoms.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>natoms</strong> – integer : number of atoms in the molecule</p></li>
+<li><p><strong>atom</strong> – string  : name of ATOM keyword, typically either ATOM or HETATM</p></li>
+<li><p><strong>index</strong> – integer list : atom number</p></li>
+<li><p><strong>name</strong> – string : atom name</p></li>
+<li><p><strong>loc</strong> – string : alt loc</p></li>
+<li><p><strong>resname</strong> – string  : residue name</p></li>
+<li><p><strong>chain</strong> – string  : chain name</p></li>
+<li><p><strong>resid</strong> – integer list : residue number</p></li>
+<li><p><strong>rescode</strong> – string  : residue code</p></li>
+<li><p><strong>coor</strong> – numpy float array : x, y, z coordinates</p></li>
+<li><p><strong>occupancy</strong> – string  : occupancy value</p></li>
+<li><p><strong>beta</strong> – string  : beta value</p></li>
+<li><p><strong>segname</strong> – string  : segment name</p></li>
+<li><p><strong>element</strong> – string  : element name</p></li>
+<li><p><strong>charge</strong> – string  : element charge</p></li>
+<li><p><strong>kwargs</strong> – optional future arguments</p></li>
 </ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"></p>
-</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">system object</p>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>system object</p>
+</dd>
+</dl>
 <p class="rubric">Examples</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">sasmol.system</span> <span class="k">as</span> <span class="nn">system</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">sasmol.system</span> <span class="k">as</span> <span class="nn">system</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">molecule</span> <span class="o">=</span> <span class="n">system</span><span class="o">.</span><span class="n">Molecule_Maker</span><span class="p">(</span><span class="mi">2048</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">molecule</span> <span class="o">=</span> <span class="n">system</span><span class="o">.</span><span class="n">Molecule_Maker</span><span class="p">(</span><span class="mi">2048</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;Ar&#39;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">molecule</span> <span class="o">=</span> <span class="n">system</span><span class="o">.</span><span class="n">Molecule_Maker</span><span class="p">(</span><span class="mi">2048</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;Ar&#39;</span><span class="p">,</span> <span class="n">segname</span><span class="o">=</span><span class="s1">&#39;ARG0&#39;</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">index</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">xrange</span><span class="p">(</span><span class="mi">340</span><span class="p">,</span><span class="mi">1000</span><span class="p">)]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">molecule</span> <span class="o">=</span> <span class="n">system</span><span class="o">.</span><span class="n">Molecule_Maker</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;N&#39;</span><span class="p">,</span> <span class="s1">&#39;CA&#39;</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">index</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">340</span><span class="p">,</span><span class="mi">1000</span><span class="p">)]</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">molecule</span> <span class="o">=</span> <span class="n">system</span><span class="o">.</span><span class="n">Molecule_Maker</span><span class="p">(</span><span class="mi">660</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;Ar&#39;</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="n">index</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">molecule</span><span class="o">.</span><span class="n">index</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
 <span class="go">340</span>
 </pre></div>
 </div>
+<dl class="py method">
+<dt class="sig sig-object py" id="sasmol.system.Molecule_Maker.residue_flag">
+<span class="sig-name descname"><span class="pre">residue_flag</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/sasmol/system.html#Molecule_Maker.residue_flag"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sasmol.system.Molecule_Maker.residue_flag" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
 </dd></dl>
 
-<dl class="class">
-<dt id="system.System">
-<em class="property">class </em><code class="descclassname">system.</code><code class="descname">System</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/system.html#System"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#system.System" title="Permalink to this definition">¶</a></dt>
+<dl class="py class">
+<dt class="sig sig-object py" id="sasmol.system.System">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">sasmol.system.</span></span><span class="sig-name descname"><span class="pre">System</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sasmol/system.html#System"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sasmol.system.System" title="Permalink to this definition">¶</a></dt>
 <dd><p>System is a class that is used to aggregate all components. It inherits
 all of attributes from Atom.</p>
 <p>Class has several initialization options</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>args</strong> &#8211; optional integer : self._id</li>
-<li><strong>kwargs</strong> &#8211; <dl class="docutils">
-<dt>optional keyword arguments</dt>
-<dd>string filename (filename = &#8216;hiv1_gag.pdb&#8217;) : default = None
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>args</strong> – optional integer : self._id</p></li>
+<li><p><strong>kwargs</strong> – <dl class="simple">
+<dt>optional keyword arguments</dt><dd><p>string filename (filename = ‘hiv1_gag.pdb’) : default = None
 integet id (id=3) : default = 0
-boolean debug (debug = True) : default = None</dd>
+boolean debug (debug = True) : default = None</p>
+</dd>
 </dl>
-</li>
+</p></li>
 </ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">if called with string (or with filename kwarg) returns
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>if called with string (or with filename kwarg) returns
 an initialized system object with data read in using
 file_io.read_pdb()</p>
-</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">system object</p>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>system object</p>
+</dd>
+</dl>
 <p class="rubric">Examples</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">sasmol.system</span> <span class="k">as</span> <span class="nn">system</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">sasmol.system</span> <span class="k">as</span> <span class="nn">system</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">molecule</span> <span class="o">=</span> <span class="n">system</span><span class="o">.</span><span class="n">Molecule</span><span class="p">(</span><span class="n">filename</span><span class="o">=</span><span class="s1">&#39;hiv1_gag.pdb&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">molecule</span> <span class="o">=</span> <span class="n">system</span><span class="o">.</span><span class="n">Molecule</span><span class="p">()</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">molecule</span> <span class="o">=</span> <span class="n">system</span><span class="o">.</span><span class="n">Molecule</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">molecule</span> <span class="o">=</span> <span class="n">system</span><span class="o">.</span><span class="n">Molecule</span><span class="p">(</span><span class="nb">id</span><span class="o">=</span><span class="mi">7</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">molecule</span> <span class="o">=</span> <span class="n">system</span><span class="o">.</span><span class="n">Molecule</span><span class="p">(</span><span class="n">debug</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">molecule</span> <span class="o">=</span> <span class="n">system</span><span class="o">.</span><span class="n">Molecule</span><span class="p">(</span><span class="s1">&#39;hiv1_gag.pdb&#39;</span><span class="p">)</span>
@@ -945,66 +982,88 @@ file_io.read_pdb()</p>
 </div>
 </dd></dl>
 
-</div>
-</div>
+</section>
+</section>
 
 
           </div>
+
         </div>
       </div>
       <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
         <div class="sphinxsidebarwrapper">
-  <h3><a href="index.html">Table Of Contents</a></h3>
-  <ul>
-<li><a class="reference internal" href="#">System</a><ul>
-<li><a class="reference internal" href="#id1"><code class="docutils literal"><span class="pre">System</span></code></a></li>
+<h1 class="logo"><a href="index.html">sasmol</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="index_calculate.html">Calculate</a></li>
+<li class="toctree-l1"><a class="reference internal" href="index_charmm_topology.html">Charmm Topology</a></li>
+<li class="toctree-l1"><a class="reference internal" href="index_dcd_io.html">DCD IO</a></li>
+<li class="toctree-l1"><a class="reference internal" href="index_file_io.html">File IO</a></li>
+<li class="toctree-l1"><a class="reference internal" href="index_linear_algebra.html">Linear Algebra</a></li>
+<li class="toctree-l1"><a class="reference internal" href="index_multiprocessing_sasmol.html">Multiprocessing SasMol</a></li>
+<li class="toctree-l1"><a class="reference internal" href="index_operate.html">Operate</a></li>
+<li class="toctree-l1"><a class="reference internal" href="index_pdb_io.html">PDB IO</a></li>
+<li class="toctree-l1"><a class="reference internal" href="index_properties.html">Properties</a></li>
+<li class="toctree-l1"><a class="reference internal" href="index_subset.html">Subset</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="index_topology.html">Topology</a></li>
+<li class="toctree-l1"><a class="reference internal" href="index_utilities.html">Utilities</a></li>
+<li class="toctree-l1"><a class="reference internal" href="index_view.html">View</a></li>
 </ul>
-</li>
-</ul>
+
 <div class="relations">
 <h3>Related Topics</h3>
 <ul>
   <li><a href="index.html">Documentation overview</a><ul>
-      <li>Previous: <a href="index_properties.html" title="previous chapter">Properties</a></li>
+      <li>Previous: <a href="index_subset.html" title="previous chapter">Subset</a></li>
       <li>Next: <a href="index_topology.html" title="next chapter">Topology</a></li>
   </ul></li>
 </ul>
 </div>
-  <div role="note" aria-label="source link">
-    <h3>This Page</h3>
-    <ul class="this-page-menu">
-      <li><a href="_sources/index_system.txt"
-            rel="nofollow">Show Source</a></li>
-    </ul>
-   </div>
 <div id="searchbox" style="display: none" role="search">
-  <h3>Quick search</h3>
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
     <form class="search" action="search.html" method="get">
-      <input type="text" name="q" />
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
       <input type="submit" value="Go" />
-      <input type="hidden" name="check_keywords" value="yes" />
-      <input type="hidden" name="area" value="default" />
     </form>
+    </div>
 </div>
-<script type="text/javascript">$('#searchbox').show(0);</script>
+<script>$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
         </div>
       </div>
       <div class="clearer"></div>
     </div>
     <div class="footer">
       &copy;2016, Joseph E. Curtis, Ph.D.
-      
+
       |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.4.1</a>
-      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.8</a>
-      
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 4.4.0</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+
       |
-      <a href="_sources/index_system.txt"
+      <a href="_sources/index_system.rst.txt"
           rel="nofollow">Page source</a>
     </div>
 
-    
 
-    
+
+
   </body>
 </html>

@@ -1,84 +1,69 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
+<!DOCTYPE html>
 
-<html xmlns="http://www.w3.org/1999/xhtml">
+<html>
   <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    
-    <title>Topology &mdash; sasmol 1.0 documentation</title>
-    
-    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
-    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-    
-    <script type="text/javascript">
-      var DOCUMENTATION_OPTIONS = {
-        URL_ROOT:    './',
-        VERSION:     '1.0',
-        COLLAPSE_INDEX: false,
-        FILE_SUFFIX: '.html',
-        HAS_SOURCE:  true
-      };
-    </script>
-    <script type="text/javascript" src="_static/jquery.js"></script>
-    <script type="text/javascript" src="_static/underscore.js"></script>
-    <script type="text/javascript" src="_static/doctools.js"></script>
-    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
-    <link rel="top" title="sasmol 1.0 documentation" href="index.html" />
-    <link rel="next" title="View" href="index_view.html" />
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+    <title>Topology &#8212; sasmol 1.0 documentation</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="_static/alabaster.css" />
+    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/doctools.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Utilities" href="index_utilities.html" />
     <link rel="prev" title="System" href="index_system.html" />
-   
+
   <link rel="stylesheet" href="_static/custom.css" type="text/css" />
-  
+
+
   <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
 
-  </head>
-  <body role="document">
-  
+  </head><body>
+
 
     <div class="document">
       <div class="documentwrapper">
         <div class="bodywrapper">
+
+
           <div class="body" role="main">
-            
-  <div class="section" id="topology">
+
+  <section id="topology">
 <h1>Topology<a class="headerlink" href="#topology" title="Permalink to this headline">¶</a></h1>
-<div class="section" id="id1">
-<h2><code class="xref py py-mod docutils literal"><span class="pre">Topology</span></code><a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h2>
-<span class="target" id="module-topology"></span><dl class="class">
-<dt id="topology.Topology">
-<em class="property">class </em><code class="descclassname">topology.</code><code class="descname">Topology</code><a class="reference internal" href="_modules/topology.html#Topology"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#topology.Topology" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">sasmol.charmm_topology.CharmmTopology</span></code></p>
+<section id="id1">
+<h2><code class="xref py py-mod docutils literal notranslate"><span class="pre">Topology</span></code><a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h2>
+<span class="target" id="module-sasmol.topology"></span><dl class="py class">
+<dt class="sig sig-object py" id="sasmol.topology.Topology">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">sasmol.topology.</span></span><span class="sig-name descname"><span class="pre">Topology</span></span><a class="reference internal" href="_modules/sasmol/topology.html#Topology"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sasmol.topology.Topology" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="index_charmm_topology.html#sasmol.charmm_topology.CharmmTopology" title="sasmol.charmm_topology.CharmmTopology"><code class="xref py py-class docutils literal notranslate"><span class="pre">sasmol.charmm_topology.CharmmTopology</span></code></a></p>
 <p>This class contains topology information used other modules.</p>
-<dl class="method">
-<dt id="topology.Topology.add">
-<code class="descname">add</code><span class="sig-paren">(</span><em>dictionary</em>, <em>key</em>, <em>value</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#topology.Topology.add" title="Permalink to this definition">¶</a></dt>
+<dl class="py method">
+<dt class="sig sig-object py" id="sasmol.topology.Topology.add">
+<span class="sig-name descname"><span class="pre">add</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dictionary</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">key</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#sasmol.topology.Topology.add" title="Permalink to this definition">¶</a></dt>
 <dd><p>This method is used by the self.read_topology method.</p>
 <p>It will check whether the key is in the dictionary:
 if yes, append value to dictionary[key]
 if no, initialize dictionary[key] as [value]</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>dictionary</strong> &#8211; dictionary : containing existing key, value pairs</li>
-<li><strong>key</strong> &#8211; dictionary key : key to query and perhaps intialize</li>
-<li><strong>value</strong> &#8211; dictionary value : value add</li>
-<li><strong>kwargs</strong> &#8211; optional future arguments</li>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>dictionary</strong> – dictionary : containing existing key, value pairs</p></li>
+<li><p><strong>key</strong> – dictionary key : key to query and perhaps intialize</p></li>
+<li><p><strong>value</strong> – dictionary value : value add</p></li>
+<li><p><strong>kwargs</strong> – optional future arguments</p></li>
 </ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"></p>
-</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">updated dictionary</p>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>updated dictionary</p>
+</dd>
+</dl>
 <p class="rubric">Examples</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">sasmol.topology</span> <span class="k">as</span> <span class="nn">topology</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">sasmol.topology</span> <span class="k">as</span> <span class="nn">topology</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">d</span> <span class="o">=</span> <span class="p">{}</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">d</span><span class="p">[</span><span class="s1">&#39;ALA&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;RESI ALA&#39;</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">test</span> <span class="o">=</span> <span class="n">topology</span><span class="o">.</span><span class="n">CharmmTopology</span><span class="p">()</span>
@@ -92,24 +77,23 @@ if no, initialize dictionary[key] as [value]</p>
 </div>
 </dd></dl>
 
-<dl class="method">
-<dt id="topology.Topology.charmm_names">
-<code class="descname">charmm_names</code><span class="sig-paren">(</span><em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#topology.Topology.charmm_names" title="Permalink to this definition">¶</a></dt>
-<dd><table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>kwargs</strong> &#8211; optional future arguments</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">dictionary : atom_name and list of atom names for
-hydrogen, carbon, nitrogen, oxygen, sulfur, phosphorus, other</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference internal" href="#topology.Topology.charmm_names" title="topology.Topology.charmm_names">charmm_names</a></td>
-</tr>
-</tbody>
-</table>
+<dl class="py method">
+<dt class="sig sig-object py" id="sasmol.topology.Topology.charmm_names">
+<span class="sig-name descname"><span class="pre">charmm_names</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#sasmol.topology.Topology.charmm_names" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>kwargs</strong> – optional future arguments</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>dictionary : atom_name and list of atom names for
+hydrogen, carbon, nitrogen, oxygen, sulfur, phosphorus, other</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>charmm_names</p>
+</dd>
+</dl>
 <p class="rubric">Examples</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">sasmol.properties</span> <span class="k">as</span> <span class="nn">properties</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">sasmol.properties</span> <span class="k">as</span> <span class="nn">properties</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">properties</span> <span class="o">=</span> <span class="n">properties</span><span class="o">.</span><span class="n">Atomic</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">properties</span><span class="o">.</span><span class="n">charmm_names</span><span class="p">()[</span><span class="s1">&#39;sulfur&#39;</span><span class="p">]</span>
 <span class="go">[&#39;SG&#39;, &#39;SD&#39;, &#39;1SG&#39;, &#39;2SG&#39;]</span>
@@ -117,63 +101,54 @@ hydrogen, carbon, nitrogen, oxygen, sulfur, phosphorus, other</td>
 </div>
 </dd></dl>
 
-<dl class="method">
-<dt id="topology.Topology.check_charmm_atomic_order_reorganize">
-<code class="descname">check_charmm_atomic_order_reorganize</code><span class="sig-paren">(</span><em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#topology.Topology.check_charmm_atomic_order_reorganize" title="Permalink to this definition">¶</a></dt>
+<dl class="py method">
+<dt class="sig sig-object py" id="sasmol.topology.Topology.check_charmm_atomic_order_reorganize">
+<span class="sig-name descname"><span class="pre">check_charmm_atomic_order_reorganize</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#sasmol.topology.Topology.check_charmm_atomic_order_reorganize" title="Permalink to this definition">¶</a></dt>
 <dd><p>re-organize the atomic list according to the charmm topology contract
 do nothing if the atomic order alreay match that in the charmm topology file
 meanwhile make sure there are no missing or extra atoms
 H-atoms are required
 Patch N-ter for the first residue and C-ter for the last residue in each segment</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>kwargs</strong> &#8211; optional future arguments</td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>kwargs</strong> – optional future arguments</p>
+</dd>
+</dl>
 <p class="rubric">Examples</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">sasmol.system</span> <span class="k">as</span> <span class="nn">system</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">sasmol.system</span> <span class="k">as</span> <span class="nn">system</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">molecule</span> <span class="o">=</span> <span class="n">system</span><span class="o">.</span><span class="n">Molecule</span><span class="p">(</span><span class="s1">&#39;hiv1_gag.pdb&#39;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">molecule</span><span class="o">.</span><span class="n">check_charmm_atomic_order_reorganize</span><span class="p">()</span>
 </pre></div>
 </div>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">list : with error code</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">error</td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>list : with error code</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>error</p>
+</dd>
+</dl>
 <div class="admonition note">
-<p class="first admonition-title">Note</p>
-<p class="last">error code needs to be addressed and handled globally</p>
+<p class="admonition-title">Note</p>
+<p>error code needs to be addressed and handled globally</p>
 </div>
 </dd></dl>
 
-<dl class="method">
-<dt id="topology.Topology.compare_list_ignore_order">
-<code class="descname">compare_list_ignore_order</code><span class="sig-paren">(</span><em>l1</em>, <em>l2</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#topology.Topology.compare_list_ignore_order" title="Permalink to this definition">¶</a></dt>
+<dl class="py method">
+<dt class="sig sig-object py" id="sasmol.topology.Topology.compare_list_ignore_order">
+<span class="sig-name descname"><span class="pre">compare_list_ignore_order</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">l1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">l2</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#sasmol.topology.Topology.compare_list_ignore_order" title="Permalink to this definition">¶</a></dt>
 <dd><p>Compare two lists while ignoring order</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>l1</strong> &#8211; list : list 1</li>
-<li><strong>l2</strong> &#8211; list : list 2</li>
-<li><strong>kwargs</strong> &#8211; optional future arguments</li>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>l1</strong> – list : list 1</p></li>
+<li><p><strong>l2</strong> – list : list 2</p></li>
+<li><p><strong>kwargs</strong> – optional future arguments</p></li>
 </ul>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+</dl>
 <p class="rubric">Examples</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">sasmol.topology</span> <span class="k">as</span> <span class="nn">topology</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">sasmol.topology</span> <span class="k">as</span> <span class="nn">topology</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">test</span> <span class="o">=</span> <span class="n">topology</span><span class="o">.</span><span class="n">CharmmTopology</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">l1</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">4</span><span class="p">]</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">l2</span> <span class="o">=</span> <span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">4</span><span class="p">]</span>
@@ -181,81 +156,246 @@ Patch N-ter for the first residue and C-ter for the last residue in each segment
 <span class="go">True</span>
 </pre></div>
 </div>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"></td>
-</tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">Boolean</td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>Boolean</p>
+</dd>
+</dl>
 </dd></dl>
 
-<dl class="method">
-<dt id="topology.Topology.patch_charmm_residue_atoms">
-<code class="descname">patch_charmm_residue_atoms</code><span class="sig-paren">(</span><em>residue</em>, <em>patch</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#topology.Topology.patch_charmm_residue_atoms" title="Permalink to this definition">¶</a></dt>
-<dd><p>Applies &#8216;patch&#8217; to &#8216;residue&#8217; based on the charmm topology
+<dl class="py method">
+<dt class="sig sig-object py" id="sasmol.topology.Topology.create_fasta">
+<span class="sig-name descname"><span class="pre">create_fasta</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sasmol/topology.html#Topology.create_fasta"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sasmol.topology.Topology.create_fasta" title="Permalink to this definition">¶</a></dt>
+<dd><p>Method to make a fasta file compatible lists of residue names</p>
+<p><a class="reference external" href="http://en.wikipedia.org/wiki/FASTA_format">http://en.wikipedia.org/wiki/FASTA_format</a></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>kwargs</strong> – optional future arguments</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>sets the fasta attribute in a system object</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>self._fasta</p>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">sasmol.system</span> <span class="k">as</span> <span class="nn">system</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">molecule</span> <span class="o">=</span> <span class="n">system</span><span class="o">.</span><span class="n">Molecule</span><span class="p">(</span><span class="s2">&quot;hiv1_gag.pdb&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">molecule</span><span class="o">.</span><span class="n">create_fasta</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">molecule</span><span class="o">.</span><span class="n">fasta</span><span class="p">()[:</span><span class="mi">5</span><span class="p">])</span>
+<span class="go">[&#39;G&#39;, &#39;A&#39;, &#39;R&#39;, &#39;A&#39;, &#39;S&#39;]</span>
+</pre></div>
+</div>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">molecule</span><span class="o">.</span><span class="n">create_fasta</span><span class="p">(</span><span class="n">fasta_format</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">molecule</span><span class="o">.</span><span class="n">fasta</span><span class="p">()[:</span><span class="mi">5</span><span class="p">])</span>
+<span class="go">&gt;</span>
+<span class="go">GAR</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">molecule</span><span class="o">.</span><span class="n">create_fasta</span><span class="p">(</span><span class="n">fasta_format</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span><span class="n">width</span><span class="o">=</span><span class="s1">&#39;60&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">molecule</span><span class="o">.</span><span class="n">fasta</span><span class="p">()[:</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+<span class="go">&gt;</span>
+<span class="go">GARASVLSGGELDKWEKIRLRPGGKKQYKLKHIVWASRELERFAVNPGLLETSEGCRQIL</span>
+<span class="go">GQLQPSLQTGSEELRSLYNTIAVLYCVHQRIDVKDTKEALDKIEEEQNKSKKKAQQAAAD</span>
+<span class="go">TGNNSQVSQNYPIVQNLQGQMVHQAISPRTLNAWVKVVEEKAFSPEVIPMFSALSEGATP</span>
+<span class="go">QDLNTMLNTVGGHQAAMQMLKETINEEAAEWDRVHPVHAGPIAPGQMREPRGSDIAGTTS</span>
+<span class="go">TLQEQIGWMTNNPPIPVGEIYKRWIILGLNKIVRMYSPTSILDIRQGPKEPFRDYVDRFY</span>
+<span class="go">KTLRAEQASQEVKNAATETLLVQNANPDCKTILKALGPAATLEEMMTACQGVGGPGHKAR</span>
+<span class="go">VIAEAMSQVTNSATIMMQKGNFRNQRKTVKCFNCGKEGHIAKNCRAPRKKGCWKCGKEGH</span>
+<span class="go">QMKDCTERQAN</span>
+</pre></div>
+</div>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">molecule</span><span class="o">.</span><span class="n">create_fasta</span><span class="p">(</span><span class="n">fasta_format</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span><span class="n">width</span><span class="o">=</span><span class="s1">&#39;60&#39;</span><span class="p">,</span><span class="n">name</span><span class="o">=</span><span class="s1">&#39;aar&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">molecule</span><span class="o">.</span><span class="n">fasta</span><span class="p">()[:</span><span class="mi">90</span><span class="p">])</span>
+<span class="go">&gt;aar</span>
+<span class="go">GARASVLSGGELDKWEKIRLRPGGKKQYKLKHIVWASRELERFAVNPGLLETSEGCRQIL</span>
+<span class="go">GQLQPSLQTGSEELRSLYNTIAVL</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Other use types below</p>
+<p>molecule.create_fasta(fasta_format=True,exclude_hetatm=True,by_chain=True)
+print(molecule.fasta())</p>
+<p>print(‘&gt;&gt;&gt; testing by_chain with HETATM (t.py): ‘)</p>
+<p>molecule.create_fasta(fasta_format=True,by_chain=True)
+print(molecule.fasta())</p>
+<p>print(‘&gt;&gt;&gt; testing by_segname (t.py): ‘)</p>
+<p>molecule.create_fasta(fasta_format=True,exclude_hetatm=True,by_segname=True)
+print(molecule.fasta())</p>
+<p>Note that this creates a simple string that is associated with the molecule (self)
+and it will return without assigning a string if a non-standard three letter code
+is supplied.</p>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="sasmol.topology.Topology.make_backbone_pdb_from_fasta">
+<span class="sig-name descname"><span class="pre">make_backbone_pdb_from_fasta</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">moltype</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sasmol/topology.html#Topology.make_backbone_pdb_from_fasta"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sasmol.topology.Topology.make_backbone_pdb_from_fasta" title="Permalink to this definition">¶</a></dt>
+<dd><p>Method to write a PDB file of one atom per residue
+based on input FASTA sequence</p>
+<p><a class="reference external" href="http://en.wikipedia.org/wiki/FASTA_format">http://en.wikipedia.org/wiki/FASTA_format</a></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>string</strong> (<em>moltype</em>) – </p></li>
+<li><p><strong>string</strong> – -&gt; ‘protein’ ; fasta sequence of a protein
+-&gt; ‘nucleic’ ; fasta sequence of a nucleic acid</p></li>
+<li><p><strong>kwargs</strong> – optional future arguments</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>sets the fasta attribute in a system object</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>self._fasta</p>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">sasmol.system</span> <span class="k">as</span> <span class="nn">system</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">molecule</span> <span class="o">=</span> <span class="n">system</span><span class="o">.</span><span class="n">Molecule</span><span class="p">(</span><span class="s2">&quot;hiv1_gag.pdb&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">molecule</span><span class="o">.</span><span class="n">create_fasta</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">molecule</span><span class="o">.</span><span class="n">fasta</span><span class="p">()[:</span><span class="mi">5</span><span class="p">]</span>
+<span class="go">[&#39;G&#39;, &#39;A&#39;, &#39;R&#39;, &#39;A&#39;, &#39;S&#39;]</span>
+</pre></div>
+</div>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">molecule</span><span class="o">.</span><span class="n">make_backbone_pdb_from_fasta</span><span class="p">(</span><span class="s1">&#39;sequence.pdb&#39;</span><span class="p">,</span> <span class="s1">&#39;protein&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Only protein and nucleic acid one-letter codes are supported
+Protein PDB files are written with one “CA” atom per residue
+Nucleic acid PDF files are written with on “O5’” atom per residue</p>
+<p>N-terminal patches for proteins (GLYP, PROP) are accommodated</p>
+<p>All coordinate values are set to 0.000</p>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="sasmol.topology.Topology.make_constraint_pdb">
+<span class="sig-name descname"><span class="pre">make_constraint_pdb</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">basis_type</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sasmol/topology.html#Topology.make_constraint_pdb"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sasmol.topology.Topology.make_constraint_pdb" title="Permalink to this definition">¶</a></dt>
+<dd><p>Method to rename attribute fields and assign values
+of 1.00 for the given basis type.</p>
+<p>“beta” is the default attribute field to reassign</p>
+<p>Default usage sets all attribute fields to zero
+prior to re-assigning basis type atoms to 1.00</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>string</strong> (<em>filename</em>) – </p></li>
+<li><p><strong>types</strong> (<em>basis</em>) – <p>‘heavy : all atoms except hydrogen</p>
+<p>’protein’ : all atoms in moltype protein</p>
+<p>’nucleic’ : all atoms in moltype nucleic</p>
+<dl class="simple">
+<dt>’backbone’</dt><dd><p>-&gt; proteins: N, CA, C, O</p>
+</dd>
+</dl>
+<p>’solute’    : all protein and nucleic</p>
+</p></li>
+</ul>
+</dd>
+</dl>
+<dl>
+<dt>kwargs</dt><dd><p>optional arguments</p>
+<blockquote>
+<div><p>field=’beta’ : write 1.00 to beta field</p>
+<p>field=’occupancy’ : write 1.00 to occupancy field</p>
+<dl class="simple">
+<dt>reset=True<span class="classifier">set all values to 0.00 before setting</span></dt><dd><p>individual vaules to 1.00</p>
+</dd>
+<dt>reset=False: only change desired values to 1.00</dt><dd><p>ignoring all other values</p>
+</dd>
+</dl>
+</div></blockquote>
+</dd>
+</dl>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>updated system object
+writes pdb to disk</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">sasmol.system</span> <span class="k">as</span> <span class="nn">system</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">molecule</span> <span class="o">=</span> <span class="n">system</span><span class="o">.</span><span class="n">Molecule</span><span class="p">(</span><span class="s1">&#39;hiv1_gag.pdb&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">molecule</span><span class="o">.</span><span class="n">make_constraint_pdb</span><span class="p">(</span><span class="s1">&#39;constrainted_backbone_hiv1_gag.pdb&#39;</span><span class="p">,</span> <span class="s1">&#39;backbone&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">molecule</span><span class="o">.</span><span class="n">make_constraint_pdb</span><span class="p">(</span><span class="s1">&#39;constrainted_backbone_occupancy_hiv1_gag.pdb&#39;</span><span class="p">,</span> <span class="s1">&#39;backbone&#39;</span><span class="p">,</span> <span class="n">field</span><span class="o">=</span><span class="s1">&#39;occupancy&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>constrtain all heavy atoms</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">molecule</span><span class="o">.</span><span class="n">make_constraint_pdb</span><span class="p">(</span><span class="s1">&#39;constrainted_heavy_hiv1_gag.pdb&#39;</span><span class="p">,</span> <span class="s1">&#39;heavy&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>constrain all protein atoms</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">molecule</span><span class="o">.</span><span class="n">make_constraint_pdb</span><span class="p">(</span><span class="s1">&#39;constrainted_protein_hiv1_gag.pdb&#39;</span><span class="p">,</span> <span class="s1">&#39;protein&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>constrain all non-solvent atoms</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">molecule</span><span class="o">.</span><span class="n">make_constraint_pdb</span><span class="p">(</span><span class="s1">&#39;constrainted_solute_hiv1_gag.pdb&#39;</span><span class="p">,</span> <span class="s1">&#39;solute&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Only moltype <cite>protein</cite> and <cite>nucleic</cite> are supported.</p>
+<p>Output PDB file will contain coordinates from frame 0</p>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="sasmol.topology.Topology.patch_charmm_residue_atoms">
+<span class="sig-name descname"><span class="pre">patch_charmm_residue_atoms</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">residue</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">patch</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#sasmol.topology.Topology.patch_charmm_residue_atoms" title="Permalink to this definition">¶</a></dt>
+<dd><p>Applies ‘patch’ to ‘residue’ based on the charmm topology
 definition to add / remove atoms as needed.  Only ATOM and DELE
 records are accommodated</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>residue</strong> &#8211; string : residue name</li>
-<li><strong>patch</strong> &#8211; string : patch name</li>
-<li><strong>kwargs</strong> &#8211; optional future arguments</li>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>residue</strong> – string : residue name</p></li>
+<li><p><strong>patch</strong> – string : patch name</p></li>
+<li><p><strong>kwargs</strong> – optional future arguments</p></li>
 </ul>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+</dl>
 <p class="rubric">Examples</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">sasmol.system</span> <span class="k">as</span> <span class="nn">system</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">sasmol.system</span> <span class="k">as</span> <span class="nn">system</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">molecule</span> <span class="o">=</span> <span class="n">system</span><span class="o">.</span><span class="n">Molecule</span><span class="p">(</span><span class="s1">&#39;hiv1_gag.pdb&#39;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">molecule</span><span class="o">.</span><span class="n">check_charmm_atomic_order_reorganize</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">molecule</span><span class="o">.</span><span class="n">patch_charmm_residue_atoms</span><span class="p">(</span><span class="s1">&#39;GLY&#39;</span><span class="p">,</span><span class="s1">&#39;GLYP&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"></td>
-</tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">updated dictionary entry for residue in question</td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>updated dictionary entry for residue in question</p>
+</dd>
+</dl>
 <div class="admonition note">
-<p class="first admonition-title">Note</p>
-<p class="last">Error list is defined and used, but not returned.  Needs to be handled globally.</p>
+<p class="admonition-title">Note</p>
+<p>Error list is defined and used, but not returned.  Needs to be handled globally.</p>
 </div>
 </dd></dl>
 
-<dl class="method">
-<dt id="topology.Topology.read_charmm_topology">
-<code class="descname">read_charmm_topology</code><span class="sig-paren">(</span><em>topology_file_path=''</em>, <em>topology_file_name='top_all27_prot_na.inp'</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#topology.Topology.read_charmm_topology" title="Permalink to this definition">¶</a></dt>
+<dl class="py method">
+<dt class="sig sig-object py" id="sasmol.topology.Topology.read_charmm_topology">
+<span class="sig-name descname"><span class="pre">read_charmm_topology</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">topology_file_path</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">topology_file_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'top_all27_prot_na.inp'</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#sasmol.topology.Topology.read_charmm_topology" title="Permalink to this definition">¶</a></dt>
 <dd><p>Read and parse the charmm topology file
 A comprehensive dictionary (topology_info) will be built to store all the topology information
 The strategy for parsing topology file is to split words in each line</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>topology_file_path</strong> &#8211; string : default = &#8216;&#8217;</li>
-<li><strong>topology_file_name</strong> &#8211; string : default = &#8216;top_all27_prot_na.inp&#8217;</li>
-<li><strong>kwargs</strong> &#8211; optional future arguments</li>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>topology_file_path</strong> – string : default = ‘’</p></li>
+<li><p><strong>topology_file_name</strong> – string : default = ‘top_all27_prot_na.inp’</p></li>
+<li><p><strong>kwargs</strong> – optional future arguments</p></li>
 </ul>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+</dl>
 <p class="rubric">Examples</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">pprint</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">pprint</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">sasmol.topology</span> <span class="k">as</span> <span class="nn">topology</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">test</span> <span class="o">=</span> <span class="n">topology</span><span class="o">.</span><span class="n">CharmmTopology</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">test</span><span class="o">.</span><span class="n">read_charmm_topology</span><span class="p">()</span>
@@ -275,68 +415,122 @@ The strategy for parsing topology file is to split words in each line</p>
 <span class="go">&#39;TOTAL_CHARGE&#39;: &#39;1.00&#39;}</span>
 </pre></div>
 </div>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">list : with error code</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">error</td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>list : with error code</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>error</p>
+</dd>
+</dl>
 <div class="admonition note">
-<p class="first admonition-title">Note</p>
-<p class="last">error code needs to be addressed and handled globally</p>
+<p class="admonition-title">Note</p>
+<p>error code needs to be addressed and handled globally</p>
 </div>
 </dd></dl>
 
-<dl class="method">
-<dt id="topology.Topology.setup_charmm_residue_atoms">
-<code class="descname">setup_charmm_residue_atoms</code><span class="sig-paren">(</span><em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#topology.Topology.setup_charmm_residue_atoms" title="Permalink to this definition">¶</a></dt>
-<dd><p>Build the atom list of all the residues in the charmm topology file</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>kwargs</strong> &#8211; optional future arguments</td>
-</tr>
-</tbody>
-</table>
+<dl class="py method">
+<dt class="sig sig-object py" id="sasmol.topology.Topology.renumber">
+<span class="sig-name descname"><span class="pre">renumber</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sasmol/topology.html#Topology.renumber"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sasmol.topology.Topology.renumber" title="Permalink to this definition">¶</a></dt>
+<dd><p>Method to renumber index and resid fields</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>kwargs</strong> – index :
+resid :</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><dl class="simple">
+<dt>updated system object</dt><dd><p>index
+resid</p>
+</dd>
+</dl>
+</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>None</p>
+</dd>
+</dl>
 <p class="rubric">Examples</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">sasmol.topology</span> <span class="k">as</span> <span class="nn">topology</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">sasmol.system</span> <span class="k">as</span> <span class="nn">system</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">molecule</span> <span class="o">=</span> <span class="n">system</span><span class="o">.</span><span class="n">Molecule</span><span class="p">(</span><span class="s1">&#39;hiv1_gag.pdb&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">molecule</span><span class="o">.</span><span class="n">index</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
+<span class="go">1</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">molecule</span><span class="o">.</span><span class="n">resid</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
+<span class="go">1</span>
+</pre></div>
+</div>
+<p>default renumber() with no arguments renumbers
+both index and resid starting at 1</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">molecule</span><span class="o">.</span><span class="n">renumber</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">molecule</span><span class="o">.</span><span class="n">index</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
+<span class="go">1</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">molecule</span><span class="o">.</span><span class="n">resid</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
+<span class="go">1</span>
+</pre></div>
+</div>
+<p>passing a kwarg with a value will renumber appropriate
+attribute with value passed</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">molecule</span><span class="o">.</span><span class="n">renumber</span><span class="p">(</span><span class="n">index</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">molecule</span><span class="o">.</span><span class="n">index</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
+<span class="go">3</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">molecule</span><span class="o">.</span><span class="n">resid</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
+<span class="go">1</span>
+</pre></div>
+</div>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">molecule</span><span class="o">.</span><span class="n">renumber</span><span class="p">(</span><span class="n">resid</span><span class="o">=</span><span class="mi">8</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">molecule</span><span class="o">.</span><span class="n">index</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
+<span class="go">3</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">molecule</span><span class="o">.</span><span class="n">resid</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
+<span class="go">8</span>
+</pre></div>
+</div>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">molecule</span><span class="o">.</span><span class="n">renumber</span><span class="p">(</span><span class="n">index</span><span class="o">=</span><span class="mi">223</span><span class="p">,</span> <span class="n">resid</span><span class="o">=</span><span class="mi">18</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">molecule</span><span class="o">.</span><span class="n">index</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
+<span class="go">223</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">molecule</span><span class="o">.</span><span class="n">resid</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
+<span class="go">18</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="sasmol.topology.Topology.setup_charmm_residue_atoms">
+<span class="sig-name descname"><span class="pre">setup_charmm_residue_atoms</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#sasmol.topology.Topology.setup_charmm_residue_atoms" title="Permalink to this definition">¶</a></dt>
+<dd><p>Build the atom list of all the residues in the charmm topology file</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>kwargs</strong> – optional future arguments</p>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">sasmol.topology</span> <span class="k">as</span> <span class="nn">topology</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">test</span> <span class="o">=</span> <span class="n">topology</span><span class="o">.</span><span class="n">CharmmTopology</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">test</span><span class="o">.</span><span class="n">read_charmm_topology</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">test</span><span class="o">.</span><span class="n">setup_charmm_residue_atoms</span><span class="p">()</span>
 </pre></div>
 </div>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><strong>self.charmm_residue_atoms</strong></td>
-</tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">new dictionary entry for residue in question</td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p><strong>self.charmm_residue_atoms</strong></p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>new dictionary entry for residue in question</p>
+</dd>
+</dl>
 </dd></dl>
 
-<dl class="method">
-<dt id="topology.Topology.setup_cys_patch_atoms_simple">
-<code class="descname">setup_cys_patch_atoms_simple</code><span class="sig-paren">(</span><em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#topology.Topology.setup_cys_patch_atoms_simple" title="Permalink to this definition">¶</a></dt>
+<dl class="py method">
+<dt class="sig sig-object py" id="sasmol.topology.Topology.setup_cys_patch_atoms_simple">
+<span class="sig-name descname"><span class="pre">setup_cys_patch_atoms_simple</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#sasmol.topology.Topology.setup_cys_patch_atoms_simple" title="Permalink to this definition">¶</a></dt>
 <dd><p>A way to set up cys patch atoms
 simply remove HG1 atom from the atom list</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>kwargs</strong> &#8211; optional future arguments</td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>kwargs</strong> – optional future arguments</p>
+</dd>
+</dl>
 <p class="rubric">Examples</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">sasmol.topology</span> <span class="k">as</span> <span class="nn">topology</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">sasmol.topology</span> <span class="k">as</span> <span class="nn">topology</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">pprint</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">test</span> <span class="o">=</span> <span class="n">topology</span><span class="o">.</span><span class="n">CharmmTopology</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">test</span><span class="o">.</span><span class="n">read_charmm_topology</span><span class="p">()</span>
@@ -365,80 +559,97 @@ simply remove HG1 atom from the atom list</p>
 <span class="go">[&#39;O&#39;, &#39;O&#39;, &#39;-0.51&#39;]]</span>
 </pre></div>
 </div>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"></td>
-</tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">updated dictionary entry for residue in question</td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>updated dictionary entry for residue in question</p>
+</dd>
+</dl>
 </dd></dl>
 
 </dd></dl>
 
-</div>
-</div>
+</section>
+</section>
 
 
           </div>
+
         </div>
       </div>
       <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
         <div class="sphinxsidebarwrapper">
-  <h3><a href="index.html">Table Of Contents</a></h3>
-  <ul>
-<li><a class="reference internal" href="#">Topology</a><ul>
-<li><a class="reference internal" href="#id1"><code class="docutils literal"><span class="pre">Topology</span></code></a></li>
+<h1 class="logo"><a href="index.html">sasmol</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="index_calculate.html">Calculate</a></li>
+<li class="toctree-l1"><a class="reference internal" href="index_charmm_topology.html">Charmm Topology</a></li>
+<li class="toctree-l1"><a class="reference internal" href="index_dcd_io.html">DCD IO</a></li>
+<li class="toctree-l1"><a class="reference internal" href="index_file_io.html">File IO</a></li>
+<li class="toctree-l1"><a class="reference internal" href="index_linear_algebra.html">Linear Algebra</a></li>
+<li class="toctree-l1"><a class="reference internal" href="index_multiprocessing_sasmol.html">Multiprocessing SasMol</a></li>
+<li class="toctree-l1"><a class="reference internal" href="index_operate.html">Operate</a></li>
+<li class="toctree-l1"><a class="reference internal" href="index_pdb_io.html">PDB IO</a></li>
+<li class="toctree-l1"><a class="reference internal" href="index_properties.html">Properties</a></li>
+<li class="toctree-l1"><a class="reference internal" href="index_subset.html">Subset</a></li>
+<li class="toctree-l1"><a class="reference internal" href="index_system.html">System</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Topology</a></li>
+<li class="toctree-l1"><a class="reference internal" href="index_utilities.html">Utilities</a></li>
+<li class="toctree-l1"><a class="reference internal" href="index_view.html">View</a></li>
 </ul>
-</li>
-</ul>
+
 <div class="relations">
 <h3>Related Topics</h3>
 <ul>
   <li><a href="index.html">Documentation overview</a><ul>
       <li>Previous: <a href="index_system.html" title="previous chapter">System</a></li>
-      <li>Next: <a href="index_view.html" title="next chapter">View</a></li>
+      <li>Next: <a href="index_utilities.html" title="next chapter">Utilities</a></li>
   </ul></li>
 </ul>
 </div>
-  <div role="note" aria-label="source link">
-    <h3>This Page</h3>
-    <ul class="this-page-menu">
-      <li><a href="_sources/index_topology.txt"
-            rel="nofollow">Show Source</a></li>
-    </ul>
-   </div>
 <div id="searchbox" style="display: none" role="search">
-  <h3>Quick search</h3>
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
     <form class="search" action="search.html" method="get">
-      <input type="text" name="q" />
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
       <input type="submit" value="Go" />
-      <input type="hidden" name="check_keywords" value="yes" />
-      <input type="hidden" name="area" value="default" />
     </form>
+    </div>
 </div>
-<script type="text/javascript">$('#searchbox').show(0);</script>
+<script>$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
         </div>
       </div>
       <div class="clearer"></div>
     </div>
     <div class="footer">
       &copy;2016, Joseph E. Curtis, Ph.D.
-      
+
       |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.4.1</a>
-      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.8</a>
-      
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 4.4.0</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+
       |
-      <a href="_sources/index_topology.txt"
+      <a href="_sources/index_topology.rst.txt"
           rel="nofollow">Page source</a>
     </div>
 
-    
 
-    
+
+
   </body>
 </html>

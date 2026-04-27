@@ -5,12 +5,12 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    
+
     <title>system &mdash; sasmol 1.0 documentation</title>
-    
+
     <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
-    
+
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../',
@@ -26,20 +26,20 @@
     <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <link rel="top" title="sasmol 1.0 documentation" href="../index.html" />
     <link rel="up" title="Module code" href="index.html" />
-   
+
   <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
-  
+
   <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
 
   </head>
   <body role="document">
-  
+
 
     <div class="document">
       <div class="documentwrapper">
         <div class="bodywrapper">
           <div class="body" role="main">
-            
+
   <h1>Source code for system</h1><div class="highlight"><pre>
 <span></span><span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">absolute_import</span>
 <span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">division</span>
@@ -203,7 +203,7 @@
 <span class="sd">       </span>
 <span class="sd">            other_keys = [&#39;_fasta&#39;, &#39;_header&#39;, &#39;_conect&#39;, &#39;_debug&#39;, &#39;_formula&#39;, &#39;_unitcell&#39;]  </span>
 <span class="sd">        </span>
-<span class="sd">    &quot;&quot;&quot;</span> 
+<span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_filename</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;filename&#39;</span><span class="p">,</span> <span class="bp">None</span><span class="p">)</span>
@@ -230,11 +230,11 @@
                     <span class="bp">self</span><span class="o">.</span><span class="n">read_pdb</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_filename</span><span class="p">)</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">_defined_with_input_file</span> <span class="o">=</span> <span class="bp">True</span>
             <span class="k">else</span><span class="p">:</span>
-                 
+
                 <span class="k">for</span> <span class="n">argument</span> <span class="ow">in</span> <span class="n">args</span><span class="p">:</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">_argument_flag</span> <span class="o">=</span> <span class="bp">True</span>
                     <span class="k">if</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">argument</span><span class="p">))):</span>
-                        <span class="k">try</span><span class="p">:</span>    
+                        <span class="k">try</span><span class="p">:</span>
                             <span class="bp">self</span><span class="o">.</span><span class="n">read_pdb</span><span class="p">(</span><span class="n">argument</span><span class="p">)</span>
                             <span class="bp">self</span><span class="o">.</span><span class="n">_defined_with_input_file</span> <span class="o">=</span> <span class="bp">True</span>
                             <span class="bp">self</span><span class="o">.</span><span class="n">_filename</span> <span class="o">=</span> <span class="n">argument</span>
@@ -247,17 +247,17 @@
                             <span class="bp">self</span><span class="o">.</span><span class="n">_id_flag</span> <span class="o">=</span> <span class="bp">True</span>
                             <span class="k">break</span>
                         <span class="k">except</span><span class="p">:</span>
-                            <span class="k">pass</span>     
-                        
+                            <span class="k">pass</span>
+
         <span class="k">except</span><span class="p">:</span>
             <span class="k">pass</span>
 
-                                                    
+
     <span class="k">def</span> <span class="nf">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_defined_with_input_file</span><span class="p">:</span>
             <span class="k">return</span> <span class="s2">&quot;sasmol object initialied with filename = &quot;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">_filename</span>
-        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">_argument_flag</span> <span class="ow">and</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_id_flag</span><span class="p">:</span> 
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">_argument_flag</span> <span class="ow">and</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_id_flag</span><span class="p">:</span>
             <span class="k">return</span> <span class="s2">&quot;sasmol object (no file found)&quot;</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">return</span> <span class="s2">&quot;sasmol object&quot;</span>
@@ -500,7 +500,7 @@
 
 <div class="viewcode-block" id="Molecule.setPmi"><a class="viewcode-back" href="../index_system.html#system.Molecule.setPmi">[docs]</a>    <span class="k">def</span> <span class="nf">setPmi</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">newValue</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_pmi</span> <span class="o">=</span> <span class="n">newValue</span></div>
-    
+
 <div class="viewcode-block" id="Molecule.minimum"><a class="viewcode-back" href="../index_system.html#system.Molecule.minimum">[docs]</a>    <span class="k">def</span> <span class="nf">minimum</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_minimum</span></div>
 
@@ -843,12 +843,12 @@
         <span class="n">Atom</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">_atom</span> <span class="o">=</span> <span class="p">[</span><span class="n">atom</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">xrange</span><span class="p">(</span><span class="n">natoms</span><span class="p">)]</span>
-        
+
         <span class="k">if</span> <span class="n">index</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_index</span> <span class="o">=</span> <span class="n">index</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_index</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">x</span><span class="o">+</span><span class="mi">1</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">xrange</span><span class="p">(</span><span class="n">natoms</span><span class="p">)],</span><span class="n">numpy</span><span class="o">.</span><span class="n">int</span><span class="p">)</span>
-        
+
         <span class="bp">self</span><span class="o">.</span><span class="n">_name</span> <span class="o">=</span> <span class="p">[</span><span class="n">name</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">xrange</span><span class="p">(</span><span class="n">natoms</span><span class="p">)]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_loc</span> <span class="o">=</span> <span class="p">[</span><span class="n">loc</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">xrange</span><span class="p">(</span><span class="n">natoms</span><span class="p">)]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_resname</span> <span class="o">=</span> <span class="p">[</span><span class="n">resname</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">xrange</span><span class="p">(</span><span class="n">natoms</span><span class="p">)]</span>
@@ -860,12 +860,12 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">_resid</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">x</span><span class="o">+</span><span class="mi">1</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">xrange</span><span class="p">(</span><span class="n">natoms</span><span class="p">)],</span><span class="n">numpy</span><span class="o">.</span><span class="n">int</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">_rescode</span> <span class="o">=</span> <span class="p">[</span><span class="n">rescode</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">xrange</span><span class="p">(</span><span class="n">natoms</span><span class="p">)]</span>
-        
+
         <span class="k">if</span> <span class="n">coor</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_coor</span> <span class="o">=</span> <span class="n">coor</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_coor</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="mi">1</span><span class="p">,</span><span class="n">natoms</span><span class="p">,</span><span class="mi">3</span><span class="p">),</span><span class="n">numpy</span><span class="o">.</span><span class="n">float</span><span class="p">)</span>
-        
+
         <span class="bp">self</span><span class="o">.</span><span class="n">_occupancy</span> <span class="o">=</span> <span class="p">[</span><span class="n">occupancy</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">xrange</span><span class="p">(</span><span class="n">natoms</span><span class="p">)]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_beta</span> <span class="o">=</span> <span class="p">[</span><span class="n">beta</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">xrange</span><span class="p">(</span><span class="n">natoms</span><span class="p">)]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_charge</span> <span class="o">=</span> <span class="p">[</span><span class="n">charge</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">xrange</span><span class="p">(</span><span class="n">natoms</span><span class="p">)]</span>
@@ -903,15 +903,15 @@
     </div>
     <div class="footer">
       &copy;2016, Joseph E. Curtis, Ph.D.
-      
+
       |
       Powered by <a href="http://sphinx-doc.org/">Sphinx 1.4.1</a>
       &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.8</a>
-      
+
     </div>
 
-    
 
-    
+
+
   </body>
 </html>

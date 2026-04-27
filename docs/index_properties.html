@@ -1,116 +1,106 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
+<!DOCTYPE html>
 
-<html xmlns="http://www.w3.org/1999/xhtml">
+<html>
   <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    
-    <title>Properties &mdash; sasmol 1.0 documentation</title>
-    
-    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
-    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-    
-    <script type="text/javascript">
-      var DOCUMENTATION_OPTIONS = {
-        URL_ROOT:    './',
-        VERSION:     '1.0',
-        COLLAPSE_INDEX: false,
-        FILE_SUFFIX: '.html',
-        HAS_SOURCE:  true
-      };
-    </script>
-    <script type="text/javascript" src="_static/jquery.js"></script>
-    <script type="text/javascript" src="_static/underscore.js"></script>
-    <script type="text/javascript" src="_static/doctools.js"></script>
-    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
-    <link rel="top" title="sasmol 1.0 documentation" href="index.html" />
-    <link rel="next" title="System" href="index_system.html" />
-    <link rel="prev" title="Operate" href="index_operate.html" />
-   
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+    <title>Properties &#8212; sasmol 1.0 documentation</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="_static/alabaster.css" />
+    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/doctools.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Subset" href="index_subset.html" />
+    <link rel="prev" title="PDB IO" href="index_pdb_io.html" />
+
   <link rel="stylesheet" href="_static/custom.css" type="text/css" />
-  
+
+
   <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
 
-  </head>
-  <body role="document">
-  
+  </head><body>
+
 
     <div class="document">
       <div class="documentwrapper">
         <div class="bodywrapper">
+
+
           <div class="body" role="main">
-            
-  <div class="section" id="properties">
+
+  <section id="properties">
 <h1>Properties<a class="headerlink" href="#properties" title="Permalink to this headline">¶</a></h1>
-<div class="section" id="id1">
-<h2><code class="xref py py-mod docutils literal"><span class="pre">Properties</span></code><a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h2>
-<span class="target" id="module-properties"></span><dl class="class">
-<dt id="properties.Atomic">
-<em class="property">class </em><code class="descclassname">properties.</code><code class="descname">Atomic</code><a class="reference internal" href="_modules/properties.html#Atomic"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#properties.Atomic" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference external" href="https://docs.python.org/library/functions.html#object" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">object</span></code></a></p>
+<section id="id1">
+<h2><code class="xref py py-mod docutils literal notranslate"><span class="pre">Properties</span></code><a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h2>
+<span class="target" id="module-sasmol.properties"></span><dl class="py class">
+<dt class="sig sig-object py" id="sasmol.properties.Atomic">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">sasmol.properties.</span></span><span class="sig-name descname"><span class="pre">Atomic</span></span><a class="reference internal" href="_modules/sasmol/properties.html#Atomic"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sasmol.properties.Atomic" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>Class containing methods to define physical properties</p>
 <p>and atomic information used by other modules.</p>
 <p><a class="reference external" href="http://physics.nist.gov/cgi-bin/Compositions/stand_alone.pl?ele=&amp;ascii=html&amp;isotype=some">http://physics.nist.gov/cgi-bin/Compositions/stand_alone.pl?ele=&amp;ascii=html&amp;isotype=some</a></p>
 <p>standard atomic weight is based on the natural istopic composition</p>
 <p class="rubric">Examples</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">sasmol.properties</span> <span class="k">as</span> <span class="nn">properties</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">sasmol.properties</span> <span class="k">as</span> <span class="nn">properties</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">properties</span> <span class="o">=</span> <span class="n">properties</span><span class="o">.</span><span class="n">Atomic</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">properties</span><span class="o">.</span><span class="n">amu</span><span class="p">()[</span><span class="s1">&#39;FE&#39;</span><span class="p">]</span>
 <span class="go">55.8452</span>
 </pre></div>
 </div>
 <div class="admonition note">
-<p class="first admonition-title">Note</p>
-<p class="last"><cite>self</cite> parameter is not shown in the <code class="docutils literal"><span class="pre">Parameters</span></code> section in the documentation</p>
+<p class="admonition-title">Note</p>
+<p><cite>self</cite> parameter is not shown in the <code class="docutils literal notranslate"><span class="pre">Parameters</span></code> section in the documentation</p>
 </div>
-<dl class="method">
-<dt id="properties.Atomic.amino_acid_sld">
-<code class="descname">amino_acid_sld</code><span class="sig-paren">(</span><em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/properties.html#Atomic.amino_acid_sld"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#properties.Atomic.amino_acid_sld" title="Permalink to this definition">¶</a></dt>
-<dd><table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>kwargs</strong> &#8211; optional future arguments</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">dictionary : residue name, and sld information
-residue name : [vol Ang^3, eSL, SLprot Ang, SLdeut Ang, #exchngH]</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">residue_scattering</td>
-</tr>
-</tbody>
-</table>
+<dl class="py method">
+<dt class="sig sig-object py" id="sasmol.properties.Atomic.amino_acid_sld">
+<span class="sig-name descname"><span class="pre">amino_acid_sld</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sasmol/properties.html#Atomic.amino_acid_sld"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sasmol.properties.Atomic.amino_acid_sld" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>kwargs</strong> – optional future arguments</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>dictionary : residue name, and sld information
+residue name : [vol Ang^3, eSL, SLprot Ang, SLdeut Ang, #exchngH]</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>residue_scattering</p>
+</dd>
+</dl>
 <p class="rubric">Examples</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">sasmol.properties</span> <span class="k">as</span> <span class="nn">properties</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">sasmol.properties</span> <span class="k">as</span> <span class="nn">properties</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">properties</span> <span class="o">=</span> <span class="n">properties</span><span class="o">.</span><span class="n">Atomic</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">properties</span><span class="o">.</span><span class="n">amino_acid_sld</span><span class="p">()[</span><span class="s1">&#39;PRO&#39;</span><span class="p">]</span>
 <span class="go">[112.7, 52, 22.2207, 95.104, 0]</span>
 </pre></div>
 </div>
 <div class="admonition note">
-<p class="first admonition-title">Note</p>
-<p class="last">Need to validate units here used in neutron reflectivity versus
+<p class="admonition-title">Note</p>
+<p>Need to validate units here used in neutron reflectivity versus
 small-angle scattering</p>
 </div>
 </dd></dl>
 
-<dl class="method">
-<dt id="properties.Atomic.amu">
-<code class="descname">amu</code><span class="sig-paren">(</span><em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/properties.html#Atomic.amu"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#properties.Atomic.amu" title="Permalink to this definition">¶</a></dt>
-<dd><table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>kwargs</strong> &#8211; optional future arguments</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">dictionary : containing standard atomic weights</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">standard_atomic_weights</td>
-</tr>
-</tbody>
-</table>
+<dl class="py method">
+<dt class="sig sig-object py" id="sasmol.properties.Atomic.amu">
+<span class="sig-name descname"><span class="pre">amu</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sasmol/properties.html#Atomic.amu"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sasmol.properties.Atomic.amu" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>kwargs</strong> – optional future arguments</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>dictionary : containing standard atomic weights</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>standard_atomic_weights</p>
+</dd>
+</dl>
 <p class="rubric">Examples</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">sasmol.properties</span> <span class="k">as</span> <span class="nn">properties</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">sasmol.properties</span> <span class="k">as</span> <span class="nn">properties</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">properties</span> <span class="o">=</span> <span class="n">properties</span><span class="o">.</span><span class="n">Atomic</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">properties</span><span class="o">.</span><span class="n">amu</span><span class="p">()[</span><span class="s1">&#39;FE&#39;</span><span class="p">]</span>
 <span class="go">55.8452</span>
@@ -118,97 +108,226 @@ small-angle scattering</p>
 </div>
 </dd></dl>
 
-<dl class="method">
-<dt id="properties.Atomic.set_average_vdw">
-<code class="descname">set_average_vdw</code><span class="sig-paren">(</span><em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/properties.html#Atomic.set_average_vdw"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#properties.Atomic.set_average_vdw" title="Permalink to this definition">¶</a></dt>
-<dd><table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>kwargs</strong> &#8211; optional future arguments</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"></td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">self._atom_vdw updated in system object</td>
-</tr>
-</tbody>
-</table>
-<p class="rubric">Examples</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">sasmol.system</span> <span class="k">as</span> <span class="nn">system</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">molecule</span> <span class="o">=</span> <span class="n">system</span><span class="o">.</span><span class="n">Molecule</span><span class="p">(</span><span class="s1">&#39;hiv1_gag.pdb&#39;</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">molecule</span><span class="o">.</span><span class="n">set_average_vdw</span><span class="p">()</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">molecule</span><span class="o">.</span><span class="n">atom_vdw</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
-<span class="go">[-0.2, 1.85]</span>
-</pre></div>
-</div>
-<div class="admonition note">
-<p class="first admonition-title">Note</p>
-<p class="last">Need to add citations.</p>
-</div>
+<dl class="py method">
+<dt class="sig sig-object py" id="sasmol.properties.Atomic.dna_scattering_lengths">
+<span class="sig-name descname"><span class="pre">dna_scattering_lengths</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sasmol/properties.html#Atomic.dna_scattering_lengths"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sasmol.properties.Atomic.dna_scattering_lengths" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>kwargs</strong> – optional future arguments</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>dictionary : DNA scattering information</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>dna_scattering_lengths</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="sasmol.properties.Atomic.dna_sl">
+<span class="sig-name descname"><span class="pre">dna_sl</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sasmol/properties.html#Atomic.dna_sl"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sasmol.properties.Atomic.dna_sl" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="sasmol.properties.Atomic.element_scattering_lengths">
+<span class="sig-name descname"><span class="pre">element_scattering_lengths</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sasmol/properties.html#Atomic.element_scattering_lengths"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sasmol.properties.Atomic.element_scattering_lengths" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>kwargs</strong> – optional future arguments</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>dictionary : element name and scattering information</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>element_scattering_lengths</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="sasmol.properties.Atomic.element_sl">
+<span class="sig-name descname"><span class="pre">element_sl</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sasmol/properties.html#Atomic.element_sl"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sasmol.properties.Atomic.element_sl" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="sasmol.properties.Atomic.nucleotide_scattering_lengths">
+<span class="sig-name descname"><span class="pre">nucleotide_scattering_lengths</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sasmol/properties.html#Atomic.nucleotide_scattering_lengths"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sasmol.properties.Atomic.nucleotide_scattering_lengths" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>kwargs</strong> – optional future arguments</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>dictionary : nucleotide scattering information</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>nucleotide_scattering_lengths</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="sasmol.properties.Atomic.nucleotide_sl">
+<span class="sig-name descname"><span class="pre">nucleotide_sl</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sasmol/properties.html#Atomic.nucleotide_sl"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sasmol.properties.Atomic.nucleotide_sl" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="sasmol.properties.Atomic.one_to_three_letter_nucleic_residue_dictionary">
+<span class="sig-name descname"><span class="pre">one_to_three_letter_nucleic_residue_dictionary</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{'A':</span> <span class="pre">'ADE',</span> <span class="pre">'C':</span> <span class="pre">'CYT',</span> <span class="pre">'G':</span> <span class="pre">'GUA',</span> <span class="pre">'T':</span> <span class="pre">'THY',</span> <span class="pre">'U':</span> <span class="pre">'URA'}</span></em><a class="headerlink" href="#sasmol.properties.Atomic.one_to_three_letter_nucleic_residue_dictionary" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="sasmol.properties.Atomic.one_to_three_letter_protein_residue_dictionary">
+<span class="sig-name descname"><span class="pre">one_to_three_letter_protein_residue_dictionary</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{'A':</span> <span class="pre">'ALA',</span> <span class="pre">'C':</span> <span class="pre">'CYS',</span> <span class="pre">'D':</span> <span class="pre">'ASP',</span> <span class="pre">'E':</span> <span class="pre">'GLU',</span> <span class="pre">'F':</span> <span class="pre">'PHE',</span> <span class="pre">'G':</span> <span class="pre">'GLY',</span> <span class="pre">'H':</span> <span class="pre">'HSE',</span> <span class="pre">'I':</span> <span class="pre">'ILE',</span> <span class="pre">'K':</span> <span class="pre">'LYS',</span> <span class="pre">'L':</span> <span class="pre">'LEU',</span> <span class="pre">'M':</span> <span class="pre">'MET',</span> <span class="pre">'N':</span> <span class="pre">'ASN',</span> <span class="pre">'P':</span> <span class="pre">'PRO',</span> <span class="pre">'Q':</span> <span class="pre">'GLN',</span> <span class="pre">'R':</span> <span class="pre">'ARG',</span> <span class="pre">'S':</span> <span class="pre">'SER',</span> <span class="pre">'T':</span> <span class="pre">'THR',</span> <span class="pre">'V':</span> <span class="pre">'VAL',</span> <span class="pre">'W':</span> <span class="pre">'TRP',</span> <span class="pre">'Y':</span> <span class="pre">'TYR'}</span></em><a class="headerlink" href="#sasmol.properties.Atomic.one_to_three_letter_protein_residue_dictionary" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="sasmol.properties.Atomic.protein_scattering_lengths">
+<span class="sig-name descname"><span class="pre">protein_scattering_lengths</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sasmol/properties.html#Atomic.protein_scattering_lengths"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sasmol.properties.Atomic.protein_scattering_lengths" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>kwargs</strong> – optional future arguments</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>dictionary : protein scattering information</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>protein_scattering_lengths</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="sasmol.properties.Atomic.protein_sl">
+<span class="sig-name descname"><span class="pre">protein_sl</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sasmol/properties.html#Atomic.protein_sl"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sasmol.properties.Atomic.protein_sl" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="sasmol.properties.Atomic.rna_scattering_lengths">
+<span class="sig-name descname"><span class="pre">rna_scattering_lengths</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sasmol/properties.html#Atomic.rna_scattering_lengths"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sasmol.properties.Atomic.rna_scattering_lengths" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>kwargs</strong> – optional future arguments</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>dictionary : RNA scattering information</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>rna_scattering_lengths</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="sasmol.properties.Atomic.rna_sl">
+<span class="sig-name descname"><span class="pre">rna_sl</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sasmol/properties.html#Atomic.rna_sl"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sasmol.properties.Atomic.rna_sl" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="sasmol.properties.Atomic.van_der_Waals_radii">
+<span class="sig-name descname"><span class="pre">van_der_Waals_radii</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sasmol/properties.html#Atomic.van_der_Waals_radii"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sasmol.properties.Atomic.van_der_Waals_radii" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="sasmol.properties.Atomic.van_der_waals_radii">
+<span class="sig-name descname"><span class="pre">van_der_waals_radii</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sasmol/properties.html#Atomic.van_der_waals_radii"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sasmol.properties.Atomic.van_der_waals_radii" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>kwargs</strong> – optional future arguments</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>dictionary : element name and van der Waals radius</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>van_der_waals_radii</p>
+</dd>
+</dl>
 </dd></dl>
 
 </dd></dl>
 
-</div>
-</div>
+</section>
+</section>
 
 
           </div>
+
         </div>
       </div>
       <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
         <div class="sphinxsidebarwrapper">
-  <h3><a href="index.html">Table Of Contents</a></h3>
-  <ul>
-<li><a class="reference internal" href="#">Properties</a><ul>
-<li><a class="reference internal" href="#id1"><code class="docutils literal"><span class="pre">Properties</span></code></a></li>
+<h1 class="logo"><a href="index.html">sasmol</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="index_calculate.html">Calculate</a></li>
+<li class="toctree-l1"><a class="reference internal" href="index_charmm_topology.html">Charmm Topology</a></li>
+<li class="toctree-l1"><a class="reference internal" href="index_dcd_io.html">DCD IO</a></li>
+<li class="toctree-l1"><a class="reference internal" href="index_file_io.html">File IO</a></li>
+<li class="toctree-l1"><a class="reference internal" href="index_linear_algebra.html">Linear Algebra</a></li>
+<li class="toctree-l1"><a class="reference internal" href="index_multiprocessing_sasmol.html">Multiprocessing SasMol</a></li>
+<li class="toctree-l1"><a class="reference internal" href="index_operate.html">Operate</a></li>
+<li class="toctree-l1"><a class="reference internal" href="index_pdb_io.html">PDB IO</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Properties</a></li>
+<li class="toctree-l1"><a class="reference internal" href="index_subset.html">Subset</a></li>
+<li class="toctree-l1"><a class="reference internal" href="index_system.html">System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="index_topology.html">Topology</a></li>
+<li class="toctree-l1"><a class="reference internal" href="index_utilities.html">Utilities</a></li>
+<li class="toctree-l1"><a class="reference internal" href="index_view.html">View</a></li>
 </ul>
-</li>
-</ul>
+
 <div class="relations">
 <h3>Related Topics</h3>
 <ul>
   <li><a href="index.html">Documentation overview</a><ul>
-      <li>Previous: <a href="index_operate.html" title="previous chapter">Operate</a></li>
-      <li>Next: <a href="index_system.html" title="next chapter">System</a></li>
+      <li>Previous: <a href="index_pdb_io.html" title="previous chapter">PDB IO</a></li>
+      <li>Next: <a href="index_subset.html" title="next chapter">Subset</a></li>
   </ul></li>
 </ul>
 </div>
-  <div role="note" aria-label="source link">
-    <h3>This Page</h3>
-    <ul class="this-page-menu">
-      <li><a href="_sources/index_properties.txt"
-            rel="nofollow">Show Source</a></li>
-    </ul>
-   </div>
 <div id="searchbox" style="display: none" role="search">
-  <h3>Quick search</h3>
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
     <form class="search" action="search.html" method="get">
-      <input type="text" name="q" />
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
       <input type="submit" value="Go" />
-      <input type="hidden" name="check_keywords" value="yes" />
-      <input type="hidden" name="area" value="default" />
     </form>
+    </div>
 </div>
-<script type="text/javascript">$('#searchbox').show(0);</script>
+<script>$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
         </div>
       </div>
       <div class="clearer"></div>
     </div>
     <div class="footer">
       &copy;2016, Joseph E. Curtis, Ph.D.
-      
+
       |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.4.1</a>
-      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.8</a>
-      
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 4.4.0</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+
       |
-      <a href="_sources/index_properties.txt"
+      <a href="_sources/index_properties.rst.txt"
           rel="nofollow">Page source</a>
     </div>
 
-    
 
-    
+
+
   </body>
 </html>

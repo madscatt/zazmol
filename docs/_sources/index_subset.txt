@@ -12,5 +12,3 @@ Subset
 .. automodule:: subset
     :members:
     :undoc-members:
-
-

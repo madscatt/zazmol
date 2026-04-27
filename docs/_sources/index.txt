@@ -13,7 +13,7 @@ Contents:
 
    index_calculate
    index_linear_algebra
-   index_multiprocessing_sasmol  
+   index_multiprocessing_sasmol
    index_operate
    index_properties
    index_subset
@@ -28,4 +28,3 @@ Indices and tables
 * :ref:`genindex`
 * :ref:`modindex`
 * :ref:`search`
-
