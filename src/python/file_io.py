@@ -49,12 +49,17 @@ import sasmol.dcd_io as dcd_io
 
 class Files(pdb_io.PDB, dcd_io.DCD):
     '''
-    Composite I/O mixin that combines PDB and DCD behaviors for system objects.
+    Composite I/O mixin that combines PDB and DCD behavior.
 
-    Notes
-    -----
-    The current constructor and helper are placeholders kept for compatibility.
-    File operations are provided by inherited methods from ``PDB`` and ``DCD``.
+    ``Files`` is inherited by ``system.Atom`` and related classes. Most public
+    methods are provided by the ``PDB`` and ``DCD`` parent classes.
+
+    Examples
+    --------
+    >>> import sasmol.system as system
+    >>> molecule = system.Molecule()
+    >>> hasattr(molecule, 'read_pdb')
+    True
     '''
 
     def __init__(self, filename, flag):
@@ -84,5 +89,10 @@ class Files(pdb_io.PDB, dcd_io.DCD):
         -------
         None
             This method is currently a stub and performs no operation.
+
+        Notes
+        -----
+        Use ``read_pdb``, ``write_pdb``, ``open_dcd_read``, and
+        ``open_dcd_write`` for actual file operations.
         '''
         pass

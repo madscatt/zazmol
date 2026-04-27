@@ -67,12 +67,33 @@ class DCD(object):
 
     This class is mixed into higher-level system/file I/O classes and is not
     typically instantiated directly.
+
+    Examples
+    --------
+    >>> import sasmol.system as system
+    >>> molecule = system.Molecule(filename='input.pdb')
+    >>> dcd_file = molecule.open_dcd_read('trajectory.dcd')
+    >>> molecule.close_dcd_read(dcd_file)
     '''
 
     def open_dcd_read(self, filename):
         '''
-        This method opens a file to read in the Charmm/Xplor data format.
-        by calling a pre-compiled C module (dcdio).
+        Open a DCD file for stepwise reads.
+
+        Parameters
+        ----------
+        filename
+            string : input DCD filename
+
+        Returns
+        -------
+        list
+            ``[filepointer, nnatoms, nset, reverseEndian, charmm]``
+            descriptor used by ``read_dcd_step`` and ``close_dcd_read``
+
+        Examples
+        --------
+        >>> dcd_file = molecule.open_dcd_read('trajectory.dcd')
         '''
 
         filepointer = dcdio.open_dcd_read(filename)
@@ -92,10 +113,26 @@ class DCD(object):
 
     def open_dcd_write(self, filename):
         '''
-        This method opens a file and writes the headerfile in the Charmm/Xplor data format.
-        by calling a pre-compiled C module (dcdio).
+        Open a DCD file for writing and emit a header.
 
-        This function will OVERWRITE a file with the same name without prompting.
+        Parameters
+        ----------
+        filename
+            string : output DCD filename
+
+        Returns
+        -------
+        filepointer
+            opaque pointer used by ``write_dcd_step`` and ``close_dcd_write``
+
+        Notes
+        -----
+        Existing files are overwritten.
+
+        Examples
+        --------
+        >>> fp = molecule.open_dcd_write('out.dcd')
+        >>> molecule.close_dcd_write(fp)
         '''
 
         filepointer = dcdio.open_dcd_write(filename)
@@ -172,7 +209,12 @@ class DCD(object):
 
     def close_dcd_write(self, filepointer):
         '''
-        This method closes a dcd file.
+        Close a DCD file opened for writing.
+
+        Parameters
+        ----------
+        filepointer
+            file pointer returned by ``open_dcd_write``
         '''
         result = dcdio.close_dcd_write(filepointer)
 
@@ -188,7 +230,12 @@ class DCD(object):
 
     def close_dcd_read(self, dcd_file):
         '''
-        This method closes a dcd file.
+        Close a DCD file opened for reading.
+
+        Parameters
+        ----------
+        dcd_file
+            dcd descriptor list from ``open_dcd_read`` or a raw filepointer
         '''
         filepointer = self._dcd_read_filepointer(dcd_file)
         result = dcdio.close_dcd_read(filepointer)
@@ -197,8 +244,20 @@ class DCD(object):
 
     def write_dcd(self, filename):
         '''
-        This method writes data in the Charmm/Xplor data format.
-        by calling a pre-compiled C module (dcdio).
+        Write all frames in ``self._coor`` to a DCD file.
+
+        Parameters
+        ----------
+        filename
+            string : output DCD filename
+
+        Returns
+        -------
+        None
+
+        Examples
+        --------
+        >>> molecule.write_dcd('all_frames.dcd')
         '''
 
         outfile = dcdio.open_dcd_write(filename)
@@ -280,7 +339,29 @@ class DCD(object):
 
     def read_dcd_step(self, dcdfile, frame, **kwargs):
         '''
-        This method reads a single dcd step in the Charmm/Xplor data format.
+        Read one frame from an open DCD stream into ``self._coor[0]``.
+
+        Parameters
+        ----------
+        dcdfile
+            list : descriptor returned by ``open_dcd_read``
+
+        frame
+            integer : frame selector forwarded to the low-level reader
+
+        kwargs
+            optional keyword arguments:
+            ``no_print`` (disable progress dot when DEBUG logging is enabled)
+
+        Returns
+        -------
+        None
+
+        Examples
+        --------
+        >>> dcd_file = molecule.open_dcd_read('trajectory.dcd')
+        >>> molecule.read_dcd_step(dcd_file, 0, no_print=True)
+        >>> molecule.close_dcd_read(dcd_file)
         '''
         num_fixed = 0
 
@@ -314,7 +395,20 @@ class DCD(object):
 
     def read_dcd(self, filename):
         '''
-        This method reads data in the Charmm/Xplor data format.
+        Read an entire DCD file into ``self._coor``.
+
+        Parameters
+        ----------
+        filename
+            string : input DCD filename
+
+        Returns
+        -------
+        None
+
+        Examples
+        --------
+        >>> molecule.read_dcd('trajectory.dcd')
         '''
 
         infile = dcdio.open_dcd_read(filename)

@@ -55,6 +55,12 @@ from . import config as config
 class PDB(object):
     '''
     Methods for reading, writing, and validating PDB-formatted molecular data.
+
+    Examples
+    --------
+    >>> import sasmol.system as system
+    >>> molecule = system.Molecule(filename='input.pdb')
+    >>> molecule.write_pdb('output.pdb', 0, 'w')
     '''
 
     def _pdb_optional_field_value(self, field_name, atom_index, default_value, fill_missing_optional):
@@ -194,7 +200,37 @@ class PDB(object):
     def write_pdb(self,filename,frame,flag,**kwargs):
 
         '''
-        This method writes the PDB file
+        Write one coordinate frame to a PDB file.
+
+        Parameters
+        ----------
+        filename
+            string : output PDB filename
+
+        frame
+            integer : frame index in ``self._coor`` to write
+
+        flag
+            string : file mode, usually ``'w'`` or ``'a'``
+
+        kwargs
+            optional keyword arguments:
+            ``model`` (MODEL record number),
+            ``final`` (write terminal END),
+            ``conect`` (include CONECT records),
+            ``fill_missing_optional`` (fill missing optional PDB fields)
+
+        Returns
+        -------
+        int
+            1 when write path completes
+
+        Examples
+        --------
+        >>> import sasmol.system as system
+        >>> molecule = system.Molecule(filename='input.pdb')
+        >>> molecule.write_pdb('single_frame.pdb', 0, 'w')
+        >>> molecule.write_pdb('trajectory_models.pdb', 0, 'w', model=1)
         '''
 
         debug=0
@@ -402,7 +438,31 @@ class PDB(object):
 
     def read_pdb(self,filename,**kwargs):
         '''
-        This method reads a PDB file.  
+        Read a PDB file and populate molecule descriptors.
+
+        Parameters
+        ----------
+        filename
+            string : input PDB filename
+
+        kwargs
+            optional keyword arguments:
+            ``verbose`` (print read progress),
+            ``fastread`` (skip heavier checks),
+            ``pdbscan`` (scan mode used by callers)
+
+        Returns
+        -------
+        int
+            1 when read path completes
+
+        Examples
+        --------
+        >>> import sasmol.system as system
+        >>> molecule = system.Molecule()
+        >>> molecule.read_pdb('input.pdb')
+        >>> molecule.natoms() > 0
+        True
         '''
         debug=0
         result=1
