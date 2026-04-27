@@ -343,7 +343,9 @@ class Move():
 
             # assign initialization data to variables
 
-            frame = 0
+            #frame = 0
+            #added for sassie testing
+            frame = kwargs.get('frame', 0)
 
             com_subset_other = align_variables['com_subset_other']
             coor_subset_other = align_variables['coor_subset_other']
