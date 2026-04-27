@@ -59,6 +59,19 @@ Do not change casually:
 
 When a numerical or scientific test fails, compare to legacy behavior where possible and report the cause before changing code or tests.
 
+#### PDB Reader Compatibility
+
+The PDB reader is intentionally tolerant because it supports long-lived SASSIE
+workflows beyond canonical protein-only PDB files, including PDB scan, PDB
+repair/build workflows, simulation setup, trajectory extraction, and merge
+utilities.
+
+Do not make the reader strictly PDB-spec compliant as a cleanup change. Preserve
+the tested behavior for blank trailing lines, single-frame files without
+``END``, multi-frame files separated by ``END`` or ``MODEL``/``ENDMDL``,
+non-CHARMM atom names, HETATM records, and non-protein systems unless a fixture
+and legacy comparison show that a behavior change is intentional.
+
 #### Dtype Contract
 
 Coordinate storage and coordinate-transfer buffers use `config.COORD_DTYPE`

@@ -29,6 +29,13 @@ DataPath = os.path.join(os.path.dirname(os.path.realpath(__file__)),'..','data',
 moduleDataPath = os.path.join(os.path.dirname(os.path.realpath(__file__)),'..','data','sasmol','file_io')+os.path.sep
 
 class Test_intg_file_io_Files_read_dcd(unittest.TestCase):
+   '''
+   Characterize intentionally tolerant PDB reader behavior.
+
+   These tests protect accepted real-world inputs such as blank trailing lines,
+   single-frame files without END records, END-separated pseudo-trajectories,
+   MODEL/ENDMDL trajectories, non-CHARMM atom names, and non-protein systems.
+   '''
 
    def setUp(self):
       self.o=system.Molecule(0)

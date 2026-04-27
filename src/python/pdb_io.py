@@ -135,9 +135,7 @@ class PDB(object):
                 natoms = len(self._name[i])
                 error,self._element[i] = self.get_element(name,resname)
                 self.check_error(error)
-#
-###	OPEN	Error exception handling stub
-#
+
             if(self._element[i] not in unique_elements): 
                 unique_elements.append(self._element[i])
 
@@ -528,9 +526,9 @@ class PDB(object):
 
             #record_name = string.strip(lin[0:6])
             record_name = lin[0:6].strip()
-#
-### 	OPEN 	need to re-factor the exception statements to a uniform reporting mechanism
-#
+            # PDB inputs in SASSIE workflows are intentionally broad. This
+            # pre-scan ignores non-coordinate records while preserving strict
+            # checks for malformed MODEL/ENDMDL frame structure below.
             try:
                 if(lins[0]=='MODEL'):
                     if modelON:
