@@ -48,11 +48,41 @@ import sasmol.dcd_io as dcd_io
 '''
 
 class Files(pdb_io.PDB, dcd_io.DCD):
+    '''
+    Composite I/O mixin that combines PDB and DCD behaviors for system objects.
 
-    def __init__(self,filename,flag):
+    Notes
+    -----
+    The current constructor and helper are placeholders kept for compatibility.
+    File operations are provided by inherited methods from ``PDB`` and ``DCD``.
+    '''
+
+    def __init__(self, filename, flag):
+        '''
+        Placeholder initializer retained for historical API compatibility.
+
+        Parameters
+        ----------
+        filename
+            string : file path provided by caller
+
+        flag
+            string : mode hint provided by caller
+        '''
         pass
-
 
     def open_file(filename):
-        pass
+        '''
+        Placeholder helper retained for compatibility with older callers.
 
+        Parameters
+        ----------
+        filename
+            string : file path to open
+
+        Returns
+        -------
+        None
+            This method is currently a stub and performs no operation.
+        '''
+        pass

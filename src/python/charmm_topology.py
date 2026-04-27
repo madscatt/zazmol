@@ -36,79 +36,20 @@ import sasmol.config as config
 class CharmmTopology(object):
 
     '''
-    This class contains charmm topology information used other modules.
+    Container for CHARMM topology records used by PDB parsing and topology tools.
 
-
-    The output topology dictionary looks like the following examples:
+    The topology file is parsed into dictionaries keyed by residue and patch
+    names, where each value stores lists for entries such as ``ATOM``, ``BOND``,
+    ``IC``, and ``IMPR``.
 
     Examples
-    ========
+    --------
 
-    >>> import pprint
     >>> import sasmol.topology as topology
-    >>> test = topology.CharmmTopology()
-    >>> test.read_charmm_topology()
-    >>> pprint.pprint(test.topology_info['NTER'],width=100)
-    {'ATOM': [['N', 'NH3', '-0.30'],
-          ['HT1', 'HC', '0.33'],
-          ['HT2', 'HC', '0.33'],
-          ['HT3', 'HC', '0.33'],
-          ['CA', 'CT1', '0.21'],
-          ['HA', 'HB', '0.10']],
-    'BOND': [['HT1', 'N'], ['HT2', 'N'], ['HT3', 'N']],
-    'DELE': [['ATOM', 'HN']],
-    'DONO': ['HT1', 'N', 'HT2', 'N', 'HT3', 'N'],
-    'IC': [['HT1', 'N', 'CA', 'C', '0.0000', '0.0000', '180.0000', '0.0000', '0.0000'],
-            ['HT2', 'CA', '*N', 'HT1', '0.0000', '0.0000', '120.0000', '0.0000', '0.0000'],
-            ['HT3', 'CA', '*N', 'HT2', '0.0000', '0.0000', '120.0000', '0.0000', '0.0000']],
-    'TOTAL_CHARGE': '1.00'}
-    
-    >>> import pprint
-    >>> import sasmol.topology as topology
-    >>> test = topology.CharmmTopology()
-    >>> test.read_charmm_topology()
-    >>> pprint.pprint(test.topology_info['ALA'],width=100)
-    {'ACCE': ['O', 'C'],
-    'ATOM': [['N', 'NH1', '-0.47'],
-            ['HN', 'H', '0.31'],
-            ['CA', 'CT1', '0.07'],
-            ['HA', 'HB', '0.09'],
-            ['CB', 'CT3', '-0.27'],
-            ['HB1', 'HA', '0.09'],
-            ['HB2', 'HA', '0.09'],
-            ['HB3', 'HA', '0.09'],
-            ['C', 'C', '0.51'],
-            ['O', 'O', '-0.51']],
-    'BOND': [['CB', 'CA'],
-            ['N', 'HN'],
-            ['N', 'CA'],
-            ['C', 'CA'],
-            ['C', '+N'],
-            ['CA', 'HA'],
-            ['CB', 'HB1'],
-            ['CB', 'HB2'],
-            ['CB', 'HB3']],
-    'DONO': ['HN', 'N'],
-    'DOUB': [['O', 'C']],
-    'IC': [['-C', 'CA', '*N', 'HN', '1.3551', '126.4900', '180.0000', '115.4200', '0.9996'],
-            ['-C', 'N', 'CA', 'C', '1.3551', '126.4900', '180.0000', '114.4400', '1.5390'],
-            ['N', 'CA', 'C', '+N', '1.4592', '114.4400', '180.0000', '116.8400', '1.3558'],
-            ['+N', 'CA', '*C', 'O', '1.3558', '116.8400', '180.0000', '122.5200', '1.2297'],
-            ['CA', 'C', '+N', '+CA', '1.5390', '116.8400', '180.0000', '126.7700', '1.4613'],
-            ['N', 'C', '*CA', 'CB', '1.4592', '114.4400', '123.2300', '111.0900', '1.5461'],
-            ['N', 'C', '*CA', 'HA', '1.4592', '114.4400', '-120.4500', '106.3900', '1.0840'],
-            ['C', 'CA', 'CB', 'HB1', '1.5390', '111.0900', '177.2500', '109.6000', '1.1109'],
-            ['HB1', 'CA', '*CB', 'HB2', '1.1109', '109.6000', '119.1300', '111.0500', '1.1119'],
-            ['HB1', 'CA', '*CB', 'HB3', '1.1109', '109.6000', '-119.5800', '111.6100', '1.1114']],
-    'IMPR': [['N', '-C', 'CA', 'HN'], ['C', 'CA', '+N', 'O']],
-
-
-        Note
-        ----
-    
-        `self` parameter is not shown in the ``Parameters`` section in the documentation
-
-
+    >>> top = topology.CharmmTopology()
+    >>> top.read_charmm_topology()
+    >>> 'ALA' in top.topology_info
+    True
     '''
 
     def charmm_names(self, **kwargs):
@@ -781,5 +722,4 @@ class CharmmTopology(object):
                     self.coor()[0][child_indices[i] -
                                    1] = child.coor()[0][new_indices[i]]
         return error
-
 

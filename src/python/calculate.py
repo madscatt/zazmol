@@ -476,6 +476,23 @@ class Calculate(object):
         return [self._minimum, self._maximum]
 
     def calc_minmax_all_steps(self, dcdfilename, **kwargs):
+        '''
+        Backward-compatible alias for ``calculate_minimum_and_maximum_all_steps``.
+
+        Parameters
+        ----------
+        dcdfilename
+            string : trajectory filename
+
+        kwargs
+            optional keyword arguments forwarded to
+            ``calculate_minimum_and_maximum_all_steps``
+
+        Returns
+        -------
+        list
+            ``[minimum, maximum]`` coordinate bounds across all frames
+        '''
         return self.calculate_minimum_and_maximum_all_steps(dcdfilename,
                                                             **kwargs)
 

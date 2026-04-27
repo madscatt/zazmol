@@ -53,6 +53,9 @@ from . import config as config
 '''
 
 class PDB(object):
+    '''
+    Methods for reading, writing, and validating PDB-formatted molecular data.
+    '''
 
     def _pdb_optional_field_value(self, field_name, atom_index, default_value, fill_missing_optional):
         if not fill_missing_optional:
@@ -64,6 +67,22 @@ class PDB(object):
             return default_value
 
     def print_error(self,name,my_message):
+        '''
+        Build a formatted error message list for element-name parsing failures.
+
+        Parameters
+        ----------
+        name
+            string : atom name that failed element resolution
+
+        my_message
+            string : descriptive error details
+
+        Returns
+        -------
+        list
+            list containing one formatted error message string
+        '''
 
         error = []
         message = '\nELEMENT NAME NOT IN CHARMM DATABASE AND SINGLE CHARACTER OPTION NOT APPLICABLE\n'
@@ -75,6 +94,14 @@ class PDB(object):
         return error
 
     def check_error(self,error):
+        '''
+        Exit immediately when an error list is non-empty.
+
+        Parameters
+        ----------
+        error
+            list : messages returned by validation helpers
+        '''
 
         if(len(error)>0):
             print(error)

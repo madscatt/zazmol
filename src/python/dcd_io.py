@@ -62,6 +62,12 @@ if config.__logging_level__ == "DEBUG":
 
 
 class DCD(object):
+    '''
+    Methods for reading and writing DCD trajectory data through ``sasmol._dcdio``.
+
+    This class is mixed into higher-level system/file I/O classes and is not
+    typically instantiated directly.
+    '''
 
     def open_dcd_read(self, filename):
         '''

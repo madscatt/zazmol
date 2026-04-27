@@ -39,10 +39,26 @@ import numpy
 
 
 def find_unique(this_list):
+    '''
+    Return sorted unique values from an input sequence.
+
+    Parameters
+    ----------
+    this_list
+        sequence : values to deduplicate
+
+    Returns
+    -------
+    list
+        unique values as a Python list
+    '''
     return list(numpy.unique(this_list))
 
 
 class Copy_Using_Mask():
+    '''
+    Utilities to construct molecule copies from atom index masks.
+    '''
 
     #@classmethod
     #def from_sasmol(class_instance,  mask, **kwargs):
@@ -161,6 +177,22 @@ class Copy_Using_Mask():
 
 
 def duplicate_molecule(molecule, number_of_duplicates):
+    '''
+    Create deep copies of a molecule object.
+
+    Parameters
+    ----------
+    molecule
+        system object : object to duplicate
+
+    number_of_duplicates
+        int : number of deep copies to create
+
+    Returns
+    -------
+    list
+        list of duplicated molecule objects
+    '''
     return [copy.deepcopy(molecule) for x in range(number_of_duplicates)]
 
 
@@ -280,6 +312,9 @@ _data = r"""'Ac', 'Actinium', 89, 227
 
 
 class Element:
+    '''
+    Chemical element descriptor used by formula parsing helpers.
+    '''
 
     def __init__(self, symbol, name, atomicnumber, molweight):
         self.sym = symbol
@@ -288,13 +323,38 @@ class Element:
         self.mw = molweight
 
     def getweight(self):
+        '''Return the stored molecular weight.'''
         return self.mw
 
     def addsyms(self, weight, result):
+        '''
+        Add weighted symbol counts to a result dictionary.
+
+        Parameters
+        ----------
+        weight
+            float : multiplier applied to this symbol
+
+        result
+            dict : target symbol-count mapping
+        '''
         result[self.sym] = result.get(self.sym, 0) + weight
 
 
 def build_dict(s):
+    '''
+    Build a symbol-to-element dictionary from serialized element records.
+
+    Parameters
+    ----------
+    s
+        string : newline-delimited records containing element tuples
+
+    Returns
+    -------
+    dict
+        mapping from atomic symbol to ``Element`` instance
+    '''
     import string
     answer = {}
     for line in s.split("\n"):
@@ -304,32 +364,40 @@ def build_dict(s):
 
 
 class ElementSequence:
+    '''
+    Parsed chemical sequence with optional multiplicity.
+    '''
 
     def __init__(self, *seq):
         self.seq = list(seq)
         self.count = 1
 
     def append(self, thing):
+        '''Append a parsed element/group to this sequence.'''
         self.seq.append(thing)
 
     def getweight(self):
+        '''Return total molecular weight for this sequence.'''
         sum = 0.0
         for thing in self.seq:
             sum = sum + thing.getweight()
         return sum * self.count
 
     def set_count(self, n):
+        '''Set multiplicity for this sequence.'''
         self.count = n
 
     def __len__(self):
         return len(self.seq)
 
     def addsyms(self, weight, result):
+        '''Accumulate symbol counts into ``result`` with multiplicity applied.'''
         totalweight = weight * self.count
         for thing in self.seq:
             thing.addsyms(totalweight, result)
 
     def displaysyms(self, sym2elt):
+        '''Print sorted symbol counts for this sequence.'''
         result = {}
         self.addsyms(1, result)
         items = list(result.items())
@@ -339,12 +407,18 @@ class ElementSequence:
 
 
 class Tokenizer:
+    '''
+    Token stream helper for formula parsing.
+    '''
 
     def __init__(self, input):
         self.input = input + "<EOS>"
         self.i = 0
 
     def gettoken(self):
+        '''
+        Advance to the next token and update module-level parse state.
+        '''
         global ttype, tvalue
         self.lasti = self.i
         m = _lexer(self.input, self.i)
@@ -365,6 +439,7 @@ class Tokenizer:
             ttype = NAME
 
     def error(self, msg):
+        '''Raise a parse error with an input-position pointer.'''
         emsg = msg + ":\n"
         emsg = emsg + self.input[:-5] + "\n"  # strip <EOS>
         emsg = emsg + " " * self.lasti + "^\n"
@@ -372,6 +447,22 @@ class Tokenizer:
 
 
 def parse(s, sym2elt):
+    '''
+    Parse a chemical formula string into an ``ElementSequence``.
+
+    Parameters
+    ----------
+    s
+        string : formula text
+
+    sym2elt
+        dict : symbol-to-element lookup table
+
+    Returns
+    -------
+    ElementSequence
+        parsed representation of the input formula
+    '''
     global t, ttype, tvalue
     t = Tokenizer(s)
     t.gettoken()
@@ -382,6 +473,19 @@ def parse(s, sym2elt):
 
 
 def parse_sequence(sym2elt):
+    '''
+    Parse one recursive sequence group from the current tokenizer position.
+
+    Parameters
+    ----------
+    sym2elt
+        dict : symbol-to-element lookup table
+
+    Returns
+    -------
+    ElementSequence
+        parsed group with multiplicity applied
+    '''
     global t, ttype, tvalue
     seq = ElementSequence()
     while ttype in (LPAREN, NAME):
@@ -410,6 +514,20 @@ def parse_sequence(sym2elt):
 
 
 def get_chemical_formula(formula_string):
+    '''
+    Convert a chemical formula string into a symbol-count dictionary.
+
+    Parameters
+    ----------
+    formula_string
+        string : chemical formula (for example ``"H2O"``)
+
+    Returns
+    -------
+    tuple
+        ``(error, formula_dictionary)`` where ``error`` is a list of messages
+        and ``formula_dictionary`` maps symbols to counts
+    '''
 
     # standard_atomic_weights = Atomic.amu(keep_lower_case=True)
     sym2elt = build_dict(_data)
@@ -468,50 +586,39 @@ if __name__ == "__main__":
 
 def parse_fasta(fasta_sequence, **kwargs):
     """
-    method to convert fasta_sequence object to list of strings
-    for each valid sequence in the initial object
+    Convert FASTA-formatted text lines into sequence strings.
 
-    format is based on the NCBI fasta format convention
+    The input format follows the NCBI FASTA convention:
     https://blast.ncbi.nlm.nih.gov/Blast.cgi?CMD=Web&PAGE_TYPE=BlastDocs&DOC_TYPE=BlastHelp
-
-    notes:
 
     Parameters
     ----------
     fasta_sequence
-        list with formatted fasta input
+        list : FASTA lines read from a file or stream
 
     kwargs
         optional future arguments
 
     Returns
     -------
-    all_sequences
-
-        a list containing sequences without comments, spaces, carriage returns, numbers,
-        or termination flags.
-
-        or
-
-        an error indicating an empty line in the file
+    list or str
+        list containing normalized sequences, or an error string when an
+        empty line is encountered
 
     Examples
-    -------
+    --------
 
     >>> import sasmol.sasutil as sasutil
     >>> fasta_sequence = open('test_fasta.txt', 'r').readlines()
     >>> all_sequences = sasutil.parse_fasta(fasta_sequence)
     >>> print(all_sequences)
 
-    Note
-    ----
-        1) lines beginning with > or ; are treated as comments and passed
-        2) spaces are ignored
-        3) * are ignored (should be a termination)
-        4) numbers are ignored so you can have numbering at the beginning of a line
-        5) \n are processed
-        6) comment lines are NOT required in the input
-        7) comment lines cause a new sequence to be started
+    Notes
+    -----
+    - Lines beginning with ``>`` or ``;`` are treated as comments.
+    - Whitespace, ``*``, and digits are ignored.
+    - Comment lines are not required, but when present they start a new
+      sequence block.
 
     """
 
@@ -546,6 +653,25 @@ def parse_fasta(fasta_sequence, **kwargs):
 
 
 def check_integrity(obj, fast_check=False, warn=True):
+    '''
+    Validate that core atom-aligned attributes have lengths matching ``natoms``.
+
+    Parameters
+    ----------
+    obj
+        system object : molecule-like object to inspect
+
+    fast_check
+        bool : reserved argument for future lightweight checks
+
+    warn
+        bool : if ``True``, emit warnings when mismatches are found
+
+    Returns
+    -------
+    dict
+        map of inspected keys to observed lengths (or ``None``/``'N/A'``)
+    '''
     import logging
     import sasmol.config as config
 
@@ -580,4 +706,3 @@ def check_integrity(obj, fast_check=False, warn=True):
         logger.debug('Integrity check passed: natoms=%s', natoms)
 
     return results
-

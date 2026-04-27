@@ -37,7 +37,7 @@ def cross_product(a, b):
     Returns cross product (vector product) on two vectors
 
     Parameters
-        ----------
+    ----------
     a
         float list : vector a
 
@@ -72,7 +72,7 @@ def matrix_multiply(a, b):
     Returns the result of multiplying matrix a by matrix b
 
     Parameters
-        ----------
+    ----------
     a
         float list : matrix a
 
@@ -132,7 +132,7 @@ def find_u(x, y):
     arrays
 
     Parameters
-        ----------
+    ----------
     x
         numpy array : 3 x 3
 
@@ -284,7 +284,7 @@ def signed_angle(a, b, c):
     dihedral (atom 2 and atom 3) overlap.
 
     Parameters
-        ----------
+    ----------
     a
         float list : vector a
 
@@ -337,7 +337,7 @@ def dihedral_angle(a1, a2, a3, a4):
 
 
     Parameters
-        ----------
+    ----------
     a1
         float list : vector a1
 
