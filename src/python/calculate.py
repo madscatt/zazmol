@@ -243,7 +243,7 @@ class Calculate(object):
         try:
             dxyz = ((self._coor - other._coor) * (self._coor - other._coor))
             self._rmsd = numpy.sqrt((numpy.sum(dxyz)) / self._natoms)
-        except:
+        except Exception:
             if (self._natoms != other._natoms):
                 print('number of atoms in (1) != (2)')
                 print('rmsd not calculated: None returned')
@@ -362,7 +362,7 @@ class Calculate(object):
 
         try:
             frames = kwargs['frames']
-        except:
+        except Exception:
             frames = [x for x in range(self.number_of_frames())]
 
         first_flag = True

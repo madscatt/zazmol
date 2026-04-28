@@ -113,14 +113,14 @@ class Topology(charmm_topology.CharmmTopology):
             if kwargs['index'] is not None:
                 renumber_index_flag = True
                 renumber_index_start = kwargs['index']
-        except:
+        except Exception:
             pass
 
         try:
             if kwargs['resid'] is not None:
                 renumber_resid_flag = True
                 renumber_resid_start = kwargs['resid']
-        except:
+        except Exception:
             pass
 
         if renumber_index_flag:
@@ -226,12 +226,12 @@ class Topology(charmm_topology.CharmmTopology):
 
         try:
             field = kwargs['field']
-        except:
+        except Exception:
             field = 'beta'
 
         try:
             reset = kwargs['reset']
-        except:
+        except Exception:
             reset = True
 
         if reset:

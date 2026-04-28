@@ -31,7 +31,6 @@
 	Util holds general methods for file naming, os differences,
         chemical formula parsing, etc.
 '''
-import sasmol.system as system
 import re
 import string
 import copy
@@ -154,6 +153,8 @@ class Copy_Using_Mask():
             if key in list_keys:
                 new_dict[key] = all_data[count]
                 count += 1
+
+        import sasmol.system as system
 
         molecule = system.Molecule()
         molecule.__dict__ = new_dict
@@ -633,7 +634,7 @@ def parse_fasta(fasta_sequence, **kwargs):
             try:
                 if new_sequence != '':
                     all_sequences.append(new_sequence)
-            except:
+            except Exception:
                 pass
             new_sequence = ''
         else:
@@ -641,7 +642,7 @@ def parse_fasta(fasta_sequence, **kwargs):
                 if not char.isspace() and char != '*' and not char.isdigit():
                     try:
                         new_sequence += char
-                    except:
+                    except Exception:
                         new_sequence = char
 
     if new_sequence != '':
@@ -695,7 +696,7 @@ def check_integrity(obj, fast_check=False, warn=True):
             results[key] = length
             if length != natoms:
                 errors.append((key, length, natoms))
-        except:
+        except Exception:
             results[key] = 'N/A'
 
     if errors and warn:

@@ -284,7 +284,7 @@ class Mask(object):
                     preliminary_mask_array.append(1)
                 else:
                     preliminary_mask_array.append(0)
-            except:
+            except Exception:
                 error.append('failed to evaluate filter selection ' +
                              basis_filter + ' for atom ' + str(i))
                 return error, preliminary_mask_array
@@ -307,7 +307,7 @@ class Mask(object):
 			try:
 				if(eval(basis_filter)):
 					mask_array[i]=1
-			except:
+			except Exception:
 				error.append('failed to evaluate filter selection '+basis_filter+' for atom '+str(i))
 				return error, mask_array		
 		if(numpy.sum(mask_array) == 0):
@@ -398,7 +398,7 @@ class Mask(object):
 
                 for i in range(natoms2):
                     values.append(getattr(mol2, field)[i])
-            except:
+            except Exception:
                 error.append(
                     'failed in merge_two_molecules when attempting to assign descriptor ' + field)
                 return None
@@ -410,7 +410,7 @@ class Mask(object):
 
         try:
             last_index_mol1 = mol1._index[-1]
-        except:
+        except Exception:
             error.append('mol1 is missing atom indices')
             return error
 
@@ -426,7 +426,7 @@ class Mask(object):
                 return error
 
             coor[frame, 0:natoms1, :] = mol1.coor()[frame, :, :]
-        except:
+        except Exception:
             error.append(
                 'failed in merge_two_molecules when assigning coordinates')
             return error
@@ -439,7 +439,7 @@ class Mask(object):
                     return error
 
                 coor[frame, natoms1:natoms, :] = mol2.coor()[frame, :, :]
-            except:
+            except Exception:
                 error.append(
                     'failed in merge_two_molecules when assigning coordinates')
                 return error
@@ -507,7 +507,7 @@ class Mask(object):
         if hasattr(mol2, '_conect'):
             try:
                 self._conect.update(dict(mol2._conect))
-            except:
+            except Exception:
                 pass
 
         return error
@@ -598,15 +598,15 @@ class Mask(object):
                     residue_flag.append(self._residue_flag[i])
                     try:
                         charmm_type.append(self._charmm_type[i])
-                    except:
+                    except Exception:
                         pass
                     try:
                         atom_charge.append(self._atom_charge[i])
-                    except:
+                    except Exception:
                         pass
                     try:
                         atom_vdw.append(self._atom_vdw[i])
-                    except:
+                    except Exception:
                         pass
 
                     if (self._name[i] not in unique_names):
@@ -628,7 +628,7 @@ class Mask(object):
                     if (self._moltype[i] not in unique_moltypes):
                         unique_moltypes.append(self._moltype[i])
 
-                except:
+                except Exception:
                     error.append(
                         'failed in copy_molecule when attempting to assign descriptors to atom ' + str(i))
                     print('\n\nerror = ', error)
@@ -818,7 +818,7 @@ class Mask(object):
 
         try:
             coor[0] = numpy.take(this_frame_coor[:, :], indicies, 0)
-        except:
+        except Exception:
             error.append(
                 'failed to extract coordinates from frame ' + str(frame))
             return error, coor
@@ -889,7 +889,7 @@ class Mask(object):
 
             self.setCoor(coor)
 
-        except:
+        except Exception:
             error.append(
                 'failed to replace coordinates from frame ' + str(frame))
             return error
@@ -934,7 +934,7 @@ class Mask(object):
             if (mask[i] == 1):
                 try:
                     descriptor[i] = value
-                except:
+                except Exception:
                     error.append('failed to assign ' +
                                  str(value) + ' to atom ' + str(i))
                     return error

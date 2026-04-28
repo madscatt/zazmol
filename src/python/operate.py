@@ -164,7 +164,7 @@ class Move():
         '''
         try:
             point_flag = kwargs['point']
-        except:
+        except Exception:
             point_flag = False
 
         self.mass_check()

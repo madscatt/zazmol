@@ -140,17 +140,17 @@ class Atom(
                             self._defined_with_input_file = True
                             self._filename = argument
                             break
-                        except BaseException:
+                        except Exception:
                             pass
                     else:
                         try:
                             self._id = int(argument)
                             self._id_flag = True
                             break
-                        except BaseException:
+                        except Exception:
                             pass
 
-        except BaseException:
+        except Exception:
             pass
 
     def __repr__(self):
@@ -215,7 +215,7 @@ class Atom(
                             'numpy array not added for self.__dict__[key]: ' +
                             str(key))
 
-            except BaseException:
+            except Exception:
                 pass
 
             self._natoms = len(self._name)
@@ -717,7 +717,7 @@ class Molecule(Atom):
     def residue_flag(self):
         try:
             return self._residue_flag
-        except BaseException:
+        except Exception:
             self._residue_flag = False
             return self._residue_flag
 

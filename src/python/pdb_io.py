@@ -545,7 +545,7 @@ class PDB(object):
                 elif(lins[0]=='END'):
                     num_counts_per_end.append(num_counts_this_end)
                     num_counts_this_end = 0
-            except:
+            except Exception:
                 pass
 			#
             if((record_name == 'ATOM' or record_name == 'HETATM')):
@@ -636,7 +636,7 @@ class PDB(object):
                         if(occupancy[-1] == ''):
                             occupancy[-1] = "  1.00"
                             this_occupancy[-1] = "  1.00"
-                    except:
+                    except Exception:
                         occupancy.append("  0.00")
                         this_occupancy = "  0.00"
                     try:
@@ -646,7 +646,7 @@ class PDB(object):
                         this_beta = lin[60:66].strip()		#	61-66		temperature factor
                         if(beta[-1] == ''):
                             beta[-1] = "  0.00"
-                    except:
+                    except Exception:
                         beta.append("  0.00")
                         this_beta = "  0.00"
                     try:
@@ -657,7 +657,7 @@ class PDB(object):
                         if(segname[-1] == '' and this_chain !=''):
                             segname[-1] = this_chain
                             this_segname = this_chain
-                    except:
+                    except Exception:
                         this_segname = ""
                         segname.append("")
                     try:
@@ -665,14 +665,14 @@ class PDB(object):
                         element.append(lin[76:78].strip())	#	77-78		element symbol
                         if(element[-1] == ''):
                             element[-1] = "  "
-                    except:
+                    except Exception:
                         element.append("  ")
                     try:
                         #charge.append(string.strip(lin[78:80]))		#	79-80		charge on the atom
                         charge.append(lin[78:80].strip())		#	79-80		charge on the atom
                         if(charge[-1] == ''):
                             charge[-1] = "  "
-                    except:
+                    except Exception:
                         charge.append("  ")
 
                 else:

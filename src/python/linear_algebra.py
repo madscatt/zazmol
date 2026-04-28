@@ -321,7 +321,7 @@ def signed_angle(a, b, c):
         try:
             argument = adb / math.sqrt(ada * bdb)
             angle = (180.0 / math.pi) * math.acos(argument)
-        except BaseException:
+        except Exception:
             return 180.0
 
     cp = cross_product(a, b)

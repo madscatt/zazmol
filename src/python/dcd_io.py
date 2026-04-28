@@ -380,7 +380,7 @@ class DCD(object):
             elif not kwargs['no_print']:
                 try:
                     sys.stdout.write('.',)
-                except:
+                except Exception:
                     pass
 
         return

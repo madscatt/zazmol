@@ -1,5 +1,6 @@
 import sys
 import os
+import shutil
 import logging
 import getpass
 import platform
@@ -19,6 +20,13 @@ class run_utils():
         self.__application__ = app
         self.txtOutput = txtOutput
 
+    def _replace_or_move_file(self, source, destination):
+        if os.path.isdir(destination):
+            destination = os.path.join(destination, os.path.basename(source))
+        if os.path.exists(destination):
+            os.remove(destination)
+        shutil.move(source, destination)
+
     def write_json_file(self):
 
         self.logger.debug('in write_json_file')
@@ -30,13 +38,14 @@ class run_utils():
             self.logger.info('writing parameters to ' + self.parmfile)
 
         if(os.path.isfile('.last_sas.json')):
-            os.system('mv .last_sas.json .last_sas.json_backup')
+            self._replace_or_move_file('.last_sas.json', '.last_sas.json_backup')
             self.logger.info(
                 'backing up existing .last_sas.json file to .last_sas.json_backup')
 
         if(os.path.isfile('.last_sas_' + self.__application__ + '.json')):
-            os.system('mv .last_sas_' + self.__application__ +
-                      '.json .last_sas_' + self.__application__ + '.json_backup')
+            self._replace_or_move_file(
+                '.last_sas_' + self.__application__ + '.json',
+                '.last_sas_' + self.__application__ + '.json_backup')
             self.logger.info('backing up existing .last_sas_' + self.__application__ +
                              '.json file to .last_sas_' + self.__application__ + '.json_backup')
 
@@ -86,9 +95,9 @@ class run_utils():
             elif(not os.path.exists(self.runpath)):
                 os.mkdir(self.runpath)
             self.logger.info('creating directory : ' + self.runpath)
-        except:
-            self.logger.critical('FAILED to create ' +
-                                 self.runpath + ' directory')
+        except Exception:
+            self.logger.exception('FAILED to create ' +
+                                  self.runpath + ' directory')
 
         other_self.runpath = self.runpath
         other_self.parmfile = self.parmfile
@@ -166,8 +175,8 @@ class run_utils():
 
         log.debug('in clean_up')
 
-        os.system('mv ' + self.logfile + ' ' + self.runpath)
-        os.system('mv ' + self.parmfile + ' ' + self.runpath)
+        self._replace_or_move_file(self.logfile, self.runpath)
+        self._replace_or_move_file(self.parmfile, self.runpath)
 
     def capture_exception(self, message):
         ''' this method is a placehoder for a possible future exception handler ... notes are below for usage in-line in code '''
