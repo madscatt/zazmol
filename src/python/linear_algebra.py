@@ -169,10 +169,9 @@ def find_u(x, y):
             numpy.put(b, k, rad)
             k = k + 1
     r = numpy.reshape(b, (-1, 3))
-    # r = numpy.mat(r)
-    r = numpy.asmatrix(r)
+    r = numpy.asarray(r, dtype=config.CALC_DTYPE)
     rt = r.T		# transpose of r
-    rtr = rt * r  # matrix multiply rt * r
+    rtr = numpy.dot(rt, r)
     uk, ak = numpy.linalg.eig(rtr)
     ak = ak.T
 
@@ -182,8 +181,8 @@ def find_u(x, y):
     ak = ak[idx]
 
     ak[2] = numpy.cross(ak[0], ak[1])
-    rak0 = numpy.inner(r, ak[0])
-    rak1 = numpy.inner(r, ak[1])
+    rak0 = numpy.dot(r, ak[0]).reshape(3, 1)
+    rak1 = numpy.dot(r, ak[1]).reshape(3, 1)
     rak0.shape = (1, 3)
     rak1.shape = (1, 3)
 

@@ -20,6 +20,7 @@ import sys
 import numpy
 import math
 import sasmol as sasmol
+import sasmol.config as config
 import sasmol.linear_algebra as linear_algebra
 
 # OPERATE
@@ -476,10 +477,11 @@ class Move():
         c32 = uz * uy * (1 - numpy.cos(theta)) + ux * numpy.sin(theta)
         c33 = numpy.cos(theta) + pow(uz, 2) * (1 - numpy.cos(theta))
 
-        C = numpy.matrix(
-            [[c11, c12, c13], [c21, c22, c23], [c31, c32, c33]])
+        C = numpy.array(
+            [[c11, c12, c13], [c21, c22, c23], [c31, c32, c33]],
+            config.CALC_DTYPE)
 
-        coor = numpy.array(self.coor()[frame] * C)
+        coor = numpy.dot(self.coor()[frame], C)
 
         self.coor()[frame, :] = coor
 
@@ -542,10 +544,11 @@ class Move():
         c32 = -numpy.sin(phi) * numpy.cos(theta)
         c33 = numpy.cos(phi) * numpy.cos(theta)
 
-        C = numpy.matrix(
-            [[c11, c12, c13], [c21, c22, c23], [c31, c32, c33]])
+        C = numpy.array(
+            [[c11, c12, c13], [c21, c22, c23], [c31, c32, c33]],
+            config.CALC_DTYPE)
 
-        coor = numpy.array(self.coor()[frame] * C)
+        coor = numpy.dot(self.coor()[frame], C)
 
         self.coor()[frame, :] = coor
 
