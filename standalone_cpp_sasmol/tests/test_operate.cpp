@@ -1,5 +1,6 @@
 #include "sasmol/file_io.hpp"
 #include "sasmol/operate.hpp"
+#include "sasmol/selection.hpp"
 
 #include <array>
 #include <cassert>
@@ -51,19 +52,6 @@ std::vector<std::size_t> all_atom_indices(const sasmol::Molecule& molecule) {
   indices.reserve(molecule.natoms());
   for (std::size_t atom = 0; atom < molecule.natoms(); ++atom) {
     indices.push_back(atom);
-  }
-  return indices;
-}
-
-std::vector<std::size_t> ca_resid_range_indices(const sasmol::Molecule& molecule,
-                                                int first_resid,
-                                                int last_resid) {
-  std::vector<std::size_t> indices;
-  for (std::size_t atom = 0; atom < molecule.natoms(); ++atom) {
-    if (molecule.name()[atom] == "CA" && molecule.resid()[atom] >= first_resid &&
-        molecule.resid()[atom] <= last_resid) {
-      indices.push_back(atom);
-    }
   }
   return indices;
 }
@@ -252,12 +240,13 @@ void test_align_ca_subset_moves_whole_molecule_com() {
   assert(status.ok());
   status = reader.read_pdb(fixture_path("pdb_common", "1CRN.pdb"), moving);
   assert(status.ok());
-  const auto indices = ca_resid_range_indices(reference, 20, 31);
-  assert(!indices.empty());
+  const auto selected = sasmol::select_indices(
+      reference, "name[i] == \"CA\" and (resid[i] >= 20 and resid[i] <= 31)");
+  assert(selected.ok());
   sasmol::rotate(moving, 0, sasmol::Axis::z, std::acos(-1.0) / 2.0);
 
-  const auto plan = sasmol::initialize_alignment(moving, reference, indices,
-                                                 indices, 0);
+  const auto plan = sasmol::initialize_alignment(
+      moving, reference, selected.indices, selected.indices, 0);
   sasmol::align(moving, plan, 0);
 
   auto reference_for_com = reference;

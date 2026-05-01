@@ -43,6 +43,8 @@ tracked in
 [`docs/calculate_parity_checklist.md`](docs/calculate_parity_checklist.md).
 Coordinate mutation and rotation parity are tracked in
 [`docs/operate_parity_checklist.md`](docs/operate_parity_checklist.md).
+Selection parity is tracked in
+[`docs/selection_parity_checklist.md`](docs/selection_parity_checklist.md).
 
 ## Build
 

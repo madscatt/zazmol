@@ -83,5 +83,4 @@ Behavior notes:
 
 Deferred from Python `align`:
 
-- selection-expression parsing such as `name[i] == "CA"`
 - initialization/production mode keyword interface
