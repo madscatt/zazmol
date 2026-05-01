@@ -1,11 +1,13 @@
 #include "sasmol/calculate.hpp"
 #include "sasmol/file_io.hpp"
 
+#include <array>
 #include <cassert>
 #include <cmath>
 #include <filesystem>
 #include <map>
 #include <stdexcept>
+#include <vector>
 
 namespace {
 
@@ -42,6 +44,26 @@ void assert_calc_vec_close(const sasmol::CalcVec3& actual,
   assert_close_double(actual.z, expected.z, tolerance);
 }
 
+void assert_matrix_close(const sasmol::CalcMatrix3& actual,
+                         const sasmol::CalcMatrix3& expected,
+                         double tolerance = 1.0e-6) {
+  for (std::size_t row = 0; row < 3; ++row) {
+    for (std::size_t column = 0; column < 3; ++column) {
+      assert_close_double(actual[row][column], expected[row][column], tolerance);
+    }
+  }
+}
+
+double absolute_eigenvector_dot(const sasmol::CalcMatrix3& eigenvectors,
+                                std::size_t column,
+                                std::array<double, 3> expected) {
+  double dot{};
+  for (std::size_t row = 0; row < 3; ++row) {
+    dot += eigenvectors[row][column] * expected[row];
+  }
+  return std::fabs(dot);
+}
+
 void test_calculate_minimum_and_maximum_all_loaded_frames() {
   sasmol::Molecule mol(2, 2);
   mol.set_coordinate(0, 0, {1.0F, 2.0F, 3.0F});
@@ -53,6 +75,83 @@ void test_calculate_minimum_and_maximum_all_loaded_frames() {
 
   assert_bounds_close(bounds, {-4.0F, -8.0F, -12.0F},
                       {10.0F, 11.0F, 9.0F});
+}
+
+void test_calculate_principal_moments_of_inertia_synthetic() {
+  sasmol::Molecule mol(3, 1);
+  mol.element() = {"C", "C", "C"};
+  mol.set_coordinate(0, 0, {1.0F, 0.0F, 0.0F});
+  mol.set_coordinate(0, 1, {0.0F, 1.0F, 0.0F});
+  mol.set_coordinate(0, 2, {0.0F, 0.0F, 1.0F});
+
+  const auto result = sasmol::calculate_principal_moments_of_inertia(mol, 0);
+
+  const auto mass = 12.01078;
+  const sasmol::CalcMatrix3 expected_inertia{
+      {{mass * 4.0 / 3.0, mass / 3.0, mass / 3.0},
+       {mass / 3.0, mass * 4.0 / 3.0, mass / 3.0},
+       {mass / 3.0, mass / 3.0, mass * 4.0 / 3.0}}};
+  assert(!result.singular);
+  assert_matrix_close(result.inertia, expected_inertia, 1.0e-6);
+  assert_close_double(result.eigenvalues[0], mass, 1.0e-6);
+  assert_close_double(result.eigenvalues[1], mass, 1.0e-6);
+  assert_close_double(result.eigenvalues[2], 2.0 * mass, 1.0e-6);
+}
+
+void test_calculate_principal_moments_of_inertia_2aad_fixture() {
+  sasmol::PdbReader reader;
+  sasmol::Molecule mol;
+  const auto status =
+      reader.read_pdb(fixture_path("pdb_common", "2AAD.pdb"), mol);
+  assert(status.ok());
+
+  const auto result = sasmol::calculate_principal_moments_of_inertia(mol, 0);
+
+  const sasmol::CalcMatrix3 expected_inertia{
+      {{589.533746311651, -64.328461565902, -439.375385704833},
+       {-64.328461565902, 1532.135608483722, -65.398994295632},
+       {-439.375385704833, -65.398994295632, 1407.583009456943}}};
+  assert(!result.singular);
+  assert_matrix_close(result.inertia, expected_inertia, 1.0e-6);
+  assert_close_double(result.eigenvalues[0], 391.910570545354, 1.0e-6);
+  assert_close_double(result.eigenvalues[1], 1523.060334881807, 1.0e-6);
+  assert_close_double(result.eigenvalues[2], 1614.281458831898, 1.0e-6);
+  assert(absolute_eigenvector_dot(result.eigenvectors, 0,
+                                  {-0.91349702, -0.07447765,
+                                   -0.39997034}) > 0.999999);
+  assert(absolute_eigenvector_dot(result.eigenvectors, 1,
+                                  {0.22717101, -0.90894624,
+                                   -0.34958556}) > 0.999999);
+  assert(absolute_eigenvector_dot(result.eigenvectors, 2,
+                                  {0.33751523, 0.41020703,
+                                   -0.84723885}) > 0.999999);
+}
+
+void test_calculate_principal_moments_of_inertia_reports_singular_tensor() {
+  sasmol::Molecule mol(1, 1);
+  mol.element()[0] = "C";
+  mol.set_coordinate(0, 0, {1.0F, 2.0F, 3.0F});
+
+  const auto result = sasmol::calculate_principal_moments_of_inertia(mol, 0);
+
+  assert(result.singular);
+  assert_matrix_close(result.inertia, {{{0.0, 0.0, 0.0},
+                                        {0.0, 0.0, 0.0},
+                                        {0.0, 0.0, 0.0}}});
+}
+
+void test_calculate_principal_moments_of_inertia_rejects_bad_frame() {
+  sasmol::Molecule mol(1, 1);
+  mol.element()[0] = "C";
+  bool threw = false;
+
+  try {
+    (void)sasmol::calculate_principal_moments_of_inertia(mol, 1);
+  } catch (const std::out_of_range&) {
+    threw = true;
+  }
+
+  assert(threw);
 }
 
 void test_calculate_mass_2aad_fixture() {
@@ -440,6 +539,10 @@ int main() {
   test_calculate_root_mean_square_deviation_synthetic();
   test_calculate_root_mean_square_deviation_fixtures();
   test_calculate_root_mean_square_deviation_rejects_shape_mismatch();
+  test_calculate_principal_moments_of_inertia_synthetic();
+  test_calculate_principal_moments_of_inertia_2aad_fixture();
+  test_calculate_principal_moments_of_inertia_reports_singular_tensor();
+  test_calculate_principal_moments_of_inertia_rejects_bad_frame();
   test_calculate_minimum_and_maximum_all_loaded_frames();
   test_calculate_minimum_and_maximum_selected_frames();
   test_calculate_minimum_and_maximum_rejects_empty_molecule();

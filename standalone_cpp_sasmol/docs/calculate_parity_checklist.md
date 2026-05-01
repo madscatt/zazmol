@@ -82,8 +82,21 @@ Implemented descriptor/topology calculations:
 - Python unit-test parity for two-residue charge sums
 - descriptor mismatches are explicit errors
 
+## Principal Moments Of Inertia Slice
+
+Implemented `calculate_principal_moments_of_inertia(molecule, frame)`:
+
+- follows Python SASMOL's center-of-mass inertia tensor convention
+- returns inertia tensor, sorted eigenvalues, eigenvectors, and an explicit
+  `singular` flag for rank-deficient tensors
+- keeps eigen decomposition local to `calculate.cpp`; no Eigen dependency is
+  introduced in this slice
+- fixture parity for `2AAD.pdb`
+- synthetic coverage for a simple non-linear three-atom system
+- one-atom tensors are reported as singular rather than assigned unstable
+  principal axes
+
 ## Deferred
 
 - DCD streaming overloads for `calculate_minimum_and_maximum_all_steps`
-- principal moments of inertia
 - alignment-dependent calculations

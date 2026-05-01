@@ -2,6 +2,7 @@
 
 #include "sasmol/molecule.hpp"
 
+#include <array>
 #include <cstddef>
 #include <map>
 #include <string>
@@ -18,6 +19,15 @@ struct CalcVec3 {
   calc_type x{};
   calc_type y{};
   calc_type z{};
+};
+
+using CalcMatrix3 = std::array<std::array<calc_type, 3>, 3>;
+
+struct PrincipalMomentsOfInertia {
+  std::array<calc_type, 3> eigenvalues{};
+  CalcMatrix3 eigenvectors{};
+  CalcMatrix3 inertia{};
+  bool singular{};
 };
 
 struct MassCalculationResult {
@@ -42,6 +52,9 @@ void calculate_residue_charge(Molecule& molecule);
 
 [[nodiscard]] calc_type calculate_root_mean_square_deviation(
     const Molecule& first, const Molecule& second);
+
+[[nodiscard]] PrincipalMomentsOfInertia calculate_principal_moments_of_inertia(
+    Molecule& molecule, std::size_t frame);
 
 [[nodiscard]] CoordinateBounds calculate_minimum_and_maximum(
     const Molecule& molecule, const std::vector<std::size_t>& frames = {});
