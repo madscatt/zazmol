@@ -64,6 +64,7 @@ if(BUILD_TESTING)
   target_link_libraries(test_dcd_reader PRIVATE sasmol_standalone)
   target_compile_definitions(test_dcd_reader PRIVATE
     SASMOL_TEST_DATA_DIR="${CMAKE_CURRENT_SOURCE_DIR}/../src/python/test_sasmol/data"
+    SASMOL_TEST_BUILD_DIR="${CMAKE_CURRENT_BINARY_DIR}"
   )
   add_test(NAME dcd_reader COMMAND test_dcd_reader)
 

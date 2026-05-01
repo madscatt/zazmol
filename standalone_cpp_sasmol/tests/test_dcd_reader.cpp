@@ -104,7 +104,9 @@ void append_valid_title_and_atom_count(std::vector<char>& bytes,
 }
 
 std::filesystem::path temp_dcd_path(const char* name) {
-  return std::filesystem::temp_directory_path() / name;
+  const auto tag = std::filesystem::path(SASMOL_TEST_BUILD_DIR).filename();
+  return std::filesystem::temp_directory_path() /
+         ("sasmol_" + tag.string() + "_" + name);
 }
 
 void test_truncated_header_returns_status() {
@@ -341,8 +343,7 @@ void test_single_step_rejects_zero_frame_number() {
 
 void test_truncated_frame_returns_status() {
   const auto source = fixture_path("1ATM.dcd");
-  const auto truncated =
-      std::filesystem::temp_directory_path() / "sasmol_truncated_frame.dcd";
+  const auto truncated = temp_dcd_path("sasmol_truncated_frame.dcd");
   std::filesystem::copy_file(source, truncated,
                              std::filesystem::copy_options::overwrite_existing);
   const auto original_size = std::filesystem::file_size(truncated);
