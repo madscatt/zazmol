@@ -16,6 +16,7 @@ add_library(sasmol_standalone
   src/operate.cpp
   src/properties.cpp
   src/selection.cpp
+  src/subset.cpp
 )
 
 target_include_directories(sasmol_standalone
@@ -84,6 +85,13 @@ if(BUILD_TESTING)
     SASMOL_TEST_DATA_DIR="${CMAKE_CURRENT_SOURCE_DIR}/../src/python/test_sasmol/data"
   )
   add_test(NAME selection COMMAND test_selection)
+
+  add_executable(test_subset tests/test_subset.cpp)
+  target_link_libraries(test_subset PRIVATE sasmol_standalone)
+  target_compile_definitions(test_subset PRIVATE
+    SASMOL_TEST_DATA_DIR="${CMAKE_CURRENT_SOURCE_DIR}/../src/python/test_sasmol/data"
+  )
+  add_test(NAME subset COMMAND test_subset)
 
   add_executable(test_dcd_reader tests/test_dcd_reader.cpp)
   target_link_libraries(test_dcd_reader PRIVATE sasmol_standalone)

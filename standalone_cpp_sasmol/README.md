@@ -45,6 +45,10 @@ Coordinate mutation and rotation parity are tracked in
 [`docs/operate_parity_checklist.md`](docs/operate_parity_checklist.md).
 Selection parity is tracked in
 [`docs/selection_parity_checklist.md`](docs/selection_parity_checklist.md).
+Subset/index operation parity is tracked in
+[`docs/subset_parity_checklist.md`](docs/subset_parity_checklist.md).
+Open design follow-ups are tracked in
+[`docs/development_progress.md`](docs/development_progress.md).
 
 ## Build
 
