@@ -15,7 +15,8 @@ python3 standalone_cpp_sasmol/tools/validate_pdb_with_python.py \
   /private/tmp/sasmol_cpp_1ATM.pdb
 ```
 
-Repeat for `2AAD.pdb` and `1ATM-1to2.pdb`.
+Repeat for `2AAD.pdb`, `1ATM-1to2.pdb`, `1CRN.pdb`, and
+`rna-1to10.pdb`.
 
 ## Results
 
@@ -26,3 +27,5 @@ Validated on the local development environment:
 | `/private/tmp/sasmol_cpp_1ATM.pdb` | 1 | 1 | `157.395000` |
 | `/private/tmp/sasmol_cpp_2AAD.pdb` | 1 | 15 | `2407.675995` |
 | `/private/tmp/sasmol_cpp_1ATM-1to2.pdb` | 2 | 1 | `314.790001` |
+| `/private/tmp/sasmol_cpp_1CRN.pdb` | 1 | 327 | `8509.587008` |
+| `/private/tmp/sasmol_cpp_rna-1to10.pdb` | 10 | 10632 | `-430804.377611` |
