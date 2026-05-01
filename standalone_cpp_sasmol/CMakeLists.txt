@@ -8,6 +8,7 @@ project(
 )
 
 add_library(sasmol_standalone
+  src/file_io.cpp
   src/molecule.cpp
 )
 
@@ -35,4 +36,8 @@ if(BUILD_TESTING)
   add_executable(test_molecule_core tests/test_molecule_core.cpp)
   target_link_libraries(test_molecule_core PRIVATE sasmol_standalone)
   add_test(NAME molecule_core COMMAND test_molecule_core)
+
+  add_executable(test_file_io_contract tests/test_file_io_contract.cpp)
+  target_link_libraries(test_file_io_contract PRIVATE sasmol_standalone)
+  add_test(NAME file_io_contract COMMAND test_file_io_contract)
 endif()
