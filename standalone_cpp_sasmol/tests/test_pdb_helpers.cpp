@@ -4,6 +4,7 @@
 #include <cmath>
 #include <filesystem>
 #include <fstream>
+#include <sstream>
 #include <string>
 #include <vector>
 
@@ -66,6 +67,27 @@ void test_conect_lines_remap_original_to_current_indices() {
 
 std::filesystem::path fixture_path(const char* area, const char* name) {
   return std::filesystem::path(SASMOL_TEST_DATA_DIR) / area / name;
+}
+
+std::vector<std::vector<std::string>> read_token_rows(
+    const std::filesystem::path& path) {
+  std::ifstream input(path);
+  assert(input.good());
+
+  std::vector<std::vector<std::string>> rows;
+  std::string line;
+  while (std::getline(input, line)) {
+    std::istringstream tokens(line);
+    std::vector<std::string> row;
+    std::string token;
+    while (tokens >> token) {
+      row.push_back(token);
+    }
+    if (!row.empty()) {
+      rows.push_back(row);
+    }
+  }
+  return rows;
 }
 
 void assert_scan(const std::filesystem::path& path, std::size_t natoms,
@@ -233,6 +255,54 @@ void test_resolve_pdb_element_matches_python_core_cases() {
 
   resolved = reader.resolve_pdb_element("11H", "RES");
   assert(resolved.status.code == sasmol::IoCode::format_error);
+}
+
+void assert_element_fixture_maps_to(const char* name, const char* expected) {
+  sasmol::PdbReader reader;
+  const auto rows = read_token_rows(fixture_path("sasmol/properties", name));
+  assert(!rows.empty());
+
+  for (const auto& row : rows) {
+    const auto resolved = reader.resolve_pdb_element(row[0], "RES");
+    assert(resolved.status.ok());
+    assert(resolved.element == expected);
+  }
+}
+
+void test_resolve_pdb_element_table_fixtures() {
+  assert_element_fixture_maps_to("Hatoms.txt", "H");
+  assert_element_fixture_maps_to("Catoms.txt", "C");
+  assert_element_fixture_maps_to("Natoms.txt", "N");
+  assert_element_fixture_maps_to("Oatoms.txt", "O");
+  assert_element_fixture_maps_to("Satoms.txt", "S");
+  assert_element_fixture_maps_to("Patoms.txt", "P");
+
+  sasmol::PdbReader reader;
+  for (const auto& row :
+       read_token_rows(fixture_path("sasmol/properties", "Otheratoms_2.txt"))) {
+    const auto resolved = reader.resolve_pdb_element(row[0], "RES");
+    assert(resolved.status.ok());
+    assert(resolved.element == row[0]);
+  }
+
+  for (const auto& row :
+       read_token_rows(fixture_path("sasmol/properties", "MisAtoms.txt"))) {
+    assert(row.size() == 2);
+    const auto resolved = reader.resolve_pdb_element(row[0], "RES");
+    assert(resolved.status.ok());
+    assert(resolved.element == row[1]);
+  }
+
+  for (const auto& row :
+       read_token_rows(fixture_path("sasmol/properties", "ConflictAtoms.txt"))) {
+    assert(row.size() == 2);
+    auto resolved = reader.resolve_pdb_element(row[0], row[0]);
+    assert(resolved.status.ok());
+    assert(resolved.element == row[0]);
+    resolved = reader.resolve_pdb_element(row[0], "RES");
+    assert(resolved.status.ok());
+    assert(resolved.element == row[1]);
+  }
 }
 
 void test_parse_pdb_atom_record_resolves_blank_element() {
@@ -795,6 +865,7 @@ int main() {
   test_parse_pdb_atom_record_preserves_altloc_in_pdbscan_mode();
   test_parse_pdb_atom_record_rejects_bad_required_numbers();
   test_resolve_pdb_element_matches_python_core_cases();
+  test_resolve_pdb_element_table_fixtures();
   test_parse_pdb_atom_record_resolves_blank_element();
   test_read_pdb_single_frame_1atm();
   test_read_pdb_single_frame_2aad_descriptors();

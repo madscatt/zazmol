@@ -125,6 +125,9 @@ surface and helper tests:
 14. Added core PDB element resolution for blank element fields: conflict atom
     names, isotope/salt aliases, known heavy elements, first-letter fallback,
     digit-prefixed fallback, and invalid-name errors.
+15. Added table-driven element-resolution tests using the existing Python
+    SASMOL property fixtures for H/C/N/O/S/P, other elements, miscellaneous
+    aliases, and conflict atoms.
 
 ## Proposed Next Validation Slice
 

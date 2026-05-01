@@ -654,6 +654,11 @@ PdbElementResult PdbReader::resolve_pdb_element(
   if (pdb_other_element_names().contains(atom_name)) {
     return {IoStatus::success(), atom_name};
   }
+  if (atom_name.size() > 1 && atom_name.front() == 'A' &&
+      (atom_name[1] == 'H' || atom_name[1] == 'C' || atom_name[1] == 'N' ||
+       atom_name[1] == 'O' || atom_name[1] == 'P')) {
+    return {IoStatus::success(), std::string(1, atom_name[1])};
+  }
   if (is_alpha(atom_name.front())) {
     return {IoStatus::success(), std::string(1, atom_name.front())};
   }
