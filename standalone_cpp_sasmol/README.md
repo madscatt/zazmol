@@ -46,6 +46,20 @@ cmake --build standalone_cpp_sasmol/build
 ctest --test-dir standalone_cpp_sasmol/build --output-on-failure
 ```
 
+## Memory-Safety Checks
+
+The standalone C++ project has an opt-in sanitizer build for development:
+
+```bash
+cmake -S standalone_cpp_sasmol -B standalone_cpp_sasmol/build-asan \
+  -DSASMOL_ENABLE_SANITIZERS=ON -DCMAKE_BUILD_TYPE=Debug
+cmake --build standalone_cpp_sasmol/build-asan
+ctest --test-dir standalone_cpp_sasmol/build-asan --output-on-failure
+```
+
+This enables AddressSanitizer and UndefinedBehaviorSanitizer on Clang/GCC-style
+toolchains. It is intentionally separate from the default build.
+
 ## Parity Survey
 
 From the repository root:

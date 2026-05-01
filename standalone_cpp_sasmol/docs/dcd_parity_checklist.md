@@ -183,3 +183,18 @@ Completed deliberate Python cross-reader parity fixture tooling:
 3. Record results in docs without making Python an unconditional CTest
    dependency.
 4. Then decide whether to start PDB I/O contracts or expand DCD writer options.
+
+## Memory-Safety Status
+
+The DCD reader/writer uses `std::ifstream`, `std::ofstream`, `std::vector`, and
+`std::array` for ownership. It does not use raw owning pointers. The binary
+parsing path includes explicit checks for:
+
+- negative header counts
+- record-marker size overflow
+- unsupported fixed/free atom tables
+- unsupported unit-cell writes
+- malformed/truncated input returning `IoStatus`
+
+The current C++ tests pass under AddressSanitizer and UndefinedBehaviorSanitizer
+using the documented `SASMOL_ENABLE_SANITIZERS=ON` build.

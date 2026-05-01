@@ -7,6 +7,8 @@ project(
   LANGUAGES CXX
 )
 
+option(SASMOL_ENABLE_SANITIZERS "Build with AddressSanitizer and UndefinedBehaviorSanitizer" OFF)
+
 add_library(sasmol_standalone
   src/file_io.cpp
   src/molecule.cpp
@@ -27,7 +29,15 @@ set_target_properties(sasmol_standalone PROPERTIES
 if(MSVC)
   target_compile_options(sasmol_standalone PRIVATE /W4)
 else()
-target_compile_options(sasmol_standalone PRIVATE -Wall -Wextra -Wpedantic)
+  target_compile_options(sasmol_standalone PRIVATE -Wall -Wextra -Wpedantic)
+endif()
+
+if(SASMOL_ENABLE_SANITIZERS)
+  if(MSVC)
+    message(FATAL_ERROR "SASMOL_ENABLE_SANITIZERS is currently configured for Clang/GCC-style sanitizers.")
+  endif()
+  target_compile_options(sasmol_standalone PUBLIC -fsanitize=address,undefined -fno-omit-frame-pointer)
+  target_link_options(sasmol_standalone PUBLIC -fsanitize=address,undefined)
 endif()
 
 add_executable(dcd_roundtrip_writer tools/dcd_roundtrip_writer.cpp)

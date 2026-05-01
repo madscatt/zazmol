@@ -6,6 +6,7 @@
 #include <cstdint>
 #include <cstring>
 #include <ios>
+#include <limits>
 #include <vector>
 #include <utility>
 
@@ -107,6 +108,12 @@ IoStatus skip_bytes(std::istream& stream, std::streamoff count,
 
 IoStatus read_float_block(std::istream& stream, std::vector<float>& values,
                           bool reverse_endian, const std::string& axis) {
+  if (values.size() >
+      static_cast<std::size_t>(std::numeric_limits<std::int32_t>::max()) /
+          sizeof(float)) {
+    return {IoCode::unsupported,
+            "DCD coordinate block is too large for int32 record markers."};
+  }
   const int expected_size = static_cast<int>(values.size() * sizeof(float));
   auto status = read_record_marker(stream, expected_size, reverse_endian,
                                    "reading " + axis + " block marker");
@@ -267,12 +274,20 @@ IoStatus DcdReader::read_header(DcdHeader& header) {
     }
   }
 
+  const int nframes =
+      read_int32_from_bytes(header_block.data() + 4, reverse_endian);
+  const int istart = read_int32_from_bytes(header_block.data() + 8, reverse_endian);
+  const int nsavc = read_int32_from_bytes(header_block.data() + 12, reverse_endian);
+  const int namnf = read_int32_from_bytes(header_block.data() + 36, reverse_endian);
+  if (nframes < 0 || nsavc < 0 || namnf < 0) {
+    return {IoCode::format_error, "Invalid negative DCD header count."};
+  }
+
   DcdHeader parsed;
-  parsed.nframes = static_cast<std::size_t>(
-      read_int32_from_bytes(header_block.data() + 4, reverse_endian));
-  parsed.istart = read_int32_from_bytes(header_block.data() + 8, reverse_endian);
-  parsed.nsavc = read_int32_from_bytes(header_block.data() + 12, reverse_endian);
-  parsed.namnf = read_int32_from_bytes(header_block.data() + 36, reverse_endian);
+  parsed.nframes = static_cast<std::size_t>(nframes);
+  parsed.istart = istart;
+  parsed.nsavc = nsavc;
+  parsed.namnf = namnf;
   parsed.delta = (charmm_flags & dcd_is_charmm)
                      ? static_cast<double>(
                            read_float_from_bytes(header_block.data() + 40,
@@ -380,6 +395,12 @@ IoStatus DcdReader::read_next_frame(Molecule& molecule) {
     return {IoCode::unsupported,
             "DCD fixed/free atom frame reading is not yet implemented."};
   }
+  if (header_.natoms >
+      static_cast<std::size_t>(std::numeric_limits<std::int32_t>::max()) /
+          sizeof(float)) {
+    return {IoCode::unsupported,
+            "DCD coordinate block is too large for int32 record markers."};
+  }
 
   const bool reverse_endian = header_.reverse_endian;
   if (header_.has_unit_cell) {
@@ -393,7 +414,7 @@ IoStatus DcdReader::read_next_frame(Molecule& molecule) {
     }
     std::int32_t block_size{};
     std::memcpy(&block_size, &raw_size, sizeof(block_size));
-    if (block_size < 0) {
+  if (block_size < 0) {
       return {IoCode::format_error, "Invalid negative DCD unit-cell block."};
     }
     auto status = skip_bytes(stream_, block_size, "skipping DCD unit-cell block");
@@ -556,8 +577,10 @@ IoStatus DcdWriter::write_dcd_header(const Molecule& molecule,
   if (!open_) {
     return {IoCode::not_open, "DCD writer is not open."};
   }
-  if (molecule.natoms() > static_cast<std::size_t>(INT32_MAX) ||
-      nframes > static_cast<std::size_t>(INT32_MAX)) {
+  if (molecule.natoms() >
+          static_cast<std::size_t>(std::numeric_limits<std::int32_t>::max()) ||
+      nframes >
+          static_cast<std::size_t>(std::numeric_limits<std::int32_t>::max())) {
     return {IoCode::unsupported, "DCD writer supports int32-sized headers."};
   }
 
@@ -626,7 +649,9 @@ IoStatus DcdWriter::write_dcd_step(const Molecule& molecule, std::size_t frame,
   if (frame >= molecule.number_of_frames()) {
     return {IoCode::format_error, "DCD frame index is out of range."};
   }
-  if (molecule.natoms() > static_cast<std::size_t>(INT32_MAX)) {
+  if (molecule.natoms() >
+      static_cast<std::size_t>(std::numeric_limits<std::int32_t>::max()) /
+          sizeof(float)) {
     return {IoCode::unsupported, "DCD writer supports int32-sized atom counts."};
   }
 
