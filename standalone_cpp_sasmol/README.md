@@ -31,6 +31,7 @@ The first milestone is the core data model and parity machinery:
 - integrity reporting that names descriptor length mismatches
 - file I/O contract types for PDB/DCD readers and writers
 - coordinate-bounds calculation parity
+- standard atomic weight and mass calculation parity
 - a read-only parity ledger generator for surveying Python `zazmol`
 
 This is not yet a feature-complete port of Python SasMol.

@@ -13,6 +13,11 @@ void assert_close(sasmol::coord_type actual, sasmol::coord_type expected,
   assert(std::fabs(static_cast<double>(actual - expected)) < tolerance);
 }
 
+void assert_close_double(sasmol::calc_type actual, sasmol::calc_type expected,
+                         double tolerance = 1.0e-6) {
+  assert(std::fabs(actual - expected) < tolerance);
+}
+
 std::filesystem::path fixture_path(const char* area, const char* name) {
   return std::filesystem::path(SASMOL_TEST_DATA_DIR) / area / name;
 }
@@ -39,6 +44,74 @@ void test_calculate_minimum_and_maximum_all_loaded_frames() {
 
   assert_bounds_close(bounds, {-4.0F, -8.0F, -12.0F},
                       {10.0F, 11.0F, 9.0F});
+}
+
+void test_calculate_mass_2aad_fixture() {
+  sasmol::PdbReader reader;
+  sasmol::Molecule mol;
+  const auto status =
+      reader.read_pdb(fixture_path("pdb_common", "2AAD.pdb"), mol);
+  assert(status.ok());
+
+  const auto result = sasmol::calculate_mass(mol);
+
+  const std::vector<sasmol::calc_type> expected_mass = {
+      14.00672, 12.01078, 12.01078, 15.99943, 12.01078,
+      12.01078, 12.01078, 12.01078, 14.00672, 12.01078,
+      12.01078, 15.99943, 12.01078, 15.99943, 12.01078};
+  assert(result.ok());
+  assert(mol.mass().size() == expected_mass.size());
+  for (std::size_t atom = 0; atom < expected_mass.size(); ++atom) {
+    assert_close_double(mol.mass()[atom], expected_mass[atom]);
+  }
+  assert_close_double(result.total_mass, 196.11953);
+  assert_close_double(mol.total_mass(), result.total_mass);
+}
+
+void test_calculate_mass_rna_and_1crn_fixture_totals() {
+  sasmol::PdbReader reader;
+  sasmol::Molecule mol;
+  auto status = reader.read_pdb(fixture_path("pdb_common", "rna.pdb"), mol);
+  assert(status.ok());
+
+  auto result = sasmol::calculate_mass(mol);
+  assert(result.ok());
+  assert_close_double(result.total_mass, 106197.087, 0.001);
+
+  status = reader.read_pdb(fixture_path("pdb_common", "1CRN.pdb"), mol);
+  assert(status.ok());
+  result = sasmol::calculate_mass(mol);
+  assert(result.ok());
+  assert_close_double(result.total_mass, 4412.904, 0.001);
+}
+
+void test_calculate_mass_reports_unknown_elements() {
+  sasmol::Molecule mol(2, 1);
+  mol.element()[0] = "C";
+  mol.element()[1] = "XX";
+
+  const auto result = sasmol::calculate_mass(mol);
+
+  assert(!result.ok());
+  assert((result.unknown_elements == std::vector<std::string>{"XX"}));
+  assert_close_double(result.total_mass, 12.01078);
+  assert_close_double(mol.mass()[0], 12.01078);
+  assert_close_double(mol.mass()[1], 0.0);
+  assert_close_double(mol.total_mass(), 12.01078);
+}
+
+void test_calculate_mass_rejects_element_mismatch() {
+  sasmol::Molecule mol(1, 1);
+  mol.element().clear();
+  bool threw = false;
+
+  try {
+    (void)sasmol::calculate_mass(mol);
+  } catch (const std::invalid_argument&) {
+    threw = true;
+  }
+
+  assert(threw);
 }
 
 void test_calculate_minimum_and_maximum_selected_frames() {
@@ -122,6 +195,10 @@ void test_calculate_minimum_and_maximum_all_steps_alias() {
 }  // namespace
 
 int main() {
+  test_calculate_mass_2aad_fixture();
+  test_calculate_mass_rna_and_1crn_fixture_totals();
+  test_calculate_mass_reports_unknown_elements();
+  test_calculate_mass_rejects_element_mismatch();
   test_calculate_minimum_and_maximum_all_loaded_frames();
   test_calculate_minimum_and_maximum_selected_frames();
   test_calculate_minimum_and_maximum_rejects_empty_molecule();

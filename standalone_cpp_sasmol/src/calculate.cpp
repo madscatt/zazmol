@@ -1,5 +1,7 @@
 #include "sasmol/calculate.hpp"
 
+#include "sasmol/properties.hpp"
+
 #include <limits>
 #include <stdexcept>
 
@@ -17,6 +19,29 @@ std::vector<std::size_t> all_frame_indices(const Molecule& molecule) {
 }
 
 }  // namespace
+
+MassCalculationResult calculate_mass(Molecule& molecule) {
+  if (molecule.element().size() != molecule.natoms()) {
+    throw std::invalid_argument("calculate_mass requires one element per atom");
+  }
+
+  const auto& weights = amu();
+  molecule.mass().assign(molecule.natoms(), calc_type{});
+  MassCalculationResult result;
+
+  for (std::size_t atom = 0; atom < molecule.natoms(); ++atom) {
+    const auto found = weights.find(molecule.element()[atom]);
+    if (found == weights.end()) {
+      result.unknown_elements.push_back(molecule.element()[atom]);
+      continue;
+    }
+    molecule.mass()[atom] = found->second;
+    result.total_mass += found->second;
+  }
+
+  molecule.set_total_mass(result.total_mass);
+  return result;
+}
 
 CoordinateBounds calculate_minimum_and_maximum(
     const Molecule& molecule, const std::vector<std::size_t>& frames) {

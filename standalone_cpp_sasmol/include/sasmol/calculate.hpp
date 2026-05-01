@@ -12,6 +12,15 @@ struct CoordinateBounds {
   Vec3 maximum;
 };
 
+struct MassCalculationResult {
+  calc_type total_mass{};
+  std::vector<std::string> unknown_elements;
+
+  [[nodiscard]] bool ok() const noexcept { return unknown_elements.empty(); }
+};
+
+[[nodiscard]] MassCalculationResult calculate_mass(Molecule& molecule);
+
 [[nodiscard]] CoordinateBounds calculate_minimum_and_maximum(
     const Molecule& molecule, const std::vector<std::size_t>& frames = {});
 

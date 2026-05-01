@@ -22,10 +22,27 @@ The first C++ slice covers:
   `1ATM-1to2.pdb`
 - alias parity for `calc_minmax_all_steps`
 
+## Mass Slice
+
+Implemented mass/property groundwork:
+
+- `amu()` standard atomic weight table using Python SASMOL values
+- `calculate_mass(molecule)`
+- updates per-atom `mass` and `total_mass`
+- reports unknown elements explicitly while preserving zero mass for those
+  entries
+- rejects element descriptor length mismatches
+
+The C++ tests cover:
+
+- `2AAD.pdb` per-atom masses and total mass
+- `rna.pdb` and `1CRN.pdb` total masses
+- unknown element reporting
+- descriptor mismatch handling
+
 ## Deferred
 
 - DCD streaming overloads for `calculate_minimum_and_maximum_all_steps`
-- mass-dependent calculations: mass, center of mass, radius of gyration,
-  principal moments of inertia
+- center of mass, radius of gyration, and principal moments of inertia
 - RMSD/alignment-dependent calculations
 - molecular formula and residue charge

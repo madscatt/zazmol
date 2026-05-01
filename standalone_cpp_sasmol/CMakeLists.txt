@@ -13,6 +13,7 @@ add_library(sasmol_standalone
   src/calculate.cpp
   src/file_io.cpp
   src/molecule.cpp
+  src/properties.cpp
 )
 
 target_include_directories(sasmol_standalone
