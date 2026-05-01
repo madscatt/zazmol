@@ -13,7 +13,8 @@ standard, fixture source, and naming reference.
 - Use modern, readable C++20 without forcing conventional C++ naming where it
   would make parity harder to see.
 - Keep public APIs owned by this library. Optional implementation dependencies
-  such as Eigen can be evaluated later without leaking into user-facing types.
+  such as Eigen can be evaluated later without leaking into user-facing types;
+  see [`docs/eigen_usage_policy.md`](docs/eigen_usage_policy.md).
 - Keep LASSIE `SasCalc`, Debye, GV, CUDA, and scattering code separate. Those
   algorithms may later consume this library but are not part of this core.
 - Keep coordinate storage explicit and contiguous so future CPU, GPU, MPI, or
