@@ -8,6 +8,9 @@ based on a read-only survey of:
 - `src/python/test_sasmol/test_file_io/test_intg_file_io_Files_write_pdb.py`
 - `src/python/test_sasmol/test_file_io/test_unit_file_io_Files_helpers.py`
 
+The fixed-column reference used for column ranges is summarized in
+[`pdb_fixed_column_reference.md`](pdb_fixed_column_reference.md).
+
 The C++ parser should not aim to be a narrow protein-only PDB reader. SASMOL
 PDB behavior is intentionally tolerant because real SASSIE/ZAZZIE workflows
 include proteins, RNA, mixed/odd atom names, nonstandard records, generated
