@@ -132,6 +132,7 @@ class DcdWriter {
  private:
   std::filesystem::path filename_;
   DcdWriteOptions options_;
+  std::ofstream stream_;
   bool open_{false};
 };
 

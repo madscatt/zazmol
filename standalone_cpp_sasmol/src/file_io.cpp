@@ -1,5 +1,6 @@
 #include "sasmol/file_io.hpp"
 
+#include <algorithm>
 #include <array>
 #include <bit>
 #include <cstdint>
@@ -130,6 +131,33 @@ IoStatus read_float_block(std::istream& stream, std::vector<float>& values,
 
   return read_record_marker(stream, expected_size, reverse_endian,
                             "reading trailing " + axis + " block marker");
+}
+
+template <typename T>
+IoStatus write_exact(std::ostream& stream, const T& value,
+                     const std::string& context) {
+  stream.write(reinterpret_cast<const char*>(&value), sizeof(T));
+  if (!stream) {
+    return {IoCode::file_error, "Failed while " + context + "."};
+  }
+  return IoStatus::success();
+}
+
+IoStatus write_bytes(std::ostream& stream, const char* data,
+                     std::streamsize count, const std::string& context) {
+  stream.write(data, count);
+  if (!stream) {
+    return {IoCode::file_error, "Failed while " + context + "."};
+  }
+  return IoStatus::success();
+}
+
+std::array<char, 80> padded_title(const std::string& text) {
+  std::array<char, 80> title{};
+  title.fill(' ');
+  const std::size_t count = std::min(text.size(), title.size());
+  std::memcpy(title.data(), text.data(), count);
+  return title;
 }
 
 }  // namespace
@@ -506,40 +534,153 @@ IoStatus DcdReader::read_dcd(const std::filesystem::path& filename,
 
 IoStatus DcdWriter::open_dcd_write(const std::filesystem::path& filename,
                                    const DcdWriteOptions& options) {
+  (void)close_dcd_write();
+  if (options.include_unit_cell) {
+    return {IoCode::unsupported,
+            "DCD writing with unit-cell blocks is not yet implemented."};
+  }
   filename_ = filename;
   options_ = options;
+  stream_.open(filename_, std::ios::binary | std::ios::trunc);
+  if (!stream_) {
+    filename_.clear();
+    return {IoCode::file_error, "Failed to open DCD file for writing: " +
+                                    filename.string()};
+  }
   open_ = true;
-  return IoStatus::not_implemented(
-      "DCD writing is intentionally deferred until Python/C-extension write "
-      "parity is captured in tests.");
+  return IoStatus::success();
 }
 
 IoStatus DcdWriter::write_dcd_header(const Molecule& molecule,
                                      std::size_t nframes) {
-  (void)molecule;
-  (void)nframes;
   if (!open_) {
     return {IoCode::not_open, "DCD writer is not open."};
   }
-  return IoStatus::not_implemented(
-      "DCD header writing is intentionally deferred until legacy header fields "
-      "are documented.");
+  if (molecule.natoms() > static_cast<std::size_t>(INT32_MAX) ||
+      nframes > static_cast<std::size_t>(INT32_MAX)) {
+    return {IoCode::unsupported, "DCD writer supports int32-sized headers."};
+  }
+
+  const std::int32_t marker84 = 84;
+  const std::int32_t marker164 = 164;
+  const std::int32_t marker4 = 4;
+  const std::int32_t zero = 0;
+  const std::int32_t one = 1;
+  const std::int32_t two = 2;
+  const std::int32_t natoms = static_cast<std::int32_t>(molecule.natoms());
+  const std::int32_t frame_count = static_cast<std::int32_t>(nframes);
+  const double delta = 1.0;
+
+  auto status = write_exact(stream_, marker84, "writing DCD header marker");
+  if (!status) return status;
+  status = write_bytes(stream_, "CORD", 4, "writing DCD CORD magic");
+  if (!status) return status;
+  status = write_exact(stream_, frame_count, "writing DCD NSET");
+  if (!status) return status;
+  status = write_exact(stream_, zero, "writing DCD ISTART");
+  if (!status) return status;
+  status = write_exact(stream_, one, "writing DCD NSAVC");
+  if (!status) return status;
+  for (int i = 0; i < 6; ++i) {
+    status = write_exact(stream_, zero, "writing DCD reserved header integer");
+    if (!status) return status;
+  }
+  status = write_exact(stream_, delta, "writing DCD DELTA");
+  if (!status) return status;
+  for (int i = 0; i < 9; ++i) {
+    status = write_exact(stream_, zero, "writing DCD reserved header integer");
+    if (!status) return status;
+  }
+  status = write_exact(stream_, marker84, "writing trailing DCD header marker");
+  if (!status) return status;
+
+  status = write_exact(stream_, marker164, "writing DCD title block marker");
+  if (!status) return status;
+  status = write_exact(stream_, two, "writing DCD title count");
+  if (!status) return status;
+  const auto title1 = padded_title("REMARKS FILENAME=A.DCD :: SASSIE");
+  const auto title2 =
+      padded_title("REMARKS CREATED BY STANDALONE C++ SASMOL");
+  status =
+      write_bytes(stream_, title1.data(), title1.size(), "writing DCD title 1");
+  if (!status) return status;
+  status =
+      write_bytes(stream_, title2.data(), title2.size(), "writing DCD title 2");
+  if (!status) return status;
+  status = write_exact(stream_, marker164,
+                       "writing trailing DCD title block marker");
+  if (!status) return status;
+
+  status = write_exact(stream_, marker4, "writing DCD atom-count marker");
+  if (!status) return status;
+  status = write_exact(stream_, natoms, "writing DCD atom count");
+  if (!status) return status;
+  return write_exact(stream_, marker4, "writing trailing DCD atom-count marker");
 }
 
 IoStatus DcdWriter::write_dcd_step(const Molecule& molecule, std::size_t frame,
                                    std::size_t step) {
-  (void)molecule;
-  (void)frame;
-  (void)step;
   if (!open_) {
     return {IoCode::not_open, "DCD writer is not open."};
   }
-  return IoStatus::not_implemented(
-      "DCD frame writing is intentionally deferred until coordinate layout and "
-      "round-trip parity are locked.");
+  if (frame >= molecule.number_of_frames()) {
+    return {IoCode::format_error, "DCD frame index is out of range."};
+  }
+  if (molecule.natoms() > static_cast<std::size_t>(INT32_MAX)) {
+    return {IoCode::unsupported, "DCD writer supports int32-sized atom counts."};
+  }
+
+  const auto natoms = molecule.natoms();
+  const std::int32_t block_size =
+      static_cast<std::int32_t>(natoms * sizeof(float));
+  std::vector<float> x(natoms);
+  std::vector<float> y(natoms);
+  std::vector<float> z(natoms);
+
+  for (std::size_t atom = 0; atom < natoms; ++atom) {
+    const auto xyz = molecule.coordinate(frame, atom);
+    x[atom] = xyz.x;
+    y[atom] = xyz.y;
+    z[atom] = xyz.z;
+  }
+
+  auto write_axis = [&](const std::vector<float>& axis,
+                        const std::string& label) -> IoStatus {
+    auto status = write_exact(stream_, block_size,
+                              "writing DCD " + label + " block marker");
+    if (!status) return status;
+    status = write_bytes(stream_, reinterpret_cast<const char*>(axis.data()),
+                         block_size, "writing DCD " + label + " coordinates");
+    if (!status) return status;
+    return write_exact(stream_, block_size,
+                       "writing trailing DCD " + label + " block marker");
+  };
+
+  auto status = write_axis(x, "X");
+  if (!status) return status;
+  status = write_axis(y, "Y");
+  if (!status) return status;
+  status = write_axis(z, "Z");
+  if (!status) return status;
+
+  if (step > 0 && step <= static_cast<std::size_t>(INT32_MAX)) {
+    const std::int32_t written_step = static_cast<std::int32_t>(step);
+    stream_.seekp(8, std::ios::beg);
+    status = write_exact(stream_, written_step, "updating DCD frame count");
+    if (!status) return status;
+    stream_.seekp(20, std::ios::beg);
+    status = write_exact(stream_, written_step, "updating DCD step count");
+    if (!status) return status;
+    stream_.seekp(0, std::ios::end);
+  }
+
+  return IoStatus::success();
 }
 
 IoStatus DcdWriter::close_dcd_write() {
+  if (stream_.is_open()) {
+    stream_.close();
+  }
   open_ = false;
   filename_.clear();
   return IoStatus::success();

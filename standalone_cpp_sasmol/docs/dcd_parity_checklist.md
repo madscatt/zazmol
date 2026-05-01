@@ -145,12 +145,22 @@ Completed whole-trajectory convenience reading:
 
 ## Proposed Next Implementation Slice
 
-Start DCD writing with the same narrowness:
+Completed first DCD writing slice with the same narrowness:
 
-1. Add `DcdWriter::open_dcd_write`, `write_dcd_header`, `write_dcd_step`, and
+1. Added `DcdWriter::open_dcd_write`, `write_dcd_header`, `write_dcd_step`, and
    `close_dcd_write` behavior for normal full-coordinate files only.
-2. Write CHARMM-style headers matching the existing Python writer for small
-   fixtures.
-3. Round-trip C++ written DCDs through the C++ reader for `1ATM` and `2AAD`
+2. Wrote non-unit-cell headers matching the existing Python writer path for
+   normal full-coordinate files.
+3. Round-tripped C++ written DCDs through the C++ reader for `1ATM` and `2AAD`
    first.
-4. Defer huge-file and cross-reader Python validation to a separate slice.
+4. Deferred huge-file and cross-reader Python validation to a separate slice.
+
+## Proposed Next Implementation Slice
+
+Add cross-reader validation and a convenience write wrapper:
+
+1. Add `DcdWriter::write_dcd(filename, molecule)` as open/header/all-steps/close.
+2. Test C++ writer output read by C++ reader for `rna-1to10`.
+3. Add a Python-side validation script or documented command to verify C++
+   generated DCDs with Python `zazmol` before claiming full parity.
+4. Keep huge-file tests separate.

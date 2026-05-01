@@ -73,17 +73,20 @@ void test_dcd_random_frame_access_is_explicit_reopen_scan_contract() {
 void test_dcd_writer_has_explicit_open_close_state() {
   sasmol::DcdWriter writer;
   sasmol::Molecule mol(1, 1);
+  const auto output =
+      std::filesystem::temp_directory_path() / "sasmol_contract_writer.dcd";
 
   auto status = writer.write_dcd_header(mol, 1);
   assert(status.code == sasmol::IoCode::not_open);
 
-  status = writer.open_dcd_write("fixture.dcd");
+  status = writer.open_dcd_write(output);
   assert(writer.is_open());
-  assert(status.code == sasmol::IoCode::not_implemented);
+  assert(status.ok());
 
   status = writer.close_dcd_write();
   assert(status.ok());
   assert(!writer.is_open());
+  std::filesystem::remove(output);
 }
 
 }  // namespace

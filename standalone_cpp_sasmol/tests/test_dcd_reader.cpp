@@ -243,6 +243,50 @@ void test_whole_trajectory_read_rna() {
   assert_close_double(coordinate_sum(mol), -430804.378, 0.1);
 }
 
+std::filesystem::path temp_dcd_path(const char* name) {
+  return std::filesystem::temp_directory_path() / name;
+}
+
+void write_round_trip_fixture(const char* source_name, const char* temp_name,
+                              double expected_sum, double sum_tolerance) {
+  sasmol::DcdReader reader;
+  sasmol::Molecule source;
+  auto status = reader.read_dcd(fixture_path(source_name), source);
+  assert(status.ok());
+
+  const auto output = temp_dcd_path(temp_name);
+  sasmol::DcdWriter writer;
+  status = writer.open_dcd_write(output);
+  assert(status.ok());
+  status = writer.write_dcd_header(source, source.number_of_frames());
+  assert(status.ok());
+  for (std::size_t frame = 0; frame < source.number_of_frames(); ++frame) {
+    status = writer.write_dcd_step(source, frame, frame + 1);
+    assert(status.ok());
+  }
+  status = writer.close_dcd_write();
+  assert(status.ok());
+
+  sasmol::Molecule round_trip;
+  status = reader.read_dcd(output, round_trip);
+  assert(status.ok());
+  assert(round_trip.natoms() == source.natoms());
+  assert(round_trip.number_of_frames() == source.number_of_frames());
+  assert_close_double(coordinate_sum(round_trip), expected_sum, sum_tolerance);
+
+  std::filesystem::remove(output);
+}
+
+void test_writer_round_trips_1atm() {
+  write_round_trip_fixture("1ATM.dcd", "sasmol_cpp_1atm_roundtrip.dcd",
+                           314.790, 0.001);
+}
+
+void test_writer_round_trips_2aad() {
+  write_round_trip_fixture("2AAD.dcd", "sasmol_cpp_2aad_roundtrip.dcd",
+                           3644.294, 0.01);
+}
+
 }  // namespace
 
 int main() {
@@ -257,5 +301,7 @@ int main() {
   test_whole_trajectory_read_1atm();
   test_whole_trajectory_read_2aad();
   test_whole_trajectory_read_rna();
+  test_writer_round_trips_1atm();
+  test_writer_round_trips_2aad();
   return 0;
 }
