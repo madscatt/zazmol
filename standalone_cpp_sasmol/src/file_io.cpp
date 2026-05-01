@@ -551,10 +551,6 @@ IoStatus PdbReader::parse_pdb_atom_record(
 IoStatus PdbWriter::write_pdb(const std::filesystem::path& filename,
                               const Molecule& molecule,
                               const PdbWriteOptions& options) const {
-  if (options.write_all_frames) {
-    return {IoCode::unsupported,
-            "PDB write_all_frames is not implemented in this writer slice."};
-  }
   if (options.frame >= molecule.number_of_frames()) {
     return {IoCode::format_error, "PDB write frame is out of range."};
   }
@@ -569,45 +565,74 @@ IoStatus PdbWriter::write_pdb(const std::filesystem::path& filename,
                                     filename.string()};
   }
 
-  if (options.model_number > 0) {
-    output << "MODEL " << options.model_number << '\n';
-  }
+  auto write_frame = [&](std::size_t frame) -> IoStatus {
+    for (std::size_t atom = 0; atom < molecule.natoms(); ++atom) {
+      int atom_index = molecule.index()[atom];
+      if (atom_index > 99999) atom_index = 99999;
+      if (atom_index < -9999) atom_index = -9999;
+      int resid = molecule.resid()[atom];
+      if (resid > 9999) resid = 9999;
+      if (resid < -999) resid = -999;
 
-  for (std::size_t atom = 0; atom < molecule.natoms(); ++atom) {
-    int atom_index = molecule.index()[atom];
-    if (atom_index > 99999) atom_index = 99999;
-    if (atom_index < -9999) atom_index = -9999;
-    int resid = molecule.resid()[atom];
-    if (resid > 9999) resid = 9999;
-    if (resid < -999) resid = -999;
+      const auto xyz = molecule.coordinate(frame, atom);
+      output << std::left << std::setw(6) << molecule.record()[atom]
+             << std::right << std::setw(5) << atom_index << ' ' << std::left
+             << std::setw(4) << molecule.name()[atom]
+             << fixed_slice(molecule.loc()[atom], 0, 1) << std::setw(4)
+             << molecule.resname()[atom]
+             << fixed_slice(molecule.chain()[atom], 0, 1) << std::right
+             << std::setw(4) << resid << fixed_slice(molecule.rescode()[atom], 0, 1)
+             << "   " << std::fixed << std::setprecision(3) << std::setw(8)
+             << static_cast<double>(xyz.x) << std::setw(8)
+             << static_cast<double>(xyz.y) << std::setw(8)
+             << static_cast<double>(xyz.z) << std::setw(6)
+             << molecule.occupancy()[atom] << std::setw(6)
+             << molecule.beta()[atom] << "      " << std::left << std::setw(4)
+             << molecule.segname()[atom] << std::right << std::setw(2)
+             << molecule.element()[atom] << std::setw(2) << molecule.charge()[atom]
+             << '\n';
+    }
+    if (!output) {
+      return {IoCode::file_error, "Failed while writing PDB atom records."};
+    }
+    return IoStatus::success();
+  };
 
-    const auto xyz = molecule.coordinate(options.frame, atom);
-    output << std::left << std::setw(6) << molecule.record()[atom]
-           << std::right << std::setw(5) << atom_index << ' ' << std::left
-           << std::setw(4) << molecule.name()[atom]
-           << fixed_slice(molecule.loc()[atom], 0, 1) << std::setw(4)
-           << molecule.resname()[atom] << fixed_slice(molecule.chain()[atom], 0, 1)
-           << std::right << std::setw(4) << resid
-           << fixed_slice(molecule.rescode()[atom], 0, 1) << "   "
-           << std::fixed << std::setprecision(3) << std::setw(8)
-           << static_cast<double>(xyz.x) << std::setw(8)
-           << static_cast<double>(xyz.y) << std::setw(8)
-           << static_cast<double>(xyz.z) << std::setw(6)
-           << molecule.occupancy()[atom] << std::setw(6) << molecule.beta()[atom]
-           << "      " << std::left << std::setw(4) << molecule.segname()[atom]
-           << std::right << std::setw(2) << molecule.element()[atom] << std::setw(2)
-           << molecule.charge()[atom] << '\n';
-  }
-
-  if (options.model_number > 0 && !options.final) {
-    output << "ENDMDL\n";
-  } else {
+  if (options.write_all_frames) {
+    for (std::size_t frame = 0; frame < molecule.number_of_frames(); ++frame) {
+      output << "MODEL " << (frame + 1) << '\n';
+      auto status = write_frame(frame);
+      if (!status) {
+        return status;
+      }
+      output << "ENDMDL\n";
+    }
     if (options.include_conect) {
       for (const auto& line : create_conect_pdb_lines(molecule)) {
         output << line << '\n';
       }
     }
     output << "END\n";
+  } else {
+    if (options.model_number > 0) {
+      output << "MODEL " << options.model_number << '\n';
+    }
+
+    auto status = write_frame(options.frame);
+    if (!status) {
+      return status;
+    }
+
+    if (options.model_number > 0 && !options.final) {
+      output << "ENDMDL\n";
+    } else {
+      if (options.include_conect) {
+        for (const auto& line : create_conect_pdb_lines(molecule)) {
+          output << line << '\n';
+        }
+      }
+      output << "END\n";
+    }
   }
   if (!output) {
     return {IoCode::file_error, "Failed while writing PDB file: " +

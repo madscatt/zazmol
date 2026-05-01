@@ -444,6 +444,45 @@ void test_write_pdb_conect_output() {
   std::filesystem::remove(output);
 }
 
+void test_write_pdb_all_frames_model_round_trip() {
+  sasmol::PdbReader reader;
+  sasmol::PdbWriter writer;
+  sasmol::Molecule source;
+  auto status =
+      reader.read_pdb(fixture_path("pdb_common", "1ATM-1to2.pdb"), source);
+  assert(status.ok());
+
+  const auto output =
+      std::filesystem::temp_directory_path() / "sasmol_all_frames_model.pdb";
+  sasmol::PdbWriteOptions options;
+  options.write_all_frames = true;
+  status = writer.write_pdb(output, source, options);
+  assert(status.ok());
+
+  std::ifstream input(output);
+  std::string content((std::istreambuf_iterator<char>(input)),
+                      std::istreambuf_iterator<char>());
+  assert(content.find("MODEL 1\n") != std::string::npos);
+  assert(content.find("MODEL 2\n") != std::string::npos);
+  assert(content.rfind("END\n") != std::string::npos);
+
+  sasmol::Molecule round_trip;
+  status = reader.read_pdb(output, round_trip);
+  assert(status.ok());
+  assert(round_trip.natoms() == 1);
+  assert(round_trip.number_of_frames() == 2);
+  auto xyz = round_trip.coordinate(0, 0);
+  assert_close(xyz.x, 76.944F);
+  assert_close(xyz.y, 41.799F);
+  assert_close(xyz.z, 41.652F);
+  xyz = round_trip.coordinate(1, 0);
+  assert_close(xyz.x, 73.944F);
+  assert_close(xyz.y, 38.799F);
+  assert_close(xyz.z, 41.652F);
+
+  std::filesystem::remove(output);
+}
+
 void test_read_pdb_multi_frame_is_explicitly_deferred() {
   sasmol::PdbReader reader;
   sasmol::Molecule mol;
@@ -523,6 +562,7 @@ int main() {
   test_write_pdb_selected_multiframe_frame_round_trip();
   test_write_pdb_model_endmdl_output();
   test_write_pdb_conect_output();
+  test_write_pdb_all_frames_model_round_trip();
   test_read_pdb_multi_frame_is_explicitly_deferred();
   test_read_pdb_end_separated_multiframe_coordinates();
   test_read_pdb_model_multiframe_coordinates();

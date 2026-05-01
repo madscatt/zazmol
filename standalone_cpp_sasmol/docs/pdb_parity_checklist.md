@@ -113,3 +113,4 @@ surface and helper tests:
    and `pdbscan` CONECT parsing.
 8. Added single-frame `write_pdb` round-trip coverage for `1ATM` and `2AAD`.
 9. Added selected-frame write support, MODEL/ENDMDL output, and CONECT output.
+10. Added `write_all_frames` multi-model output with C++ readback coverage.
