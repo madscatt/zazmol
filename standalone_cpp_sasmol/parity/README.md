@@ -20,7 +20,7 @@ reviewed, implemented, deferred, or intentionally expressed differently in C++.
 | `config.COORD_DTYPE` | `sasmol::coord_type` | implemented | `float`, matching storage-friendly coordinate intent. |
 | `config.CALC_DTYPE` | `sasmol::calc_type` | implemented | `double`, matching calculation-friendly intent. |
 | PDB I/O | `PdbReader` / `PdbWriter` | required | Contract API added; parser deferred until tolerant fixture parity is reviewed. |
-| DCD I/O | `DcdReader` / `DcdWriter` | required | Reader implemented for normal full-coordinate small fixtures; writer round-trips through C++ reader for `1ATM` and `2AAD`. |
+| DCD I/O | `DcdReader` / `DcdWriter` | required | Reader implemented for normal full-coordinate small fixtures; writer round-trips through C++ reader for `1ATM`, `2AAD`, and `rna-1to10`. |
 | calculations | free functions / module namespaces | deferred | Port only after file and descriptor parity are stable. |
 | GPU/MPI backends | optional backends | deferred | Data views are being shaped now; dependencies wait. |
 

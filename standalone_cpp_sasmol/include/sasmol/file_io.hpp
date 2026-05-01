@@ -126,6 +126,9 @@ class DcdWriter {
   [[nodiscard]] IoStatus write_dcd_step(const Molecule& molecule,
                                         std::size_t frame, std::size_t step);
   [[nodiscard]] IoStatus close_dcd_write();
+  [[nodiscard]] IoStatus write_dcd(const std::filesystem::path& filename,
+                                   const Molecule& molecule,
+                                   const DcdWriteOptions& options = {});
 
   [[nodiscard]] bool is_open() const noexcept { return open_; }
 

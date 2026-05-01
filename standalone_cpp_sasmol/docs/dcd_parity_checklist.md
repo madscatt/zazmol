@@ -157,10 +157,28 @@ Completed first DCD writing slice with the same narrowness:
 
 ## Proposed Next Implementation Slice
 
-Add cross-reader validation and a convenience write wrapper:
+Completed cross-reader preparation and convenience write wrapper:
 
-1. Add `DcdWriter::write_dcd(filename, molecule)` as open/header/all-steps/close.
-2. Test C++ writer output read by C++ reader for `rna-1to10`.
-3. Add a Python-side validation script or documented command to verify C++
+1. Added `DcdWriter::write_dcd(filename, molecule)` as
+   open/header/all-steps/close.
+2. Tested C++ writer output read by C++ reader for `rna-1to10`.
+3. Added a Python-side validation script to verify C++
    generated DCDs with Python `zazmol` before claiming full parity.
-4. Keep huge-file tests separate.
+4. Kept huge-file tests separate.
+
+Python-side validation command:
+
+```bash
+python3 standalone_cpp_sasmol/tools/validate_dcd_with_python.py path/to/file.dcd
+```
+
+## Proposed Next Implementation Slice
+
+Add deliberate Python cross-reader parity fixtures:
+
+1. Generate C++ written DCD files for `1ATM`, `2AAD`, and `rna-1to10`.
+2. Validate them with Python `zazmol` using
+   `tools/validate_dcd_with_python.py`.
+3. Record the results in docs without making Python an unconditional CTest
+   dependency.
+4. Then decide whether to start PDB I/O contracts or expand DCD writer options.

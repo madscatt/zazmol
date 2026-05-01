@@ -287,6 +287,32 @@ void test_writer_round_trips_2aad() {
                            3644.294, 0.01);
 }
 
+void test_writer_convenience_round_trips_rna() {
+  sasmol::DcdReader reader;
+  sasmol::Molecule source;
+  auto status = reader.read_dcd(fixture_path("rna-1to10.dcd"), source);
+  assert(status.ok());
+
+  const auto output = temp_dcd_path("sasmol_cpp_rna_roundtrip.dcd");
+  sasmol::DcdWriter writer;
+  status = writer.write_dcd(output, source);
+  assert(status.ok());
+  assert(!writer.is_open());
+
+  sasmol::Molecule round_trip;
+  status = reader.read_dcd(output, round_trip);
+  assert(status.ok());
+  assert(round_trip.natoms() == 10632);
+  assert(round_trip.number_of_frames() == 10);
+  const auto xyz = round_trip.coordinate(9, 10631);
+  assert_close(xyz.x, -6.392F);
+  assert_close(xyz.y, 14.348F);
+  assert_close(xyz.z, 20.914F);
+  assert_close_double(coordinate_sum(round_trip), -430804.378, 0.1);
+
+  std::filesystem::remove(output);
+}
+
 }  // namespace
 
 int main() {
@@ -303,5 +329,6 @@ int main() {
   test_whole_trajectory_read_rna();
   test_writer_round_trips_1atm();
   test_writer_round_trips_2aad();
+  test_writer_convenience_round_trips_rna();
   return 0;
 }
