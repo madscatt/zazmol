@@ -1,10 +1,12 @@
 #include "sasmol/calculate.hpp"
 
+#include "sasmol/file_io.hpp"
 #include "sasmol/properties.hpp"
 
 #include <algorithm>
 #include <cmath>
 #include <limits>
+#include <sstream>
 #include <stdexcept>
 
 namespace sasmol {
@@ -119,6 +121,33 @@ std::pair<std::array<calc_type, 3>, CalcMatrix3> symmetric_eigen_decomposition(
                                        matrix[2][2]};
   sort_eigens_ascending(eigenvalues, eigenvectors);
   return {eigenvalues, eigenvectors};
+}
+
+void throw_if_io_failed(const IoStatus& status, const char* context) {
+  if (status.ok()) {
+    return;
+  }
+  std::ostringstream message;
+  message << context << ": " << status.message;
+  throw std::runtime_error(message.str());
+}
+
+void update_bounds(CoordinateBounds& bounds, const Vec3& xyz) {
+  if (xyz.x < bounds.minimum.x) bounds.minimum.x = xyz.x;
+  if (xyz.y < bounds.minimum.y) bounds.minimum.y = xyz.y;
+  if (xyz.z < bounds.minimum.z) bounds.minimum.z = xyz.z;
+  if (xyz.x > bounds.maximum.x) bounds.maximum.x = xyz.x;
+  if (xyz.y > bounds.maximum.y) bounds.maximum.y = xyz.y;
+  if (xyz.z > bounds.maximum.z) bounds.maximum.z = xyz.z;
+}
+
+CoordinateBounds empty_bounds() {
+  return {{std::numeric_limits<coord_type>::max(),
+           std::numeric_limits<coord_type>::max(),
+           std::numeric_limits<coord_type>::max()},
+          {std::numeric_limits<coord_type>::lowest(),
+           std::numeric_limits<coord_type>::lowest(),
+           std::numeric_limits<coord_type>::lowest()}};
 }
 
 }  // namespace
@@ -321,26 +350,14 @@ CoordinateBounds calculate_minimum_and_maximum(
     throw std::invalid_argument("calculate_minimum_and_maximum requires frames");
   }
 
-  CoordinateBounds bounds{
-      {std::numeric_limits<coord_type>::max(),
-       std::numeric_limits<coord_type>::max(),
-       std::numeric_limits<coord_type>::max()},
-      {std::numeric_limits<coord_type>::lowest(),
-       std::numeric_limits<coord_type>::lowest(),
-       std::numeric_limits<coord_type>::lowest()}};
+  auto bounds = empty_bounds();
 
   for (const auto frame : selected_frames) {
     if (frame >= molecule.number_of_frames()) {
       throw std::out_of_range("calculate_minimum_and_maximum frame is out of range");
     }
     for (std::size_t atom = 0; atom < molecule.natoms(); ++atom) {
-      const auto xyz = molecule.coordinate(frame, atom);
-      if (xyz.x < bounds.minimum.x) bounds.minimum.x = xyz.x;
-      if (xyz.y < bounds.minimum.y) bounds.minimum.y = xyz.y;
-      if (xyz.z < bounds.minimum.z) bounds.minimum.z = xyz.z;
-      if (xyz.x > bounds.maximum.x) bounds.maximum.x = xyz.x;
-      if (xyz.y > bounds.maximum.y) bounds.maximum.y = xyz.y;
-      if (xyz.z > bounds.maximum.z) bounds.maximum.z = xyz.z;
+      update_bounds(bounds, molecule.coordinate(frame, atom));
     }
   }
 
@@ -352,8 +369,48 @@ CoordinateBounds calculate_minimum_and_maximum_all_steps(
   return calculate_minimum_and_maximum(molecule);
 }
 
+CoordinateBounds calculate_minimum_and_maximum_all_steps(
+    const std::filesystem::path& trajectory_filename) {
+  DcdReader reader;
+  DcdHeader header;
+  auto status = reader.open_dcd_read(trajectory_filename);
+  throw_if_io_failed(status, "opening DCD for min/max calculation");
+  status = reader.read_header(header);
+  if (!status) {
+    (void)reader.close_dcd_read();
+    throw_if_io_failed(status, "reading DCD header for min/max calculation");
+  }
+  if (header.natoms == 0 || header.nframes == 0) {
+    (void)reader.close_dcd_read();
+    throw std::invalid_argument(
+        "calculate_minimum_and_maximum_all_steps requires atoms and frames");
+  }
+
+  auto bounds = empty_bounds();
+  std::vector<Vec3> coordinates;
+  for (std::size_t frame = 0; frame < header.nframes; ++frame) {
+    status = reader.read_next_frame_coordinates(coordinates);
+    if (!status) {
+      (void)reader.close_dcd_read();
+      throw_if_io_failed(status, "reading DCD frame for min/max calculation");
+    }
+    for (const auto& xyz : coordinates) {
+      update_bounds(bounds, xyz);
+    }
+  }
+
+  status = reader.close_dcd_read();
+  throw_if_io_failed(status, "closing DCD after min/max calculation");
+  return bounds;
+}
+
 CoordinateBounds calc_minmax_all_steps(const Molecule& molecule) {
   return calculate_minimum_and_maximum_all_steps(molecule);
+}
+
+CoordinateBounds calc_minmax_all_steps(
+    const std::filesystem::path& trajectory_filename) {
+  return calculate_minimum_and_maximum_all_steps(trajectory_filename);
 }
 
 }  // namespace sasmol

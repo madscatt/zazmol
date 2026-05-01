@@ -142,6 +142,8 @@ class DcdReader {
   [[nodiscard]] IoStatus open_dcd_read(const std::filesystem::path& filename,
                                        const DcdReadOptions& options = {});
   [[nodiscard]] IoStatus read_header(DcdHeader& header);
+  [[nodiscard]] IoStatus read_next_frame_coordinates(
+      std::vector<Vec3>& coordinates);
   [[nodiscard]] IoStatus read_next_frame(Molecule& molecule);
   [[nodiscard]] IoStatus close_dcd_read();
 

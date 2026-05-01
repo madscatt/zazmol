@@ -1054,7 +1054,7 @@ IoStatus DcdReader::read_header(DcdHeader& header) {
   return IoStatus::success();
 }
 
-IoStatus DcdReader::read_next_frame(Molecule& molecule) {
+IoStatus DcdReader::read_next_frame_coordinates(std::vector<Vec3>& coordinates) {
   if (!open_) {
     return {IoCode::not_open, "DCD reader is not open."};
   }
@@ -1091,7 +1091,7 @@ IoStatus DcdReader::read_next_frame(Molecule& molecule) {
     }
     std::int32_t block_size{};
     std::memcpy(&block_size, &raw_size, sizeof(block_size));
-  if (block_size < 0) {
+    if (block_size < 0) {
       return {IoCode::format_error, "Invalid negative DCD unit-cell block."};
     }
     auto status = skip_bytes(stream_, block_size, "skipping DCD unit-cell block");
@@ -1147,16 +1147,32 @@ IoStatus DcdReader::read_next_frame(Molecule& molecule) {
     }
   }
 
+  coordinates.resize(header_.natoms);
+  for (std::size_t atom = 0; atom < header_.natoms; ++atom) {
+    coordinates[atom] = {x[atom], y[atom], z[atom]};
+  }
+
+  ++current_frame_;
+  return IoStatus::success();
+}
+
+IoStatus DcdReader::read_next_frame(Molecule& molecule) {
+  const auto frame = current_frame_;
+  std::vector<Vec3> coordinates;
+  auto status = read_next_frame_coordinates(coordinates);
+  if (!status) {
+    return status;
+  }
+
   if (molecule.natoms() != header_.natoms ||
       molecule.number_of_frames() != header_.nframes) {
     molecule.resize(header_.natoms, header_.nframes);
   }
 
   for (std::size_t atom = 0; atom < header_.natoms; ++atom) {
-    molecule.set_coordinate(current_frame_, atom, {x[atom], y[atom], z[atom]});
+    molecule.set_coordinate(frame, atom, coordinates[atom]);
   }
 
-  ++current_frame_;
   return IoStatus::success();
 }
 

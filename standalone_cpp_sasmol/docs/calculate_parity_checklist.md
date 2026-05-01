@@ -96,7 +96,18 @@ Implemented `calculate_principal_moments_of_inertia(molecule, frame)`:
 - one-atom tensors are reported as singular rather than assigned unstable
   principal axes
 
+## DCD Min/Max Streaming Slice
+
+Implemented DCD trajectory overloads:
+
+- `calculate_minimum_and_maximum_all_steps(trajectory_filename)`
+- `calc_minmax_all_steps(trajectory_filename)`
+- streams frame coordinates through `DcdReader` without allocating a full
+  trajectory molecule
+- keeps the existing loaded-molecule overloads unchanged
+- fixture parity for `1ATM.dcd`
+- loaded-versus-streamed parity for `2AAD.dcd`
+
 ## Deferred
 
-- DCD streaming overloads for `calculate_minimum_and_maximum_all_steps`
 - alignment-dependent calculations

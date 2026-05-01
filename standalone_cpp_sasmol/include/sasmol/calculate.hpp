@@ -4,6 +4,7 @@
 
 #include <array>
 #include <cstddef>
+#include <filesystem>
 #include <map>
 #include <string>
 #include <vector>
@@ -62,6 +63,12 @@ void calculate_residue_charge(Molecule& molecule);
 [[nodiscard]] CoordinateBounds calculate_minimum_and_maximum_all_steps(
     const Molecule& molecule);
 
+[[nodiscard]] CoordinateBounds calculate_minimum_and_maximum_all_steps(
+    const std::filesystem::path& trajectory_filename);
+
 [[nodiscard]] CoordinateBounds calc_minmax_all_steps(const Molecule& molecule);
+
+[[nodiscard]] CoordinateBounds calc_minmax_all_steps(
+    const std::filesystem::path& trajectory_filename);
 
 }  // namespace sasmol

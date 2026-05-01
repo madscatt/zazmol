@@ -519,6 +519,30 @@ void test_calculate_minimum_and_maximum_all_steps_alias() {
   assert_bounds_close(alias, primary.minimum, primary.maximum);
 }
 
+void test_calculate_minimum_and_maximum_all_steps_streams_dcd() {
+  const auto bounds = sasmol::calculate_minimum_and_maximum_all_steps(
+      fixture_path("dcd_common", "1ATM.dcd"));
+  const auto alias =
+      sasmol::calc_minmax_all_steps(fixture_path("dcd_common", "1ATM.dcd"));
+
+  assert_bounds_close(bounds, {73.944F, 38.799F, 41.652F},
+                      {76.944F, 41.799F, 41.652F});
+  assert_bounds_close(alias, bounds.minimum, bounds.maximum);
+}
+
+void test_calculate_minimum_and_maximum_dcd_matches_loaded_trajectory() {
+  sasmol::DcdReader reader;
+  sasmol::Molecule mol;
+  const auto path = fixture_path("dcd_common", "2AAD.dcd");
+  const auto status = reader.read_dcd(path, mol);
+  assert(status.ok());
+
+  const auto loaded = sasmol::calculate_minimum_and_maximum(mol);
+  const auto streamed = sasmol::calculate_minimum_and_maximum_all_steps(path);
+
+  assert_bounds_close(streamed, loaded.minimum, loaded.maximum);
+}
+
 }  // namespace
 
 int main() {
@@ -550,5 +574,7 @@ int main() {
   test_calculate_minimum_and_maximum_pdb_fixture_2aad();
   test_calculate_minimum_and_maximum_pdb_fixture_1crn();
   test_calculate_minimum_and_maximum_all_steps_alias();
+  test_calculate_minimum_and_maximum_all_steps_streams_dcd();
+  test_calculate_minimum_and_maximum_dcd_matches_loaded_trajectory();
   return 0;
 }
