@@ -200,6 +200,54 @@ void test_parse_pdb_atom_record_rejects_bad_required_numbers() {
   assert(status.code == sasmol::IoCode::format_error);
 }
 
+void test_resolve_pdb_element_matches_python_core_cases() {
+  sasmol::PdbReader reader;
+
+  auto resolved = reader.resolve_pdb_element("CD", "CD");
+  assert(resolved.status.ok());
+  assert(resolved.element == "CD");
+
+  resolved = reader.resolve_pdb_element("CD", "RES");
+  assert(resolved.status.ok());
+  assert(resolved.element == "C");
+
+  resolved = reader.resolve_pdb_element("SOD", "RES");
+  assert(resolved.status.ok());
+  assert(resolved.element == "NA");
+
+  resolved = reader.resolve_pdb_element("CAL", "RES");
+  assert(resolved.status.ok());
+  assert(resolved.element == "CA");
+
+  resolved = reader.resolve_pdb_element("FE", "RES");
+  assert(resolved.status.ok());
+  assert(resolved.element == "FE");
+
+  resolved = reader.resolve_pdb_element("OXT", "RES");
+  assert(resolved.status.ok());
+  assert(resolved.element == "O");
+
+  resolved = reader.resolve_pdb_element("1H11", "RES");
+  assert(resolved.status.ok());
+  assert(resolved.element == "H");
+
+  resolved = reader.resolve_pdb_element("11H", "RES");
+  assert(resolved.status.code == sasmol::IoCode::format_error);
+}
+
+void test_parse_pdb_atom_record_resolves_blank_element() {
+  sasmol::PdbReader reader;
+  sasmol::PdbAtomRecord atom;
+  std::string line =
+      "ATOM      1  FE  HEM A   1      11.100  12.200  13.300  1.00  0.00";
+  line.resize(80, ' ');
+
+  const auto status = reader.parse_pdb_atom_record(line, atom);
+
+  assert(status.ok());
+  assert(atom.element == "FE");
+}
+
 void test_read_pdb_single_frame_1atm() {
   sasmol::PdbReader reader;
   sasmol::Molecule mol;
@@ -746,6 +794,8 @@ int main() {
   test_parse_pdb_atom_record_uses_sasmol_field_names();
   test_parse_pdb_atom_record_preserves_altloc_in_pdbscan_mode();
   test_parse_pdb_atom_record_rejects_bad_required_numbers();
+  test_resolve_pdb_element_matches_python_core_cases();
+  test_parse_pdb_atom_record_resolves_blank_element();
   test_read_pdb_single_frame_1atm();
   test_read_pdb_single_frame_2aad_descriptors();
   test_read_pdb_classifies_rna_moltype();

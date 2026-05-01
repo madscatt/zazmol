@@ -69,6 +69,11 @@ struct PdbAtomRecord {
   std::string charge;
 };
 
+struct PdbElementResult {
+  IoStatus status;
+  std::string element;
+};
+
 struct PdbWriteOptions {
   std::size_t frame{0};
   bool write_all_frames{false};
@@ -89,6 +94,8 @@ class PdbReader {
   [[nodiscard]] IoStatus parse_pdb_atom_record(
       const std::string& line, PdbAtomRecord& record,
       const PdbReadOptions& options = {}) const;
+  [[nodiscard]] PdbElementResult resolve_pdb_element(
+      const std::string& name, const std::string& resname) const;
 
   [[nodiscard]] static constexpr bool tolerant_by_default() noexcept {
     return true;

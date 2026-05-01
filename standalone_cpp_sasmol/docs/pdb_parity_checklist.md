@@ -122,6 +122,9 @@ surface and helper tests:
     default writes fail cleanly when optional descriptor vectors are missing,
     `fill_missing_optional` supplies Python-compatible optional defaults, and
     missing required descriptors remain errors.
+14. Added core PDB element resolution for blank element fields: conflict atom
+    names, isotope/salt aliases, known heavy elements, first-letter fallback,
+    digit-prefixed fallback, and invalid-name errors.
 
 ## Proposed Next Validation Slice
 

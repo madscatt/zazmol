@@ -3,6 +3,7 @@
 #include <algorithm>
 #include <array>
 #include <bit>
+#include <cctype>
 #include <cstdint>
 #include <cstring>
 #include <ios>
@@ -180,6 +181,21 @@ std::string trim_copy(std::string value) {
   return value.substr(first, last - first + 1);
 }
 
+std::string uppercase(std::string value) {
+  std::transform(value.begin(), value.end(), value.begin(), [](unsigned char c) {
+    return static_cast<char>(std::toupper(c));
+  });
+  return value;
+}
+
+bool is_alpha(char c) {
+  return std::isalpha(static_cast<unsigned char>(c)) != 0;
+}
+
+bool is_digit(char c) {
+  return std::isdigit(static_cast<unsigned char>(c)) != 0;
+}
+
 std::string fixed_slice(const std::string& line, std::size_t start,
                         std::size_t count) {
   if (start >= line.size()) {
@@ -277,6 +293,25 @@ std::string moltype_for_resname(const std::string& resname) {
   if (dna.contains(resname)) return "dna";
   if (water.contains(resname)) return "water";
   return "other";
+}
+
+const std::set<std::string>& pdb_conflict_atom_names() {
+  static const std::set<std::string> names = {"CD", "CE", "HE", "HG", "NE",
+                                              "ND", "NB", "PB", "PA"};
+  return names;
+}
+
+const std::set<std::string>& pdb_other_element_names() {
+  static const std::set<std::string> names = {
+      "AS", "AG", "AL", "AR", "AC", "AT", "AU", "BI", "BE", "B",  "BR",
+      "BA", "CR", "CS", "CU", "CO", "D",  "DY", "EU", "ER", "F",  "FE",
+      "FR", "GA", "GE", "GD", "HO", "HF", "IN", "I",  "IR", "K",  "KR",
+      "LI", "LA", "LU", "MG", "MN", "MO", "NE", "NI", "OS", "PD", "PR",
+      "PM", "PT", "PO", "RB", "RU", "RH", "RE", "RN", "RA", "SI", "SC",
+      "SE", "SR", "SN", "SB", "SM", "TI", "TC", "TE", "TB", "TA", "TL",
+      "TH", "U",  "V",  "W",  "XE", "Y",  "YB", "ZN", "ZR", "SS", "CAL",
+      "DUM", "POT", "CES", "CLA"};
+  return names;
 }
 
 bool all_equal(const std::vector<std::size_t>& values) {
@@ -561,6 +596,15 @@ IoStatus PdbReader::parse_pdb_atom_record(
   if (!options.pdbscan && parsed.element.empty()) {
     parsed.element = "  ";
   }
+  if (options.resolve_elements &&
+      (parsed.element.empty() || parsed.element == " " ||
+       parsed.element == "  ")) {
+    const auto resolved = resolve_pdb_element(parsed.name, parsed.resname);
+    if (!resolved.status) {
+      return resolved.status;
+    }
+    parsed.element = resolved.element;
+  }
 
   parsed.charge = trim_copy(fixed_slice(line, 78, 2));
   if (!options.pdbscan && parsed.charge.empty()) {
@@ -569,6 +613,62 @@ IoStatus PdbReader::parse_pdb_atom_record(
 
   record = parsed;
   return IoStatus::success();
+}
+
+PdbElementResult PdbReader::resolve_pdb_element(
+    const std::string& name, const std::string& resname) const {
+  const auto atom_name = uppercase(trim_copy(name));
+  const auto residue_name = uppercase(trim_copy(resname));
+
+  if (atom_name.empty()) {
+    return {{IoCode::format_error, "PDB atom name is empty."}, ""};
+  }
+  if (pdb_conflict_atom_names().contains(atom_name) &&
+      atom_name == residue_name) {
+    return {IoStatus::success(), atom_name};
+  }
+  if (atom_name == "1H") {
+    return {IoStatus::success(), "1H"};
+  }
+  if (atom_name == "2H") {
+    return {IoStatus::success(), "D"};
+  }
+  if (atom_name == "SOD") {
+    return {IoStatus::success(), "NA"};
+  }
+  if (atom_name == "POT") {
+    return {IoStatus::success(), "K"};
+  }
+  if (atom_name == "CAL") {
+    return {IoStatus::success(), "CA"};
+  }
+  if (atom_name == "CLA") {
+    return {IoStatus::success(), "CL"};
+  }
+  if (atom_name == "CES") {
+    return {IoStatus::success(), "CS"};
+  }
+  if (atom_name == "F2'") {
+    return {IoStatus::success(), "F"};
+  }
+  if (pdb_other_element_names().contains(atom_name)) {
+    return {IoStatus::success(), atom_name};
+  }
+  if (is_alpha(atom_name.front())) {
+    return {IoStatus::success(), std::string(1, atom_name.front())};
+  }
+  if (is_digit(atom_name.front()) && atom_name.size() > 1 &&
+      is_alpha(atom_name[1])) {
+    return {IoStatus::success(), std::string(1, atom_name[1])};
+  }
+  if (is_digit(atom_name.front())) {
+    return {{IoCode::format_error,
+             "PDB atom name starts with two non-element digits."},
+            ""};
+  }
+  return {{IoCode::format_error,
+           "PDB atom name does not start with an element character."},
+          ""};
 }
 
 IoStatus PdbWriter::write_pdb(const std::filesystem::path& filename,
