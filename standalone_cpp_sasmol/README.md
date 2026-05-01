@@ -30,13 +30,15 @@ The first milestone is the core data model and parity machinery:
 - storage-friendly `coord_type` and calculation-friendly `calc_type`
 - integrity reporting that names descriptor length mismatches
 - file I/O contract types for PDB/DCD readers and writers
+- coordinate-bounds calculation parity
 - a read-only parity ledger generator for surveying Python `zazmol`
 
 This is not yet a feature-complete port of Python SasMol.
 
 The PDB/DCD APIs are defined in
-[`docs/file_io_contract.md`](docs/file_io_contract.md), but parser internals are
-intentionally deferred until fixture parity is reviewed.
+[`docs/file_io_contract.md`](docs/file_io_contract.md). Calculation parity is
+tracked in
+[`docs/calculate_parity_checklist.md`](docs/calculate_parity_checklist.md).
 
 ## Build
 

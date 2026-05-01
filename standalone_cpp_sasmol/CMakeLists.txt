@@ -10,6 +10,7 @@ project(
 option(SASMOL_ENABLE_SANITIZERS "Build with AddressSanitizer and UndefinedBehaviorSanitizer" OFF)
 
 add_library(sasmol_standalone
+  src/calculate.cpp
   src/file_io.cpp
   src/molecule.cpp
 )
@@ -59,6 +60,13 @@ if(BUILD_TESTING)
     SASMOL_TEST_DATA_DIR="${CMAKE_CURRENT_SOURCE_DIR}/../src/python/test_sasmol/data"
   )
   add_test(NAME file_io_contract COMMAND test_file_io_contract)
+
+  add_executable(test_calculate tests/test_calculate.cpp)
+  target_link_libraries(test_calculate PRIVATE sasmol_standalone)
+  target_compile_definitions(test_calculate PRIVATE
+    SASMOL_TEST_DATA_DIR="${CMAKE_CURRENT_SOURCE_DIR}/../src/python/test_sasmol/data"
+  )
+  add_test(NAME calculate COMMAND test_calculate)
 
   add_executable(test_dcd_reader tests/test_dcd_reader.cpp)
   target_link_libraries(test_dcd_reader PRIVATE sasmol_standalone)
