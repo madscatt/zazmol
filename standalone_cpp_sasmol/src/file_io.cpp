@@ -261,21 +261,37 @@ IoStatus PdbReader::read_pdb(const std::filesystem::path& filename,
   if (!status) {
     return status;
   }
-  if (scan.nframes != 1) {
-    return {IoCode::unsupported,
-            "PDB descriptor population currently supports one frame only."};
-  }
-
   std::ifstream input(filename);
   if (!input) {
     return {IoCode::file_error, "Failed to open PDB file: " + filename.string()};
   }
 
   molecule.resize(scan.natoms, scan.nframes);
+  std::size_t frame_index = 0;
   std::size_t atom_index = 0;
   std::string line;
   while (std::getline(input, line)) {
     const auto record = pdb_record_name(line);
+    if (record == "END" && scan.mode == PdbFrameMode::end_records) {
+      if (atom_index != 0) {
+        if (atom_index != scan.natoms) {
+          return {IoCode::format_error,
+                  "PDB END frame has fewer atoms than pre-scan."};
+        }
+        ++frame_index;
+        atom_index = 0;
+      }
+      continue;
+    }
+    if (record == "ENDMDL" && scan.mode == PdbFrameMode::model_records) {
+      if (atom_index != scan.natoms) {
+        return {IoCode::format_error,
+                "PDB MODEL frame has fewer atoms than pre-scan."};
+      }
+      ++frame_index;
+      atom_index = 0;
+      continue;
+    }
     if (!is_pdb_coordinate_record(record)) {
       continue;
     }
@@ -289,26 +305,36 @@ IoStatus PdbReader::read_pdb(const std::filesystem::path& filename,
       return status;
     }
 
-    molecule.record()[atom_index] = atom.record;
-    molecule.original_index()[atom_index] = atom.original_index;
-    molecule.index()[atom_index] = static_cast<int>(atom_index + 1);
-    molecule.name()[atom_index] = atom.name;
-    molecule.loc()[atom_index] = atom.loc;
-    molecule.resname()[atom_index] = atom.resname;
-    molecule.chain()[atom_index] = atom.chain;
-    molecule.resid()[atom_index] = atom.resid;
-    molecule.original_resid()[atom_index] = atom.resid;
-    molecule.rescode()[atom_index] = atom.rescode;
-    molecule.occupancy()[atom_index] = atom.occupancy;
-    molecule.beta()[atom_index] = atom.beta;
-    molecule.segname()[atom_index] = atom.segname;
-    molecule.element()[atom_index] = atom.element;
-    molecule.charge()[atom_index] = atom.charge;
-    molecule.set_coordinate(0, atom_index, atom.coordinate);
+    if (frame_index >= scan.nframes) {
+      return {IoCode::format_error, "PDB contains more frames than pre-scan."};
+    }
+    if (frame_index == 0) {
+      molecule.record()[atom_index] = atom.record;
+      molecule.original_index()[atom_index] = atom.original_index;
+      molecule.index()[atom_index] = static_cast<int>(atom_index + 1);
+      molecule.name()[atom_index] = atom.name;
+      molecule.loc()[atom_index] = atom.loc;
+      molecule.resname()[atom_index] = atom.resname;
+      molecule.chain()[atom_index] = atom.chain;
+      molecule.resid()[atom_index] = atom.resid;
+      molecule.original_resid()[atom_index] = atom.resid;
+      molecule.rescode()[atom_index] = atom.rescode;
+      molecule.occupancy()[atom_index] = atom.occupancy;
+      molecule.beta()[atom_index] = atom.beta;
+      molecule.segname()[atom_index] = atom.segname;
+      molecule.element()[atom_index] = atom.element;
+      molecule.charge()[atom_index] = atom.charge;
+    }
+    molecule.set_coordinate(frame_index, atom_index, atom.coordinate);
     ++atom_index;
   }
 
-  if (atom_index != scan.natoms) {
+  if (scan.mode == PdbFrameMode::single && atom_index == scan.natoms) {
+    frame_index = 1;
+    atom_index = 0;
+  }
+
+  if (atom_index != 0 || frame_index != scan.nframes) {
     return {IoCode::format_error, "PDB contains fewer atoms than pre-scan."};
   }
 

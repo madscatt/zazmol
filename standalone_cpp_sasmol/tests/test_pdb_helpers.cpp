@@ -250,7 +250,54 @@ void test_read_pdb_multi_frame_is_explicitly_deferred() {
   const auto status =
       reader.read_pdb(fixture_path("pdb_common", "1ATM-1to2.pdb"), mol);
 
-  assert(status.code == sasmol::IoCode::unsupported);
+  assert(status.ok());
+  assert(mol.natoms() == 1);
+  assert(mol.number_of_frames() == 2);
+  auto xyz = mol.coordinate(0, 0);
+  assert_close(xyz.x, 76.944F);
+  assert_close(xyz.y, 41.799F);
+  assert_close(xyz.z, 41.652F);
+  xyz = mol.coordinate(1, 0);
+  assert_close(xyz.x, 73.944F);
+  assert_close(xyz.y, 38.799F);
+  assert_close(xyz.z, 41.652F);
+}
+
+void test_read_pdb_end_separated_multiframe_coordinates() {
+  sasmol::PdbReader reader;
+  sasmol::Molecule mol;
+
+  const auto status =
+      reader.read_pdb(fixture_path("sasmol/file_io", "2AAD-1to3-END.pdb"), mol);
+
+  assert(status.ok());
+  assert(mol.natoms() == 15);
+  assert(mol.number_of_frames() == 3);
+  assert(mol.name()[0] == "N");
+  auto xyz = mol.coordinate(1, 0);
+  assert_close(xyz.x, -73.944F);
+  assert_close(xyz.y, 41.799F);
+  assert_close(xyz.z, 41.652F);
+  xyz = mol.coordinate(2, 14);
+  assert_close(xyz.x, 76.970F);
+  assert_close(xyz.y, -46.273F);
+  assert_close(xyz.z, 42.000F);
+}
+
+void test_read_pdb_model_multiframe_coordinates() {
+  sasmol::PdbReader reader;
+  sasmol::Molecule mol;
+
+  const auto status =
+      reader.read_pdb(fixture_path("sasmol/file_io", "2AAD-1to3-MODEL.pdb"), mol);
+
+  assert(status.ok());
+  assert(mol.natoms() == 15);
+  assert(mol.number_of_frames() == 3);
+  auto xyz = mol.coordinate(1, 0);
+  assert_close(xyz.x, -73.944F);
+  assert_close(xyz.y, 41.799F);
+  assert_close(xyz.z, 41.652F);
 }
 
 }  // namespace
@@ -267,5 +314,7 @@ int main() {
   test_read_pdb_single_frame_1atm();
   test_read_pdb_single_frame_2aad_descriptors();
   test_read_pdb_multi_frame_is_explicitly_deferred();
+  test_read_pdb_end_separated_multiframe_coordinates();
+  test_read_pdb_model_multiframe_coordinates();
   return 0;
 }

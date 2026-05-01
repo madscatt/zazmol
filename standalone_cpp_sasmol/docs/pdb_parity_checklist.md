@@ -107,4 +107,5 @@ surface and helper tests:
    field names/defaults.
 5. Added one-frame `read_pdb` descriptor/coordinate population for `1ATM` and
    `2AAD`.
-6. Multi-frame descriptor population remains explicitly deferred.
+6. Added multi-frame coordinate loading while preserving first-frame
+   descriptors for `1ATM-1to2`, END-separated `2AAD`, and MODEL/ENDMDL `2AAD`.
