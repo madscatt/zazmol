@@ -116,6 +116,8 @@ surface and helper tests:
 10. Added `write_all_frames` multi-model output with C++ readback coverage.
 11. Added larger fixture coverage for `rna-1to10.pdb` multi-frame reads,
     selected-frame RNA writes, and `1CRN.pdb` protein read/write round trips.
+12. Added direct fixture tests for no-terminal-`END` input and trailing-blank
+    tolerance.
 
 ## Proposed Next Validation Slice
 

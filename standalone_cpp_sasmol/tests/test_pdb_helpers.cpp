@@ -102,6 +102,8 @@ void test_pdb_frame_scan_fixtures() {
               sasmol::PdbFrameMode::model_records);
   assert_scan(fixture_path("sasmol/file_io", "1AA-NoEND.pdb"), 9, 1,
               sasmol::PdbFrameMode::single);
+  assert_scan(fixture_path("pdb_common", "dimcd_fixed_atoms.pdb"), 21362, 1,
+              sasmol::PdbFrameMode::end_records);
   assert_scan(fixture_path("pdb_common", "rna-1to10.pdb"), 10632, 10,
               sasmol::PdbFrameMode::end_records);
 }
@@ -301,6 +303,43 @@ void test_read_pdb_1crn_protein_fixture() {
   assert_close(xyz.x, 12.703F);
   assert_close(xyz.y, 4.973F);
   assert_close(xyz.z, 10.746F);
+}
+
+void test_read_pdb_accepts_single_frame_without_end() {
+  sasmol::PdbReader reader;
+  sasmol::Molecule mol;
+
+  const auto status =
+      reader.read_pdb(fixture_path("sasmol/file_io", "1AA-NoEND.pdb"), mol);
+
+  assert(status.ok());
+  assert(mol.natoms() == 9);
+  assert(mol.number_of_frames() == 1);
+  assert(mol.name()[0] == "N");
+  auto xyz = mol.coordinate(0, 0);
+  assert_close(xyz.x, -21.525F);
+  assert_close(xyz.y, -67.562F);
+  assert_close(xyz.z, 86.759F);
+  xyz = mol.coordinate(0, 8);
+  assert_close(xyz.x, -23.249F);
+  assert_close(xyz.y, -65.504F);
+  assert_close(xyz.z, 84.385F);
+}
+
+void test_read_pdb_accepts_trailing_blank_lines() {
+  sasmol::PdbReader reader;
+  sasmol::Molecule mol;
+
+  const auto status =
+      reader.read_pdb(fixture_path("pdb_common", "dimcd_fixed_atoms.pdb"), mol);
+
+  assert(status.ok());
+  assert(mol.natoms() == 21362);
+  assert(mol.number_of_frames() == 1);
+  const auto xyz = mol.coordinate(0, 10);
+  assert_close(xyz.x, 65.124F);
+  assert_close(xyz.y, 35.624F);
+  assert_close(xyz.z, 50.733F);
 }
 
 void test_read_pdb_check_zero_coor_guard() {
@@ -638,6 +677,8 @@ int main() {
   test_read_pdb_classifies_rna_moltype();
   test_read_pdb_rna_multiframe_fixture();
   test_read_pdb_1crn_protein_fixture();
+  test_read_pdb_accepts_single_frame_without_end();
+  test_read_pdb_accepts_trailing_blank_lines();
   test_read_pdb_check_zero_coor_guard();
   test_read_pdb_pdbscan_conect_parsing();
   test_write_pdb_single_frame_1atm_round_trip();
