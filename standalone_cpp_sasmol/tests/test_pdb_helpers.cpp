@@ -196,6 +196,63 @@ void test_parse_pdb_atom_record_rejects_bad_required_numbers() {
   assert(status.code == sasmol::IoCode::format_error);
 }
 
+void test_read_pdb_single_frame_1atm() {
+  sasmol::PdbReader reader;
+  sasmol::Molecule mol;
+
+  const auto status = reader.read_pdb(fixture_path("pdb_common", "1ATM.pdb"), mol);
+
+  assert(status.ok());
+  assert(mol.natoms() == 1);
+  assert(mol.number_of_frames() == 1);
+  assert(mol.record()[0] == "ATOM");
+  assert(mol.original_index()[0] == 53893);
+  assert(mol.index()[0] == 1);
+  assert(mol.name()[0] == "N");
+  assert(mol.resname()[0] == "ILE");
+  assert(mol.chain()[0] == "N");
+  assert(mol.resid()[0] == 515);
+  const auto xyz = mol.coordinate(0, 0);
+  assert_close(xyz.x, 73.944F);
+  assert_close(xyz.y, 41.799F);
+  assert_close(xyz.z, 41.652F);
+}
+
+void test_read_pdb_single_frame_2aad_descriptors() {
+  sasmol::PdbReader reader;
+  sasmol::Molecule mol;
+
+  const auto status = reader.read_pdb(fixture_path("pdb_common", "2AAD.pdb"), mol);
+
+  assert(status.ok());
+  assert(mol.natoms() == 15);
+  assert(mol.number_of_frames() == 1);
+  assert(mol.name()[0] == "N");
+  assert(mol.resname()[0] == "ILE");
+  assert(mol.chain()[0] == "N");
+  assert(mol.resid()[0] == 515);
+  assert(mol.occupancy()[0] == "1.00");
+  assert(mol.beta()[0] == "36.37");
+  assert(mol.segname()[0] == "N");
+  assert(mol.element()[0] == "N");
+  assert(mol.charge()[0] == "  ");
+  assert(mol.name()[14] == "CG2");
+  const auto xyz = mol.coordinate(0, 14);
+  assert_close(xyz.x, 76.970F);
+  assert_close(xyz.y, 46.273F);
+  assert_close(xyz.z, 42.000F);
+}
+
+void test_read_pdb_multi_frame_is_explicitly_deferred() {
+  sasmol::PdbReader reader;
+  sasmol::Molecule mol;
+
+  const auto status =
+      reader.read_pdb(fixture_path("pdb_common", "1ATM-1to2.pdb"), mol);
+
+  assert(status.code == sasmol::IoCode::unsupported);
+}
+
 }  // namespace
 
 int main() {
@@ -207,5 +264,8 @@ int main() {
   test_parse_pdb_atom_record_uses_sasmol_field_names();
   test_parse_pdb_atom_record_preserves_altloc_in_pdbscan_mode();
   test_parse_pdb_atom_record_rejects_bad_required_numbers();
+  test_read_pdb_single_frame_1atm();
+  test_read_pdb_single_frame_2aad_descriptors();
+  test_read_pdb_multi_frame_is_explicitly_deferred();
   return 0;
 }

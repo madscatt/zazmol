@@ -105,4 +105,6 @@ surface and helper tests:
 3. Added PDB frame-boundary pre-scan tests for the fixture categories above.
 4. Added fixed-column ATOM/HETATM record parsing helper tests using SASMOL
    field names/defaults.
-5. Stop before descriptor population until record parsing behavior is reviewed.
+5. Added one-frame `read_pdb` descriptor/coordinate population for `1ATM` and
+   `2AAD`.
+6. Multi-frame descriptor population remains explicitly deferred.

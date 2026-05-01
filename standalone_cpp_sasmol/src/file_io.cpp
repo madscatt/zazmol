@@ -256,12 +256,63 @@ IoStatus IoStatus::not_implemented(std::string message) {
 IoStatus PdbReader::read_pdb(const std::filesystem::path& filename,
                              Molecule& molecule,
                              const PdbReadOptions& options) const {
-  (void)filename;
-  (void)molecule;
-  (void)options;
-  return IoStatus::not_implemented(
-      "PDB parsing is intentionally deferred until the tolerance contract is "
-      "fully reviewed against Python zazmol fixtures.");
+  PdbFrameScan scan;
+  auto status = scan_pdb_frames(filename, scan, options);
+  if (!status) {
+    return status;
+  }
+  if (scan.nframes != 1) {
+    return {IoCode::unsupported,
+            "PDB descriptor population currently supports one frame only."};
+  }
+
+  std::ifstream input(filename);
+  if (!input) {
+    return {IoCode::file_error, "Failed to open PDB file: " + filename.string()};
+  }
+
+  molecule.resize(scan.natoms, scan.nframes);
+  std::size_t atom_index = 0;
+  std::string line;
+  while (std::getline(input, line)) {
+    const auto record = pdb_record_name(line);
+    if (!is_pdb_coordinate_record(record)) {
+      continue;
+    }
+    if (atom_index >= scan.natoms) {
+      return {IoCode::format_error, "PDB contains more atoms than pre-scan."};
+    }
+
+    PdbAtomRecord atom;
+    status = parse_pdb_atom_record(line, atom, options);
+    if (!status) {
+      return status;
+    }
+
+    molecule.record()[atom_index] = atom.record;
+    molecule.original_index()[atom_index] = atom.original_index;
+    molecule.index()[atom_index] = static_cast<int>(atom_index + 1);
+    molecule.name()[atom_index] = atom.name;
+    molecule.loc()[atom_index] = atom.loc;
+    molecule.resname()[atom_index] = atom.resname;
+    molecule.chain()[atom_index] = atom.chain;
+    molecule.resid()[atom_index] = atom.resid;
+    molecule.original_resid()[atom_index] = atom.resid;
+    molecule.rescode()[atom_index] = atom.rescode;
+    molecule.occupancy()[atom_index] = atom.occupancy;
+    molecule.beta()[atom_index] = atom.beta;
+    molecule.segname()[atom_index] = atom.segname;
+    molecule.element()[atom_index] = atom.element;
+    molecule.charge()[atom_index] = atom.charge;
+    molecule.set_coordinate(0, atom_index, atom.coordinate);
+    ++atom_index;
+  }
+
+  if (atom_index != scan.natoms) {
+    return {IoCode::format_error, "PDB contains fewer atoms than pre-scan."};
+  }
+
+  return IoStatus::success();
 }
 
 IoStatus PdbReader::scan_pdb_frames(const std::filesystem::path& filename,

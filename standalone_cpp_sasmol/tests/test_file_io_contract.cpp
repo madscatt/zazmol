@@ -16,16 +16,16 @@ void test_pdb_contract_defaults_are_tolerant() {
   assert(sasmol::PdbReader::tolerant_by_default());
 }
 
-void test_pdb_reader_reports_deferred_parser_without_mutating_molecule() {
-  sasmol::Molecule mol(2, 1);
+void test_pdb_reader_reports_unsupported_for_multiframe_parser_slice() {
+  sasmol::Molecule mol;
   sasmol::PdbReader reader;
+  const auto fixture =
+      std::filesystem::path(SASMOL_TEST_DATA_DIR) / "pdb_common" / "1ATM-1to2.pdb";
 
-  const auto status = reader.read_pdb("fixture.pdb", mol);
+  const auto status = reader.read_pdb(fixture, mol);
 
   assert(!status.ok());
-  assert(status.code == sasmol::IoCode::not_implemented);
-  assert(mol.natoms() == 2);
-  assert(mol.number_of_frames() == 1);
+  assert(status.code == sasmol::IoCode::unsupported);
 }
 
 void test_dcd_contract_defaults_are_sequential() {
@@ -93,7 +93,7 @@ void test_dcd_writer_has_explicit_open_close_state() {
 
 int main() {
   test_pdb_contract_defaults_are_tolerant();
-  test_pdb_reader_reports_deferred_parser_without_mutating_molecule();
+  test_pdb_reader_reports_unsupported_for_multiframe_parser_slice();
   test_dcd_contract_defaults_are_sequential();
   test_dcd_reader_has_explicit_open_close_state();
   test_dcd_random_frame_access_is_explicit_reopen_scan_contract();
