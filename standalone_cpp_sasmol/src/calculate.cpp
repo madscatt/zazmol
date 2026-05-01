@@ -93,6 +93,29 @@ calc_type calculate_radius_of_gyration(Molecule& molecule, std::size_t frame) {
   return std::sqrt(rg_squared / static_cast<calc_type>(molecule.natoms()));
 }
 
+calc_type calculate_root_mean_square_deviation(const Molecule& first,
+                                               const Molecule& second) {
+  if (first.natoms() == 0) {
+    throw std::invalid_argument(
+        "calculate_root_mean_square_deviation requires atoms");
+  }
+  if (first.natoms() != second.natoms() ||
+      first.number_of_frames() != second.number_of_frames() ||
+      first.coor().size() != second.coor().size()) {
+    throw std::invalid_argument(
+        "calculate_root_mean_square_deviation requires matching coordinates");
+  }
+
+  calc_type sum{};
+  for (std::size_t index = 0; index < first.coor().size(); ++index) {
+    const auto delta = static_cast<calc_type>(first.coor()[index]) -
+                       static_cast<calc_type>(second.coor()[index]);
+    sum += delta * delta;
+  }
+
+  return std::sqrt(sum / static_cast<calc_type>(first.natoms()));
+}
+
 CoordinateBounds calculate_minimum_and_maximum(
     const Molecule& molecule, const std::vector<std::size_t>& frames) {
   if (molecule.natoms() == 0 || molecule.number_of_frames() == 0) {

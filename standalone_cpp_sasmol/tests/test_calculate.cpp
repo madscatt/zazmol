@@ -215,6 +215,71 @@ void test_calculate_radius_of_gyration_reuses_center_errors() {
   assert(threw);
 }
 
+void test_calculate_root_mean_square_deviation_synthetic() {
+  sasmol::Molecule first(1, 1);
+  sasmol::Molecule second(1, 1);
+  first.set_coordinate(0, 0, {1.0F, 2.0F, 3.0F});
+  second.set_coordinate(0, 0, {4.0F, 5.0F, 6.0F});
+
+  assert_close_double(
+      sasmol::calculate_root_mean_square_deviation(first, second),
+      3.0 * std::sqrt(3.0));
+
+  first.resize(2, 1);
+  second.resize(2, 1);
+  first.set_coordinate(0, 0, {7.0F, 8.0F, 9.0F});
+  first.set_coordinate(0, 1, {1.0F, 3.0F, 5.0F});
+  second.set_coordinate(0, 0, {12.0F, 53.0F, 67.0F});
+  second.set_coordinate(0, 1, {76.0F, 87.0F, 96.0F});
+
+  assert_close_double(
+      sasmol::calculate_root_mean_square_deviation(first, second),
+      114.83901775964473);
+}
+
+void test_calculate_root_mean_square_deviation_fixtures() {
+  sasmol::PdbReader reader;
+  sasmol::Molecule first;
+  sasmol::Molecule second;
+
+  auto status = reader.read_pdb(fixture_path("pdb_common", "1ATM.pdb"), first);
+  assert(status.ok());
+  status = reader.read_pdb(fixture_path("pdb_common", "1ATM.pdb"), second);
+  assert(status.ok());
+  assert_close_double(
+      sasmol::calculate_root_mean_square_deviation(first, second), 0.0);
+
+  status = reader.read_pdb(fixture_path("pdb_common", "1CRN.pdb"), first);
+  assert(status.ok());
+  status = reader.read_pdb(fixture_path("sasmol/calculate", "1CRN-rot.pdb"),
+                           second);
+  assert(status.ok());
+  assert_close_double(
+      sasmol::calculate_root_mean_square_deviation(first, second), 29.008,
+      0.001);
+
+  status = reader.read_pdb(fixture_path("sasmol/calculate", "1CRN-rot-shift.pdb"),
+                           second);
+  assert(status.ok());
+  assert_close_double(
+      sasmol::calculate_root_mean_square_deviation(first, second), 19.831,
+      0.001);
+}
+
+void test_calculate_root_mean_square_deviation_rejects_shape_mismatch() {
+  const sasmol::Molecule first(1, 1);
+  const sasmol::Molecule second(2, 1);
+  bool threw = false;
+
+  try {
+    (void)sasmol::calculate_root_mean_square_deviation(first, second);
+  } catch (const std::invalid_argument&) {
+    threw = true;
+  }
+
+  assert(threw);
+}
+
 void test_calculate_minimum_and_maximum_selected_frames() {
   sasmol::Molecule mol(1, 3);
   mol.set_coordinate(0, 0, {-10.0F, -10.0F, -10.0F});
@@ -306,6 +371,9 @@ int main() {
   test_calculate_center_of_mass_rejects_bad_frame();
   test_calculate_radius_of_gyration_fixtures();
   test_calculate_radius_of_gyration_reuses_center_errors();
+  test_calculate_root_mean_square_deviation_synthetic();
+  test_calculate_root_mean_square_deviation_fixtures();
+  test_calculate_root_mean_square_deviation_rejects_shape_mismatch();
   test_calculate_minimum_and_maximum_all_loaded_frames();
   test_calculate_minimum_and_maximum_selected_frames();
   test_calculate_minimum_and_maximum_rejects_empty_molecule();

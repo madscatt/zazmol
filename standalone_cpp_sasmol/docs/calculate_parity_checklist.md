@@ -58,9 +58,20 @@ Implemented `calculate_radius_of_gyration(molecule, frame)`:
 - fixture parity for `1ATM.pdb`, `2AAD.pdb`, `rna.pdb`, and `1CRN.pdb`
 - reuses center-of-mass validation for unknown masses and frame errors
 
+## RMSD Slice
+
+Implemented `calculate_root_mean_square_deviation(first, second)`:
+
+- follows Python SASMOL convention: sum squared differences over all loaded
+  coordinate values divided by atom count
+- synthetic parity for one-atom and two-atom examples
+- fixture parity for identical `1ATM.pdb`, `1CRN-rot.pdb`, and
+  `1CRN-rot-shift.pdb`
+- shape mismatches are explicit errors instead of printed warnings
+
 ## Deferred
 
 - DCD streaming overloads for `calculate_minimum_and_maximum_all_steps`
 - principal moments of inertia
-- RMSD/alignment-dependent calculations
+- alignment-dependent calculations
 - molecular formula and residue charge
