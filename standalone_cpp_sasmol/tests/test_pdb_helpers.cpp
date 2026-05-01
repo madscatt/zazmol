@@ -305,6 +305,58 @@ void test_read_pdb_pdbscan_conect_parsing() {
   std::filesystem::remove(path);
 }
 
+void write_and_read_back_pdb(const char* area, const char* name,
+                             const char* output_name, std::size_t natoms,
+                             sasmol::Vec3 expected_last) {
+  sasmol::PdbReader reader;
+  sasmol::PdbWriter writer;
+  sasmol::Molecule source;
+  auto status = reader.read_pdb(fixture_path(area, name), source);
+  assert(status.ok());
+
+  const auto output = std::filesystem::temp_directory_path() / output_name;
+  status = writer.write_pdb(output, source);
+  assert(status.ok());
+
+  sasmol::Molecule round_trip;
+  status = reader.read_pdb(output, round_trip);
+  assert(status.ok());
+  assert(round_trip.natoms() == natoms);
+  assert(round_trip.number_of_frames() == 1);
+  const auto xyz = round_trip.coordinate(0, natoms - 1);
+  assert_close(xyz.x, expected_last.x);
+  assert_close(xyz.y, expected_last.y);
+  assert_close(xyz.z, expected_last.z);
+
+  std::filesystem::remove(output);
+}
+
+void test_write_pdb_single_frame_1atm_round_trip() {
+  write_and_read_back_pdb("pdb_common", "1ATM.pdb", "sasmol_cpp_1atm.pdb", 1,
+                          {73.944F, 41.799F, 41.652F});
+}
+
+void test_write_pdb_single_frame_2aad_round_trip() {
+  write_and_read_back_pdb("pdb_common", "2AAD.pdb", "sasmol_cpp_2aad.pdb", 15,
+                          {76.970F, 46.273F, 42.000F});
+}
+
+void test_write_pdb_rejects_out_of_range_frame() {
+  sasmol::PdbReader reader;
+  sasmol::PdbWriter writer;
+  sasmol::Molecule source;
+  auto status = reader.read_pdb(fixture_path("pdb_common", "1ATM.pdb"), source);
+  assert(status.ok());
+
+  sasmol::PdbWriteOptions options;
+  options.frame = 1;
+  status = writer.write_pdb(std::filesystem::temp_directory_path() /
+                                "sasmol_bad_frame.pdb",
+                            source, options);
+
+  assert(status.code == sasmol::IoCode::format_error);
+}
+
 void test_read_pdb_multi_frame_is_explicitly_deferred() {
   sasmol::PdbReader reader;
   sasmol::Molecule mol;
@@ -378,6 +430,9 @@ int main() {
   test_read_pdb_classifies_rna_moltype();
   test_read_pdb_check_zero_coor_guard();
   test_read_pdb_pdbscan_conect_parsing();
+  test_write_pdb_single_frame_1atm_round_trip();
+  test_write_pdb_single_frame_2aad_round_trip();
+  test_write_pdb_rejects_out_of_range_frame();
   test_read_pdb_multi_frame_is_explicitly_deferred();
   test_read_pdb_end_separated_multiframe_coordinates();
   test_read_pdb_model_multiframe_coordinates();

@@ -111,3 +111,4 @@ surface and helper tests:
    descriptors for `1ATM-1to2`, END-separated `2AAD`, and MODEL/ENDMDL `2AAD`.
 7. Added PDB read parity for moltype classification, all-zero coordinate guard,
    and `pdbscan` CONECT parsing.
+8. Added single-frame `write_pdb` round-trip coverage for `1ATM` and `2AAD`.
