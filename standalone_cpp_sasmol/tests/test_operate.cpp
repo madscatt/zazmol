@@ -5,6 +5,7 @@
 #include <cassert>
 #include <cmath>
 #include <filesystem>
+#include <vector>
 
 namespace {
 
@@ -43,6 +44,28 @@ double axis_alignment(const sasmol::Molecule& mol, std::size_t frame,
     expected_norm += expected_axis[row] * expected_axis[row];
   }
   return std::fabs(dot) / std::sqrt(expected_norm);
+}
+
+std::vector<std::size_t> all_atom_indices(const sasmol::Molecule& molecule) {
+  std::vector<std::size_t> indices;
+  indices.reserve(molecule.natoms());
+  for (std::size_t atom = 0; atom < molecule.natoms(); ++atom) {
+    indices.push_back(atom);
+  }
+  return indices;
+}
+
+std::vector<std::size_t> ca_resid_range_indices(const sasmol::Molecule& molecule,
+                                                int first_resid,
+                                                int last_resid) {
+  std::vector<std::size_t> indices;
+  for (std::size_t atom = 0; atom < molecule.natoms(); ++atom) {
+    if (molecule.name()[atom] == "CA" && molecule.resid()[atom] >= first_resid &&
+        molecule.resid()[atom] <= last_resid) {
+      indices.push_back(atom);
+    }
+  }
+  return indices;
 }
 
 void test_translate_mutates_only_selected_frame() {
@@ -177,6 +200,76 @@ void test_pmi_aligned_copy_does_not_mutate_source() {
   assert(axis_alignment(copy, 0, 2, {0.0, 0.0, 1.0}) > 0.9999);
 }
 
+void test_align_full_basis_rotated_fixture() {
+  sasmol::PdbReader reader;
+  sasmol::Molecule reference;
+  sasmol::Molecule moving;
+  auto status = reader.read_pdb(fixture_path("pdb_common", "1CRN.pdb"),
+                                reference);
+  assert(status.ok());
+  status = reader.read_pdb(fixture_path("sasmol/operate", "1CRN-rot.pdb"),
+                           moving);
+  assert(status.ok());
+  const auto indices = all_atom_indices(reference);
+
+  const auto plan = sasmol::initialize_alignment(moving, reference, indices,
+                                                 indices, 0);
+  sasmol::align(moving, plan, 0);
+
+  assert_close_double(
+      sasmol::calculate_root_mean_square_deviation(reference, moving), 0.0,
+      0.02);
+}
+
+void test_align_full_basis_rotated_shifted_fixture() {
+  sasmol::PdbReader reader;
+  sasmol::Molecule reference;
+  sasmol::Molecule moving;
+  auto status = reader.read_pdb(fixture_path("pdb_common", "1CRN.pdb"),
+                                reference);
+  assert(status.ok());
+  status = reader.read_pdb(fixture_path("sasmol/operate", "1CRN-rot-shift.pdb"),
+                           moving);
+  assert(status.ok());
+  const auto indices = all_atom_indices(reference);
+
+  const auto plan = sasmol::initialize_alignment(moving, reference, indices,
+                                                 indices, 0);
+  const auto aligned_copy = sasmol::aligned(moving, plan, 0);
+
+  assert_close_double(
+      sasmol::calculate_root_mean_square_deviation(reference, aligned_copy), 0.0,
+      0.02);
+  assert(sasmol::calculate_root_mean_square_deviation(reference, moving) > 1.0);
+}
+
+void test_align_ca_subset_moves_whole_molecule_com() {
+  sasmol::PdbReader reader;
+  sasmol::Molecule reference;
+  sasmol::Molecule moving;
+  auto status = reader.read_pdb(fixture_path("pdb_common", "1CRN.pdb"),
+                                reference);
+  assert(status.ok());
+  status = reader.read_pdb(fixture_path("pdb_common", "1CRN.pdb"), moving);
+  assert(status.ok());
+  const auto indices = ca_resid_range_indices(reference, 20, 31);
+  assert(!indices.empty());
+  sasmol::rotate(moving, 0, sasmol::Axis::z, std::acos(-1.0) / 2.0);
+
+  const auto plan = sasmol::initialize_alignment(moving, reference, indices,
+                                                 indices, 0);
+  sasmol::align(moving, plan, 0);
+
+  auto reference_for_com = reference;
+  auto moving_for_com = moving;
+  const auto expected_com =
+      sasmol::calculate_center_of_mass(reference_for_com, 0);
+  const auto result_com = sasmol::calculate_center_of_mass(moving_for_com, 0);
+  assert_close_double(result_com.x, expected_com.x, 0.02);
+  assert_close_double(result_com.y, expected_com.y, 0.02);
+  assert_close_double(result_com.z, expected_com.z, 0.02);
+}
+
 }  // namespace
 
 int main() {
@@ -191,5 +284,8 @@ int main() {
   test_align_pmi_on_axis_matches_python_alignment_contract();
   test_align_pmi_on_cardinal_axes_matches_python_contract();
   test_pmi_aligned_copy_does_not_mutate_source();
+  test_align_full_basis_rotated_fixture();
+  test_align_full_basis_rotated_shifted_fixture();
+  test_align_ca_subset_moves_whole_molecule_com();
   return 0;
 }

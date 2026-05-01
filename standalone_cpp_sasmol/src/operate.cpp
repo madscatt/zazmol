@@ -1,8 +1,11 @@
 #include "sasmol/operate.hpp"
 
 #include <algorithm>
+#include <array>
 #include <cmath>
+#include <limits>
 #include <stdexcept>
+#include <utility>
 
 namespace sasmol {
 namespace {
@@ -70,6 +73,176 @@ CalcVec3 normalized(CalcVec3 value) {
     throw std::invalid_argument("cannot normalize zero or non-finite vector");
   }
   return scaled(value, 1.0 / length);
+}
+
+std::array<std::size_t, 3> eigen_order_descending(
+    const std::array<calc_type, 3>& values) {
+  std::array<std::size_t, 3> order{0, 1, 2};
+  std::sort(order.begin(), order.end(), [&](std::size_t lhs, std::size_t rhs) {
+    return values[lhs] > values[rhs];
+  });
+  return order;
+}
+
+CalcMatrix3 identity_matrix3() {
+  return {{{1.0, 0.0, 0.0}, {0.0, 1.0, 0.0}, {0.0, 0.0, 1.0}}};
+}
+
+calc_type max_abs_diagonal(const CalcMatrix3& matrix) {
+  calc_type value{};
+  for (std::size_t i = 0; i < 3; ++i) {
+    value = std::max(value, std::fabs(matrix[i][i]));
+  }
+  return value;
+}
+
+std::pair<std::array<calc_type, 3>, CalcMatrix3> symmetric_eigen_decomposition(
+    const CalcMatrix3& input) {
+  auto matrix = input;
+  auto eigenvectors = identity_matrix3();
+
+  for (std::size_t iteration = 0; iteration < 60; ++iteration) {
+    std::size_t p = 0;
+    std::size_t q = 1;
+    auto offdiag = std::fabs(matrix[p][q]);
+    for (std::size_t row = 0; row < 3; ++row) {
+      for (std::size_t column = row + 1; column < 3; ++column) {
+        const auto value = std::fabs(matrix[row][column]);
+        if (value > offdiag) {
+          offdiag = value;
+          p = row;
+          q = column;
+        }
+      }
+    }
+
+    const auto scale = std::max<calc_type>(1.0, max_abs_diagonal(matrix));
+    if (offdiag <= std::numeric_limits<calc_type>::epsilon() * scale) {
+      break;
+    }
+
+    const auto app = matrix[p][p];
+    const auto aqq = matrix[q][q];
+    const auto apq = matrix[p][q];
+    const auto angle = 0.5 * std::atan2(2.0 * apq, aqq - app);
+    const auto c = std::cos(angle);
+    const auto s = std::sin(angle);
+
+    matrix[p][p] = c * c * app - 2.0 * s * c * apq + s * s * aqq;
+    matrix[q][q] = s * s * app + 2.0 * s * c * apq + c * c * aqq;
+    matrix[p][q] = 0.0;
+    matrix[q][p] = 0.0;
+
+    for (std::size_t k = 0; k < 3; ++k) {
+      if (k == p || k == q) {
+        continue;
+      }
+      const auto akp = matrix[k][p];
+      const auto akq = matrix[k][q];
+      matrix[k][p] = c * akp - s * akq;
+      matrix[p][k] = matrix[k][p];
+      matrix[k][q] = s * akp + c * akq;
+      matrix[q][k] = matrix[k][q];
+    }
+
+    for (std::size_t row = 0; row < 3; ++row) {
+      const auto vkp = eigenvectors[row][p];
+      const auto vkq = eigenvectors[row][q];
+      eigenvectors[row][p] = c * vkp - s * vkq;
+      eigenvectors[row][q] = s * vkp + c * vkq;
+    }
+  }
+
+  return {{matrix[0][0], matrix[1][1], matrix[2][2]}, eigenvectors};
+}
+
+CalcVec3 matrix_vector_multiply(const CalcMatrix3& matrix, CalcVec3 value) {
+  return {matrix[0][0] * value.x + matrix[0][1] * value.y +
+              matrix[0][2] * value.z,
+          matrix[1][0] * value.x + matrix[1][1] * value.y +
+              matrix[1][2] * value.z,
+          matrix[2][0] * value.x + matrix[2][1] * value.y +
+              matrix[2][2] * value.z};
+}
+
+Rotation alignment_rotation(const std::vector<Vec3>& reference_centered,
+                            const std::vector<Vec3>& moving_centered) {
+  if (reference_centered.size() != moving_centered.size() ||
+      reference_centered.empty()) {
+    throw std::invalid_argument(
+        "alignment requires equal non-empty reference and moving bases");
+  }
+
+  CalcMatrix3 r{};
+  for (std::size_t atom = 0; atom < reference_centered.size(); ++atom) {
+    const auto x = reference_centered[atom];
+    const auto y = moving_centered[atom];
+    const calc_type ref[3] = {x.x, x.y, x.z};
+    const calc_type mov[3] = {y.x, y.y, y.z};
+    for (std::size_t i = 0; i < 3; ++i) {
+      for (std::size_t j = 0; j < 3; ++j) {
+        r[i][j] += mov[i] * ref[j];
+      }
+    }
+  }
+
+  CalcMatrix3 rtr{};
+  for (std::size_t i = 0; i < 3; ++i) {
+    for (std::size_t j = 0; j < 3; ++j) {
+      for (std::size_t k = 0; k < 3; ++k) {
+        rtr[i][j] += r[k][i] * r[k][j];
+      }
+    }
+  }
+
+  auto eigens = symmetric_eigen_decomposition(rtr);
+  const auto order = eigen_order_descending(eigens.first);
+  std::array<calc_type, 3> uk{};
+  CalcMatrix3 ak{};
+  for (std::size_t row = 0; row < 3; ++row) {
+    uk[row] = eigens.first[order[row]];
+    for (std::size_t column = 0; column < 3; ++column) {
+      ak[row][column] = eigens.second[column][order[row]];
+    }
+  }
+  const auto ak2 = cross({ak[0][0], ak[0][1], ak[0][2]},
+                         {ak[1][0], ak[1][1], ak[1][2]});
+  ak[2] = {ak2.x, ak2.y, ak2.z};
+
+  auto rak0 = matrix_vector_multiply(r, {ak[0][0], ak[0][1], ak[0][2]});
+  auto rak1 = matrix_vector_multiply(r, {ak[1][0], ak[1][1], ak[1][2]});
+  auto urak0 = scaled(rak0, uk[0] == 0.0 ? 1.0e15 : 1.0 / std::sqrt(std::fabs(uk[0])));
+  auto urak1 = scaled(rak1, uk[1] == 0.0 ? 1.0e15 : 1.0 / std::sqrt(std::fabs(uk[1])));
+  auto urak2 = cross(urak0, urak1);
+
+  CalcMatrix3 bk{{{urak0.x, urak0.y, urak0.z},
+                  {urak1.x, urak1.y, urak1.z},
+                  {urak2.x, urak2.y, urak2.z}}};
+
+  Rotation rotation;
+  rotation.convention = CoordinateTransformConvention::column_vector;
+  for (std::size_t j = 0; j < 3; ++j) {
+    for (std::size_t i = 0; i < 3; ++i) {
+      for (std::size_t k = 0; k < 3; ++k) {
+        rotation.matrix[j][i] += bk[k][i] * ak[k][j];
+      }
+    }
+  }
+  return rotation;
+}
+
+std::vector<Vec3> centered_coordinates(const Molecule& molecule,
+                                       const std::vector<std::size_t>& indices,
+                                       std::size_t frame, CalcVec3 center) {
+  std::vector<Vec3> coordinates;
+  coordinates.reserve(indices.size());
+  for (const auto atom : indices) {
+    const auto xyz = molecule.coordinate(frame, atom);
+    coordinates.push_back({static_cast<coord_type>(xyz.x - center.x),
+                           static_cast<coord_type>(xyz.y - center.y),
+                           static_cast<coord_type>(xyz.z - center.z)});
+  }
+  return coordinates;
 }
 
 }  // namespace
@@ -278,6 +451,74 @@ Molecule pmi_aligned_on_cardinal_axes(const Molecule& molecule,
                                       std::size_t frame) {
   auto copy = molecule;
   align_pmi_on_cardinal_axes(copy, frame);
+  return copy;
+}
+
+AlignmentPlan initialize_alignment(
+    const Molecule& moving, const Molecule& reference,
+    const std::vector<std::size_t>& moving_basis_indices,
+    const std::vector<std::size_t>& reference_basis_indices, std::size_t frame) {
+  if (moving_basis_indices.size() != reference_basis_indices.size() ||
+      moving_basis_indices.empty()) {
+    throw std::invalid_argument(
+        "alignment initialization requires matching non-empty basis indices");
+  }
+  if (frame >= moving.number_of_frames() || frame >= reference.number_of_frames()) {
+    throw std::out_of_range("alignment frame is out of range");
+  }
+
+  auto reference_copy = reference;
+  auto moving_copy = moving;
+  AlignmentPlan plan;
+  plan.moving_basis_indices = moving_basis_indices;
+  const auto reference_center =
+      calculate_center_of_mass(reference_copy, frame);
+  const auto moving_center = calculate_center_of_mass(moving_copy, frame);
+  plan.reference_center_of_mass = reference_center;
+  plan.centered_reference_basis =
+      centered_coordinates(reference, reference_basis_indices, frame,
+                           reference_center);
+  (void)centered_coordinates(moving, moving_basis_indices, frame, moving_center);
+  return plan;
+}
+
+void align(Molecule& moving, const AlignmentPlan& plan, std::size_t frame) {
+  if (plan.moving_basis_indices.empty() ||
+      plan.centered_reference_basis.size() != plan.moving_basis_indices.size()) {
+    throw std::invalid_argument("alignment plan is incomplete");
+  }
+  if (frame >= moving.number_of_frames()) {
+    throw std::out_of_range("alignment frame is out of range");
+  }
+
+  auto moving_for_mass = moving;
+  const auto moving_center = calculate_center_of_mass(moving_for_mass, frame);
+  const auto moving_centered =
+      centered_coordinates(moving, plan.moving_basis_indices, frame,
+                           moving_center);
+  const auto rotation =
+      alignment_rotation(plan.centered_reference_basis, moving_centered);
+
+  auto view = moving.coordinate_view(frame);
+  for (std::size_t atom = 0; atom < view.natoms; ++atom) {
+    const auto xyz = view[atom];
+    const Vec3 centered{static_cast<coord_type>(xyz.x - moving_center.x),
+                        static_cast<coord_type>(xyz.y - moving_center.y),
+                        static_cast<coord_type>(xyz.z - moving_center.z)};
+    const auto rotated_xyz = transform_column_vector(centered, rotation.matrix);
+    view.set(atom, {static_cast<coord_type>(rotated_xyz.x +
+                                            plan.reference_center_of_mass.x),
+                    static_cast<coord_type>(rotated_xyz.y +
+                                            plan.reference_center_of_mass.y),
+                    static_cast<coord_type>(rotated_xyz.z +
+                                            plan.reference_center_of_mass.z)});
+  }
+}
+
+Molecule aligned(const Molecule& moving, const AlignmentPlan& plan,
+                 std::size_t frame) {
+  auto copy = moving;
+  align(copy, plan, frame);
   return copy;
 }
 

@@ -64,4 +64,24 @@ Behavior notes:
 
 ## Deferred
 
-- full basis/Kabsch-style `align`
+## Basis Alignment Slice
+
+Implemented explicit-index basis alignment:
+
+- `initialize_alignment(moving, reference, moving_basis_indices,
+  reference_basis_indices, frame)`
+- `align(moving, plan, frame)`
+- `aligned(moving, plan, frame)`
+
+Behavior notes:
+
+- this ports the rigid-body fit core used by Python `align`
+- C++ callers provide explicit atom indices rather than Python basis strings
+- the transform is applied to the whole moving molecule frame, not just the
+  basis atoms
+- pure `aligned(...)` returns a copy and leaves the source molecule unchanged
+
+Deferred from Python `align`:
+
+- selection-expression parsing such as `name[i] == "CA"`
+- initialization/production mode keyword interface
