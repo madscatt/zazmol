@@ -390,11 +390,21 @@ Molecule copied_molecule_using_indices(const Molecule& source,
                                        std::size_t frame) {
   Molecule destination;
   const auto result = copy_molecule_using_indices(source, destination, indices,
-                                                 frame);
+                                                  frame);
   if (!result.ok()) {
     throw std::invalid_argument(result.errors.front());
   }
   return destination;
+}
+
+std::vector<Molecule> duplicate_molecule(const Molecule& molecule,
+                                         std::size_t number_of_duplicates) {
+  std::vector<Molecule> duplicates;
+  duplicates.reserve(number_of_duplicates);
+  for (std::size_t i = 0; i < number_of_duplicates; ++i) {
+    duplicates.push_back(molecule);
+  }
+  return duplicates;
 }
 
 StringSelection get_string_descriptor_using_indices(

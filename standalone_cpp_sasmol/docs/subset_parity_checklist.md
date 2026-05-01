@@ -37,6 +37,10 @@ Implemented descriptor get/set helpers:
 - `set_calc_descriptor_using_indices(...)`
 - `set_calc_descriptor_using_mask(...)`
 
+Implemented molecule duplication:
+
+- `duplicate_molecule(molecule, number_of_duplicates)`
+
 Behavior notes:
 
 - failures return structured errors for non-throwing APIs
@@ -49,9 +53,10 @@ Behavior notes:
 - `CONECT` entries are filtered to selected atoms only
 - descriptor APIs use typed descriptor enums instead of arbitrary descriptor
   object mutation
+- duplication returns independent value copies; zero requested duplicates returns
+  an empty vector
 
 ## Deferred
 
-- `duplicate_molecule`
 - `merge_two_molecules`
 - BIOMT operations

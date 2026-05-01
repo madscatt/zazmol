@@ -107,6 +107,9 @@ struct CalcSelection {
     const Molecule& source, const std::vector<std::size_t>& indices,
     std::size_t frame);
 
+[[nodiscard]] std::vector<Molecule> duplicate_molecule(
+    const Molecule& molecule, std::size_t number_of_duplicates);
+
 [[nodiscard]] StringSelection get_string_descriptor_using_indices(
     const Molecule& molecule, StringDescriptor descriptor,
     const std::vector<std::size_t>& indices);

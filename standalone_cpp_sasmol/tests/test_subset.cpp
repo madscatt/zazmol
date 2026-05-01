@@ -136,6 +136,44 @@ void test_copied_molecule_using_indices_returns_value() {
   assert(subset.index()[1] == source.index()[1]);
 }
 
+void test_duplicate_molecule_returns_deep_value_copies() {
+  auto source = read_fixture("2AAD.pdb");
+  source.formula() = {{"C", 2}, {"N", 1}};
+  source.fasta() = "AG";
+  source.unitcell() = {1.0, 2.0, 3.0, 90.0, 90.0, 120.0};
+
+  auto duplicates = sasmol::duplicate_molecule(source, 2);
+
+  assert(duplicates.size() == 2);
+  assert(duplicates[0].natoms() == source.natoms());
+  assert(duplicates[0].number_of_frames() == source.number_of_frames());
+  assert(duplicates[0].name() == source.name());
+  assert(duplicates[0].resid() == source.resid());
+  assert(duplicates[0].coor() == source.coor());
+  assert(duplicates[0].conect() == source.conect());
+  assert(duplicates[0].formula() == source.formula());
+  assert(duplicates[0].fasta() == source.fasta());
+  assert(duplicates[0].unitcell() == source.unitcell());
+
+  duplicates[0].name()[0] = "XX";
+  duplicates[0].set_coordinate(0, 0, {10.0F, 20.0F, 30.0F});
+  duplicates[0].formula()["C"] = 99;
+
+  assert(source.name()[0] != "XX");
+  assert(duplicates[1].name()[0] == source.name()[0]);
+  assert_vec_close(source.coordinate(0, 0), duplicates[1].coordinate(0, 0));
+  assert(source.formula().at("C") == 2);
+  assert(duplicates[1].formula().at("C") == 2);
+}
+
+void test_duplicate_molecule_allows_zero_duplicates() {
+  const auto source = read_fixture("2AAD.pdb");
+
+  const auto duplicates = sasmol::duplicate_molecule(source, 0);
+
+  assert(duplicates.empty());
+}
+
 void test_set_coordinates_using_mask_replaces_selected_atoms_only() {
   sasmol::Molecule target(3, 1);
   target.set_coordinate(0, 0, {1.0F, 1.0F, 1.0F});
@@ -312,6 +350,8 @@ int main() {
   test_copy_molecule_using_indices_preserves_descriptors();
   test_copy_molecule_using_mask_preserves_descriptors();
   test_copied_molecule_using_indices_returns_value();
+  test_duplicate_molecule_returns_deep_value_copies();
+  test_duplicate_molecule_allows_zero_duplicates();
   test_set_coordinates_using_mask_replaces_selected_atoms_only();
   test_set_coordinates_using_mask_rejects_before_mutation();
   test_set_coordinates_using_indices_replaces_selected_atoms_only();
