@@ -43,6 +43,9 @@ endif()
 add_executable(dcd_roundtrip_writer tools/dcd_roundtrip_writer.cpp)
 target_link_libraries(dcd_roundtrip_writer PRIVATE sasmol_standalone)
 
+add_executable(pdb_roundtrip_writer tools/pdb_roundtrip_writer.cpp)
+target_link_libraries(pdb_roundtrip_writer PRIVATE sasmol_standalone)
+
 include(CTest)
 
 if(BUILD_TESTING)

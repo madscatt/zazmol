@@ -114,3 +114,14 @@ surface and helper tests:
 8. Added single-frame `write_pdb` round-trip coverage for `1ATM` and `2AAD`.
 9. Added selected-frame write support, MODEL/ENDMDL output, and CONECT output.
 10. Added `write_all_frames` multi-model output with C++ readback coverage.
+
+## Proposed Next Validation Slice
+
+Completed Python cross-reader validation for generated C++ PDB outputs:
+
+1. Generated C++ written PDB files for `1ATM`, `2AAD`, and `1ATM-1to2`.
+2. Validated them with Python `zazmol` using
+   `tools/validate_pdb_with_python.py`.
+3. Recorded the result in `pdb_python_validation.md`.
+4. Kept this separate from normal CTest so Python is not an unconditional C++
+   build dependency.
