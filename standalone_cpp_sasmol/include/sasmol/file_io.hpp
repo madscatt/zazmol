@@ -36,6 +36,7 @@ struct PdbReadOptions {
   bool resolve_elements{true};
   bool preserve_conect{true};
   bool apply_all_zero_coordinate_guard{true};
+  bool pdbscan{false};
 };
 
 enum class PdbFrameMode {
@@ -48,6 +49,24 @@ struct PdbFrameScan {
   std::size_t natoms{};
   std::size_t nframes{};
   PdbFrameMode mode{PdbFrameMode::single};
+};
+
+struct PdbAtomRecord {
+  std::string record;
+  int original_index{};
+  std::string name;
+  std::string loc;
+  std::string resname;
+  std::string chain;
+  int resid{};
+  std::string original_resid;
+  std::string rescode;
+  Vec3 coordinate;
+  std::string occupancy;
+  std::string beta;
+  std::string segname;
+  std::string element;
+  std::string charge;
 };
 
 struct PdbWriteOptions {
@@ -63,6 +82,9 @@ class PdbReader {
                                   const PdbReadOptions& options = {}) const;
   [[nodiscard]] IoStatus scan_pdb_frames(
       const std::filesystem::path& filename, PdbFrameScan& scan,
+      const PdbReadOptions& options = {}) const;
+  [[nodiscard]] IoStatus parse_pdb_atom_record(
+      const std::string& line, PdbAtomRecord& record,
       const PdbReadOptions& options = {}) const;
 
   [[nodiscard]] static constexpr bool tolerant_by_default() noexcept {

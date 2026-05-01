@@ -3,6 +3,7 @@
 #include <cassert>
 #include <cmath>
 #include <filesystem>
+#include <fstream>
 #include <string>
 #include <vector>
 
@@ -115,6 +116,86 @@ void test_pdb_frame_scan_failure_fixtures() {
   assert_scan_fails(fixture_path("pdb_common", "1PSI.pdb"));
 }
 
+std::string first_coordinate_line(const std::filesystem::path& path) {
+  std::ifstream input(path);
+  std::string line;
+  while (std::getline(input, line)) {
+    if (line.rfind("ATOM", 0) == 0 || line.rfind("HETATM", 0) == 0) {
+      return line;
+    }
+  }
+  return {};
+}
+
+void test_parse_pdb_atom_record_uses_sasmol_field_names() {
+  sasmol::PdbReader reader;
+  sasmol::PdbAtomRecord atom;
+  const auto line = first_coordinate_line(fixture_path("pdb_common", "2AAD.pdb"));
+
+  const auto status = reader.parse_pdb_atom_record(line, atom);
+
+  assert(status.ok());
+  assert(atom.record == "ATOM");
+  assert(atom.original_index == 53893);
+  assert(atom.name == "N");
+  assert(atom.loc == " ");
+  assert(atom.resname == "ILE");
+  assert(atom.chain == "N");
+  assert(atom.resid == 515);
+  assert(atom.original_resid == " 515");
+  assert(atom.rescode == " ");
+  assert_close(atom.coordinate.x, 73.944F);
+  assert_close(atom.coordinate.y, 41.799F);
+  assert_close(atom.coordinate.z, 41.652F);
+  assert(atom.occupancy == "1.00");
+  assert(atom.beta == "36.37");
+  assert(atom.segname == "N");
+  assert(atom.element == "N");
+  assert(atom.charge == "  ");
+}
+
+void test_parse_pdb_atom_record_preserves_altloc_in_pdbscan_mode() {
+  sasmol::PdbReader reader;
+  sasmol::PdbReadOptions options;
+  options.pdbscan = true;
+  sasmol::PdbAtomRecord atom;
+  std::string line(80, ' ');
+  line.replace(0, 6, "ATOM  ");
+  line.replace(6, 5, "    1");
+  line.replace(12, 4, " CA ");
+  line[16] = 'A';
+  line.replace(17, 4, "ALA ");
+  line[21] = 'A';
+  line.replace(22, 4, "   1");
+  line[26] = ' ';
+  line.replace(30, 8, "  11.100");
+  line.replace(38, 8, "  12.200");
+  line.replace(46, 8, "  13.300");
+  line.replace(76, 2, " C");
+
+  const auto status = reader.parse_pdb_atom_record(line, atom, options);
+
+  assert(status.ok());
+  assert(atom.name == "CA");
+  assert(atom.loc == "A");
+  assert(atom.resname == "ALA");
+  assert(atom.occupancy == "");
+  assert(atom.beta == "");
+  assert(atom.segname == "");
+  assert(atom.element == "C");
+}
+
+void test_parse_pdb_atom_record_rejects_bad_required_numbers() {
+  sasmol::PdbReader reader;
+  sasmol::PdbAtomRecord atom;
+  const std::string line =
+      "ATOM      X  CA  ALA A   1      11.100  12.200  13.300  1.00  0.00";
+
+  const auto status = reader.parse_pdb_atom_record(line, atom);
+
+  assert(status.code == sasmol::IoCode::format_error);
+}
+
 }  // namespace
 
 int main() {
@@ -123,5 +204,8 @@ int main() {
   test_conect_lines_remap_original_to_current_indices();
   test_pdb_frame_scan_fixtures();
   test_pdb_frame_scan_failure_fixtures();
+  test_parse_pdb_atom_record_uses_sasmol_field_names();
+  test_parse_pdb_atom_record_preserves_altloc_in_pdbscan_mode();
+  test_parse_pdb_atom_record_rejects_bad_required_numbers();
   return 0;
 }

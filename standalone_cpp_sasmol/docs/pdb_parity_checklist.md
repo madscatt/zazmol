@@ -103,4 +103,6 @@ surface and helper tests:
 2. Added tests for `check_for_all_zero_columns` and `create_conect_pdb_lines`
    parity because those are isolated and already important.
 3. Added PDB frame-boundary pre-scan tests for the fixture categories above.
-4. Stop before descriptor population until frame-boundary behavior is reviewed.
+4. Added fixed-column ATOM/HETATM record parsing helper tests using SASMOL
+   field names/defaults.
+5. Stop before descriptor population until record parsing behavior is reviewed.

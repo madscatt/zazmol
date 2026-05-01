@@ -178,6 +178,53 @@ std::string trim_copy(std::string value) {
   return value.substr(first, last - first + 1);
 }
 
+std::string fixed_slice(const std::string& line, std::size_t start,
+                        std::size_t count) {
+  if (start >= line.size()) {
+    return std::string(count, ' ');
+  }
+  auto result = line.substr(start, std::min(count, line.size() - start));
+  if (result.size() < count) {
+    result.append(count - result.size(), ' ');
+  }
+  return result;
+}
+
+char fixed_char(const std::string& line, std::size_t index) {
+  if (index >= line.size()) {
+    return ' ';
+  }
+  return line[index];
+}
+
+bool parse_int_field(const std::string& text, int& value) {
+  const auto trimmed = trim_copy(text);
+  if (trimmed.empty()) {
+    return false;
+  }
+  try {
+    std::size_t parsed{};
+    value = std::stoi(trimmed, &parsed);
+    return parsed == trimmed.size();
+  } catch (...) {
+    return false;
+  }
+}
+
+bool parse_coord_field(const std::string& text, coord_type& value) {
+  const auto trimmed = trim_copy(text);
+  if (trimmed.empty()) {
+    return false;
+  }
+  try {
+    std::size_t parsed{};
+    value = static_cast<coord_type>(std::stof(trimmed, &parsed));
+    return parsed == trimmed.size();
+  } catch (...) {
+    return false;
+  }
+}
+
 std::string pdb_record_name(const std::string& line) {
   return trim_copy(line.substr(0, std::min<std::size_t>(6, line.size())));
 }
@@ -308,6 +355,64 @@ IoStatus PdbReader::scan_pdb_frames(const std::filesystem::path& filename,
     scan = {count_this_model, 1, PdbFrameMode::single};
   }
 
+  return IoStatus::success();
+}
+
+IoStatus PdbReader::parse_pdb_atom_record(
+    const std::string& line, PdbAtomRecord& record,
+    const PdbReadOptions& options) const {
+  const auto record_name = pdb_record_name(line);
+  if (!is_pdb_coordinate_record(record_name)) {
+    return {IoCode::format_error, "PDB line is not an ATOM/HETATM record."};
+  }
+
+  PdbAtomRecord parsed;
+  parsed.record = record_name;
+  if (!parse_int_field(fixed_slice(line, 6, 5), parsed.original_index)) {
+    return {IoCode::format_error, "Failed to parse PDB atom serial."};
+  }
+  parsed.name = trim_copy(fixed_slice(line, 12, 4));
+  parsed.loc = options.pdbscan ? std::string(1, fixed_char(line, 16)) : " ";
+  parsed.resname = trim_copy(fixed_slice(line, 17, 4));
+  parsed.chain = std::string(1, fixed_char(line, 21));
+  parsed.original_resid = fixed_slice(line, 22, 4);
+  if (!parse_int_field(parsed.original_resid, parsed.resid)) {
+    return {IoCode::format_error, "Failed to parse PDB residue id."};
+  }
+  parsed.rescode = std::string(1, fixed_char(line, 26));
+
+  if (!parse_coord_field(fixed_slice(line, 30, 8), parsed.coordinate.x) ||
+      !parse_coord_field(fixed_slice(line, 38, 8), parsed.coordinate.y) ||
+      !parse_coord_field(fixed_slice(line, 46, 8), parsed.coordinate.z)) {
+    return {IoCode::format_error, "Failed to parse PDB coordinates."};
+  }
+
+  parsed.occupancy = trim_copy(fixed_slice(line, 54, 6));
+  if (parsed.occupancy.empty()) {
+    parsed.occupancy = options.pdbscan ? "" : "  1.00";
+  }
+
+  parsed.beta = trim_copy(fixed_slice(line, 60, 6));
+  if (parsed.beta.empty()) {
+    parsed.beta = options.pdbscan ? "" : "  0.00";
+  }
+
+  parsed.segname = trim_copy(fixed_slice(line, 72, 4));
+  if (!options.pdbscan && parsed.segname.empty() && parsed.chain != " ") {
+    parsed.segname = parsed.chain;
+  }
+
+  parsed.element = trim_copy(fixed_slice(line, 76, 2));
+  if (!options.pdbscan && parsed.element.empty()) {
+    parsed.element = "  ";
+  }
+
+  parsed.charge = trim_copy(fixed_slice(line, 78, 2));
+  if (!options.pdbscan && parsed.charge.empty()) {
+    parsed.charge = "  ";
+  }
+
+  record = parsed;
   return IoStatus::success();
 }
 
