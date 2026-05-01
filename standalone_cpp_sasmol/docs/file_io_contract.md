@@ -52,6 +52,9 @@ The DCD parity pass must cover:
 - write/read round trips
 - failure modes that return library status instead of terminating callers
 
+The detailed DCD implementation gate is tracked in
+[`dcd_parity_checklist.md`](dcd_parity_checklist.md).
+
 ## Error Handling
 
 The standalone C++ library returns `IoStatus` for file I/O operations. It should
