@@ -9,6 +9,7 @@
 #include <limits>
 #include <map>
 #include <sstream>
+#include <set>
 #include <vector>
 #include <utility>
 
@@ -233,6 +234,27 @@ bool is_pdb_coordinate_record(const std::string& record) {
   return record == "ATOM" || record == "HETATM";
 }
 
+std::string moltype_for_resname(const std::string& resname) {
+  static const std::set<std::string> protein = {
+      "ALA", "ARG", "ASN", "ASP", "CYS", "GLN", "GLU", "GLY",
+      "HIS", "HSD", "HSE", "HSP", "ILE", "LEU", "LYS", "MET",
+      "PHE", "PRO", "SER", "THR", "TRP", "TYR", "VAL"};
+  static const std::set<std::string> dna = {
+      "NUSA", "NUSG", "NUSC", "NUSU", "DA", "DG", "DC", "DT",
+      "ADE",  "GUA",  "CYT",  "THY"};
+  static const std::set<std::string> rna = {
+      "RNUS", "RNUA", "RUUG", "RNUC", "A", "C", "G", "U",
+      "ADE",  "CYT",  "GUA",  "URA"};
+  static const std::set<std::string> water = {
+      "TIP3", "SPCE", "TIP", "SPC", "TIP4", "TP3M"};
+
+  if (protein.contains(resname)) return "protein";
+  if (rna.contains(resname)) return "rna";
+  if (dna.contains(resname)) return "dna";
+  if (water.contains(resname)) return "water";
+  return "other";
+}
+
 bool all_equal(const std::vector<std::size_t>& values) {
   if (values.empty()) {
     return true;
@@ -243,6 +265,17 @@ bool all_equal(const std::vector<std::size_t>& values) {
     }
   }
   return true;
+}
+
+std::vector<int> parse_conect_line(const std::string& line) {
+  std::vector<int> indices;
+  for (std::size_t start = 6; start < line.size(); start += 5) {
+    int value{};
+    if (parse_int_field(fixed_slice(line, start, 5), value)) {
+      indices.push_back(value);
+    }
+  }
+  return indices;
 }
 
 }  // namespace
@@ -293,6 +326,18 @@ IoStatus PdbReader::read_pdb(const std::filesystem::path& filename,
       continue;
     }
     if (!is_pdb_coordinate_record(record)) {
+      if (record == "CONECT" && options.pdbscan) {
+        const auto indices = parse_conect_line(line);
+        if (indices.size() > 1) {
+          const int base = indices.front();
+          for (std::size_t atom = 0; atom < molecule.natoms(); ++atom) {
+            if (molecule.original_index()[atom] == base) {
+              molecule.conect()[atom].assign(indices.begin() + 1, indices.end());
+              break;
+            }
+          }
+        }
+      }
       continue;
     }
     if (atom_index >= scan.natoms) {
@@ -324,6 +369,7 @@ IoStatus PdbReader::read_pdb(const std::filesystem::path& filename,
       molecule.segname()[atom_index] = atom.segname;
       molecule.element()[atom_index] = atom.element;
       molecule.charge()[atom_index] = atom.charge;
+      molecule.moltype()[atom_index] = moltype_for_resname(atom.resname);
     }
     molecule.set_coordinate(frame_index, atom_index, atom.coordinate);
     ++atom_index;
@@ -336,6 +382,14 @@ IoStatus PdbReader::read_pdb(const std::filesystem::path& filename,
 
   if (atom_index != 0 || frame_index != scan.nframes) {
     return {IoCode::format_error, "PDB contains fewer atoms than pre-scan."};
+  }
+
+  if (options.apply_all_zero_coordinate_guard) {
+    PdbWriter writer;
+    status = writer.check_for_all_zero_columns(molecule);
+    if (!status) {
+      return status;
+    }
   }
 
   return IoStatus::success();

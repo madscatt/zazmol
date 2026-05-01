@@ -236,11 +236,73 @@ void test_read_pdb_single_frame_2aad_descriptors() {
   assert(mol.segname()[0] == "N");
   assert(mol.element()[0] == "N");
   assert(mol.charge()[0] == "  ");
+  assert(mol.moltype()[0] == "protein");
   assert(mol.name()[14] == "CG2");
   const auto xyz = mol.coordinate(0, 14);
   assert_close(xyz.x, 76.970F);
   assert_close(xyz.y, 46.273F);
   assert_close(xyz.z, 42.000F);
+}
+
+void test_read_pdb_classifies_rna_moltype() {
+  sasmol::PdbReader reader;
+  sasmol::Molecule mol;
+
+  const auto status = reader.read_pdb(fixture_path("pdb_common", "rna.pdb"), mol);
+
+  assert(status.ok());
+  assert(mol.natoms() == 10632);
+  assert(mol.moltype()[0] == "rna");
+}
+
+void test_read_pdb_check_zero_coor_guard() {
+  const auto path = std::filesystem::temp_directory_path() / "sasmol_zero_axis.pdb";
+  {
+    std::ofstream out(path);
+    out << "ATOM      1  C   GLY A   1       0.000   1.000   0.000  1.00  0.00           C\n";
+    out << "ATOM      2  O   GLY A   1       0.000   2.000   0.000  1.00  0.00           O\n";
+    out << "END\n";
+  }
+
+  sasmol::PdbReader reader;
+  sasmol::PdbReadOptions options;
+  options.apply_all_zero_coordinate_guard = true;
+  sasmol::Molecule mol;
+
+  const auto status = reader.read_pdb(path, mol, options);
+
+  assert(status.ok());
+  auto xyz = mol.coordinate(0, 0);
+  assert_close(xyz.x, 1.0e-10F);
+  assert_close(xyz.y, 1.0F);
+  assert_close(xyz.z, 1.0e-10F);
+
+  std::filesystem::remove(path);
+}
+
+void test_read_pdb_pdbscan_conect_parsing() {
+  const auto path = std::filesystem::temp_directory_path() / "sasmol_conect_scan.pdb";
+  {
+    std::ofstream out(path);
+    out << "ATOM     10  C   GLY A   1       1.000   2.000   3.000  1.00  0.00           C\n";
+    out << "ATOM     20  O   GLY A   1       2.000   3.000   4.000  1.00  0.00           O\n";
+    out << "ATOM     30  N   GLY A   1       3.000   4.000   5.000  1.00  0.00           N\n";
+    out << "CONECT   10   20   30\n";
+    out << "END\n";
+  }
+
+  sasmol::PdbReader reader;
+  sasmol::PdbReadOptions options;
+  options.pdbscan = true;
+  sasmol::Molecule mol;
+
+  const auto status = reader.read_pdb(path, mol, options);
+
+  assert(status.ok());
+  assert((mol.conect()[0] == std::vector<int>{20, 30}));
+  assert(mol.conect()[1].empty());
+
+  std::filesystem::remove(path);
 }
 
 void test_read_pdb_multi_frame_is_explicitly_deferred() {
@@ -313,6 +375,9 @@ int main() {
   test_parse_pdb_atom_record_rejects_bad_required_numbers();
   test_read_pdb_single_frame_1atm();
   test_read_pdb_single_frame_2aad_descriptors();
+  test_read_pdb_classifies_rna_moltype();
+  test_read_pdb_check_zero_coor_guard();
+  test_read_pdb_pdbscan_conect_parsing();
   test_read_pdb_multi_frame_is_explicitly_deferred();
   test_read_pdb_end_separated_multiframe_coordinates();
   test_read_pdb_model_multiframe_coordinates();
