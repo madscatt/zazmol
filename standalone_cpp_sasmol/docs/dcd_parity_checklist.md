@@ -99,13 +99,24 @@ Write parity must include:
 
 ## Proposed Next Implementation Slice
 
-Start with **header-only C++ DCD parsing tests and implementation**:
+Completed first slice: **header-only C++ DCD parsing tests and implementation**.
 
-1. Add binary little/big-endian record-marker helpers.
-2. Implement `DcdReader::open_dcd_read` and `read_header`.
-3. Populate `DcdHeader` with atom count, frame count, unit-cell flag, CHARMM
+1. Added binary little/big-endian record-marker helpers.
+2. Implemented `DcdReader::open_dcd_read` and `read_header`.
+3. Populated `DcdHeader` with atom count, frame count, unit-cell flag, CHARMM
    flag, endian flag, `istart`, `nsavc`, `delta`, and `namnf`.
-4. Add C++ tests for the three small DCD fixtures above.
-5. Stop before frame-coordinate parsing.
+4. Added C++ tests for the three small DCD fixtures above.
+5. Stopped before frame-coordinate parsing.
 
-This keeps the first risky binary step small and reviewable.
+## Proposed Next Implementation Slice
+
+Add sequential frame-coordinate parsing for normal full-coordinate DCD files:
+
+1. Implement CHARMm unit-cell/extra-block skipping before each frame.
+2. Read X, Y, and Z float blocks with record-marker validation.
+3. Convert DCD X/Y/Z arrays into `Molecule` frame-major atom `xyz` triplets.
+4. Add tests for first/middle/final frame samples and coordinate sums for the
+   three small fixtures.
+5. Keep fixed/free atom DCDs as explicit `IoCode::unsupported`.
+
+This is the next risky binary step and should stay separate from DCD writing.

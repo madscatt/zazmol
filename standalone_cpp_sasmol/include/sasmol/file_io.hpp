@@ -4,6 +4,7 @@
 
 #include <cstddef>
 #include <filesystem>
+#include <fstream>
 #include <string>
 
 namespace sasmol {
@@ -63,8 +64,14 @@ class PdbWriter {
 struct DcdHeader {
   std::size_t natoms{};
   std::size_t nframes{};
+  int istart{};
+  int nsavc{};
+  double delta{};
+  int namnf{};
+  bool reverse_endian{};
   bool has_unit_cell{};
   bool charmm_format{};
+  int charmm_flags{};
 };
 
 struct DcdReadOptions {
@@ -98,6 +105,9 @@ class DcdReader {
  private:
   std::filesystem::path filename_;
   DcdReadOptions options_;
+  std::ifstream stream_;
+  DcdHeader header_;
+  bool header_read_{false};
   bool open_{false};
 };
 

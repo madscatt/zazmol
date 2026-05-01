@@ -1,6 +1,7 @@
 #include "sasmol/file_io.hpp"
 
 #include <cassert>
+#include <filesystem>
 #include <string>
 
 namespace {
@@ -38,14 +39,16 @@ void test_dcd_contract_defaults_are_sequential() {
 void test_dcd_reader_has_explicit_open_close_state() {
   sasmol::DcdReader reader;
   sasmol::DcdHeader header;
+  const std::filesystem::path fixture =
+      std::filesystem::path(SASMOL_TEST_DATA_DIR) / "dcd_common" / "1ATM.dcd";
 
   assert(!reader.is_open());
   auto status = reader.read_header(header);
   assert(status.code == sasmol::IoCode::not_open);
 
-  status = reader.open_dcd_read("fixture.dcd");
+  status = reader.open_dcd_read(fixture);
   assert(reader.is_open());
-  assert(status.code == sasmol::IoCode::not_implemented);
+  assert(status.ok());
 
   status = reader.close_dcd_read();
   assert(status.ok());

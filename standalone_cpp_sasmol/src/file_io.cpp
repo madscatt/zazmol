@@ -1,8 +1,109 @@
 #include "sasmol/file_io.hpp"
 
+#include <array>
+#include <bit>
+#include <cstdint>
+#include <cstring>
+#include <ios>
 #include <utility>
 
 namespace sasmol {
+
+namespace {
+
+constexpr int dcd_is_charmm = 0x01;
+constexpr int dcd_has_4dims = 0x02;
+constexpr int dcd_has_extra_block = 0x04;
+
+std::uint32_t byte_swap32(std::uint32_t value) {
+  return ((value & 0x000000FFU) << 24U) | ((value & 0x0000FF00U) << 8U) |
+         ((value & 0x00FF0000U) >> 8U) | ((value & 0xFF000000U) >> 24U);
+}
+
+std::uint64_t byte_swap64(std::uint64_t value) {
+  return ((value & 0x00000000000000FFULL) << 56U) |
+         ((value & 0x000000000000FF00ULL) << 40U) |
+         ((value & 0x0000000000FF0000ULL) << 24U) |
+         ((value & 0x00000000FF000000ULL) << 8U) |
+         ((value & 0x000000FF00000000ULL) >> 8U) |
+         ((value & 0x0000FF0000000000ULL) >> 24U) |
+         ((value & 0x00FF000000000000ULL) >> 40U) |
+         ((value & 0xFF00000000000000ULL) >> 56U);
+}
+
+template <typename T>
+bool read_exact(std::istream& stream, T* value) {
+  stream.read(reinterpret_cast<char*>(value), sizeof(T));
+  return static_cast<bool>(stream);
+}
+
+bool read_bytes(std::istream& stream, char* data, std::streamsize count) {
+  stream.read(data, count);
+  return static_cast<bool>(stream);
+}
+
+int read_int32_from_bytes(const char* data, bool reverse_endian) {
+  std::uint32_t raw{};
+  std::memcpy(&raw, data, sizeof(raw));
+  if (reverse_endian) {
+    raw = byte_swap32(raw);
+  }
+  std::int32_t value{};
+  std::memcpy(&value, &raw, sizeof(value));
+  return value;
+}
+
+float read_float_from_bytes(const char* data, bool reverse_endian) {
+  std::uint32_t raw{};
+  std::memcpy(&raw, data, sizeof(raw));
+  if (reverse_endian) {
+    raw = byte_swap32(raw);
+  }
+  float value{};
+  std::memcpy(&value, &raw, sizeof(value));
+  return value;
+}
+
+double read_double_from_bytes(const char* data, bool reverse_endian) {
+  std::uint64_t raw{};
+  std::memcpy(&raw, data, sizeof(raw));
+  if (reverse_endian) {
+    raw = byte_swap64(raw);
+  }
+  double value{};
+  std::memcpy(&value, &raw, sizeof(value));
+  return value;
+}
+
+IoStatus read_record_marker(std::istream& stream, int expected,
+                            bool reverse_endian,
+                            const std::string& context) {
+  std::uint32_t raw{};
+  if (!read_exact(stream, &raw)) {
+    return {IoCode::end_of_file, "Unexpected EOF while " + context + "."};
+  }
+  if (reverse_endian) {
+    raw = byte_swap32(raw);
+  }
+  std::int32_t marker{};
+  std::memcpy(&marker, &raw, sizeof(marker));
+  if (marker != expected) {
+    return {IoCode::format_error, "Unexpected DCD record marker while " +
+                                      context + "."};
+  }
+  return IoStatus::success();
+}
+
+IoStatus skip_bytes(std::istream& stream, std::streamoff count,
+                    const std::string& context) {
+  stream.seekg(count, std::ios::cur);
+  if (!stream) {
+    return {IoCode::end_of_file, "Unexpected EOF while " + context + "."};
+  }
+  return IoStatus::success();
+}
+
+}  // namespace
 
 IoStatus IoStatus::success() { return {}; }
 
@@ -34,22 +135,172 @@ IoStatus PdbWriter::write_pdb(const std::filesystem::path& filename,
 
 IoStatus DcdReader::open_dcd_read(const std::filesystem::path& filename,
                                   const DcdReadOptions& options) {
+  (void)close_dcd_read();
   filename_ = filename;
   options_ = options;
+  header_ = {};
+  header_read_ = false;
+
+  stream_.open(filename_, std::ios::binary);
+  if (!stream_) {
+    filename_.clear();
+    return {IoCode::file_error, "Failed to open DCD file: " +
+                                    filename.string()};
+  }
+
   open_ = true;
-  return IoStatus::not_implemented(
-      "DCD opening is intentionally deferred until the C-extension binary "
-      "contract is captured in parity tests.");
+  return IoStatus::success();
 }
 
 IoStatus DcdReader::read_header(DcdHeader& header) {
-  (void)header;
   if (!open_) {
     return {IoCode::not_open, "DCD reader is not open."};
   }
-  return IoStatus::not_implemented(
-      "DCD header parsing is intentionally deferred until CHARMM/NAMD/unit-cell "
-      "variants are captured in parity tests.");
+
+  stream_.clear();
+  stream_.seekg(0, std::ios::beg);
+  if (!stream_) {
+    return {IoCode::file_error, "Failed to seek to DCD header."};
+  }
+
+  std::uint32_t raw_marker{};
+  if (!read_exact(stream_, &raw_marker)) {
+    return {IoCode::format_error, "Failed to read initial DCD record marker."};
+  }
+
+  std::int32_t marker{};
+  std::memcpy(&marker, &raw_marker, sizeof(marker));
+  bool reverse_endian = false;
+  if (marker != 84) {
+    raw_marker = byte_swap32(raw_marker);
+    std::memcpy(&marker, &raw_marker, sizeof(marker));
+    if (marker != 84) {
+      return {IoCode::format_error, "Invalid initial DCD record marker."};
+    }
+    reverse_endian = true;
+  }
+
+  std::array<char, 84> header_block{};
+  if (!read_bytes(stream_, header_block.data(), header_block.size())) {
+    return {IoCode::format_error, "Failed to read DCD 84-byte header block."};
+  }
+
+  if (header_block[0] != 'C' || header_block[1] != 'O' ||
+      header_block[2] != 'R' || header_block[3] != 'D') {
+    return {IoCode::format_error, "DCD header does not contain CORD magic."};
+  }
+
+  auto status = read_record_marker(stream_, 84, reverse_endian,
+                                   "reading trailing header marker");
+  if (!status) {
+    return status;
+  }
+
+  const int charmm_version =
+      read_int32_from_bytes(header_block.data() + 80, reverse_endian);
+  int charmm_flags = 0;
+  if (charmm_version != 0) {
+    charmm_flags = dcd_is_charmm;
+    if (read_int32_from_bytes(header_block.data() + 44, reverse_endian) == 1) {
+      charmm_flags |= dcd_has_extra_block;
+    }
+    if (read_int32_from_bytes(header_block.data() + 48, reverse_endian) == 1) {
+      charmm_flags |= dcd_has_4dims;
+    }
+  }
+
+  DcdHeader parsed;
+  parsed.nframes = static_cast<std::size_t>(
+      read_int32_from_bytes(header_block.data() + 4, reverse_endian));
+  parsed.istart = read_int32_from_bytes(header_block.data() + 8, reverse_endian);
+  parsed.nsavc = read_int32_from_bytes(header_block.data() + 12, reverse_endian);
+  parsed.namnf = read_int32_from_bytes(header_block.data() + 36, reverse_endian);
+  parsed.delta = (charmm_flags & dcd_is_charmm)
+                     ? static_cast<double>(
+                           read_float_from_bytes(header_block.data() + 40,
+                                                 reverse_endian))
+                     : read_double_from_bytes(header_block.data() + 40,
+                                              reverse_endian);
+  parsed.reverse_endian = reverse_endian;
+  parsed.has_unit_cell = (charmm_flags & dcd_has_extra_block) != 0;
+  parsed.charmm_format = (charmm_flags & dcd_is_charmm) != 0;
+  parsed.charmm_flags = charmm_flags;
+
+  std::uint32_t raw_title_size{};
+  if (!read_exact(stream_, &raw_title_size)) {
+    return {IoCode::format_error, "Failed to read DCD title block size."};
+  }
+  if (reverse_endian) {
+    raw_title_size = byte_swap32(raw_title_size);
+  }
+  std::int32_t title_size{};
+  std::memcpy(&title_size, &raw_title_size, sizeof(title_size));
+  if (title_size < 4 || ((title_size - 4) % 80) != 0) {
+    return {IoCode::format_error, "Invalid DCD title block size."};
+  }
+
+  std::uint32_t raw_ntitle{};
+  if (!read_exact(stream_, &raw_ntitle)) {
+    return {IoCode::format_error, "Failed to read DCD title count."};
+  }
+  if (reverse_endian) {
+    raw_ntitle = byte_swap32(raw_ntitle);
+  }
+  std::int32_t ntitle{};
+  std::memcpy(&ntitle, &raw_ntitle, sizeof(ntitle));
+  if (ntitle < 0 || 4 + (ntitle * 80) != title_size) {
+    return {IoCode::format_error, "Invalid DCD title count."};
+  }
+
+  status = skip_bytes(stream_, static_cast<std::streamoff>(ntitle) * 80,
+                      "skipping DCD title strings");
+  if (!status) {
+    return status;
+  }
+
+  status =
+      read_record_marker(stream_, title_size, reverse_endian,
+                         "reading trailing DCD title block marker");
+  if (!status) {
+    return status;
+  }
+
+  status = read_record_marker(stream_, 4, reverse_endian,
+                              "reading DCD atom-count block marker");
+  if (!status) {
+    return status;
+  }
+
+  std::uint32_t raw_natoms{};
+  if (!read_exact(stream_, &raw_natoms)) {
+    return {IoCode::format_error, "Failed to read DCD atom count."};
+  }
+  if (reverse_endian) {
+    raw_natoms = byte_swap32(raw_natoms);
+  }
+  std::int32_t natoms{};
+  std::memcpy(&natoms, &raw_natoms, sizeof(natoms));
+  if (natoms < 0) {
+    return {IoCode::format_error, "Invalid negative DCD atom count."};
+  }
+  parsed.natoms = static_cast<std::size_t>(natoms);
+
+  status = read_record_marker(stream_, 4, reverse_endian,
+                              "reading trailing DCD atom-count marker");
+  if (!status) {
+    return status;
+  }
+
+  if (parsed.namnf != 0) {
+    return {IoCode::unsupported,
+            "DCD fixed/free atom index tables are detected but not yet "
+            "implemented."};
+  }
+
+  header_ = parsed;
+  header_read_ = true;
+  header = parsed;
+  return IoStatus::success();
 }
 
 IoStatus DcdReader::read_next_frame(Molecule& molecule) {
@@ -63,7 +314,12 @@ IoStatus DcdReader::read_next_frame(Molecule& molecule) {
 }
 
 IoStatus DcdReader::close_dcd_read() {
+  if (stream_.is_open()) {
+    stream_.close();
+  }
   open_ = false;
+  header_read_ = false;
+  header_ = {};
   filename_.clear();
   return IoStatus::success();
 }
