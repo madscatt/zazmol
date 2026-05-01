@@ -6,6 +6,7 @@
 #include <filesystem>
 #include <fstream>
 #include <string>
+#include <vector>
 
 namespace sasmol {
 
@@ -59,6 +60,10 @@ class PdbWriter {
   [[nodiscard]] IoStatus write_pdb(const std::filesystem::path& filename,
                                    const Molecule& molecule,
                                    const PdbWriteOptions& options = {}) const;
+  [[nodiscard]] IoStatus check_for_all_zero_columns(
+      Molecule& molecule, std::size_t frame = 0) const;
+  [[nodiscard]] std::vector<std::string> create_conect_pdb_lines(
+      const Molecule& molecule) const;
 };
 
 struct DcdHeader {

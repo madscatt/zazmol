@@ -7,6 +7,7 @@
 #include <cstring>
 #include <ios>
 #include <limits>
+#include <map>
 #include <vector>
 #include <utility>
 
@@ -195,6 +196,87 @@ IoStatus PdbWriter::write_pdb(const std::filesystem::path& filename,
   return IoStatus::not_implemented(
       "PDB writing is intentionally deferred until descriptor and formatting "
       "parity are reviewed against Python zazmol fixtures.");
+}
+
+IoStatus PdbWriter::check_for_all_zero_columns(Molecule& molecule,
+                                               std::size_t frame) const {
+  if (frame >= molecule.number_of_frames()) {
+    return {IoCode::format_error, "PDB coordinate frame is out of range."};
+  }
+  if (molecule.natoms() == 0) {
+    return {IoCode::format_error, "PDB coordinate guard requires atoms."};
+  }
+
+  constexpr calc_type small = 1.0e-10;
+  calc_type x_sum{};
+  calc_type y_sum{};
+  calc_type z_sum{};
+
+  for (std::size_t atom = 0; atom < molecule.natoms(); ++atom) {
+    const auto xyz = molecule.coordinate(frame, atom);
+    x_sum += static_cast<calc_type>(xyz.x) * static_cast<calc_type>(xyz.x);
+    y_sum += static_cast<calc_type>(xyz.y) * static_cast<calc_type>(xyz.y);
+    z_sum += static_cast<calc_type>(xyz.z) * static_cast<calc_type>(xyz.z);
+  }
+
+  auto first = molecule.coordinate(frame, 0);
+  if (x_sum < small) {
+    first.x = static_cast<coord_type>(small);
+  }
+  if (y_sum < small) {
+    first.y = static_cast<coord_type>(small);
+  }
+  if (z_sum < small) {
+    first.z = static_cast<coord_type>(small);
+  }
+  molecule.set_coordinate(frame, 0, first);
+  return IoStatus::success();
+}
+
+std::vector<std::string> PdbWriter::create_conect_pdb_lines(
+    const Molecule& molecule) const {
+  std::map<int, int> original_to_current;
+  for (std::size_t atom = 0; atom < molecule.natoms(); ++atom) {
+    original_to_current[molecule.original_index()[atom]] = molecule.index()[atom];
+  }
+
+  std::map<int, std::vector<int>> remapped;
+  const auto& conect = molecule.conect();
+  for (std::size_t atom = 0; atom < molecule.natoms() && atom < conect.size();
+       ++atom) {
+    if (conect[atom].empty()) {
+      continue;
+    }
+
+    const auto base_it = original_to_current.find(molecule.original_index()[atom]);
+    if (base_it == original_to_current.end()) {
+      continue;
+    }
+
+    auto& linked = remapped[base_it->second];
+    for (const int original_linked : conect[atom]) {
+      const auto linked_it = original_to_current.find(original_linked);
+      if (linked_it != original_to_current.end()) {
+        linked.push_back(linked_it->second);
+      }
+    }
+  }
+
+  std::vector<std::string> lines;
+  for (const auto& [base, linked] : remapped) {
+    std::string line = "CONECT";
+    auto append_index = [&line](int value) {
+      const std::string text = std::to_string(value);
+      line.append(5 - std::min<std::size_t>(5, text.size()), ' ');
+      line += text;
+    };
+    append_index(base);
+    for (const int value : linked) {
+      append_index(value);
+    }
+    lines.push_back(line);
+  }
+  return lines;
 }
 
 IoStatus DcdReader::open_dcd_read(const std::filesystem::path& filename,

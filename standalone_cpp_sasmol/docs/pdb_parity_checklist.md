@@ -97,7 +97,7 @@ surface and helper tests:
 
 1. Add C++ helper functions for fixed-column slicing and numeric parsing that
    return `IoStatus`/small result types instead of throwing or exiting.
-2. Add tests for `check_for_all_zero_columns` and `create_conect_pdb_lines`
+2. Added tests for `check_for_all_zero_columns` and `create_conect_pdb_lines`
    parity because those are isolated and already important.
 3. Add PDB frame-boundary pre-scan tests for the fixture categories above.
 4. Stop before descriptor population until frame-boundary behavior is reviewed.
