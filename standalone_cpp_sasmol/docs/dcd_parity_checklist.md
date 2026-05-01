@@ -123,10 +123,22 @@ This slice remains separate from DCD writing.
 
 ## Proposed Next Implementation Slice
 
-Strengthen sequential DCD reader tests before adding writer behavior:
+Completed reader hardening slice before writer behavior:
 
-1. Add coordinate sum parity for the same frames already sampled.
-2. Add `read_single_dcd_step` reopen-and-scan behavior using one-based frame
+1. Added coordinate sum parity for the same frames already sampled.
+2. Added `read_single_dcd_step` reopen-and-scan behavior using one-based frame
    numbering to match Python `zazmol`.
-3. Add malformed/truncated-frame tests that return `IoStatus` errors.
-4. Keep fixed/free atom DCDs as explicit `IoCode::unsupported`.
+3. Added malformed/truncated-frame tests that return `IoStatus` errors.
+4. Kept fixed/free atom DCDs as explicit `IoCode::unsupported`.
+
+## Proposed Next Implementation Slice
+
+Add whole-trajectory convenience reading:
+
+1. Add `DcdReader::read_dcd(filename, molecule)` as a convenience wrapper over
+   open/read_header/repeated `read_next_frame`/close.
+2. Test whole-file read parity for `1ATM.dcd`, `2AAD.dcd`, and
+   `rna-1to10.dcd`.
+3. Preserve the same sequential internals rather than adding hidden random
+   access.
+4. Stop before DCD writing.

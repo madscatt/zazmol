@@ -57,15 +57,17 @@ void test_dcd_reader_has_explicit_open_close_state() {
 
 void test_dcd_random_frame_access_is_explicit_reopen_scan_contract() {
   sasmol::DcdReader reader;
-  sasmol::Molecule mol(1, 1);
+  sasmol::Molecule mol;
   sasmol::DcdReadOptions options;
+  const std::filesystem::path fixture =
+      std::filesystem::path(SASMOL_TEST_DATA_DIR) / "dcd_common" / "1ATM.dcd";
   options.reopen_for_random_frame = true;
 
-  const auto status =
-      reader.read_single_dcd_step("fixture.dcd", 0, mol, options);
+  const auto status = reader.read_single_dcd_step(fixture, 2, mol, options);
 
-  assert(status.code == sasmol::IoCode::not_implemented);
-  assert(status.message.find("reopen") != std::string::npos);
+  assert(status.ok());
+  assert(mol.natoms() == 1);
+  assert(mol.number_of_frames() == 1);
 }
 
 void test_dcd_writer_has_explicit_open_close_state() {
