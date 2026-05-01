@@ -4,6 +4,7 @@
 #include <cassert>
 #include <cmath>
 #include <filesystem>
+#include <map>
 #include <stdexcept>
 
 namespace {
@@ -115,6 +116,67 @@ void test_calculate_mass_rejects_element_mismatch() {
 
   try {
     (void)sasmol::calculate_mass(mol);
+  } catch (const std::invalid_argument&) {
+    threw = true;
+  }
+
+  assert(threw);
+}
+
+void test_calculate_molecular_formula_fixtures() {
+  sasmol::PdbReader reader;
+  sasmol::Molecule mol;
+  auto status = reader.read_pdb(fixture_path("pdb_common", "1ATM.pdb"), mol);
+  assert(status.ok());
+
+  auto formula = sasmol::calculate_molecular_formula(mol);
+  assert((formula == std::map<std::string, std::size_t>{{"N", 1}}));
+  assert(mol.formula() == formula);
+
+  status = reader.read_pdb(fixture_path("pdb_common", "2AAD.pdb"), mol);
+  assert(status.ok());
+  formula = sasmol::calculate_molecular_formula(mol);
+  assert(formula.at("N") == 2);
+  assert(formula.at("O") == 3);
+  assert(formula.at("C") == 10);
+  assert(mol.formula() == formula);
+}
+
+void test_calculate_molecular_formula_rejects_element_mismatch() {
+  sasmol::Molecule mol(1, 1);
+  mol.element().clear();
+  bool threw = false;
+
+  try {
+    (void)sasmol::calculate_molecular_formula(mol);
+  } catch (const std::invalid_argument&) {
+    threw = true;
+  }
+
+  assert(threw);
+}
+
+void test_calculate_residue_charge_two_residues() {
+  sasmol::Molecule mol(4, 1);
+  mol.resid() = {1, 1, 2, 2};
+  mol.atom_charge() = {0.1, 0.2, -0.4, 0.3};
+
+  sasmol::calculate_residue_charge(mol);
+
+  assert(mol.residue_charge().size() == 4);
+  assert_close_double(mol.residue_charge()[0], 0.3);
+  assert_close_double(mol.residue_charge()[1], 0.3);
+  assert_close_double(mol.residue_charge()[2], -0.1);
+  assert_close_double(mol.residue_charge()[3], -0.1);
+}
+
+void test_calculate_residue_charge_rejects_descriptor_mismatch() {
+  sasmol::Molecule mol(1, 1);
+  mol.atom_charge().clear();
+  bool threw = false;
+
+  try {
+    sasmol::calculate_residue_charge(mol);
   } catch (const std::invalid_argument&) {
     threw = true;
   }
@@ -365,6 +427,10 @@ int main() {
   test_calculate_mass_rna_and_1crn_fixture_totals();
   test_calculate_mass_reports_unknown_elements();
   test_calculate_mass_rejects_element_mismatch();
+  test_calculate_molecular_formula_fixtures();
+  test_calculate_molecular_formula_rejects_element_mismatch();
+  test_calculate_residue_charge_two_residues();
+  test_calculate_residue_charge_rejects_descriptor_mismatch();
   test_calculate_center_of_mass_autocalculates_mass();
   test_calculate_center_of_mass_fixture_totals();
   test_calculate_center_of_mass_rejects_unknown_mass();

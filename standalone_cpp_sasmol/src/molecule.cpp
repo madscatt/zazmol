@@ -65,10 +65,11 @@ void Molecule::resize(std::size_t natoms, std::size_t number_of_frames) {
   resize_descriptor(segname_, natoms_, std::string{});
   resize_descriptor(element_, natoms_, std::string{});
   resize_descriptor(charge_, natoms_, std::string{});
-  resize_descriptor(atom_charge_, natoms_, std::string{});
+  resize_descriptor(atom_charge_, natoms_, calc_type{});
   resize_descriptor(atom_vdw_, natoms_, calc_type{});
   resize_descriptor(moltype_, natoms_, std::string{});
   resize_descriptor(mass_, natoms_, calc_type{});
+  resize_descriptor(residue_charge_, natoms_, calc_type{});
   conect_.assign(natoms_, {});
 
   for (std::size_t i = 0; i < natoms_; ++i) {
@@ -153,6 +154,7 @@ IntegrityReport Molecule::check_integrity(bool fast_check) const {
   add("atom_vdw", atom_vdw_);
   add("moltype", moltype_);
   add("mass", mass_);
+  add("residue_charge", residue_charge_);
   add("conect", conect_);
 
   if (fast_check && !report.issues.empty()) {

@@ -109,10 +109,10 @@ class Molecule {
   [[nodiscard]] const std::vector<std::string>& charge() const noexcept {
     return charge_;
   }
-  [[nodiscard]] std::vector<std::string>& atom_charge() noexcept {
+  [[nodiscard]] std::vector<calc_type>& atom_charge() noexcept {
     return atom_charge_;
   }
-  [[nodiscard]] const std::vector<std::string>& atom_charge() const noexcept {
+  [[nodiscard]] const std::vector<calc_type>& atom_charge() const noexcept {
     return atom_charge_;
   }
   [[nodiscard]] std::vector<calc_type>& atom_vdw() noexcept {
@@ -134,9 +134,18 @@ class Molecule {
   [[nodiscard]] calc_type total_mass() const noexcept { return total_mass_; }
   void set_total_mass(calc_type value) noexcept { total_mass_ = value; }
 
-  [[nodiscard]] std::string& formula() noexcept { return formula_; }
-  [[nodiscard]] const std::string& formula() const noexcept {
+  [[nodiscard]] std::map<std::string, std::size_t>& formula() noexcept {
     return formula_;
+  }
+  [[nodiscard]] const std::map<std::string, std::size_t>& formula()
+      const noexcept {
+    return formula_;
+  }
+  [[nodiscard]] std::vector<calc_type>& residue_charge() noexcept {
+    return residue_charge_;
+  }
+  [[nodiscard]] const std::vector<calc_type>& residue_charge() const noexcept {
+    return residue_charge_;
   }
   [[nodiscard]] std::string& fasta() noexcept { return fasta_; }
   [[nodiscard]] const std::string& fasta() const noexcept { return fasta_; }
@@ -188,13 +197,14 @@ class Molecule {
   std::vector<std::string> segname_;
   std::vector<std::string> element_;
   std::vector<std::string> charge_;
-  std::vector<std::string> atom_charge_;
+  std::vector<calc_type> atom_charge_;
   std::vector<calc_type> atom_vdw_;
   std::vector<std::string> moltype_;
   std::vector<calc_type> mass_;
 
   calc_type total_mass_{};
-  std::string formula_;
+  std::map<std::string, std::size_t> formula_;
+  std::vector<calc_type> residue_charge_;
   std::string fasta_;
   std::array<calc_type, 6> unitcell_{};
   std::vector<std::vector<int>> conect_;

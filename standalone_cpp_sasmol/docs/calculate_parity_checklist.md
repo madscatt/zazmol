@@ -69,9 +69,21 @@ Implemented `calculate_root_mean_square_deviation(first, second)`:
   `1CRN-rot-shift.pdb`
 - shape mismatches are explicit errors instead of printed warnings
 
+## Formula And Residue Charge Slice
+
+Implemented descriptor/topology calculations:
+
+- `calculate_molecular_formula(molecule)`
+- `calculate_residue_charge(molecule)`
+- formula is stored as `std::map<std::string, std::size_t>`, matching Python's
+  dictionary-style result
+- residue charge is stored per atom as `calc_type`
+- fixture parity for `1ATM.pdb` and `2AAD.pdb` formula counts
+- Python unit-test parity for two-residue charge sums
+- descriptor mismatches are explicit errors
+
 ## Deferred
 
 - DCD streaming overloads for `calculate_minimum_and_maximum_all_steps`
 - principal moments of inertia
 - alignment-dependent calculations
-- molecular formula and residue charge

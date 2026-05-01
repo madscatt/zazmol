@@ -44,6 +44,40 @@ MassCalculationResult calculate_mass(Molecule& molecule) {
   return result;
 }
 
+std::map<std::string, std::size_t> calculate_molecular_formula(
+    Molecule& molecule) {
+  if (molecule.element().size() != molecule.natoms()) {
+    throw std::invalid_argument(
+        "calculate_molecular_formula requires one element per atom");
+  }
+
+  std::map<std::string, std::size_t> formula;
+  for (const auto& element : molecule.element()) {
+    ++formula[element];
+  }
+
+  molecule.formula() = formula;
+  return formula;
+}
+
+void calculate_residue_charge(Molecule& molecule) {
+  if (molecule.resid().size() != molecule.natoms() ||
+      molecule.atom_charge().size() != molecule.natoms()) {
+    throw std::invalid_argument(
+        "calculate_residue_charge requires resid and atom_charge per atom");
+  }
+
+  std::map<int, calc_type> charge_by_resid;
+  for (std::size_t atom = 0; atom < molecule.natoms(); ++atom) {
+    charge_by_resid[molecule.resid()[atom]] += molecule.atom_charge()[atom];
+  }
+
+  molecule.residue_charge().assign(molecule.natoms(), calc_type{});
+  for (std::size_t atom = 0; atom < molecule.natoms(); ++atom) {
+    molecule.residue_charge()[atom] = charge_by_resid[molecule.resid()[atom]];
+  }
+}
+
 CalcVec3 calculate_center_of_mass(Molecule& molecule, std::size_t frame) {
   if (frame >= molecule.number_of_frames()) {
     throw std::out_of_range("calculate_center_of_mass frame is out of range");

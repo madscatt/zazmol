@@ -3,6 +3,8 @@
 #include "sasmol/molecule.hpp"
 
 #include <cstddef>
+#include <map>
+#include <string>
 #include <vector>
 
 namespace sasmol {
@@ -26,6 +28,11 @@ struct MassCalculationResult {
 };
 
 [[nodiscard]] MassCalculationResult calculate_mass(Molecule& molecule);
+
+[[nodiscard]] std::map<std::string, std::size_t> calculate_molecular_formula(
+    Molecule& molecule);
+
+void calculate_residue_charge(Molecule& molecule);
 
 [[nodiscard]] CalcVec3 calculate_center_of_mass(Molecule& molecule,
                                                 std::size_t frame);
