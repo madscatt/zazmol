@@ -19,7 +19,7 @@ reviewed, implemented, deferred, or intentionally expressed differently in C++.
 | `system` molecule state | `sasmol::Molecule` | implemented | Initial descriptor, coordinate, and integrity model only. |
 | `config.COORD_DTYPE` | `sasmol::coord_type` | implemented | `float`, matching storage-friendly coordinate intent. |
 | `config.CALC_DTYPE` | `sasmol::calc_type` | implemented | `double`, matching calculation-friendly intent. |
-| PDB I/O | `PdbReader` / `PdbWriter` | required | PDB parity checklist added; parser deferred until tolerant frame-boundary behavior is reviewed. |
+| PDB I/O | `PdbReader` / `PdbWriter` | implemented | Implemented for tolerant fixed-column reads, END and MODEL trajectories, selected/all-frame writes, CONECT output, and larger fixture validation through Python `zazmol`. Optional-field fill and full element-resolution parity remain deferred. |
 | DCD I/O | `DcdReader` / `DcdWriter` | required | Reader implemented for normal full-coordinate small fixtures; writer round-trips through C++ and Python readers for `1ATM`, `2AAD`, and `rna-1to10`. |
 | calculations | free functions / module namespaces | deferred | Port only after file and descriptor parity are stable. |
 | GPU/MPI backends | optional backends | deferred | Data views are being shaped now; dependencies wait. |
