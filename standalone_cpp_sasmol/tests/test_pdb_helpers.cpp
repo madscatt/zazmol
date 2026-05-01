@@ -102,6 +102,8 @@ void test_pdb_frame_scan_fixtures() {
               sasmol::PdbFrameMode::model_records);
   assert_scan(fixture_path("sasmol/file_io", "1AA-NoEND.pdb"), 9, 1,
               sasmol::PdbFrameMode::single);
+  assert_scan(fixture_path("pdb_common", "rna-1to10.pdb"), 10632, 10,
+              sasmol::PdbFrameMode::end_records);
 }
 
 void test_pdb_frame_scan_failure_fixtures() {
@@ -255,6 +257,52 @@ void test_read_pdb_classifies_rna_moltype() {
   assert(mol.moltype()[0] == "rna");
 }
 
+void test_read_pdb_rna_multiframe_fixture() {
+  sasmol::PdbReader reader;
+  sasmol::Molecule mol;
+
+  const auto status =
+      reader.read_pdb(fixture_path("pdb_common", "rna-1to10.pdb"), mol);
+
+  assert(status.ok());
+  assert(mol.natoms() == 10632);
+  assert(mol.number_of_frames() == 10);
+  assert(mol.name()[0] == "C5'");
+  assert(mol.resname()[0] == "GUA");
+  assert(mol.moltype()[0] == "rna");
+  auto xyz = mol.coordinate(0, 0);
+  assert_close(xyz.x, -5.094F);
+  assert_close(xyz.y, 1.608F);
+  assert_close(xyz.z, 11.003F);
+  xyz = mol.coordinate(9, 10631);
+  assert_close(xyz.x, -6.392F);
+  assert_close(xyz.y, 14.348F);
+  assert_close(xyz.z, 20.914F);
+}
+
+void test_read_pdb_1crn_protein_fixture() {
+  sasmol::PdbReader reader;
+  sasmol::Molecule mol;
+
+  const auto status =
+      reader.read_pdb(fixture_path("pdb_common", "1CRN.pdb"), mol);
+
+  assert(status.ok());
+  assert(mol.natoms() == 327);
+  assert(mol.number_of_frames() == 1);
+  assert(mol.name()[0] == "N");
+  assert(mol.resname()[0] == "THR");
+  assert(mol.moltype()[0] == "protein");
+  auto xyz = mol.coordinate(0, 0);
+  assert_close(xyz.x, 17.047F);
+  assert_close(xyz.y, 14.099F);
+  assert_close(xyz.z, 3.625F);
+  xyz = mol.coordinate(0, 326);
+  assert_close(xyz.x, 12.703F);
+  assert_close(xyz.y, 4.973F);
+  assert_close(xyz.z, 10.746F);
+}
+
 void test_read_pdb_check_zero_coor_guard() {
   const auto path = std::filesystem::temp_directory_path() / "sasmol_zero_axis.pdb";
   {
@@ -341,6 +389,11 @@ void test_write_pdb_single_frame_2aad_round_trip() {
                           {76.970F, 46.273F, 42.000F});
 }
 
+void test_write_pdb_single_frame_1crn_round_trip() {
+  write_and_read_back_pdb("pdb_common", "1CRN.pdb", "sasmol_cpp_1crn.pdb", 327,
+                          {12.703F, 4.973F, 10.746F});
+}
+
 void test_write_pdb_rejects_out_of_range_frame() {
   sasmol::PdbReader reader;
   sasmol::PdbWriter writer;
@@ -381,6 +434,35 @@ void test_write_pdb_selected_multiframe_frame_round_trip() {
   assert_close(xyz.x, 73.944F);
   assert_close(xyz.y, 38.799F);
   assert_close(xyz.z, 41.652F);
+
+  std::filesystem::remove(output);
+}
+
+void test_write_pdb_selected_rna_frame_round_trip() {
+  sasmol::PdbReader reader;
+  sasmol::PdbWriter writer;
+  sasmol::Molecule source;
+  auto status =
+      reader.read_pdb(fixture_path("pdb_common", "rna-1to10.pdb"), source);
+  assert(status.ok());
+
+  const auto output =
+      std::filesystem::temp_directory_path() / "sasmol_selected_rna.pdb";
+  sasmol::PdbWriteOptions options;
+  options.frame = 9;
+  status = writer.write_pdb(output, source, options);
+  assert(status.ok());
+
+  sasmol::Molecule round_trip;
+  status = reader.read_pdb(output, round_trip);
+  assert(status.ok());
+  assert(round_trip.natoms() == 10632);
+  assert(round_trip.number_of_frames() == 1);
+  assert(round_trip.moltype()[0] == "rna");
+  const auto xyz = round_trip.coordinate(0, 10631);
+  assert_close(xyz.x, -6.392F);
+  assert_close(xyz.y, 14.348F);
+  assert_close(xyz.z, 20.914F);
 
   std::filesystem::remove(output);
 }
@@ -554,12 +636,16 @@ int main() {
   test_read_pdb_single_frame_1atm();
   test_read_pdb_single_frame_2aad_descriptors();
   test_read_pdb_classifies_rna_moltype();
+  test_read_pdb_rna_multiframe_fixture();
+  test_read_pdb_1crn_protein_fixture();
   test_read_pdb_check_zero_coor_guard();
   test_read_pdb_pdbscan_conect_parsing();
   test_write_pdb_single_frame_1atm_round_trip();
   test_write_pdb_single_frame_2aad_round_trip();
+  test_write_pdb_single_frame_1crn_round_trip();
   test_write_pdb_rejects_out_of_range_frame();
   test_write_pdb_selected_multiframe_frame_round_trip();
+  test_write_pdb_selected_rna_frame_round_trip();
   test_write_pdb_model_endmdl_output();
   test_write_pdb_conect_output();
   test_write_pdb_all_frames_model_round_trip();

@@ -114,6 +114,8 @@ surface and helper tests:
 8. Added single-frame `write_pdb` round-trip coverage for `1ATM` and `2AAD`.
 9. Added selected-frame write support, MODEL/ENDMDL output, and CONECT output.
 10. Added `write_all_frames` multi-model output with C++ readback coverage.
+11. Added larger fixture coverage for `rna-1to10.pdb` multi-frame reads,
+    selected-frame RNA writes, and `1CRN.pdb` protein read/write round trips.
 
 ## Proposed Next Validation Slice
 
