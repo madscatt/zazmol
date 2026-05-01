@@ -2,7 +2,11 @@
 
 #include <cassert>
 #include <cmath>
+#include <cstdint>
+#include <cstring>
 #include <filesystem>
+#include <fstream>
+#include <vector>
 
 namespace {
 
@@ -46,6 +50,57 @@ void test_missing_file_is_file_error() {
 
   assert(status.code == sasmol::IoCode::file_error);
   assert(!reader.is_open());
+}
+
+void write_bytes(const std::filesystem::path& path,
+                 const std::vector<char>& bytes) {
+  std::ofstream out(path, std::ios::binary | std::ios::trunc);
+  out.write(bytes.data(), static_cast<std::streamsize>(bytes.size()));
+  assert(out.good());
+}
+
+std::filesystem::path temp_dcd_path(const char* name) {
+  return std::filesystem::temp_directory_path() / name;
+}
+
+void test_truncated_header_returns_status() {
+  const auto truncated = temp_dcd_path("sasmol_truncated_header.dcd");
+  write_bytes(truncated, {'n', 'o', 't', 'd', 'c', 'd'});
+
+  sasmol::DcdReader reader;
+  sasmol::DcdHeader header;
+
+  auto status = reader.open_dcd_read(truncated);
+  assert(status.ok());
+  status = reader.read_header(header);
+  assert(!status.ok());
+  assert(status.code == sasmol::IoCode::format_error);
+
+  std::filesystem::remove(truncated);
+}
+
+void test_bad_cord_magic_returns_status() {
+  const auto bad_magic = temp_dcd_path("sasmol_bad_cord.dcd");
+  auto bytes = std::vector<char>(4 + 84 + 4, '\0');
+  const std::int32_t marker = 84;
+  std::memcpy(bytes.data(), &marker, sizeof(marker));
+  bytes[4] = 'B';
+  bytes[5] = 'A';
+  bytes[6] = 'D';
+  bytes[7] = '!';
+  std::memcpy(bytes.data() + 4 + 84, &marker, sizeof(marker));
+  write_bytes(bad_magic, bytes);
+
+  sasmol::DcdReader reader;
+  sasmol::DcdHeader header;
+
+  auto status = reader.open_dcd_read(bad_magic);
+  assert(status.ok());
+  status = reader.read_header(header);
+  assert(!status.ok());
+  assert(status.code == sasmol::IoCode::format_error);
+
+  std::filesystem::remove(bad_magic);
 }
 
 void assert_close(sasmol::coord_type actual, sasmol::coord_type expected,
@@ -243,10 +298,6 @@ void test_whole_trajectory_read_rna() {
   assert_close_double(coordinate_sum(mol), -430804.378, 0.1);
 }
 
-std::filesystem::path temp_dcd_path(const char* name) {
-  return std::filesystem::temp_directory_path() / name;
-}
-
 void write_round_trip_fixture(const char* source_name, const char* temp_name,
                               double expected_sum, double sum_tolerance) {
   sasmol::DcdReader reader;
@@ -313,11 +364,71 @@ void test_writer_convenience_round_trips_rna() {
   std::filesystem::remove(output);
 }
 
+void test_read_dcd_failure_closes_reader() {
+  const auto source = fixture_path("1ATM.dcd");
+  const auto truncated = temp_dcd_path("sasmol_truncated_read_dcd.dcd");
+  std::filesystem::copy_file(source, truncated,
+                             std::filesystem::copy_options::overwrite_existing);
+  const auto original_size = std::filesystem::file_size(truncated);
+  std::filesystem::resize_file(truncated, original_size - 8);
+
+  sasmol::DcdReader reader;
+  sasmol::Molecule mol;
+  const auto status = reader.read_dcd(truncated, mol);
+
+  assert(!status.ok());
+  assert(!reader.is_open());
+
+  std::filesystem::remove(truncated);
+}
+
+void test_single_step_past_end_closes_reader() {
+  sasmol::DcdReader reader;
+  sasmol::Molecule mol;
+
+  const auto status =
+      reader.read_single_dcd_step(fixture_path("1ATM.dcd"), 3, mol);
+
+  assert(status.code == sasmol::IoCode::end_of_file);
+  assert(!reader.is_open());
+}
+
+void test_writer_rejects_unit_cell_option() {
+  sasmol::DcdWriter writer;
+  sasmol::DcdWriteOptions options;
+  options.include_unit_cell = true;
+
+  const auto status =
+      writer.open_dcd_write(temp_dcd_path("sasmol_unit_cell_write.dcd"), options);
+
+  assert(status.code == sasmol::IoCode::unsupported);
+  assert(!writer.is_open());
+}
+
+void test_writer_rejects_out_of_range_frame() {
+  sasmol::DcdWriter writer;
+  sasmol::Molecule mol(1, 1);
+  const auto output = temp_dcd_path("sasmol_out_of_range_write.dcd");
+
+  auto status = writer.open_dcd_write(output);
+  assert(status.ok());
+  status = writer.write_dcd_header(mol, 1);
+  assert(status.ok());
+  status = writer.write_dcd_step(mol, 1, 1);
+  assert(status.code == sasmol::IoCode::format_error);
+  status = writer.close_dcd_write();
+  assert(status.ok());
+
+  std::filesystem::remove(output);
+}
+
 }  // namespace
 
 int main() {
   test_small_fixture_headers();
   test_missing_file_is_file_error();
+  test_truncated_header_returns_status();
+  test_bad_cord_magic_returns_status();
   test_sequential_frame_reads_1atm();
   test_sequential_frame_reads_2aad_middle_and_final();
   test_sequential_frame_reads_rna_final_sample();
@@ -330,5 +441,9 @@ int main() {
   test_writer_round_trips_1atm();
   test_writer_round_trips_2aad();
   test_writer_convenience_round_trips_rna();
+  test_read_dcd_failure_closes_reader();
+  test_single_step_past_end_closes_reader();
+  test_writer_rejects_unit_cell_option();
+  test_writer_rejects_out_of_range_frame();
   return 0;
 }

@@ -198,3 +198,27 @@ parsing path includes explicit checks for:
 
 The current C++ tests pass under AddressSanitizer and UndefinedBehaviorSanitizer
 using the documented `SASMOL_ENABLE_SANITIZERS=ON` build.
+
+## Additional DCD Hardening
+
+Completed malformed-input and misuse coverage:
+
+- truncated headers return `IoStatus`
+- bad `CORD` magic returns `IoStatus`
+- truncated frame reads return `IoStatus`
+- `read_dcd` closes the reader on failure
+- `read_single_dcd_step` closes its internal reader when reading past EOF
+- unit-cell DCD writing is explicit `IoCode::unsupported`
+- out-of-range DCD write frames return `IoStatus`
+
+These paths pass in both the normal build and the sanitizer build.
+
+## Proposed Next Implementation Slice
+
+Add targeted binary-header edge tests:
+
+1. Invalid title block size/count.
+2. Negative header counts.
+3. Oversized/unsupported record marker paths where feasible without allocating
+   huge memory.
+4. Keep these as status-return tests rather than exceptions or process exits.
