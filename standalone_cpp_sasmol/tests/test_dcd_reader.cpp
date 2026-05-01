@@ -534,6 +534,73 @@ void test_writer_rejects_out_of_range_frame() {
   std::filesystem::remove(output);
 }
 
+void test_repeated_open_close_is_safe() {
+  sasmol::DcdReader reader;
+
+  auto status = reader.open_dcd_read(fixture_path("1ATM.dcd"));
+  assert(status.ok());
+  status = reader.open_dcd_read(fixture_path("2AAD.dcd"));
+  assert(status.ok());
+
+  sasmol::DcdHeader header;
+  status = reader.read_header(header);
+  assert(status.ok());
+  assert(header.natoms == 15);
+
+  status = reader.close_dcd_read();
+  assert(status.ok());
+  status = reader.close_dcd_read();
+  assert(status.ok());
+}
+
+void test_read_header_resets_sequential_position() {
+  sasmol::DcdReader reader;
+  sasmol::DcdHeader header;
+  sasmol::Molecule mol;
+
+  auto status = reader.open_dcd_read(fixture_path("1ATM.dcd"));
+  assert(status.ok());
+  status = reader.read_next_frame(mol);
+  assert(status.ok());
+  auto xyz = mol.coordinate(0, 0);
+  assert_close(xyz.x, 76.944F);
+
+  status = reader.read_header(header);
+  assert(status.ok());
+  status = reader.read_next_frame(mol);
+  assert(status.ok());
+  xyz = mol.coordinate(0, 0);
+  assert_close(xyz.x, 76.944F);
+}
+
+void test_read_and_write_after_close_return_not_open() {
+  sasmol::DcdReader reader;
+  sasmol::DcdWriter writer;
+  sasmol::Molecule mol(1, 1);
+  sasmol::DcdHeader header;
+
+  auto status = reader.open_dcd_read(fixture_path("1ATM.dcd"));
+  assert(status.ok());
+  status = reader.close_dcd_read();
+  assert(status.ok());
+  status = reader.read_header(header);
+  assert(status.code == sasmol::IoCode::not_open);
+  status = reader.read_next_frame(mol);
+  assert(status.code == sasmol::IoCode::not_open);
+
+  const auto output = temp_dcd_path("sasmol_after_close_write.dcd");
+  status = writer.open_dcd_write(output);
+  assert(status.ok());
+  status = writer.close_dcd_write();
+  assert(status.ok());
+  status = writer.write_dcd_header(mol, 1);
+  assert(status.code == sasmol::IoCode::not_open);
+  status = writer.write_dcd_step(mol, 0, 1);
+  assert(status.code == sasmol::IoCode::not_open);
+
+  std::filesystem::remove(output);
+}
+
 }  // namespace
 
 int main() {
@@ -561,5 +628,8 @@ int main() {
   test_single_step_past_end_closes_reader();
   test_writer_rejects_unit_cell_option();
   test_writer_rejects_out_of_range_frame();
+  test_repeated_open_close_is_safe();
+  test_read_header_resets_sequential_position();
+  test_read_and_write_after_close_return_not_open();
   return 0;
 }

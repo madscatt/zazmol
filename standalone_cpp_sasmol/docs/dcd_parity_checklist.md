@@ -227,9 +227,20 @@ These paths pass in both the normal build and the sanitizer build.
 
 ## Proposed Next Implementation Slice
 
-Add explicit lifecycle and state-machine hardening:
+Completed explicit lifecycle and state-machine hardening:
 
 1. Repeated open/close calls are safe.
 2. Re-reading the header resets frame position deliberately.
 3. Read/write calls after close return `IoCode::not_open`.
 4. Temporary files are cleaned by tests.
+
+These paths pass in both the normal build and the sanitizer build.
+
+## Proposed Next Implementation Slice
+
+The remaining DCD hardening options are higher policy choices:
+
+1. Add larger generated-file tests.
+2. Add explicit unsupported fixtures for fixed/free atom DCDs if we have one.
+3. Add Python cross-reader checks to CI-like tooling rather than normal CTest.
+4. Move to PDB I/O contract/parity.
