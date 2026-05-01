@@ -13,6 +13,7 @@ add_library(sasmol_standalone
   src/calculate.cpp
   src/file_io.cpp
   src/molecule.cpp
+  src/operate.cpp
   src/properties.cpp
 )
 
@@ -68,6 +69,13 @@ if(BUILD_TESTING)
     SASMOL_TEST_DATA_DIR="${CMAKE_CURRENT_SOURCE_DIR}/../src/python/test_sasmol/data"
   )
   add_test(NAME calculate COMMAND test_calculate)
+
+  add_executable(test_operate tests/test_operate.cpp)
+  target_link_libraries(test_operate PRIVATE sasmol_standalone)
+  target_compile_definitions(test_operate PRIVATE
+    SASMOL_TEST_DATA_DIR="${CMAKE_CURRENT_SOURCE_DIR}/../src/python/test_sasmol/data"
+  )
+  add_test(NAME operate COMMAND test_operate)
 
   add_executable(test_dcd_reader tests/test_dcd_reader.cpp)
   target_link_libraries(test_dcd_reader PRIVATE sasmol_standalone)

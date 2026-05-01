@@ -41,6 +41,8 @@ The PDB/DCD APIs are defined in
 [`docs/file_io_contract.md`](docs/file_io_contract.md). Calculation parity is
 tracked in
 [`docs/calculate_parity_checklist.md`](docs/calculate_parity_checklist.md).
+Coordinate mutation and rotation parity are tracked in
+[`docs/operate_parity_checklist.md`](docs/operate_parity_checklist.md).
 
 ## Build
 
