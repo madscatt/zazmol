@@ -6,6 +6,7 @@
 #include <cstring>
 #include <filesystem>
 #include <fstream>
+#include <limits>
 #include <vector>
 
 namespace {
@@ -59,6 +60,49 @@ void write_bytes(const std::filesystem::path& path,
   assert(out.good());
 }
 
+void append_i32(std::vector<char>& bytes, std::int32_t value) {
+  const auto* raw = reinterpret_cast<const char*>(&value);
+  bytes.insert(bytes.end(), raw, raw + sizeof(value));
+}
+
+void append_f64(std::vector<char>& bytes, double value) {
+  const auto* raw = reinterpret_cast<const char*>(&value);
+  bytes.insert(bytes.end(), raw, raw + sizeof(value));
+}
+
+std::vector<char> dcd_header_prefix(std::int32_t nframes,
+                                    std::int32_t nsavc = 1,
+                                    std::int32_t namnf = 0) {
+  std::vector<char> bytes;
+  append_i32(bytes, 84);
+  bytes.insert(bytes.end(), {'C', 'O', 'R', 'D'});
+  append_i32(bytes, nframes);
+  append_i32(bytes, 0);
+  append_i32(bytes, nsavc);
+  for (int i = 0; i < 5; ++i) {
+    append_i32(bytes, 0);
+  }
+  append_i32(bytes, namnf);
+  append_f64(bytes, 1.0);
+  for (int i = 0; i < 9; ++i) {
+    append_i32(bytes, 0);
+  }
+  append_i32(bytes, 84);
+  assert(bytes.size() == 92);
+  return bytes;
+}
+
+void append_valid_title_and_atom_count(std::vector<char>& bytes,
+                                       std::int32_t natoms) {
+  append_i32(bytes, 84);
+  append_i32(bytes, 1);
+  bytes.insert(bytes.end(), 80, ' ');
+  append_i32(bytes, 84);
+  append_i32(bytes, 4);
+  append_i32(bytes, natoms);
+  append_i32(bytes, 4);
+}
+
 std::filesystem::path temp_dcd_path(const char* name) {
   return std::filesystem::temp_directory_path() / name;
 }
@@ -101,6 +145,74 @@ void test_bad_cord_magic_returns_status() {
   assert(status.code == sasmol::IoCode::format_error);
 
   std::filesystem::remove(bad_magic);
+}
+
+void test_invalid_title_block_size_returns_status() {
+  const auto bad_title = temp_dcd_path("sasmol_bad_title_size.dcd");
+  auto bytes = dcd_header_prefix(1);
+  append_i32(bytes, 5);
+  write_bytes(bad_title, bytes);
+
+  sasmol::DcdReader reader;
+  sasmol::DcdHeader header;
+
+  auto status = reader.open_dcd_read(bad_title);
+  assert(status.ok());
+  status = reader.read_header(header);
+  assert(status.code == sasmol::IoCode::format_error);
+
+  std::filesystem::remove(bad_title);
+}
+
+void test_invalid_title_count_returns_status() {
+  const auto bad_title = temp_dcd_path("sasmol_bad_title_count.dcd");
+  auto bytes = dcd_header_prefix(1);
+  append_i32(bytes, 84);
+  append_i32(bytes, 2);
+  write_bytes(bad_title, bytes);
+
+  sasmol::DcdReader reader;
+  sasmol::DcdHeader header;
+
+  auto status = reader.open_dcd_read(bad_title);
+  assert(status.ok());
+  status = reader.read_header(header);
+  assert(status.code == sasmol::IoCode::format_error);
+
+  std::filesystem::remove(bad_title);
+}
+
+void test_negative_header_count_returns_status() {
+  const auto bad_count = temp_dcd_path("sasmol_negative_header_count.dcd");
+  const auto bytes = dcd_header_prefix(-1);
+  write_bytes(bad_count, bytes);
+
+  sasmol::DcdReader reader;
+  sasmol::DcdHeader header;
+
+  auto status = reader.open_dcd_read(bad_count);
+  assert(status.ok());
+  status = reader.read_header(header);
+  assert(status.code == sasmol::IoCode::format_error);
+
+  std::filesystem::remove(bad_count);
+}
+
+void test_oversized_atom_count_returns_unsupported_before_allocation() {
+  const auto oversized = temp_dcd_path("sasmol_oversized_atom_count.dcd");
+  auto bytes = dcd_header_prefix(1);
+  append_valid_title_and_atom_count(bytes, std::numeric_limits<std::int32_t>::max());
+  write_bytes(oversized, bytes);
+
+  sasmol::DcdReader reader;
+  sasmol::Molecule mol;
+
+  auto status = reader.open_dcd_read(oversized);
+  assert(status.ok());
+  status = reader.read_next_frame(mol);
+  assert(status.code == sasmol::IoCode::unsupported);
+
+  std::filesystem::remove(oversized);
 }
 
 void assert_close(sasmol::coord_type actual, sasmol::coord_type expected,
@@ -429,6 +541,10 @@ int main() {
   test_missing_file_is_file_error();
   test_truncated_header_returns_status();
   test_bad_cord_magic_returns_status();
+  test_invalid_title_block_size_returns_status();
+  test_invalid_title_count_returns_status();
+  test_negative_header_count_returns_status();
+  test_oversized_atom_count_returns_unsupported_before_allocation();
   test_sequential_frame_reads_1atm();
   test_sequential_frame_reads_2aad_middle_and_final();
   test_sequential_frame_reads_rna_final_sample();

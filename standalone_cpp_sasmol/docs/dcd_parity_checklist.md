@@ -215,10 +215,21 @@ These paths pass in both the normal build and the sanitizer build.
 
 ## Proposed Next Implementation Slice
 
-Add targeted binary-header edge tests:
+Completed targeted binary-header edge tests:
 
 1. Invalid title block size/count.
 2. Negative header counts.
 3. Oversized/unsupported record marker paths where feasible without allocating
    huge memory.
-4. Keep these as status-return tests rather than exceptions or process exits.
+4. Kept these as status-return tests rather than exceptions or process exits.
+
+These paths pass in both the normal build and the sanitizer build.
+
+## Proposed Next Implementation Slice
+
+Add explicit lifecycle and state-machine hardening:
+
+1. Repeated open/close calls are safe.
+2. Re-reading the header resets frame position deliberately.
+3. Read/write calls after close return `IoCode::not_open`.
+4. Temporary files are cleaned by tests.
