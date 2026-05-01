@@ -357,6 +357,93 @@ void test_write_pdb_rejects_out_of_range_frame() {
   assert(status.code == sasmol::IoCode::format_error);
 }
 
+void test_write_pdb_selected_multiframe_frame_round_trip() {
+  sasmol::PdbReader reader;
+  sasmol::PdbWriter writer;
+  sasmol::Molecule source;
+  auto status =
+      reader.read_pdb(fixture_path("pdb_common", "1ATM-1to2.pdb"), source);
+  assert(status.ok());
+
+  const auto output = std::filesystem::temp_directory_path() /
+                      "sasmol_selected_multiframe.pdb";
+  sasmol::PdbWriteOptions options;
+  options.frame = 1;
+  status = writer.write_pdb(output, source, options);
+  assert(status.ok());
+
+  sasmol::Molecule round_trip;
+  status = reader.read_pdb(output, round_trip);
+  assert(status.ok());
+  assert(round_trip.natoms() == 1);
+  assert(round_trip.number_of_frames() == 1);
+  const auto xyz = round_trip.coordinate(0, 0);
+  assert_close(xyz.x, 73.944F);
+  assert_close(xyz.y, 38.799F);
+  assert_close(xyz.z, 41.652F);
+
+  std::filesystem::remove(output);
+}
+
+void test_write_pdb_model_endmdl_output() {
+  sasmol::PdbReader reader;
+  sasmol::PdbWriter writer;
+  sasmol::Molecule source;
+  auto status = reader.read_pdb(fixture_path("pdb_common", "1ATM.pdb"), source);
+  assert(status.ok());
+
+  const auto output =
+      std::filesystem::temp_directory_path() / "sasmol_model_output.pdb";
+  sasmol::PdbWriteOptions options;
+  options.model_number = 7;
+  status = writer.write_pdb(output, source, options);
+  assert(status.ok());
+
+  std::ifstream input(output);
+  std::string content((std::istreambuf_iterator<char>(input)),
+                      std::istreambuf_iterator<char>());
+  assert(content.find("MODEL 7\n") != std::string::npos);
+  assert(content.find("ENDMDL\n") != std::string::npos);
+  assert(content.find("END\n") == std::string::npos);
+
+  std::filesystem::remove(output);
+}
+
+void test_write_pdb_conect_output() {
+  sasmol::Molecule mol(3, 1);
+  mol.record() = {"ATOM", "ATOM", "ATOM"};
+  mol.original_index() = {10, 20, 30};
+  mol.index() = {1, 2, 3};
+  mol.name() = {"C", "O", "N"};
+  mol.resname() = {"GLY", "GLY", "GLY"};
+  mol.chain() = {"A", "A", "A"};
+  mol.resid() = {1, 1, 1};
+  mol.rescode() = {" ", " ", " "};
+  mol.occupancy() = {"1.00", "1.00", "1.00"};
+  mol.beta() = {"0.00", "0.00", "0.00"};
+  mol.segname() = {"A", "A", "A"};
+  mol.element() = {"C", "O", "N"};
+  mol.charge() = {"  ", "  ", "  "};
+  mol.conect()[0] = {20, 30};
+  mol.set_coordinate(0, 0, {1.0F, 2.0F, 3.0F});
+  mol.set_coordinate(0, 1, {2.0F, 3.0F, 4.0F});
+  mol.set_coordinate(0, 2, {3.0F, 4.0F, 5.0F});
+
+  const auto output =
+      std::filesystem::temp_directory_path() / "sasmol_conect_output.pdb";
+  sasmol::PdbWriter writer;
+  const auto status = writer.write_pdb(output, mol);
+  assert(status.ok());
+
+  std::ifstream input(output);
+  std::string content((std::istreambuf_iterator<char>(input)),
+                      std::istreambuf_iterator<char>());
+  assert(content.find("CONECT    1    2    3\n") != std::string::npos);
+  assert(content.rfind("END\n") != std::string::npos);
+
+  std::filesystem::remove(output);
+}
+
 void test_read_pdb_multi_frame_is_explicitly_deferred() {
   sasmol::PdbReader reader;
   sasmol::Molecule mol;
@@ -433,6 +520,9 @@ int main() {
   test_write_pdb_single_frame_1atm_round_trip();
   test_write_pdb_single_frame_2aad_round_trip();
   test_write_pdb_rejects_out_of_range_frame();
+  test_write_pdb_selected_multiframe_frame_round_trip();
+  test_write_pdb_model_endmdl_output();
+  test_write_pdb_conect_output();
   test_read_pdb_multi_frame_is_explicitly_deferred();
   test_read_pdb_end_separated_multiframe_coordinates();
   test_read_pdb_model_multiframe_coordinates();

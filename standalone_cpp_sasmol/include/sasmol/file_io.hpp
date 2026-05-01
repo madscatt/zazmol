@@ -73,6 +73,8 @@ struct PdbWriteOptions {
   std::size_t frame{0};
   bool write_all_frames{false};
   bool include_conect{true};
+  int model_number{};
+  bool final{false};
 };
 
 class PdbReader {

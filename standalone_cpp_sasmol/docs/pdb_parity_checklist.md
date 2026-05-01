@@ -112,3 +112,4 @@ surface and helper tests:
 7. Added PDB read parity for moltype classification, all-zero coordinate guard,
    and `pdbscan` CONECT parsing.
 8. Added single-frame `write_pdb` round-trip coverage for `1ATM` and `2AAD`.
+9. Added selected-frame write support, MODEL/ENDMDL output, and CONECT output.

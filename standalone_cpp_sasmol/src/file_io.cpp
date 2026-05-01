@@ -569,6 +569,10 @@ IoStatus PdbWriter::write_pdb(const std::filesystem::path& filename,
                                     filename.string()};
   }
 
+  if (options.model_number > 0) {
+    output << "MODEL " << options.model_number << '\n';
+  }
+
   for (std::size_t atom = 0; atom < molecule.natoms(); ++atom) {
     int atom_index = molecule.index()[atom];
     if (atom_index > 99999) atom_index = 99999;
@@ -595,7 +599,16 @@ IoStatus PdbWriter::write_pdb(const std::filesystem::path& filename,
            << molecule.charge()[atom] << '\n';
   }
 
-  output << "END\n";
+  if (options.model_number > 0 && !options.final) {
+    output << "ENDMDL\n";
+  } else {
+    if (options.include_conect) {
+      for (const auto& line : create_conect_pdb_lines(molecule)) {
+        output << line << '\n';
+      }
+    }
+    output << "END\n";
+  }
   if (!output) {
     return {IoCode::file_error, "Failed while writing PDB file: " +
                                     filename.string()};
