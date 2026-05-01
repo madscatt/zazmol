@@ -22,6 +22,9 @@ The initial C++ API therefore exposes `PdbReadOptions` and `PdbWriteOptions`,
 but parsing and writing return `IoCode::not_implemented` until fixture parity
 tests are in place.
 
+The detailed PDB implementation gate is tracked in
+[`pdb_parity_checklist.md`](pdb_parity_checklist.md).
+
 ## DCD
 
 DCD is treated as a binary compatibility problem first and a cleanup problem
