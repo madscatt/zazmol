@@ -107,6 +107,7 @@ class DcdReader {
   DcdReadOptions options_;
   std::ifstream stream_;
   DcdHeader header_;
+  std::size_t current_frame_{};
   bool header_read_{false};
   bool open_{false};
 };

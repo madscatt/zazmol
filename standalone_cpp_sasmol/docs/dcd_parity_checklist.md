@@ -112,11 +112,21 @@ Completed first slice: **header-only C++ DCD parsing tests and implementation**.
 
 Add sequential frame-coordinate parsing for normal full-coordinate DCD files:
 
-1. Implement CHARMm unit-cell/extra-block skipping before each frame.
+1. Implemented CHARMm unit-cell/extra-block skipping before each frame.
 2. Read X, Y, and Z float blocks with record-marker validation.
-3. Convert DCD X/Y/Z arrays into `Molecule` frame-major atom `xyz` triplets.
-4. Add tests for first/middle/final frame samples and coordinate sums for the
-   three small fixtures.
+3. Converted DCD X/Y/Z arrays into `Molecule` frame-major atom `xyz` triplets.
+4. Added tests for first/middle/final frame samples for the three small
+   fixtures.
 5. Keep fixed/free atom DCDs as explicit `IoCode::unsupported`.
 
-This is the next risky binary step and should stay separate from DCD writing.
+This slice remains separate from DCD writing.
+
+## Proposed Next Implementation Slice
+
+Strengthen sequential DCD reader tests before adding writer behavior:
+
+1. Add coordinate sum parity for the same frames already sampled.
+2. Add `read_single_dcd_step` reopen-and-scan behavior using one-based frame
+   numbering to match Python `zazmol`.
+3. Add malformed/truncated-frame tests that return `IoStatus` errors.
+4. Keep fixed/free atom DCDs as explicit `IoCode::unsupported`.

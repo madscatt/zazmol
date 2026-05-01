@@ -5,6 +5,7 @@
 #include <cstdint>
 #include <cstring>
 #include <ios>
+#include <vector>
 #include <utility>
 
 namespace sasmol {
@@ -103,6 +104,34 @@ IoStatus skip_bytes(std::istream& stream, std::streamoff count,
   return IoStatus::success();
 }
 
+IoStatus read_float_block(std::istream& stream, std::vector<float>& values,
+                          bool reverse_endian, const std::string& axis) {
+  const int expected_size = static_cast<int>(values.size() * sizeof(float));
+  auto status = read_record_marker(stream, expected_size, reverse_endian,
+                                   "reading " + axis + " block marker");
+  if (!status) {
+    return status;
+  }
+
+  if (!read_bytes(stream, reinterpret_cast<char*>(values.data()),
+                  static_cast<std::streamsize>(expected_size))) {
+    return {IoCode::end_of_file, "Unexpected EOF while reading DCD " + axis +
+                                " coordinate block."};
+  }
+
+  if (reverse_endian) {
+    for (float& value : values) {
+      std::uint32_t raw{};
+      std::memcpy(&raw, &value, sizeof(raw));
+      raw = byte_swap32(raw);
+      std::memcpy(&value, &raw, sizeof(value));
+    }
+  }
+
+  return read_record_marker(stream, expected_size, reverse_endian,
+                            "reading trailing " + axis + " block marker");
+}
+
 }  // namespace
 
 IoStatus IoStatus::success() { return {}; }
@@ -140,6 +169,7 @@ IoStatus DcdReader::open_dcd_read(const std::filesystem::path& filename,
   options_ = options;
   header_ = {};
   header_read_ = false;
+  current_frame_ = 0;
 
   stream_.open(filename_, std::ios::binary);
   if (!stream_) {
@@ -299,18 +329,109 @@ IoStatus DcdReader::read_header(DcdHeader& header) {
 
   header_ = parsed;
   header_read_ = true;
+  current_frame_ = 0;
   header = parsed;
   return IoStatus::success();
 }
 
 IoStatus DcdReader::read_next_frame(Molecule& molecule) {
-  (void)molecule;
   if (!open_) {
     return {IoCode::not_open, "DCD reader is not open."};
   }
-  return IoStatus::not_implemented(
-      "DCD frame reading is intentionally deferred; the primary API is "
-      "sequential read_next_frame().");
+  if (!header_read_) {
+    DcdHeader header;
+    auto status = read_header(header);
+    if (!status) {
+      return status;
+    }
+  }
+  if (current_frame_ >= header_.nframes) {
+    return {IoCode::end_of_file, "No more DCD frames are available."};
+  }
+  if (header_.namnf != 0) {
+    return {IoCode::unsupported,
+            "DCD fixed/free atom frame reading is not yet implemented."};
+  }
+
+  const bool reverse_endian = header_.reverse_endian;
+  if (header_.has_unit_cell) {
+    std::uint32_t raw_size{};
+    if (!read_exact(stream_, &raw_size)) {
+      return {IoCode::end_of_file,
+              "Unexpected EOF while reading DCD unit-cell block marker."};
+    }
+    if (reverse_endian) {
+      raw_size = byte_swap32(raw_size);
+    }
+    std::int32_t block_size{};
+    std::memcpy(&block_size, &raw_size, sizeof(block_size));
+    if (block_size < 0) {
+      return {IoCode::format_error, "Invalid negative DCD unit-cell block."};
+    }
+    auto status = skip_bytes(stream_, block_size, "skipping DCD unit-cell block");
+    if (!status) {
+      return status;
+    }
+    status = read_record_marker(stream_, block_size, reverse_endian,
+                                "reading trailing DCD unit-cell block marker");
+    if (!status) {
+      return status;
+    }
+  }
+
+  std::vector<float> x(header_.natoms);
+  std::vector<float> y(header_.natoms);
+  std::vector<float> z(header_.natoms);
+
+  auto status = read_float_block(stream_, x, reverse_endian, "X");
+  if (!status) {
+    return status;
+  }
+  status = read_float_block(stream_, y, reverse_endian, "Y");
+  if (!status) {
+    return status;
+  }
+  status = read_float_block(stream_, z, reverse_endian, "Z");
+  if (!status) {
+    return status;
+  }
+
+  if (header_.charmm_flags & dcd_has_4dims) {
+    std::uint32_t raw_size{};
+    if (!read_exact(stream_, &raw_size)) {
+      return {IoCode::end_of_file,
+              "Unexpected EOF while reading DCD 4D block marker."};
+    }
+    if (reverse_endian) {
+      raw_size = byte_swap32(raw_size);
+    }
+    std::int32_t block_size{};
+    std::memcpy(&block_size, &raw_size, sizeof(block_size));
+    if (block_size < 0) {
+      return {IoCode::format_error, "Invalid negative DCD 4D block."};
+    }
+    status = skip_bytes(stream_, block_size, "skipping DCD 4D block");
+    if (!status) {
+      return status;
+    }
+    status = read_record_marker(stream_, block_size, reverse_endian,
+                                "reading trailing DCD 4D block marker");
+    if (!status) {
+      return status;
+    }
+  }
+
+  if (molecule.natoms() != header_.natoms ||
+      molecule.number_of_frames() != header_.nframes) {
+    molecule.resize(header_.natoms, header_.nframes);
+  }
+
+  for (std::size_t atom = 0; atom < header_.natoms; ++atom) {
+    molecule.set_coordinate(current_frame_, atom, {x[atom], y[atom], z[atom]});
+  }
+
+  ++current_frame_;
+  return IoStatus::success();
 }
 
 IoStatus DcdReader::close_dcd_read() {
@@ -320,6 +441,7 @@ IoStatus DcdReader::close_dcd_read() {
   open_ = false;
   header_read_ = false;
   header_ = {};
+  current_frame_ = 0;
   filename_.clear();
   return IoStatus::success();
 }

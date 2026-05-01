@@ -44,10 +44,10 @@ if(BUILD_TESTING)
   )
   add_test(NAME file_io_contract COMMAND test_file_io_contract)
 
-  add_executable(test_dcd_header tests/test_dcd_header.cpp)
-  target_link_libraries(test_dcd_header PRIVATE sasmol_standalone)
-  target_compile_definitions(test_dcd_header PRIVATE
+  add_executable(test_dcd_reader tests/test_dcd_reader.cpp)
+  target_link_libraries(test_dcd_reader PRIVATE sasmol_standalone)
+  target_compile_definitions(test_dcd_reader PRIVATE
     SASMOL_TEST_DATA_DIR="${CMAKE_CURRENT_SOURCE_DIR}/../src/python/test_sasmol/data"
   )
-  add_test(NAME dcd_header COMMAND test_dcd_header)
+  add_test(NAME dcd_reader COMMAND test_dcd_reader)
 endif()
