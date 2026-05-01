@@ -58,5 +58,6 @@ Behavior notes:
 
 ## Deferred
 
-- `merge_two_molecules`
+- `merge_two_molecules`; design captured in
+  `docs/merge_two_molecules_design.md`
 - BIOMT operations
