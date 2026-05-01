@@ -21,7 +21,7 @@ reviewed, implemented, deferred, or intentionally expressed differently in C++.
 | `config.CALC_DTYPE` | `sasmol::calc_type` | implemented | `double`, matching calculation-friendly intent. |
 | PDB I/O | `PdbReader` / `PdbWriter` | implemented | Implemented for tolerant fixed-column reads, END and MODEL trajectories, selected/all-frame writes, CONECT output, optional-field fill, element resolution, and larger fixture validation through Python `zazmol`. |
 | DCD I/O | `DcdReader` / `DcdWriter` | required | Reader implemented for normal full-coordinate small fixtures; writer round-trips through C++ and Python readers for `1ATM`, `2AAD`, and `rna-1to10`. |
-| calculations | free functions / module namespaces | required | Coordinate bounds, mass, and center-of-mass slices implemented; Rg/PMI and alignment-dependent calculations remain deferred. |
+| calculations | free functions / module namespaces | required | Coordinate bounds, mass, center-of-mass, and radius-of-gyration slices implemented; PMI and alignment-dependent calculations remain deferred. |
 | GPU/MPI backends | optional backends | deferred | Data views are being shaped now; dependencies wait. |
 
 Run `../tools/generate_parity_ledger.py` from the repository root to produce a

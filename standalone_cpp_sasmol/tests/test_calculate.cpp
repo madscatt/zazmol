@@ -178,6 +178,43 @@ void test_calculate_center_of_mass_rejects_bad_frame() {
   assert(threw);
 }
 
+void test_calculate_radius_of_gyration_fixtures() {
+  sasmol::PdbReader reader;
+  sasmol::Molecule mol;
+  auto status = reader.read_pdb(fixture_path("pdb_common", "1ATM.pdb"), mol);
+  assert(status.ok());
+  assert_close_double(sasmol::calculate_radius_of_gyration(mol, 0), 0.0);
+
+  status = reader.read_pdb(fixture_path("pdb_common", "2AAD.pdb"), mol);
+  assert(status.ok());
+  assert_close_double(sasmol::calculate_radius_of_gyration(mol, 0), 2.998744,
+                      1.0e-5);
+
+  status = reader.read_pdb(fixture_path("pdb_common", "rna.pdb"), mol);
+  assert(status.ok());
+  assert_close_double(sasmol::calculate_radius_of_gyration(mol, 0),
+                      65.62305792313865, 0.001);
+
+  status = reader.read_pdb(fixture_path("pdb_common", "1CRN.pdb"), mol);
+  assert(status.ok());
+  assert_close_double(sasmol::calculate_radius_of_gyration(mol, 0),
+                      9.666350273306351, 0.001);
+}
+
+void test_calculate_radius_of_gyration_reuses_center_errors() {
+  sasmol::Molecule mol(1, 1);
+  mol.element()[0] = "XX";
+  bool threw = false;
+
+  try {
+    (void)sasmol::calculate_radius_of_gyration(mol, 0);
+  } catch (const std::invalid_argument&) {
+    threw = true;
+  }
+
+  assert(threw);
+}
+
 void test_calculate_minimum_and_maximum_selected_frames() {
   sasmol::Molecule mol(1, 3);
   mol.set_coordinate(0, 0, {-10.0F, -10.0F, -10.0F});
@@ -267,6 +304,8 @@ int main() {
   test_calculate_center_of_mass_fixture_totals();
   test_calculate_center_of_mass_rejects_unknown_mass();
   test_calculate_center_of_mass_rejects_bad_frame();
+  test_calculate_radius_of_gyration_fixtures();
+  test_calculate_radius_of_gyration_reuses_center_errors();
   test_calculate_minimum_and_maximum_all_loaded_frames();
   test_calculate_minimum_and_maximum_selected_frames();
   test_calculate_minimum_and_maximum_rejects_empty_molecule();

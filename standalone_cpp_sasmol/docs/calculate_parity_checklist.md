@@ -49,9 +49,18 @@ Implemented `calculate_center_of_mass(molecule, frame)`:
 - rejects unknown masses and out-of-range frames
 - fixture parity for `2AAD.pdb`, `rna.pdb`, and `1CRN.pdb`
 
+## Radius Of Gyration Slice
+
+Implemented `calculate_radius_of_gyration(molecule, frame)`:
+
+- follows Python SASMOL convention: mass-weighted center of mass, then
+  unweighted mean squared coordinate distance over atom count
+- fixture parity for `1ATM.pdb`, `2AAD.pdb`, `rna.pdb`, and `1CRN.pdb`
+- reuses center-of-mass validation for unknown masses and frame errors
+
 ## Deferred
 
 - DCD streaming overloads for `calculate_minimum_and_maximum_all_steps`
-- radius of gyration and principal moments of inertia
+- principal moments of inertia
 - RMSD/alignment-dependent calculations
 - molecular formula and residue charge

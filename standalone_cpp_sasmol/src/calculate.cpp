@@ -2,6 +2,7 @@
 
 #include "sasmol/properties.hpp"
 
+#include <cmath>
 #include <limits>
 #include <stdexcept>
 
@@ -75,6 +76,21 @@ CalcVec3 calculate_center_of_mass(Molecule& molecule, std::size_t frame) {
   center.y /= molecule.total_mass();
   center.z /= molecule.total_mass();
   return center;
+}
+
+calc_type calculate_radius_of_gyration(Molecule& molecule, std::size_t frame) {
+  const auto center = calculate_center_of_mass(molecule, frame);
+  calc_type rg_squared{};
+
+  for (std::size_t atom = 0; atom < molecule.natoms(); ++atom) {
+    const auto xyz = molecule.coordinate(frame, atom);
+    const auto dx = static_cast<calc_type>(xyz.x) - center.x;
+    const auto dy = static_cast<calc_type>(xyz.y) - center.y;
+    const auto dz = static_cast<calc_type>(xyz.z) - center.z;
+    rg_squared += dx * dx + dy * dy + dz * dz;
+  }
+
+  return std::sqrt(rg_squared / static_cast<calc_type>(molecule.natoms()));
 }
 
 CoordinateBounds calculate_minimum_and_maximum(

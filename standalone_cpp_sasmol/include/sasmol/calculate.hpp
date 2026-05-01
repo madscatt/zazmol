@@ -30,6 +30,9 @@ struct MassCalculationResult {
 [[nodiscard]] CalcVec3 calculate_center_of_mass(Molecule& molecule,
                                                 std::size_t frame);
 
+[[nodiscard]] calc_type calculate_radius_of_gyration(Molecule& molecule,
+                                                     std::size_t frame);
+
 [[nodiscard]] CoordinateBounds calculate_minimum_and_maximum(
     const Molecule& molecule, const std::vector<std::size_t>& frames = {});
 
