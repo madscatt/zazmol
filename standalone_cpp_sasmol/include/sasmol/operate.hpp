@@ -61,4 +61,15 @@ void rotate_euler(Molecule& molecule, std::size_t frame, calc_type phi,
                                      calc_type phi, calc_type theta,
                                      calc_type psi);
 
+void align_pmi_on_axis(Molecule& molecule, std::size_t frame,
+                       std::size_t pmi_eigenvector, Axis alignment_axis);
+[[nodiscard]] Molecule pmi_aligned_on_axis(const Molecule& molecule,
+                                           std::size_t frame,
+                                           std::size_t pmi_eigenvector,
+                                           Axis alignment_axis);
+
+void align_pmi_on_cardinal_axes(Molecule& molecule, std::size_t frame);
+[[nodiscard]] Molecule pmi_aligned_on_cardinal_axes(const Molecule& molecule,
+                                                    std::size_t frame);
+
 }  // namespace sasmol

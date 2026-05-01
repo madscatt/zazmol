@@ -1,6 +1,8 @@
 #include "sasmol/operate.hpp"
 
+#include <algorithm>
 #include <cmath>
+#include <stdexcept>
 
 namespace sasmol {
 namespace {
@@ -27,6 +29,47 @@ Vec3 transform_row_vector(Vec3 xyz, const CalcMatrix3& matrix) {
           static_cast<coord_type>(xyz.x * matrix[0][2] +
                                   xyz.y * matrix[1][2] +
                                   xyz.z * matrix[2][2])};
+}
+
+CalcVec3 axis_vector(Axis axis) {
+  switch (axis) {
+    case Axis::x:
+      return {1.0, 0.0, 0.0};
+    case Axis::y:
+      return {0.0, 1.0, 0.0};
+    case Axis::z:
+      return {0.0, 0.0, 1.0};
+  }
+  return {};
+}
+
+CalcVec3 matrix_column(const CalcMatrix3& matrix, std::size_t column) {
+  return {matrix[0][column], matrix[1][column], matrix[2][column]};
+}
+
+calc_type dot(CalcVec3 lhs, CalcVec3 rhs) {
+  return lhs.x * rhs.x + lhs.y * rhs.y + lhs.z * rhs.z;
+}
+
+CalcVec3 cross(CalcVec3 lhs, CalcVec3 rhs) {
+  return {lhs.y * rhs.z - lhs.z * rhs.y, lhs.z * rhs.x - lhs.x * rhs.z,
+          lhs.x * rhs.y - lhs.y * rhs.x};
+}
+
+calc_type norm(CalcVec3 value) {
+  return std::sqrt(dot(value, value));
+}
+
+CalcVec3 scaled(CalcVec3 value, calc_type scale) {
+  return {value.x * scale, value.y * scale, value.z * scale};
+}
+
+CalcVec3 normalized(CalcVec3 value) {
+  const auto length = norm(value);
+  if (length <= 0.0 || !std::isfinite(length)) {
+    throw std::invalid_argument("cannot normalize zero or non-finite vector");
+  }
+  return scaled(value, 1.0 / length);
 }
 
 }  // namespace
@@ -175,6 +218,66 @@ Molecule rotated_euler(const Molecule& molecule, std::size_t frame,
                        calc_type phi, calc_type theta, calc_type psi) {
   auto copy = molecule;
   rotate_euler(copy, frame, phi, theta, psi);
+  return copy;
+}
+
+void align_pmi_on_axis(Molecule& molecule, std::size_t frame,
+                       std::size_t pmi_eigenvector, Axis alignment_axis) {
+  if (pmi_eigenvector >= 3) {
+    throw std::out_of_range("PMI eigenvector index is out of range");
+  }
+
+  center(molecule, frame);
+  const auto pmi = calculate_principal_moments_of_inertia(molecule, frame);
+  if (pmi.singular) {
+    throw std::invalid_argument("cannot align singular PMI tensor");
+  }
+
+  auto pmi_axis = normalized(matrix_column(pmi.eigenvectors, pmi_eigenvector));
+  const auto target_axis = axis_vector(alignment_axis);
+  auto rotation_axis = cross(target_axis, pmi_axis);
+  const auto sine = norm(rotation_axis);
+  const auto cosine = std::clamp(dot(pmi_axis, target_axis), -1.0, 1.0);
+
+  if (sine > 1.0e-12) {
+    rotation_axis = scaled(rotation_axis, 1.0 / sine);
+  } else if (cosine > 0.0) {
+    return;
+  } else {
+    const CalcVec3 bases[3] = {{1.0, 0.0, 0.0}, {0.0, 1.0, 0.0},
+                               {0.0, 0.0, 1.0}};
+    std::size_t basis_index = 0;
+    auto smallest_component = std::fabs(pmi_axis.x);
+    if (std::fabs(pmi_axis.y) < smallest_component) {
+      basis_index = 1;
+      smallest_component = std::fabs(pmi_axis.y);
+    }
+    if (std::fabs(pmi_axis.z) < smallest_component) {
+      basis_index = 2;
+    }
+    rotation_axis = normalized(cross(pmi_axis, bases[basis_index]));
+  }
+
+  rotate_general_axis(molecule, frame, std::atan2(sine, cosine), rotation_axis);
+}
+
+Molecule pmi_aligned_on_axis(const Molecule& molecule, std::size_t frame,
+                             std::size_t pmi_eigenvector,
+                             Axis alignment_axis) {
+  auto copy = molecule;
+  align_pmi_on_axis(copy, frame, pmi_eigenvector, alignment_axis);
+  return copy;
+}
+
+void align_pmi_on_cardinal_axes(Molecule& molecule, std::size_t frame) {
+  align_pmi_on_axis(molecule, frame, 2, Axis::z);
+  align_pmi_on_axis(molecule, frame, 1, Axis::y);
+}
+
+Molecule pmi_aligned_on_cardinal_axes(const Molecule& molecule,
+                                      std::size_t frame) {
+  auto copy = molecule;
+  align_pmi_on_cardinal_axes(copy, frame);
   return copy;
 }
 

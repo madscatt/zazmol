@@ -44,7 +44,24 @@ Behavior notes:
 
 ## Deferred
 
-- `align_pmi_on_axis`
-- `align_pmi_on_cardinal_axes`
+## PMI Alignment Slice
+
+Implemented PMI alignment operations:
+
+- `align_pmi_on_axis(molecule, frame, pmi_eigenvector, alignment_axis)`
+- `pmi_aligned_on_axis(molecule, frame, pmi_eigenvector, alignment_axis)`
+- `align_pmi_on_cardinal_axes(molecule, frame)`
+- `pmi_aligned_on_cardinal_axes(molecule, frame)`
+
+Behavior notes:
+
+- the method centers the selected frame before alignment, matching Python
+  behavior
+- the rotation axis uses Python's `cross(target_axis, pmi_axis)` convention
+  because this is coupled to the row-vector general-axis rotation path
+- tests assert absolute axis alignment, not eigenvector sign identity
+- singular PMI tensors are rejected explicitly
+
+## Deferred
+
 - full basis/Kabsch-style `align`
-- sign-convention tests for PMI alignment

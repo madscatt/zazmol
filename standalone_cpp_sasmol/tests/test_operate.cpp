@@ -1,6 +1,7 @@
 #include "sasmol/file_io.hpp"
 #include "sasmol/operate.hpp"
 
+#include <array>
 #include <cassert>
 #include <cmath>
 #include <filesystem>
@@ -26,6 +27,22 @@ void assert_vec_close(sasmol::Vec3 actual, sasmol::Vec3 expected,
   assert_close(actual.x, expected.x, tolerance);
   assert_close(actual.y, expected.y, tolerance);
   assert_close(actual.z, expected.z, tolerance);
+}
+
+double axis_alignment(const sasmol::Molecule& mol, std::size_t frame,
+                      std::size_t pmi_eigenvector,
+                      std::array<double, 3> expected_axis) {
+  auto copy = mol;
+  const auto pmi = sasmol::calculate_principal_moments_of_inertia(copy, frame);
+  assert(!pmi.singular);
+
+  double dot{};
+  double expected_norm{};
+  for (std::size_t row = 0; row < 3; ++row) {
+    dot += pmi.eigenvectors[row][pmi_eigenvector] * expected_axis[row];
+    expected_norm += expected_axis[row] * expected_axis[row];
+  }
+  return std::fabs(dot) / std::sqrt(expected_norm);
 }
 
 void test_translate_mutates_only_selected_frame() {
@@ -123,6 +140,43 @@ void test_general_axis_preserves_python_non_unit_axis_behavior() {
                    0.001);
 }
 
+void test_align_pmi_on_axis_matches_python_alignment_contract() {
+  sasmol::PdbReader reader;
+  sasmol::Molecule mol;
+  auto status = reader.read_pdb(fixture_path("pdb_common", "1CRN.pdb"), mol);
+  assert(status.ok());
+
+  sasmol::align_pmi_on_axis(mol, 0, 2, sasmol::Axis::z);
+
+  assert(axis_alignment(mol, 0, 2, {0.0, 0.0, 1.0}) > 0.9999);
+}
+
+void test_align_pmi_on_cardinal_axes_matches_python_contract() {
+  sasmol::PdbReader reader;
+  sasmol::Molecule mol;
+  auto status = reader.read_pdb(fixture_path("pdb_common", "1CRN.pdb"), mol);
+  assert(status.ok());
+
+  sasmol::align_pmi_on_cardinal_axes(mol, 0);
+
+  assert(axis_alignment(mol, 0, 2, {0.0, 0.0, 1.0}) > 0.999);
+  assert(axis_alignment(mol, 0, 1, {0.0, 1.0, 0.0}) > 0.999);
+  assert(axis_alignment(mol, 0, 0, {1.0, 0.0, 0.0}) > 0.999);
+}
+
+void test_pmi_aligned_copy_does_not_mutate_source() {
+  sasmol::PdbReader reader;
+  sasmol::Molecule mol;
+  auto status = reader.read_pdb(fixture_path("pdb_common", "1CRN.pdb"), mol);
+  assert(status.ok());
+  const auto original = mol.coordinate(0, 0);
+
+  const auto copy = sasmol::pmi_aligned_on_axis(mol, 0, 2, sasmol::Axis::z);
+
+  assert_vec_close(mol.coordinate(0, 0), original);
+  assert(axis_alignment(copy, 0, 2, {0.0, 0.0, 1.0}) > 0.9999);
+}
+
 }  // namespace
 
 int main() {
@@ -134,5 +188,8 @@ int main() {
   test_general_axis_rotation_matches_python_row_vector_convention();
   test_euler_rotation_identity();
   test_general_axis_preserves_python_non_unit_axis_behavior();
+  test_align_pmi_on_axis_matches_python_alignment_contract();
+  test_align_pmi_on_cardinal_axes_matches_python_contract();
+  test_pmi_aligned_copy_does_not_mutate_source();
   return 0;
 }
