@@ -196,6 +196,53 @@ void test_truncated_frame_returns_status() {
   std::filesystem::remove(truncated);
 }
 
+void test_whole_trajectory_read_1atm() {
+  sasmol::DcdReader reader;
+  sasmol::Molecule mol;
+
+  const auto status = reader.read_dcd(fixture_path("1ATM.dcd"), mol);
+
+  assert(status.ok());
+  assert(!reader.is_open());
+  assert(mol.natoms() == 1);
+  assert(mol.number_of_frames() == 2);
+  assert_close_double(coordinate_sum(mol), 314.790, 0.001);
+}
+
+void test_whole_trajectory_read_2aad() {
+  sasmol::DcdReader reader;
+  sasmol::Molecule mol;
+
+  const auto status = reader.read_dcd(fixture_path("2AAD.dcd"), mol);
+
+  assert(status.ok());
+  assert(!reader.is_open());
+  assert(mol.natoms() == 15);
+  assert(mol.number_of_frames() == 3);
+  const auto xyz = mol.coordinate(2, 14);
+  assert_close(xyz.x, 76.970F);
+  assert_close(xyz.y, -46.273F);
+  assert_close(xyz.z, 42.000F);
+  assert_close_double(coordinate_sum(mol), 3644.294, 0.01);
+}
+
+void test_whole_trajectory_read_rna() {
+  sasmol::DcdReader reader;
+  sasmol::Molecule mol;
+
+  const auto status = reader.read_dcd(fixture_path("rna-1to10.dcd"), mol);
+
+  assert(status.ok());
+  assert(!reader.is_open());
+  assert(mol.natoms() == 10632);
+  assert(mol.number_of_frames() == 10);
+  const auto xyz = mol.coordinate(9, 10631);
+  assert_close(xyz.x, -6.392F);
+  assert_close(xyz.y, 14.348F);
+  assert_close(xyz.z, 20.914F);
+  assert_close_double(coordinate_sum(mol), -430804.378, 0.1);
+}
+
 }  // namespace
 
 int main() {
@@ -207,5 +254,8 @@ int main() {
   test_single_step_reopen_scan_uses_one_based_frames();
   test_single_step_rejects_zero_frame_number();
   test_truncated_frame_returns_status();
+  test_whole_trajectory_read_1atm();
+  test_whole_trajectory_read_2aad();
+  test_whole_trajectory_read_rna();
   return 0;
 }

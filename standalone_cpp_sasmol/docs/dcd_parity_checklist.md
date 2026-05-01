@@ -133,12 +133,24 @@ Completed reader hardening slice before writer behavior:
 
 ## Proposed Next Implementation Slice
 
-Add whole-trajectory convenience reading:
+Completed whole-trajectory convenience reading:
 
-1. Add `DcdReader::read_dcd(filename, molecule)` as a convenience wrapper over
+1. Added `DcdReader::read_dcd(filename, molecule)` as a convenience wrapper over
    open/read_header/repeated `read_next_frame`/close.
-2. Test whole-file read parity for `1ATM.dcd`, `2AAD.dcd`, and
+2. Tested whole-file read parity for `1ATM.dcd`, `2AAD.dcd`, and
    `rna-1to10.dcd`.
-3. Preserve the same sequential internals rather than adding hidden random
+3. Preserved the same sequential internals rather than adding hidden random
    access.
-4. Stop before DCD writing.
+4. Stopped before DCD writing.
+
+## Proposed Next Implementation Slice
+
+Start DCD writing with the same narrowness:
+
+1. Add `DcdWriter::open_dcd_write`, `write_dcd_header`, `write_dcd_step`, and
+   `close_dcd_write` behavior for normal full-coordinate files only.
+2. Write CHARMM-style headers matching the existing Python writer for small
+   fixtures.
+3. Round-trip C++ written DCDs through the C++ reader for `1ATM` and `2AAD`
+   first.
+4. Defer huge-file and cross-reader Python validation to a separate slice.

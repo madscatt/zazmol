@@ -96,6 +96,9 @@ class DcdReader {
   [[nodiscard]] IoStatus read_single_dcd_step(
       const std::filesystem::path& filename, std::size_t frame,
       Molecule& molecule, const DcdReadOptions& options = {});
+  [[nodiscard]] IoStatus read_dcd(const std::filesystem::path& filename,
+                                  Molecule& molecule,
+                                  const DcdReadOptions& options = {});
 
   [[nodiscard]] bool is_open() const noexcept { return open_; }
   [[nodiscard]] static constexpr bool sequential_by_default() noexcept {

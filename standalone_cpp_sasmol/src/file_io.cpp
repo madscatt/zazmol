@@ -477,6 +477,33 @@ IoStatus DcdReader::read_single_dcd_step(const std::filesystem::path& filename,
   return reader.close_dcd_read();
 }
 
+IoStatus DcdReader::read_dcd(const std::filesystem::path& filename,
+                             Molecule& molecule,
+                             const DcdReadOptions& options) {
+  auto status = open_dcd_read(filename, options);
+  if (!status) {
+    return status;
+  }
+
+  DcdHeader header;
+  status = read_header(header);
+  if (!status) {
+    (void)close_dcd_read();
+    return status;
+  }
+
+  molecule.resize(header.natoms, header.nframes);
+  for (std::size_t frame = 0; frame < header.nframes; ++frame) {
+    status = read_next_frame(molecule);
+    if (!status) {
+      (void)close_dcd_read();
+      return status;
+    }
+  }
+
+  return close_dcd_read();
+}
+
 IoStatus DcdWriter::open_dcd_write(const std::filesystem::path& filename,
                                    const DcdWriteOptions& options) {
   filename_ = filename;
