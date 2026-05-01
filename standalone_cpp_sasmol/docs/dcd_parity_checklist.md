@@ -174,11 +174,12 @@ python3 standalone_cpp_sasmol/tools/validate_dcd_with_python.py path/to/file.dcd
 
 ## Proposed Next Implementation Slice
 
-Add deliberate Python cross-reader parity fixtures:
+Completed deliberate Python cross-reader parity fixture tooling:
 
-1. Generate C++ written DCD files for `1ATM`, `2AAD`, and `rna-1to10`.
-2. Validate them with Python `zazmol` using
+1. Added a C++ `dcd_roundtrip_writer` tool to generate C++ written DCD files
+   from existing DCD fixtures.
+2. Validate generated files with Python `zazmol` using
    `tools/validate_dcd_with_python.py`.
-3. Record the results in docs without making Python an unconditional CTest
+3. Record results in docs without making Python an unconditional CTest
    dependency.
 4. Then decide whether to start PDB I/O contracts or expand DCD writer options.
