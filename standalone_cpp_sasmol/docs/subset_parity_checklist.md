@@ -22,6 +22,21 @@ Implemented 0/1 mask compatibility wrappers:
 - `set_coordinates_using_mask(molecule, source, frame, mask)`
 - `copy_molecule_using_mask(source, destination, mask, frame)`
 
+Implemented descriptor get/set helpers:
+
+- `get_string_descriptor_using_indices(...)`
+- `get_string_descriptor_using_mask(...)`
+- `set_string_descriptor_using_indices(...)`
+- `set_string_descriptor_using_mask(...)`
+- `get_int_descriptor_using_indices(...)`
+- `get_int_descriptor_using_mask(...)`
+- `set_int_descriptor_using_indices(...)`
+- `set_int_descriptor_using_mask(...)`
+- `get_calc_descriptor_using_indices(...)`
+- `get_calc_descriptor_using_mask(...)`
+- `set_calc_descriptor_using_indices(...)`
+- `set_calc_descriptor_using_mask(...)`
+
 Behavior notes:
 
 - failures return structured errors for non-throwing APIs
@@ -32,10 +47,11 @@ Behavior notes:
 - copy creates a one-frame molecule using the requested source frame
 - copied descriptors follow the explicit selected atom order
 - `CONECT` entries are filtered to selected atoms only
+- descriptor APIs use typed descriptor enums instead of arbitrary descriptor
+  object mutation
 
 ## Deferred
 
-- descriptor set/get using mask or indices
 - `duplicate_molecule`
 - `merge_two_molecules`
 - BIOMT operations

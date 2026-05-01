@@ -27,6 +27,22 @@ std::vector<std::string> validate_indices(const Molecule& molecule,
   return errors;
 }
 
+std::vector<std::string> validate_atom_indices(
+    const Molecule& molecule, const std::vector<std::size_t>& indices) {
+  std::vector<std::string> errors;
+  if (indices.empty()) {
+    errors.push_back("subset indices are empty");
+    return errors;
+  }
+  for (const auto atom : indices) {
+    if (atom >= molecule.natoms()) {
+      errors.push_back("subset atom index is out of range");
+      return errors;
+    }
+  }
+  return errors;
+}
+
 template <typename T>
 void copy_selected_vector(const std::vector<T>& source, std::vector<T>& destination,
                           const std::vector<std::size_t>& indices) {
@@ -44,6 +60,163 @@ void copy_selected_vector(const std::vector<T>& source, std::vector<T>& destinat
     }
     destination.push_back(source[atom]);
   }
+}
+
+std::vector<std::string>& string_descriptor(Molecule& molecule,
+                                            StringDescriptor descriptor) {
+  switch (descriptor) {
+    case StringDescriptor::record:
+      return molecule.record();
+    case StringDescriptor::name:
+      return molecule.name();
+    case StringDescriptor::loc:
+      return molecule.loc();
+    case StringDescriptor::resname:
+      return molecule.resname();
+    case StringDescriptor::chain:
+      return molecule.chain();
+    case StringDescriptor::rescode:
+      return molecule.rescode();
+    case StringDescriptor::occupancy:
+      return molecule.occupancy();
+    case StringDescriptor::beta:
+      return molecule.beta();
+    case StringDescriptor::segname:
+      return molecule.segname();
+    case StringDescriptor::element:
+      return molecule.element();
+    case StringDescriptor::charge:
+      return molecule.charge();
+    case StringDescriptor::moltype:
+      return molecule.moltype();
+  }
+  return molecule.name();
+}
+
+const std::vector<std::string>& string_descriptor(
+    const Molecule& molecule, StringDescriptor descriptor) {
+  switch (descriptor) {
+    case StringDescriptor::record:
+      return molecule.record();
+    case StringDescriptor::name:
+      return molecule.name();
+    case StringDescriptor::loc:
+      return molecule.loc();
+    case StringDescriptor::resname:
+      return molecule.resname();
+    case StringDescriptor::chain:
+      return molecule.chain();
+    case StringDescriptor::rescode:
+      return molecule.rescode();
+    case StringDescriptor::occupancy:
+      return molecule.occupancy();
+    case StringDescriptor::beta:
+      return molecule.beta();
+    case StringDescriptor::segname:
+      return molecule.segname();
+    case StringDescriptor::element:
+      return molecule.element();
+    case StringDescriptor::charge:
+      return molecule.charge();
+    case StringDescriptor::moltype:
+      return molecule.moltype();
+  }
+  return molecule.name();
+}
+
+std::vector<int>& int_descriptor(Molecule& molecule, IntDescriptor descriptor) {
+  switch (descriptor) {
+    case IntDescriptor::index:
+      return molecule.index();
+    case IntDescriptor::original_index:
+      return molecule.original_index();
+    case IntDescriptor::original_resid:
+      return molecule.original_resid();
+    case IntDescriptor::resid:
+      return molecule.resid();
+  }
+  return molecule.index();
+}
+
+const std::vector<int>& int_descriptor(const Molecule& molecule,
+                                       IntDescriptor descriptor) {
+  switch (descriptor) {
+    case IntDescriptor::index:
+      return molecule.index();
+    case IntDescriptor::original_index:
+      return molecule.original_index();
+    case IntDescriptor::original_resid:
+      return molecule.original_resid();
+    case IntDescriptor::resid:
+      return molecule.resid();
+  }
+  return molecule.index();
+}
+
+std::vector<calc_type>& calc_descriptor(Molecule& molecule,
+                                        CalcDescriptor descriptor) {
+  switch (descriptor) {
+    case CalcDescriptor::atom_charge:
+      return molecule.atom_charge();
+    case CalcDescriptor::atom_vdw:
+      return molecule.atom_vdw();
+    case CalcDescriptor::mass:
+      return molecule.mass();
+  }
+  return molecule.mass();
+}
+
+const std::vector<calc_type>& calc_descriptor(const Molecule& molecule,
+                                              CalcDescriptor descriptor) {
+  switch (descriptor) {
+    case CalcDescriptor::atom_charge:
+      return molecule.atom_charge();
+    case CalcDescriptor::atom_vdw:
+      return molecule.atom_vdw();
+    case CalcDescriptor::mass:
+      return molecule.mass();
+  }
+  return molecule.mass();
+}
+
+template <typename T>
+std::vector<std::string> validate_descriptor_vector(
+    const Molecule& molecule, const std::vector<T>& descriptor) {
+  if (descriptor.size() != molecule.natoms()) {
+    return {"descriptor length does not match natoms"};
+  }
+  return {};
+}
+
+template <typename T>
+std::vector<T> get_descriptor_values(const std::vector<T>& descriptor,
+                                     const std::vector<std::size_t>& indices) {
+  std::vector<T> values;
+  values.reserve(indices.size());
+  for (const auto atom : indices) {
+    values.push_back(descriptor[atom]);
+  }
+  return values;
+}
+
+template <typename T>
+SubsetResult set_descriptor_values(std::vector<T>& descriptor,
+                                   const Molecule& molecule,
+                                   const std::vector<std::size_t>& indices,
+                                   const T& value) {
+  SubsetResult result;
+  result.errors = validate_atom_indices(molecule, indices);
+  if (!result.ok()) {
+    return result;
+  }
+  result.errors = validate_descriptor_vector(molecule, descriptor);
+  if (!result.ok()) {
+    return result;
+  }
+  for (const auto atom : indices) {
+    descriptor[atom] = value;
+  }
+  return result;
 }
 
 void copy_selected_conect(const Molecule& source, Molecule& destination,
@@ -222,6 +395,144 @@ Molecule copied_molecule_using_indices(const Molecule& source,
     throw std::invalid_argument(result.errors.front());
   }
   return destination;
+}
+
+StringSelection get_string_descriptor_using_indices(
+    const Molecule& molecule, StringDescriptor descriptor,
+    const std::vector<std::size_t>& indices) {
+  StringSelection result;
+  result.errors = validate_atom_indices(molecule, indices);
+  if (!result.ok()) {
+    return result;
+  }
+  const auto& values = string_descriptor(molecule, descriptor);
+  result.errors = validate_descriptor_vector(molecule, values);
+  if (!result.ok()) {
+    return result;
+  }
+  result.values = get_descriptor_values(values, indices);
+  return result;
+}
+
+StringSelection get_string_descriptor_using_mask(
+    const Molecule& molecule, StringDescriptor descriptor,
+    const std::vector<int>& mask) {
+  auto selected = get_indices_from_mask(molecule, mask);
+  if (!selected.ok()) {
+    return {{}, selected.errors};
+  }
+  return get_string_descriptor_using_indices(molecule, descriptor,
+                                             selected.indices);
+}
+
+SubsetResult set_string_descriptor_using_indices(
+    Molecule& molecule, StringDescriptor descriptor,
+    const std::vector<std::size_t>& indices, const std::string& value) {
+  return set_descriptor_values(string_descriptor(molecule, descriptor), molecule,
+                               indices, value);
+}
+
+SubsetResult set_string_descriptor_using_mask(
+    Molecule& molecule, StringDescriptor descriptor, const std::vector<int>& mask,
+    const std::string& value) {
+  auto selected = get_indices_from_mask(molecule, mask);
+  if (!selected.ok()) {
+    return {selected.errors};
+  }
+  return set_string_descriptor_using_indices(molecule, descriptor,
+                                             selected.indices, value);
+}
+
+IntSelection get_int_descriptor_using_indices(
+    const Molecule& molecule, IntDescriptor descriptor,
+    const std::vector<std::size_t>& indices) {
+  IntSelection result;
+  result.errors = validate_atom_indices(molecule, indices);
+  if (!result.ok()) {
+    return result;
+  }
+  const auto& values = int_descriptor(molecule, descriptor);
+  result.errors = validate_descriptor_vector(molecule, values);
+  if (!result.ok()) {
+    return result;
+  }
+  result.values = get_descriptor_values(values, indices);
+  return result;
+}
+
+IntSelection get_int_descriptor_using_mask(const Molecule& molecule,
+                                           IntDescriptor descriptor,
+                                           const std::vector<int>& mask) {
+  auto selected = get_indices_from_mask(molecule, mask);
+  if (!selected.ok()) {
+    return {{}, selected.errors};
+  }
+  return get_int_descriptor_using_indices(molecule, descriptor, selected.indices);
+}
+
+SubsetResult set_int_descriptor_using_indices(
+    Molecule& molecule, IntDescriptor descriptor,
+    const std::vector<std::size_t>& indices, int value) {
+  return set_descriptor_values(int_descriptor(molecule, descriptor), molecule,
+                               indices, value);
+}
+
+SubsetResult set_int_descriptor_using_mask(Molecule& molecule,
+                                           IntDescriptor descriptor,
+                                           const std::vector<int>& mask,
+                                           int value) {
+  auto selected = get_indices_from_mask(molecule, mask);
+  if (!selected.ok()) {
+    return {selected.errors};
+  }
+  return set_int_descriptor_using_indices(molecule, descriptor, selected.indices,
+                                          value);
+}
+
+CalcSelection get_calc_descriptor_using_indices(
+    const Molecule& molecule, CalcDescriptor descriptor,
+    const std::vector<std::size_t>& indices) {
+  CalcSelection result;
+  result.errors = validate_atom_indices(molecule, indices);
+  if (!result.ok()) {
+    return result;
+  }
+  const auto& values = calc_descriptor(molecule, descriptor);
+  result.errors = validate_descriptor_vector(molecule, values);
+  if (!result.ok()) {
+    return result;
+  }
+  result.values = get_descriptor_values(values, indices);
+  return result;
+}
+
+CalcSelection get_calc_descriptor_using_mask(const Molecule& molecule,
+                                             CalcDescriptor descriptor,
+                                             const std::vector<int>& mask) {
+  auto selected = get_indices_from_mask(molecule, mask);
+  if (!selected.ok()) {
+    return {{}, selected.errors};
+  }
+  return get_calc_descriptor_using_indices(molecule, descriptor, selected.indices);
+}
+
+SubsetResult set_calc_descriptor_using_indices(
+    Molecule& molecule, CalcDescriptor descriptor,
+    const std::vector<std::size_t>& indices, calc_type value) {
+  return set_descriptor_values(calc_descriptor(molecule, descriptor), molecule,
+                               indices, value);
+}
+
+SubsetResult set_calc_descriptor_using_mask(Molecule& molecule,
+                                            CalcDescriptor descriptor,
+                                            const std::vector<int>& mask,
+                                            calc_type value) {
+  auto selected = get_indices_from_mask(molecule, mask);
+  if (!selected.ok()) {
+    return {selected.errors};
+  }
+  return set_calc_descriptor_using_indices(molecule, descriptor, selected.indices,
+                                           value);
 }
 
 }  // namespace sasmol

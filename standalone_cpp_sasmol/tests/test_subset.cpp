@@ -214,6 +214,93 @@ void test_copy_conect_filters_to_selected_atoms() {
   assert((subset.conect()[1] == std::vector<int>{10}));
 }
 
+void test_get_and_set_string_descriptor_using_indices() {
+  auto mol = read_fixture("2AAD.pdb");
+
+  auto values = sasmol::get_string_descriptor_using_indices(
+      mol, sasmol::StringDescriptor::beta, {0, 4, 14});
+  assert(values.ok());
+  assert((values.values ==
+          std::vector<std::string>{mol.beta()[0], mol.beta()[4],
+                                   mol.beta()[14]}));
+
+  const auto result = sasmol::set_string_descriptor_using_indices(
+      mol, sasmol::StringDescriptor::beta, {0, 14}, "7.50");
+
+  assert(result.ok());
+  assert(mol.beta()[0] == "7.50");
+  assert(mol.beta()[4] == values.values[1]);
+  assert(mol.beta()[14] == "7.50");
+}
+
+void test_get_and_set_string_descriptor_using_mask() {
+  auto mol = read_fixture("2AAD.pdb");
+
+  const auto result = sasmol::set_string_descriptor_using_mask(
+      mol, sasmol::StringDescriptor::segname,
+      {1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1}, "TEST");
+
+  assert(result.ok());
+  auto values = sasmol::get_string_descriptor_using_mask(
+      mol, sasmol::StringDescriptor::segname,
+      {1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1});
+  assert(values.ok());
+  assert((values.values == std::vector<std::string>{"TEST", "TEST", "TEST"}));
+}
+
+void test_get_and_set_int_descriptor_using_indices() {
+  auto mol = read_fixture("2AAD.pdb");
+  const auto unchanged_resid = mol.resid()[4];
+
+  const auto result = sasmol::set_int_descriptor_using_indices(
+      mol, sasmol::IntDescriptor::resid, {0, 14}, 99);
+
+  assert(result.ok());
+  auto values = sasmol::get_int_descriptor_using_indices(
+      mol, sasmol::IntDescriptor::resid, {0, 4, 14});
+  assert(values.ok());
+  assert((values.values == std::vector<int>{99, unchanged_resid, 99}));
+}
+
+void test_get_and_set_calc_descriptor_using_mask() {
+  sasmol::Molecule mol(3, 1);
+  mol.atom_charge() = {0.1, 0.2, 0.3};
+
+  const auto result = sasmol::set_calc_descriptor_using_mask(
+      mol, sasmol::CalcDescriptor::atom_charge, {1, 0, 1}, -1.5);
+
+  assert(result.ok());
+  auto values = sasmol::get_calc_descriptor_using_indices(
+      mol, sasmol::CalcDescriptor::atom_charge, {0, 1, 2});
+  assert(values.ok());
+  assert(std::fabs(values.values[0] + 1.5) < 1.0e-12);
+  assert(std::fabs(values.values[1] - 0.2) < 1.0e-12);
+  assert(std::fabs(values.values[2] + 1.5) < 1.0e-12);
+}
+
+void test_descriptor_set_rejects_bad_mask_before_mutation() {
+  auto mol = read_fixture("2AAD.pdb");
+  const auto original = mol.beta()[0];
+
+  const auto result = sasmol::set_string_descriptor_using_mask(
+      mol, sasmol::StringDescriptor::beta,
+      {2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}, "9.99");
+
+  assert(!result.ok());
+  assert(mol.beta()[0] == original);
+}
+
+void test_descriptor_get_rejects_descriptor_length_mismatch() {
+  auto mol = read_fixture("2AAD.pdb");
+  mol.beta().clear();
+
+  const auto result = sasmol::get_string_descriptor_using_indices(
+      mol, sasmol::StringDescriptor::beta, {0});
+
+  assert(!result.ok());
+  assert(result.values.empty());
+}
+
 }  // namespace
 
 int main() {
@@ -230,5 +317,11 @@ int main() {
   test_set_coordinates_using_indices_replaces_selected_atoms_only();
   test_set_coordinates_rejects_shape_mismatch();
   test_copy_conect_filters_to_selected_atoms();
+  test_get_and_set_string_descriptor_using_indices();
+  test_get_and_set_string_descriptor_using_mask();
+  test_get_and_set_int_descriptor_using_indices();
+  test_get_and_set_calc_descriptor_using_mask();
+  test_descriptor_set_rejects_bad_mask_before_mutation();
+  test_descriptor_get_rejects_descriptor_length_mismatch();
   return 0;
 }
