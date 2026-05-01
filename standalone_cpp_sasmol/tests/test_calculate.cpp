@@ -33,6 +33,14 @@ void assert_bounds_close(const sasmol::CoordinateBounds& bounds,
   assert_close(bounds.maximum.z, expected_max.z);
 }
 
+void assert_calc_vec_close(const sasmol::CalcVec3& actual,
+                           sasmol::CalcVec3 expected,
+                           double tolerance = 1.0e-5) {
+  assert_close_double(actual.x, expected.x, tolerance);
+  assert_close_double(actual.y, expected.y, tolerance);
+  assert_close_double(actual.z, expected.z, tolerance);
+}
+
 void test_calculate_minimum_and_maximum_all_loaded_frames() {
   sasmol::Molecule mol(2, 2);
   mol.set_coordinate(0, 0, {1.0F, 2.0F, 3.0F});
@@ -108,6 +116,62 @@ void test_calculate_mass_rejects_element_mismatch() {
   try {
     (void)sasmol::calculate_mass(mol);
   } catch (const std::invalid_argument&) {
+    threw = true;
+  }
+
+  assert(threw);
+}
+
+void test_calculate_center_of_mass_autocalculates_mass() {
+  sasmol::PdbReader reader;
+  sasmol::Molecule mol;
+  const auto status =
+      reader.read_pdb(fixture_path("pdb_common", "2AAD.pdb"), mol);
+  assert(status.ok());
+  mol.set_total_mass(0.0);
+
+  const auto center = sasmol::calculate_center_of_mass(mol, 0);
+
+  assert_calc_vec_close(center, {75.68045, 43.70790, 41.27621}, 1.0e-5);
+  assert(mol.total_mass() > 0.0);
+}
+
+void test_calculate_center_of_mass_fixture_totals() {
+  sasmol::PdbReader reader;
+  sasmol::Molecule mol;
+  auto status = reader.read_pdb(fixture_path("pdb_common", "rna.pdb"), mol);
+  assert(status.ok());
+  auto center = sasmol::calculate_center_of_mass(mol, 0);
+  assert_calc_vec_close(center, {-8.033, 4.352, 9.231}, 0.001);
+
+  status = reader.read_pdb(fixture_path("pdb_common", "1CRN.pdb"), mol);
+  assert(status.ok());
+  center = sasmol::calculate_center_of_mass(mol, 0);
+  assert_calc_vec_close(center, {9.30026, 9.77488, 6.97776}, 1.0e-5);
+}
+
+void test_calculate_center_of_mass_rejects_unknown_mass() {
+  sasmol::Molecule mol(1, 1);
+  mol.element()[0] = "XX";
+  bool threw = false;
+
+  try {
+    (void)sasmol::calculate_center_of_mass(mol, 0);
+  } catch (const std::invalid_argument&) {
+    threw = true;
+  }
+
+  assert(threw);
+}
+
+void test_calculate_center_of_mass_rejects_bad_frame() {
+  sasmol::Molecule mol(1, 1);
+  mol.element()[0] = "C";
+  bool threw = false;
+
+  try {
+    (void)sasmol::calculate_center_of_mass(mol, 1);
+  } catch (const std::out_of_range&) {
     threw = true;
   }
 
@@ -199,6 +263,10 @@ int main() {
   test_calculate_mass_rna_and_1crn_fixture_totals();
   test_calculate_mass_reports_unknown_elements();
   test_calculate_mass_rejects_element_mismatch();
+  test_calculate_center_of_mass_autocalculates_mass();
+  test_calculate_center_of_mass_fixture_totals();
+  test_calculate_center_of_mass_rejects_unknown_mass();
+  test_calculate_center_of_mass_rejects_bad_frame();
   test_calculate_minimum_and_maximum_all_loaded_frames();
   test_calculate_minimum_and_maximum_selected_frames();
   test_calculate_minimum_and_maximum_rejects_empty_molecule();

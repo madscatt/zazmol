@@ -40,9 +40,18 @@ The C++ tests cover:
 - unknown element reporting
 - descriptor mismatch handling
 
+## Center Of Mass Slice
+
+Implemented `calculate_center_of_mass(molecule, frame)`:
+
+- auto-calculates mass when total mass is not populated
+- returns calculation-precision coordinates
+- rejects unknown masses and out-of-range frames
+- fixture parity for `2AAD.pdb`, `rna.pdb`, and `1CRN.pdb`
+
 ## Deferred
 
 - DCD streaming overloads for `calculate_minimum_and_maximum_all_steps`
-- center of mass, radius of gyration, and principal moments of inertia
+- radius of gyration and principal moments of inertia
 - RMSD/alignment-dependent calculations
 - molecular formula and residue charge

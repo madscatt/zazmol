@@ -43,6 +43,40 @@ MassCalculationResult calculate_mass(Molecule& molecule) {
   return result;
 }
 
+CalcVec3 calculate_center_of_mass(Molecule& molecule, std::size_t frame) {
+  if (frame >= molecule.number_of_frames()) {
+    throw std::out_of_range("calculate_center_of_mass frame is out of range");
+  }
+  if (molecule.natoms() == 0) {
+    throw std::invalid_argument("calculate_center_of_mass requires atoms");
+  }
+  if (molecule.mass().size() != molecule.natoms() ||
+      molecule.total_mass() <= calc_type{}) {
+    const auto mass_result = calculate_mass(molecule);
+    if (!mass_result.ok()) {
+      throw std::invalid_argument(
+          "calculate_center_of_mass requires known element masses");
+    }
+  }
+  if (molecule.total_mass() <= calc_type{}) {
+    throw std::invalid_argument("calculate_center_of_mass requires positive mass");
+  }
+
+  CalcVec3 center;
+  for (std::size_t atom = 0; atom < molecule.natoms(); ++atom) {
+    const auto xyz = molecule.coordinate(frame, atom);
+    const auto mass = molecule.mass()[atom];
+    center.x += mass * static_cast<calc_type>(xyz.x);
+    center.y += mass * static_cast<calc_type>(xyz.y);
+    center.z += mass * static_cast<calc_type>(xyz.z);
+  }
+
+  center.x /= molecule.total_mass();
+  center.y /= molecule.total_mass();
+  center.z /= molecule.total_mass();
+  return center;
+}
+
 CoordinateBounds calculate_minimum_and_maximum(
     const Molecule& molecule, const std::vector<std::size_t>& frames) {
   if (molecule.natoms() == 0 || molecule.number_of_frames() == 0) {

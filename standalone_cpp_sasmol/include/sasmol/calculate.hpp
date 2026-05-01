@@ -12,6 +12,12 @@ struct CoordinateBounds {
   Vec3 maximum;
 };
 
+struct CalcVec3 {
+  calc_type x{};
+  calc_type y{};
+  calc_type z{};
+};
+
 struct MassCalculationResult {
   calc_type total_mass{};
   std::vector<std::string> unknown_elements;
@@ -20,6 +26,9 @@ struct MassCalculationResult {
 };
 
 [[nodiscard]] MassCalculationResult calculate_mass(Molecule& molecule);
+
+[[nodiscard]] CalcVec3 calculate_center_of_mass(Molecule& molecule,
+                                                std::size_t frame);
 
 [[nodiscard]] CoordinateBounds calculate_minimum_and_maximum(
     const Molecule& molecule, const std::vector<std::size_t>& frames = {});
