@@ -235,6 +235,29 @@ bool is_pdb_coordinate_record(const std::string& record) {
   return record == "ATOM" || record == "HETATM";
 }
 
+bool has_pdb_required_write_fields(const Molecule& molecule, std::size_t atom) {
+  return atom < molecule.record().size() && atom < molecule.index().size() &&
+         atom < molecule.name().size() && atom < molecule.resname().size() &&
+         atom < molecule.chain().size() && atom < molecule.resid().size();
+}
+
+bool has_pdb_optional_write_fields(const Molecule& molecule, std::size_t atom) {
+  return atom < molecule.loc().size() && atom < molecule.rescode().size() &&
+         atom < molecule.occupancy().size() && atom < molecule.beta().size() &&
+         atom < molecule.segname().size() && atom < molecule.element().size() &&
+         atom < molecule.charge().size();
+}
+
+std::string optional_pdb_value(const std::vector<std::string>& values,
+                               std::size_t atom,
+                               const std::string& default_value,
+                               bool fill_missing_optional) {
+  if (atom < values.size()) {
+    return values[atom];
+  }
+  return fill_missing_optional ? default_value : std::string{};
+}
+
 std::string moltype_for_resname(const std::string& resname) {
   static const std::set<std::string> protein = {
       "ALA", "ARG", "ASN", "ASP", "CYS", "GLN", "GLU", "GLY",
@@ -554,9 +577,11 @@ IoStatus PdbWriter::write_pdb(const std::filesystem::path& filename,
   if (options.frame >= molecule.number_of_frames()) {
     return {IoCode::format_error, "PDB write frame is out of range."};
   }
-  const auto integrity = molecule.check_integrity();
-  if (!integrity.ok()) {
-    return {IoCode::format_error, "PDB write molecule integrity check failed."};
+  const auto expected_coordinates =
+      molecule.natoms() * molecule.number_of_frames() * 3;
+  if (molecule.coor().size() != expected_coordinates) {
+    return {IoCode::format_error,
+            "PDB write molecule coordinate length check failed."};
   }
 
   std::ofstream output(filename);
@@ -567,6 +592,16 @@ IoStatus PdbWriter::write_pdb(const std::filesystem::path& filename,
 
   auto write_frame = [&](std::size_t frame) -> IoStatus {
     for (std::size_t atom = 0; atom < molecule.natoms(); ++atom) {
+      if (!has_pdb_required_write_fields(molecule, atom)) {
+        return {IoCode::format_error,
+                "PDB molecule is missing required descriptor fields."};
+      }
+      if (!options.fill_missing_optional &&
+          !has_pdb_optional_write_fields(molecule, atom)) {
+        return {IoCode::format_error,
+                "PDB molecule is missing optional descriptor fields."};
+      }
+
       int atom_index = molecule.index()[atom];
       if (atom_index > 99999) atom_index = 99999;
       if (atom_index < -9999) atom_index = -9999;
@@ -575,22 +610,34 @@ IoStatus PdbWriter::write_pdb(const std::filesystem::path& filename,
       if (resid < -999) resid = -999;
 
       const auto xyz = molecule.coordinate(frame, atom);
+      const auto loc = optional_pdb_value(molecule.loc(), atom, " ",
+                                          options.fill_missing_optional);
+      const auto rescode = optional_pdb_value(molecule.rescode(), atom, " ",
+                                              options.fill_missing_optional);
+      const auto occupancy = optional_pdb_value(
+          molecule.occupancy(), atom, "0.00", options.fill_missing_optional);
+      const auto beta = optional_pdb_value(molecule.beta(), atom, "0.00",
+                                           options.fill_missing_optional);
+      const auto segname = optional_pdb_value(molecule.segname(), atom, " ",
+                                              options.fill_missing_optional);
+      const auto element = optional_pdb_value(molecule.element(), atom, " ",
+                                              options.fill_missing_optional);
+      const auto charge = optional_pdb_value(molecule.charge(), atom, " ",
+                                             options.fill_missing_optional);
       output << std::left << std::setw(6) << molecule.record()[atom]
              << std::right << std::setw(5) << atom_index << ' ' << std::left
              << std::setw(4) << molecule.name()[atom]
-             << fixed_slice(molecule.loc()[atom], 0, 1) << std::setw(4)
+             << fixed_slice(loc, 0, 1) << std::setw(4)
              << molecule.resname()[atom]
              << fixed_slice(molecule.chain()[atom], 0, 1) << std::right
-             << std::setw(4) << resid << fixed_slice(molecule.rescode()[atom], 0, 1)
+             << std::setw(4) << resid << fixed_slice(rescode, 0, 1)
              << "   " << std::fixed << std::setprecision(3) << std::setw(8)
              << static_cast<double>(xyz.x) << std::setw(8)
              << static_cast<double>(xyz.y) << std::setw(8)
              << static_cast<double>(xyz.z) << std::setw(6)
-             << molecule.occupancy()[atom] << std::setw(6)
-             << molecule.beta()[atom] << "      " << std::left << std::setw(4)
-             << molecule.segname()[atom] << std::right << std::setw(2)
-             << molecule.element()[atom] << std::setw(2) << molecule.charge()[atom]
-             << '\n';
+             << occupancy << std::setw(6) << beta << "      " << std::left
+             << std::setw(4) << segname << std::right << std::setw(2)
+             << element << std::setw(2) << charge << '\n';
     }
     if (!output) {
       return {IoCode::file_error, "Failed while writing PDB atom records."};

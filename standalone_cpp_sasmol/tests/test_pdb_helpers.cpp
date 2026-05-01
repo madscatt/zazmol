@@ -565,6 +565,80 @@ void test_write_pdb_conect_output() {
   std::filesystem::remove(output);
 }
 
+void test_write_pdb_missing_optional_fields_default_fails_cleanly() {
+  sasmol::Molecule mol(1, 1);
+  mol.name()[0] = "C";
+  mol.resname()[0] = "GLY";
+  mol.chain()[0] = "A";
+  mol.loc().clear();
+  mol.rescode().clear();
+  mol.occupancy().clear();
+  mol.beta().clear();
+  mol.segname().clear();
+  mol.element().clear();
+  mol.charge().clear();
+  mol.set_coordinate(0, 0, {1.0F, 2.0F, 3.0F});
+
+  const auto output =
+      std::filesystem::temp_directory_path() / "sasmol_missing_optional.pdb";
+  sasmol::PdbWriter writer;
+  const auto status = writer.write_pdb(output, mol);
+
+  assert(status.code == sasmol::IoCode::format_error);
+  std::filesystem::remove(output);
+}
+
+void test_write_pdb_missing_optional_fields_can_be_filled() {
+  sasmol::Molecule mol(1, 1);
+  mol.name()[0] = "C";
+  mol.resname()[0] = "GLY";
+  mol.chain()[0] = "A";
+  mol.loc().clear();
+  mol.rescode().clear();
+  mol.occupancy().clear();
+  mol.beta().clear();
+  mol.segname().clear();
+  mol.element().clear();
+  mol.charge().clear();
+  mol.set_coordinate(0, 0, {1.0F, 2.0F, 3.0F});
+
+  const auto output =
+      std::filesystem::temp_directory_path() / "sasmol_filled_optional.pdb";
+  sasmol::PdbWriteOptions options;
+  options.fill_missing_optional = true;
+  sasmol::PdbWriter writer;
+  const auto status = writer.write_pdb(output, mol, options);
+  assert(status.ok());
+
+  const auto line = first_coordinate_line(output);
+  assert(line.size() >= 80);
+  assert(line[16] == ' ');
+  assert(line[26] == ' ');
+  assert(line.substr(54, 6) == "  0.00");
+  assert(line.substr(60, 6) == "  0.00");
+  assert(line.substr(72, 4) == "    ");
+  assert(line.substr(76, 2) == "  ");
+  assert(line.substr(78, 2) == "  ");
+
+  std::filesystem::remove(output);
+}
+
+void test_write_pdb_missing_required_fields_fail_when_filling_optional() {
+  sasmol::Molecule mol(1, 1);
+  mol.name().clear();
+  mol.set_coordinate(0, 0, {1.0F, 2.0F, 3.0F});
+
+  const auto output =
+      std::filesystem::temp_directory_path() / "sasmol_missing_required.pdb";
+  sasmol::PdbWriteOptions options;
+  options.fill_missing_optional = true;
+  sasmol::PdbWriter writer;
+  const auto status = writer.write_pdb(output, mol, options);
+
+  assert(status.code == sasmol::IoCode::format_error);
+  std::filesystem::remove(output);
+}
+
 void test_write_pdb_all_frames_model_round_trip() {
   sasmol::PdbReader reader;
   sasmol::PdbWriter writer;
@@ -689,6 +763,9 @@ int main() {
   test_write_pdb_selected_rna_frame_round_trip();
   test_write_pdb_model_endmdl_output();
   test_write_pdb_conect_output();
+  test_write_pdb_missing_optional_fields_default_fails_cleanly();
+  test_write_pdb_missing_optional_fields_can_be_filled();
+  test_write_pdb_missing_required_fields_fail_when_filling_optional();
   test_write_pdb_all_frames_model_round_trip();
   test_read_pdb_multi_frame_is_explicitly_deferred();
   test_read_pdb_end_separated_multiframe_coordinates();

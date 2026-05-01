@@ -118,6 +118,10 @@ surface and helper tests:
     selected-frame RNA writes, and `1CRN.pdb` protein read/write round trips.
 12. Added direct fixture tests for no-terminal-`END` input and trailing-blank
     tolerance.
+13. Added explicit missing-descriptor handling for PDB writes:
+    default writes fail cleanly when optional descriptor vectors are missing,
+    `fill_missing_optional` supplies Python-compatible optional defaults, and
+    missing required descriptors remain errors.
 
 ## Proposed Next Validation Slice
 

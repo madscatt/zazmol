@@ -73,6 +73,7 @@ struct PdbWriteOptions {
   std::size_t frame{0};
   bool write_all_frames{false};
   bool include_conect{true};
+  bool fill_missing_optional{false};
   int model_number{};
   bool final{false};
 };
