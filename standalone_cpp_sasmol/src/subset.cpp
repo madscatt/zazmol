@@ -74,6 +74,28 @@ void copy_selected_conect(const Molecule& source, Molecule& destination,
 
 }  // namespace
 
+IndexSelection get_indices_from_mask(const Molecule& molecule,
+                                     const std::vector<int>& mask) {
+  IndexSelection result;
+  if (mask.size() != molecule.natoms()) {
+    result.errors.push_back("mask length does not match natoms");
+    return result;
+  }
+  for (std::size_t atom = 0; atom < mask.size(); ++atom) {
+    if (mask[atom] == 1) {
+      result.indices.push_back(atom);
+    } else if (mask[atom] != 0) {
+      result.indices.clear();
+      result.errors.push_back("mask values must be 0 or 1");
+      return result;
+    }
+  }
+  if (result.indices.empty()) {
+    result.errors.push_back("mask selects no atoms");
+  }
+  return result;
+}
+
 CoordinateSelection get_coordinates_using_indices(
     const Molecule& molecule, std::size_t frame,
     const std::vector<std::size_t>& indices) {
@@ -88,6 +110,15 @@ CoordinateSelection get_coordinates_using_indices(
     result.coordinates.push_back(molecule.coordinate(frame, atom));
   }
   return result;
+}
+
+CoordinateSelection get_coordinates_using_mask(
+    const Molecule& molecule, std::size_t frame, const std::vector<int>& mask) {
+  auto selected = get_indices_from_mask(molecule, mask);
+  if (!selected.ok()) {
+    return {{}, selected.errors};
+  }
+  return get_coordinates_using_indices(molecule, frame, selected.indices);
 }
 
 SubsetResult set_coordinates_using_indices(
@@ -113,6 +144,16 @@ SubsetResult set_coordinates_using_indices(
                             source.coordinate(frame, selected));
   }
   return result;
+}
+
+SubsetResult set_coordinates_using_mask(
+    Molecule& molecule, const Molecule& source, std::size_t frame,
+    const std::vector<int>& mask) {
+  auto selected = get_indices_from_mask(molecule, mask);
+  if (!selected.ok()) {
+    return {selected.errors};
+  }
+  return set_coordinates_using_indices(molecule, source, frame, selected.indices);
 }
 
 SubsetResult copy_molecule_using_indices(
@@ -158,6 +199,17 @@ SubsetResult copy_molecule_using_indices(
   }
 
   return result;
+}
+
+SubsetResult copy_molecule_using_mask(const Molecule& source,
+                                      Molecule& destination,
+                                      const std::vector<int>& mask,
+                                      std::size_t frame) {
+  auto selected = get_indices_from_mask(source, mask);
+  if (!selected.ok()) {
+    return {selected.errors};
+  }
+  return copy_molecule_using_indices(source, destination, selected.indices, frame);
 }
 
 Molecule copied_molecule_using_indices(const Molecule& source,

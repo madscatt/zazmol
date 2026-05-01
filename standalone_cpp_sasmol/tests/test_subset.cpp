@@ -54,6 +54,42 @@ void test_get_coordinates_rejects_bad_index() {
   assert(result.coordinates.empty());
 }
 
+void test_get_indices_from_mask() {
+  const auto mol = read_fixture("2AAD.pdb");
+
+  const auto result =
+      sasmol::get_indices_from_mask(mol, {1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1});
+
+  assert(result.ok());
+  assert((result.indices == std::vector<std::size_t>{0, 4, 14}));
+}
+
+void test_get_coordinates_using_mask_delegates_to_indices() {
+  const auto mol = read_fixture("2AAD.pdb");
+
+  const auto result =
+      sasmol::get_coordinates_using_mask(mol, 0,
+                                         {1, 0, 0, 0, 1, 0, 0, 0,
+                                          0, 0, 0, 0, 0, 0, 1});
+
+  assert(result.ok());
+  assert(result.coordinates.size() == 3);
+  assert_vec_close(result.coordinates[1], mol.coordinate(0, 4));
+}
+
+void test_mask_rejects_bad_shape_and_values() {
+  const auto mol = read_fixture("2AAD.pdb");
+
+  auto result = sasmol::get_indices_from_mask(mol, {1, 0});
+  assert(!result.ok());
+  assert(result.indices.empty());
+
+  result = sasmol::get_indices_from_mask(
+      mol, {1, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1});
+  assert(!result.ok());
+  assert(result.indices.empty());
+}
+
 void test_copy_molecule_using_indices_preserves_descriptors() {
   const auto source = read_fixture("1CRN.pdb");
   const auto selected = sasmol::select_indices(
@@ -76,6 +112,20 @@ void test_copy_molecule_using_indices_preserves_descriptors() {
   }
 }
 
+void test_copy_molecule_using_mask_preserves_descriptors() {
+  const auto source = read_fixture("2AAD.pdb");
+  sasmol::Molecule subset;
+
+  const auto result = sasmol::copy_molecule_using_mask(
+      source, subset, {1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1}, 0);
+
+  assert(result.ok());
+  assert(subset.natoms() == 3);
+  assert(subset.name()[0] == source.name()[0]);
+  assert(subset.name()[1] == source.name()[4]);
+  assert(subset.name()[2] == source.name()[14]);
+}
+
 void test_copied_molecule_using_indices_returns_value() {
   const auto source = read_fixture("2AAD.pdb");
 
@@ -84,6 +134,39 @@ void test_copied_molecule_using_indices_returns_value() {
   assert(subset.natoms() == 2);
   assert(subset.index()[0] == source.index()[0]);
   assert(subset.index()[1] == source.index()[1]);
+}
+
+void test_set_coordinates_using_mask_replaces_selected_atoms_only() {
+  sasmol::Molecule target(3, 1);
+  target.set_coordinate(0, 0, {1.0F, 1.0F, 1.0F});
+  target.set_coordinate(0, 1, {2.0F, 2.0F, 2.0F});
+  target.set_coordinate(0, 2, {3.0F, 3.0F, 3.0F});
+  sasmol::Molecule source(2, 1);
+  source.set_coordinate(0, 0, {10.0F, 11.0F, 12.0F});
+  source.set_coordinate(0, 1, {20.0F, 21.0F, 22.0F});
+
+  const auto result =
+      sasmol::set_coordinates_using_mask(target, source, 0, {1, 0, 1});
+
+  assert(result.ok());
+  assert_vec_close(target.coordinate(0, 0), {10.0F, 11.0F, 12.0F});
+  assert_vec_close(target.coordinate(0, 1), {2.0F, 2.0F, 2.0F});
+  assert_vec_close(target.coordinate(0, 2), {20.0F, 21.0F, 22.0F});
+}
+
+void test_set_coordinates_using_mask_rejects_before_mutation() {
+  sasmol::Molecule target(2, 1);
+  target.set_coordinate(0, 0, {1.0F, 1.0F, 1.0F});
+  target.set_coordinate(0, 1, {2.0F, 2.0F, 2.0F});
+  sasmol::Molecule source(1, 1);
+  source.set_coordinate(0, 0, {10.0F, 11.0F, 12.0F});
+
+  const auto result =
+      sasmol::set_coordinates_using_mask(target, source, 0, {1, 2});
+
+  assert(!result.ok());
+  assert_vec_close(target.coordinate(0, 0), {1.0F, 1.0F, 1.0F});
+  assert_vec_close(target.coordinate(0, 1), {2.0F, 2.0F, 2.0F});
 }
 
 void test_set_coordinates_using_indices_replaces_selected_atoms_only() {
@@ -136,8 +219,14 @@ void test_copy_conect_filters_to_selected_atoms() {
 int main() {
   test_get_coordinates_using_indices();
   test_get_coordinates_rejects_bad_index();
+  test_get_indices_from_mask();
+  test_get_coordinates_using_mask_delegates_to_indices();
+  test_mask_rejects_bad_shape_and_values();
   test_copy_molecule_using_indices_preserves_descriptors();
+  test_copy_molecule_using_mask_preserves_descriptors();
   test_copied_molecule_using_indices_returns_value();
+  test_set_coordinates_using_mask_replaces_selected_atoms_only();
+  test_set_coordinates_using_mask_rejects_before_mutation();
   test_set_coordinates_using_indices_replaces_selected_atoms_only();
   test_set_coordinates_rejects_shape_mismatch();
   test_copy_conect_filters_to_selected_atoms();

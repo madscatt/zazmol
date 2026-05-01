@@ -15,10 +15,18 @@ Implemented explicit-index operations:
 - `copy_molecule_using_indices(source, destination, indices, frame)`
 - `copied_molecule_using_indices(source, indices, frame)`
 
+Implemented 0/1 mask compatibility wrappers:
+
+- `get_indices_from_mask(molecule, mask)`
+- `get_coordinates_using_mask(molecule, frame, mask)`
+- `set_coordinates_using_mask(molecule, source, frame, mask)`
+- `copy_molecule_using_mask(source, destination, mask, frame)`
+
 Behavior notes:
 
 - failures return structured errors for non-throwing APIs
-- empty selections, bad frames, and bad atom indices fail without mutation
+- empty selections, bad frames, bad atom indices, bad mask lengths, and
+  non-0/1 mask values fail without mutation
 - coordinate replacement requires the source atom count to match the selected
   destination atom count
 - copy creates a one-frame molecule using the requested source frame
@@ -27,7 +35,6 @@ Behavior notes:
 
 ## Deferred
 
-- 0/1 mask wrappers matching Python names
 - descriptor set/get using mask or indices
 - `duplicate_molecule`
 - `merge_two_molecules`
