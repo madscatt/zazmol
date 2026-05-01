@@ -8,6 +8,7 @@
 #include <ios>
 #include <limits>
 #include <map>
+#include <sstream>
 #include <vector>
 #include <utility>
 
@@ -168,6 +169,35 @@ std::array<char, 80> padded_title(const std::string& text) {
   return title;
 }
 
+std::string trim_copy(std::string value) {
+  const auto first = value.find_first_not_of(" \t\r\n");
+  if (first == std::string::npos) {
+    return {};
+  }
+  const auto last = value.find_last_not_of(" \t\r\n");
+  return value.substr(first, last - first + 1);
+}
+
+std::string pdb_record_name(const std::string& line) {
+  return trim_copy(line.substr(0, std::min<std::size_t>(6, line.size())));
+}
+
+bool is_pdb_coordinate_record(const std::string& record) {
+  return record == "ATOM" || record == "HETATM";
+}
+
+bool all_equal(const std::vector<std::size_t>& values) {
+  if (values.empty()) {
+    return true;
+  }
+  for (const auto value : values) {
+    if (value != values.front()) {
+      return false;
+    }
+  }
+  return true;
+}
+
 }  // namespace
 
 IoStatus IoStatus::success() { return {}; }
@@ -185,6 +215,100 @@ IoStatus PdbReader::read_pdb(const std::filesystem::path& filename,
   return IoStatus::not_implemented(
       "PDB parsing is intentionally deferred until the tolerance contract is "
       "fully reviewed against Python zazmol fixtures.");
+}
+
+IoStatus PdbReader::scan_pdb_frames(const std::filesystem::path& filename,
+                                    PdbFrameScan& scan,
+                                    const PdbReadOptions& options) const {
+  (void)options;
+  std::ifstream input(filename);
+  if (!input) {
+    return {IoCode::file_error, "Failed to open PDB file: " + filename.string()};
+  }
+
+  std::vector<std::size_t> counts_per_model;
+  std::vector<std::size_t> counts_per_end;
+  std::size_t count_this_model{};
+  std::size_t count_this_end{};
+  bool model_on = false;
+
+  std::string line;
+  while (std::getline(input, line)) {
+    const std::string record = pdb_record_name(line);
+    if (record.empty()) {
+      continue;
+    }
+
+    if (record == "MODEL") {
+      if (model_on) {
+        return {IoCode::format_error,
+                "Encountered consecutive MODEL records in PDB file."};
+      }
+      if (count_this_model != 0) {
+        return {IoCode::format_error,
+                "Encountered atoms after ENDMDL and before MODEL records."};
+      }
+      model_on = true;
+    } else if (record == "ENDMDL") {
+      if (!model_on) {
+        return {IoCode::format_error,
+                "Encountered ENDMDL without active MODEL record."};
+      }
+      model_on = false;
+      counts_per_model.push_back(count_this_model);
+      count_this_model = 0;
+    } else if (record == "END") {
+      counts_per_end.push_back(count_this_end);
+      count_this_end = 0;
+    }
+
+    if (is_pdb_coordinate_record(record)) {
+      ++count_this_model;
+      ++count_this_end;
+    }
+  }
+
+  if (model_on) {
+    return {IoCode::format_error,
+            "PDB MODEL record does not have a matching ENDMDL."};
+  }
+  if (counts_per_end.empty() && !counts_per_model.empty()) {
+    return {IoCode::format_error,
+            "PDB MODEL trajectory is missing a terminating END record."};
+  }
+  std::size_t model_sum{};
+  for (const auto count : counts_per_model) {
+    model_sum += count;
+  }
+  std::size_t end_sum{};
+  for (const auto count : counts_per_end) {
+    end_sum += count;
+  }
+  if (!counts_per_model.empty() &&
+      (counts_per_end.size() > 1 || model_sum != end_sum)) {
+    return {IoCode::format_error,
+            "PDB MODEL/END records imply ambiguous frame boundaries."};
+  }
+
+  if (!counts_per_model.empty()) {
+    if (!all_equal(counts_per_model)) {
+      return {IoCode::format_error,
+              "PDB MODEL frames have inconsistent atom counts."};
+    }
+    scan = {counts_per_model.front(), counts_per_model.size(),
+            PdbFrameMode::model_records};
+  } else if (!counts_per_end.empty()) {
+    if (!all_equal(counts_per_end)) {
+      return {IoCode::format_error,
+              "PDB END-separated frames have inconsistent atom counts."};
+    }
+    scan = {counts_per_end.front(), counts_per_end.size(),
+            PdbFrameMode::end_records};
+  } else {
+    scan = {count_this_model, 1, PdbFrameMode::single};
+  }
+
+  return IoStatus::success();
 }
 
 IoStatus PdbWriter::write_pdb(const std::filesystem::path& filename,

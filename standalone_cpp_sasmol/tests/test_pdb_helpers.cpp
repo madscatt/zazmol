@@ -2,6 +2,7 @@
 
 #include <cassert>
 #include <cmath>
+#include <filesystem>
 #include <string>
 #include <vector>
 
@@ -62,11 +63,65 @@ void test_conect_lines_remap_original_to_current_indices() {
                    }));
 }
 
+std::filesystem::path fixture_path(const char* area, const char* name) {
+  return std::filesystem::path(SASMOL_TEST_DATA_DIR) / area / name;
+}
+
+void assert_scan(const std::filesystem::path& path, std::size_t natoms,
+                 std::size_t nframes, sasmol::PdbFrameMode mode) {
+  sasmol::PdbReader reader;
+  sasmol::PdbFrameScan scan;
+
+  const auto status = reader.scan_pdb_frames(path, scan);
+
+  assert(status.ok());
+  assert(scan.natoms == natoms);
+  assert(scan.nframes == nframes);
+  assert(scan.mode == mode);
+}
+
+void assert_scan_fails(const std::filesystem::path& path) {
+  sasmol::PdbReader reader;
+  sasmol::PdbFrameScan scan;
+
+  const auto status = reader.scan_pdb_frames(path, scan);
+
+  assert(!status.ok());
+  assert(status.code == sasmol::IoCode::format_error);
+}
+
+void test_pdb_frame_scan_fixtures() {
+  assert_scan(fixture_path("pdb_common", "1ATM.pdb"), 1, 1,
+              sasmol::PdbFrameMode::end_records);
+  assert_scan(fixture_path("pdb_common", "1ATM-1to2.pdb"), 1, 2,
+              sasmol::PdbFrameMode::end_records);
+  assert_scan(fixture_path("sasmol/file_io", "2AAD-1to3-END.pdb"), 15, 3,
+              sasmol::PdbFrameMode::end_records);
+  assert_scan(fixture_path("sasmol/file_io", "2AAD-1to3-MODEL.pdb"), 15, 3,
+              sasmol::PdbFrameMode::model_records);
+  assert_scan(fixture_path("sasmol/file_io", "1AA-NoEND.pdb"), 9, 1,
+              sasmol::PdbFrameMode::single);
+}
+
+void test_pdb_frame_scan_failure_fixtures() {
+  assert_scan_fails(
+      fixture_path("sasmol/file_io", "2AAD-1to3-END_wrong_number_atoms.pdb"));
+  assert_scan_fails(fixture_path(
+      "sasmol/file_io", "2AAD-1to3-MODEL_wrong_number_atoms.pdb"));
+  assert_scan_fails(fixture_path(
+      "sasmol/file_io", "2AAD-1to3-MODEL_wrongnumber_mix_END.pdb"));
+  assert_scan_fails(fixture_path(
+      "sasmol/file_io", "2AAD-1to3-MODEL_mix_END_noterminating.pdb"));
+  assert_scan_fails(fixture_path("pdb_common", "1PSI.pdb"));
+}
+
 }  // namespace
 
 int main() {
   test_all_zero_axis_guard_only_nudges_first_atom();
   test_nonzero_axes_are_untouched();
   test_conect_lines_remap_original_to_current_indices();
+  test_pdb_frame_scan_fixtures();
+  test_pdb_frame_scan_failure_fixtures();
   return 0;
 }

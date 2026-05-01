@@ -38,6 +38,18 @@ struct PdbReadOptions {
   bool apply_all_zero_coordinate_guard{true};
 };
 
+enum class PdbFrameMode {
+  single,
+  end_records,
+  model_records,
+};
+
+struct PdbFrameScan {
+  std::size_t natoms{};
+  std::size_t nframes{};
+  PdbFrameMode mode{PdbFrameMode::single};
+};
+
 struct PdbWriteOptions {
   std::size_t frame{0};
   bool write_all_frames{false};
@@ -49,6 +61,9 @@ class PdbReader {
   [[nodiscard]] IoStatus read_pdb(const std::filesystem::path& filename,
                                   Molecule& molecule,
                                   const PdbReadOptions& options = {}) const;
+  [[nodiscard]] IoStatus scan_pdb_frames(
+      const std::filesystem::path& filename, PdbFrameScan& scan,
+      const PdbReadOptions& options = {}) const;
 
   [[nodiscard]] static constexpr bool tolerant_by_default() noexcept {
     return true;

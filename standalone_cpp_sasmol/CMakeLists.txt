@@ -66,5 +66,8 @@ if(BUILD_TESTING)
 
   add_executable(test_pdb_helpers tests/test_pdb_helpers.cpp)
   target_link_libraries(test_pdb_helpers PRIVATE sasmol_standalone)
+  target_compile_definitions(test_pdb_helpers PRIVATE
+    SASMOL_TEST_DATA_DIR="${CMAKE_CURRENT_SOURCE_DIR}/../src/python/test_sasmol/data"
+  )
   add_test(NAME pdb_helpers COMMAND test_pdb_helpers)
 endif()
