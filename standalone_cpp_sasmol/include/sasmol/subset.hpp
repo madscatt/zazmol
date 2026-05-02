@@ -77,6 +77,10 @@ struct CalcSelection {
   [[nodiscard]] bool ok() const noexcept { return errors.empty(); }
 };
 
+struct MergeOptions {
+  bool report_skipped_descriptors{false};
+};
+
 [[nodiscard]] IndexSelection get_indices_from_mask(
     const Molecule& molecule, const std::vector<int>& mask);
 
@@ -109,6 +113,13 @@ struct CalcSelection {
 
 [[nodiscard]] std::vector<Molecule> duplicate_molecule(
     const Molecule& molecule, std::size_t number_of_duplicates);
+
+[[nodiscard]] SubsetResult merge_two_molecules(
+    const Molecule& mol1, const Molecule& mol2, Molecule& merged,
+    MergeOptions options = {});
+
+[[nodiscard]] Molecule merged_two_molecules(
+    const Molecule& mol1, const Molecule& mol2, MergeOptions options = {});
 
 [[nodiscard]] StringSelection get_string_descriptor_using_indices(
     const Molecule& molecule, StringDescriptor descriptor,

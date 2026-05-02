@@ -189,6 +189,58 @@ std::vector<std::string> validate_descriptor_vector(
 }
 
 template <typename T>
+void append_vector(std::vector<T>& destination, const std::vector<T>& source) {
+  destination.insert(destination.end(), source.begin(), source.end());
+}
+
+template <typename T>
+void validate_required_vector(const Molecule& molecule,
+                              const std::vector<T>& values,
+                              const std::string& label,
+                              std::vector<std::string>& errors) {
+  if (values.size() != molecule.natoms()) {
+    errors.push_back(label + " length does not match natoms");
+  }
+}
+
+template <typename T>
+void merge_required_vector(const std::vector<T>& left,
+                           const std::vector<T>& right,
+                           std::vector<T>& destination) {
+  destination.clear();
+  destination.reserve(left.size() + right.size());
+  append_vector(destination, left);
+  append_vector(destination, right);
+}
+
+template <typename T>
+void merge_optional_vector(const std::vector<T>& left,
+                           std::size_t left_natoms,
+                           const std::vector<T>& right,
+                           std::size_t right_natoms,
+                           std::vector<T>& destination,
+                           const std::string& label,
+                           MergeOptions options,
+                           SubsetResult& result) {
+  destination.clear();
+  const bool left_present = left_natoms == 0 || !left.empty();
+  const bool right_present = right_natoms == 0 || !right.empty();
+  if (!left_present && !right_present) {
+    return;
+  }
+  if (left_present != right_present) {
+    if (options.report_skipped_descriptors) {
+      result.errors.push_back("skipped descriptor " + label +
+                              " missing from one input molecule");
+    }
+    return;
+  }
+  destination.reserve(left.size() + right.size());
+  append_vector(destination, left);
+  append_vector(destination, right);
+}
+
+template <typename T>
 std::vector<T> get_descriptor_values(const std::vector<T>& descriptor,
                                      const std::vector<std::size_t>& indices) {
   std::vector<T> values;
@@ -243,6 +295,70 @@ void copy_selected_conect(const Molecule& source, Molecule& destination,
       }
     }
   }
+}
+
+std::vector<std::string> validate_merge_source(const Molecule& molecule,
+                                               const std::string& label,
+                                               bool require_atoms) {
+  std::vector<std::string> errors;
+  if (require_atoms && molecule.natoms() == 0) {
+    errors.push_back(label + " has no atoms to merge");
+    return errors;
+  }
+  if (molecule.natoms() == 0) {
+    return errors;
+  }
+  if (molecule.number_of_frames() == 0) {
+    errors.push_back(label + " has no coordinate frames");
+    return errors;
+  }
+  const auto expected_coor = molecule.natoms() * molecule.number_of_frames() * 3;
+  if (molecule.coor().size() != expected_coor) {
+    errors.push_back(label + " coordinate storage does not match shape");
+    return errors;
+  }
+
+  validate_required_vector(molecule, molecule.record(), label + " record",
+                           errors);
+  validate_required_vector(molecule, molecule.index(), label + " index",
+                           errors);
+  validate_required_vector(molecule, molecule.original_index(),
+                           label + " original_index", errors);
+  validate_required_vector(molecule, molecule.original_resid(),
+                           label + " original_resid", errors);
+  validate_required_vector(molecule, molecule.name(), label + " name", errors);
+  validate_required_vector(molecule, molecule.loc(), label + " loc", errors);
+  validate_required_vector(molecule, molecule.resname(), label + " resname",
+                           errors);
+  validate_required_vector(molecule, molecule.chain(), label + " chain", errors);
+  validate_required_vector(molecule, molecule.resid(), label + " resid", errors);
+  validate_required_vector(molecule, molecule.rescode(), label + " rescode",
+                           errors);
+  validate_required_vector(molecule, molecule.occupancy(),
+                           label + " occupancy", errors);
+  validate_required_vector(molecule, molecule.beta(), label + " beta", errors);
+  validate_required_vector(molecule, molecule.segname(), label + " segname",
+                           errors);
+  validate_required_vector(molecule, molecule.element(), label + " element",
+                           errors);
+  validate_required_vector(molecule, molecule.charge(), label + " charge",
+                           errors);
+  validate_required_vector(molecule, molecule.moltype(), label + " moltype",
+                           errors);
+  validate_required_vector(molecule, molecule.mass(), label + " mass", errors);
+  if (!molecule.atom_charge().empty()) {
+    validate_required_vector(molecule, molecule.atom_charge(),
+                             label + " atom_charge", errors);
+  }
+  if (!molecule.atom_vdw().empty()) {
+    validate_required_vector(molecule, molecule.atom_vdw(),
+                             label + " atom_vdw", errors);
+  }
+  if (!molecule.residue_charge().empty()) {
+    validate_required_vector(molecule, molecule.residue_charge(),
+                             label + " residue_charge", errors);
+  }
+  return errors;
 }
 
 }  // namespace
@@ -405,6 +521,100 @@ std::vector<Molecule> duplicate_molecule(const Molecule& molecule,
     duplicates.push_back(molecule);
   }
   return duplicates;
+}
+
+SubsetResult merge_two_molecules(const Molecule& mol1, const Molecule& mol2,
+                                 Molecule& merged, MergeOptions options) {
+  SubsetResult result;
+  auto errors = validate_merge_source(mol1, "mol1", true);
+  append_vector(result.errors, errors);
+  errors = validate_merge_source(mol2, "mol2", false);
+  append_vector(result.errors, errors);
+  if (!result.ok()) {
+    return result;
+  }
+
+  const auto natoms1 = mol1.natoms();
+  const auto natoms2 = mol2.natoms();
+  const auto natoms = natoms1 + natoms2;
+
+  Molecule candidate(natoms, 1);
+
+  merge_required_vector(mol1.record(), mol2.record(), candidate.record());
+  merge_required_vector(mol1.original_index(), mol2.original_index(),
+                        candidate.original_index());
+  merge_required_vector(mol1.original_resid(), mol2.original_resid(),
+                        candidate.original_resid());
+  merge_required_vector(mol1.name(), mol2.name(), candidate.name());
+  merge_required_vector(mol1.loc(), mol2.loc(), candidate.loc());
+  merge_required_vector(mol1.resname(), mol2.resname(), candidate.resname());
+  merge_required_vector(mol1.chain(), mol2.chain(), candidate.chain());
+  merge_required_vector(mol1.resid(), mol2.resid(), candidate.resid());
+  merge_required_vector(mol1.rescode(), mol2.rescode(), candidate.rescode());
+  merge_required_vector(mol1.occupancy(), mol2.occupancy(),
+                        candidate.occupancy());
+  merge_required_vector(mol1.beta(), mol2.beta(), candidate.beta());
+  merge_required_vector(mol1.segname(), mol2.segname(), candidate.segname());
+  merge_required_vector(mol1.element(), mol2.element(), candidate.element());
+  merge_required_vector(mol1.charge(), mol2.charge(), candidate.charge());
+  merge_required_vector(mol1.moltype(), mol2.moltype(), candidate.moltype());
+  merge_required_vector(mol1.mass(), mol2.mass(), candidate.mass());
+
+  candidate.index().clear();
+  candidate.index().reserve(natoms);
+  append_vector(candidate.index(), mol1.index());
+  const auto last_index = mol1.index().back();
+  for (std::size_t atom = 0; atom < natoms2; ++atom) {
+    candidate.index().push_back(last_index + static_cast<int>(atom) + 1);
+  }
+
+  merge_optional_vector(mol1.atom_charge(), natoms1, mol2.atom_charge(), natoms2,
+                        candidate.atom_charge(), "atom_charge", options,
+                        result);
+  merge_optional_vector(mol1.atom_vdw(), natoms1, mol2.atom_vdw(), natoms2,
+                        candidate.atom_vdw(), "atom_vdw", options, result);
+  merge_optional_vector(mol1.residue_charge(), natoms1, mol2.residue_charge(),
+                        natoms2,
+                        candidate.residue_charge(), "residue_charge", options,
+                        result);
+
+  for (std::size_t atom = 0; atom < natoms1; ++atom) {
+    candidate.set_coordinate(0, atom, mol1.coordinate(0, atom));
+  }
+  for (std::size_t atom = 0; atom < natoms2; ++atom) {
+    candidate.set_coordinate(0, natoms1 + atom, mol2.coordinate(0, atom));
+  }
+
+  candidate.conect().assign(natoms, {});
+  for (std::size_t atom = 0; atom < natoms1 && atom < mol1.conect().size();
+       ++atom) {
+    candidate.conect()[atom] = mol1.conect()[atom];
+  }
+  for (std::size_t atom = 0; atom < natoms2 && atom < mol2.conect().size();
+       ++atom) {
+    candidate.conect()[natoms1 + atom] = mol2.conect()[atom];
+  }
+
+  candidate.unitcell() = mol1.unitcell();
+  if (!mol1.fasta().empty() || !mol2.fasta().empty()) {
+    candidate.fasta() = mol1.fasta() + mol2.fasta();
+  }
+  if (mol1.total_mass() != calc_type{} && mol2.total_mass() != calc_type{}) {
+    candidate.set_total_mass(mol1.total_mass() + mol2.total_mass());
+  }
+
+  merged = candidate;
+  return result;
+}
+
+Molecule merged_two_molecules(const Molecule& mol1, const Molecule& mol2,
+                              MergeOptions options) {
+  Molecule merged;
+  const auto result = merge_two_molecules(mol1, mol2, merged, options);
+  if (!result.ok()) {
+    throw std::invalid_argument(result.errors.front());
+  }
+  return merged;
 }
 
 StringSelection get_string_descriptor_using_indices(

@@ -41,6 +41,11 @@ Implemented molecule duplication:
 
 - `duplicate_molecule(molecule, number_of_duplicates)`
 
+Implemented first molecule merge slice:
+
+- `merge_two_molecules(mol1, mol2, merged, options)`
+- `merged_two_molecules(mol1, mol2, options)`
+
 Behavior notes:
 
 - failures return structured errors for non-throwing APIs
@@ -55,9 +60,13 @@ Behavior notes:
   object mutation
 - duplication returns independent value copies; zero requested duplicates returns
   an empty vector
+- merge copies frame 0 coordinates into a one-frame molecule
+- merge preserves `mol1.index()` and regenerates `mol2.index()` sequentially
+- merge validates input shape before mutating the output molecule
+- merge copies connectivity by value
 
 ## Deferred
 
-- `merge_two_molecules`; design captured in
+- expanded `merge_two_molecules` behavior; design captured in
   `docs/merge_two_molecules_design.md`
 - BIOMT operations

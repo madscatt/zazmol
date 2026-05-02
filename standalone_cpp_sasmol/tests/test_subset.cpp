@@ -174,6 +174,127 @@ void test_duplicate_molecule_allows_zero_duplicates() {
   assert(duplicates.empty());
 }
 
+void test_merge_two_molecules_combines_core_descriptors_and_coordinates() {
+  const auto mol1 = read_fixture("1ATM.pdb");
+  const auto mol2 = read_fixture("2AAD.pdb");
+  sasmol::Molecule merged;
+
+  const auto result = sasmol::merge_two_molecules(mol1, mol2, merged);
+
+  assert(result.ok());
+  assert(merged.natoms() == mol1.natoms() + mol2.natoms());
+  assert(merged.number_of_frames() == 1);
+  assert(merged.name()[0] == mol1.name()[0]);
+  assert(merged.name()[mol1.natoms()] == mol2.name()[0]);
+  assert(merged.resid()[0] == mol1.resid()[0]);
+  assert(merged.resid()[mol1.natoms()] == mol2.resid()[0]);
+  assert_vec_close(merged.coordinate(0, 0), mol1.coordinate(0, 0));
+  assert_vec_close(merged.coordinate(0, mol1.natoms()), mol2.coordinate(0, 0));
+}
+
+void test_merge_two_molecules_regenerates_second_indices() {
+  auto mol1 = read_fixture("1ATM.pdb");
+  const auto mol2 = read_fixture("2AAD.pdb");
+  mol1.index()[0] = 20;
+  sasmol::Molecule merged;
+
+  const auto result = sasmol::merge_two_molecules(mol1, mol2, merged);
+
+  assert(result.ok());
+  assert(merged.index()[0] == 20);
+  for (std::size_t atom = 0; atom < mol2.natoms(); ++atom) {
+    assert(merged.index()[mol1.natoms() + atom] == 21 + static_cast<int>(atom));
+  }
+}
+
+void test_merge_two_molecules_uses_frame_zero_only() {
+  const auto mol1 = read_fixture("1ATM.pdb");
+  const auto mol2 = read_fixture("2AAD-1to3.pdb");
+  sasmol::Molecule merged;
+
+  const auto result = sasmol::merge_two_molecules(mol1, mol2, merged);
+
+  assert(result.ok());
+  assert(merged.number_of_frames() == 1);
+  assert_vec_close(merged.coordinate(0, mol1.natoms()), mol2.coordinate(0, 0));
+}
+
+void test_merge_two_molecules_rejects_empty_first_molecule() {
+  const sasmol::Molecule mol1;
+  const auto mol2 = read_fixture("1ATM.pdb");
+  sasmol::Molecule merged(1, 1);
+  merged.name()[0] = "KEEP";
+
+  const auto result = sasmol::merge_two_molecules(mol1, mol2, merged);
+
+  assert(!result.ok());
+  assert(merged.natoms() == 1);
+  assert(merged.name()[0] == "KEEP");
+}
+
+void test_merge_two_molecules_allows_empty_second_molecule() {
+  auto mol1 = read_fixture("1ATM.pdb");
+  mol1.atom_charge()[0] = 0.25;
+  const sasmol::Molecule mol2;
+  sasmol::Molecule merged;
+
+  const auto result = sasmol::merge_two_molecules(mol1, mol2, merged);
+
+  assert(result.ok());
+  assert(merged.natoms() == mol1.natoms());
+  assert(merged.name() == mol1.name());
+  assert(merged.atom_charge() == mol1.atom_charge());
+}
+
+void test_merge_two_molecules_rejects_bad_coordinates_before_mutation() {
+  auto mol1 = read_fixture("1ATM.pdb");
+  const auto mol2 = read_fixture("2AAD.pdb");
+  mol1.coor().pop_back();
+  sasmol::Molecule merged(1, 1);
+  merged.name()[0] = "KEEP";
+
+  const auto result = sasmol::merge_two_molecules(mol1, mol2, merged);
+
+  assert(!result.ok());
+  assert(merged.natoms() == 1);
+  assert(merged.name()[0] == "KEEP");
+}
+
+void test_merge_two_molecules_reports_skipped_optional_numeric_descriptor() {
+  auto mol1 = read_fixture("1ATM.pdb");
+  auto mol2 = read_fixture("1ATM.pdb");
+  mol2.atom_charge().clear();
+  sasmol::Molecule merged;
+
+  const auto result = sasmol::merge_two_molecules(
+      mol1, mol2, merged, {.report_skipped_descriptors = true});
+
+  assert(!result.ok());
+  assert(result.errors.size() == 1);
+  assert(merged.natoms() == 2);
+  assert(merged.atom_charge().empty());
+}
+
+void test_merge_two_molecules_copies_conect_without_aliasing() {
+  sasmol::Molecule mol1(1, 1);
+  sasmol::Molecule mol2(1, 1);
+  mol1.name()[0] = "A";
+  mol2.name()[0] = "B";
+  mol1.original_index()[0] = 10;
+  mol2.original_index()[0] = 20;
+  mol1.conect()[0] = {20};
+  mol2.conect()[0] = {10};
+  sasmol::Molecule merged;
+
+  const auto result = sasmol::merge_two_molecules(mol1, mol2, merged);
+
+  assert(result.ok());
+  assert((merged.conect()[0] == std::vector<int>{20}));
+  assert((merged.conect()[1] == std::vector<int>{10}));
+  mol1.conect()[0].clear();
+  assert((merged.conect()[0] == std::vector<int>{20}));
+}
+
 void test_set_coordinates_using_mask_replaces_selected_atoms_only() {
   sasmol::Molecule target(3, 1);
   target.set_coordinate(0, 0, {1.0F, 1.0F, 1.0F});
@@ -352,6 +473,14 @@ int main() {
   test_copied_molecule_using_indices_returns_value();
   test_duplicate_molecule_returns_deep_value_copies();
   test_duplicate_molecule_allows_zero_duplicates();
+  test_merge_two_molecules_combines_core_descriptors_and_coordinates();
+  test_merge_two_molecules_regenerates_second_indices();
+  test_merge_two_molecules_uses_frame_zero_only();
+  test_merge_two_molecules_rejects_empty_first_molecule();
+  test_merge_two_molecules_allows_empty_second_molecule();
+  test_merge_two_molecules_rejects_bad_coordinates_before_mutation();
+  test_merge_two_molecules_reports_skipped_optional_numeric_descriptor();
+  test_merge_two_molecules_copies_conect_without_aliasing();
   test_set_coordinates_using_mask_replaces_selected_atoms_only();
   test_set_coordinates_using_mask_rejects_before_mutation();
   test_set_coordinates_using_indices_replaces_selected_atoms_only();
