@@ -122,6 +122,54 @@ void test_mask_rejects_bad_shape_and_values() {
   assert(result.indices.empty());
 }
 
+void test_get_dihedral_subset_mask_protein() {
+  sasmol::Molecule mol(18, 1);
+  mol.name() = {"N",  "CA", "C",  "O",  "CB", "CG",
+                "N",  "CA", "C",  "O",  "CB", "CG",
+                "N",  "CA", "C",  "O",  "CB", "CG"};
+  mol.resid() = {1, 1, 1, 1, 1, 1, 2, 2, 2,
+                 2, 2, 2, 3, 3, 3, 3, 3, 3};
+
+  const auto result = sasmol::get_dihedral_subset_mask(mol, {2}, 0);
+
+  assert(result.ok());
+  assert(result.masks.size() == 1);
+  assert((result.masks[0] ==
+          std::vector<int>{0, 0, 1, 0, 0, 0, 1, 1, 1,
+                           0, 0, 0, 1, 0, 0, 0, 0, 0}));
+}
+
+void test_get_dihedral_subset_mask_rna() {
+  sasmol::Molecule mol(18, 1);
+  mol.name() = {"P", "O5'", "C5'", "C4'", "C3'", "O3'",
+                "P", "O5'", "C5'", "C4'", "C3'", "O3'",
+                "P", "O5'", "C5'", "C4'", "C3'", "O3'"};
+  mol.resid() = {1, 1, 1, 1, 1, 1, 2, 2, 2,
+                 2, 2, 2, 3, 3, 3, 3, 3, 3};
+
+  const auto result = sasmol::get_dihedral_subset_mask(mol, {2}, 1);
+
+  assert(result.ok());
+  assert(result.masks.size() == 1);
+  assert((result.masks[0] ==
+          std::vector<int>{0, 0, 0, 0, 0, 1, 1, 1, 1,
+                           1, 1, 1, 1, 1, 0, 0, 0, 0}));
+}
+
+void test_get_dihedral_subset_mask_rejects_bad_inputs() {
+  sasmol::Molecule mol(1, 1);
+  mol.name().clear();
+
+  auto result = sasmol::get_dihedral_subset_mask(mol, {1}, 0);
+  assert(!result.ok());
+  assert(result.masks.empty());
+
+  mol.name() = {"N"};
+  result = sasmol::get_dihedral_subset_mask(mol, {1}, 99);
+  assert(!result.ok());
+  assert(result.masks.empty());
+}
+
 void test_copy_molecule_using_indices_preserves_descriptors() {
   const auto source = read_fixture("1CRN.pdb");
   const auto selected = sasmol::select_indices(
@@ -648,6 +696,9 @@ int main() {
   test_select_mask_flows_into_coordinate_subset();
   test_named_basis_mask_flows_into_copy_subset();
   test_mask_rejects_bad_shape_and_values();
+  test_get_dihedral_subset_mask_protein();
+  test_get_dihedral_subset_mask_rna();
+  test_get_dihedral_subset_mask_rejects_bad_inputs();
   test_copy_molecule_using_indices_preserves_descriptors();
   test_copy_molecule_using_mask_preserves_descriptors();
   test_copy_molecule_using_indices_preserves_extended_descriptors();

@@ -466,6 +466,46 @@ IndexSelection get_indices_from_mask(const Molecule& molecule,
   return result;
 }
 
+MaskMatrixSelection get_dihedral_subset_mask(
+    const Molecule& molecule, const std::vector<int>& flexible_residues,
+    int molecule_type) {
+  MaskMatrixSelection result;
+  if (molecule.name().size() != molecule.natoms() ||
+      molecule.resid().size() != molecule.natoms()) {
+    result.errors.push_back("name and resid descriptors must match natoms");
+    return result;
+  }
+  if (molecule_type != 0 && molecule_type != 1) {
+    result.errors.push_back("dihedral molecule type must be 0 protein or 1 RNA");
+    return result;
+  }
+
+  result.masks.assign(flexible_residues.size(),
+                      std::vector<int>(molecule.natoms(), 0));
+  for (std::size_t row = 0; row < flexible_residues.size(); ++row) {
+    const auto q0 = flexible_residues[row];
+    for (std::size_t atom = 0; atom < molecule.natoms(); ++atom) {
+      const auto resid = molecule.resid()[atom];
+      const auto& name = molecule.name()[atom];
+      bool include = false;
+      if (molecule_type == 0) {
+        include = (resid == q0 - 1 && name == "C") ||
+                  (resid == q0 && (name == "N" || name == "CA" ||
+                                   name == "C")) ||
+                  (resid == q0 + 1 && name == "N");
+      } else {
+        include = (resid == q0 - 1 && name == "O3'") ||
+                  (resid == q0 &&
+                   (name == "P" || name == "O5'" || name == "C5'" ||
+                    name == "C4'" || name == "C3'" || name == "O3'")) ||
+                  (resid == q0 + 1 && (name == "P" || name == "O5'"));
+      }
+      result.masks[row][atom] = include ? 1 : 0;
+    }
+  }
+  return result;
+}
+
 CoordinateSelection get_coordinates_using_indices(
     const Molecule& molecule, std::size_t frame,
     const std::vector<std::size_t>& indices) {

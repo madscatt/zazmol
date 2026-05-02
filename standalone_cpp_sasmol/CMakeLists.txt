@@ -12,8 +12,10 @@ option(SASMOL_ENABLE_SANITIZERS "Build with AddressSanitizer and UndefinedBehavi
 add_library(sasmol_standalone
   src/calculate.cpp
   src/file_io.cpp
+  src/linear_algebra.cpp
   src/molecule.cpp
   src/operate.cpp
+  src/overlap.cpp
   src/properties.cpp
   src/selection.cpp
   src/subset.cpp
@@ -79,6 +81,14 @@ if(BUILD_TESTING)
     SASMOL_TEST_DATA_DIR="${CMAKE_CURRENT_SOURCE_DIR}/../src/python/test_sasmol/data"
   )
   add_test(NAME operate COMMAND test_operate)
+
+  add_executable(test_linear_algebra tests/test_linear_algebra.cpp)
+  target_link_libraries(test_linear_algebra PRIVATE sasmol_standalone)
+  add_test(NAME linear_algebra COMMAND test_linear_algebra)
+
+  add_executable(test_overlap tests/test_overlap.cpp)
+  target_link_libraries(test_overlap PRIVATE sasmol_standalone)
+  add_test(NAME overlap COMMAND test_overlap)
 
   add_executable(test_selection tests/test_selection.cpp)
   target_link_libraries(test_selection PRIVATE sasmol_standalone)

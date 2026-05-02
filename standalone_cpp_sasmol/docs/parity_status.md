@@ -22,13 +22,16 @@ behavior oracle.
 - Calculation coverage for mass, molecular formula, residue charge, center of
   mass, radius of gyration, RMSD, min/max, DCD streaming min/max, and principal
   moments of inertia.
+- Linear algebra coverage for cross products, matrix multiplication, vector
+  helpers, signed angles, dihedral angles, and ordinary three-point angles.
 - Operate coverage for translate, center, axis/general/Euler rotations, PMI
   alignment, explicit-index basis alignment, pure copy-returning variants, row
   and column convention preservation, and failure-before-mutation behavior.
 - Selection/subset coverage for a bounded safe expression grammar, named `all`
   and `heavy` bases, 0/1 mask bridge helpers, coordinate get/set/copy, molecule
-  copy/duplicate/merge, descriptor get/set, extension descriptors, and structured
-  failure returns.
+  copy/duplicate/merge, dihedral subset masks, descriptor get/set, extension
+  descriptors, and structured failure returns.
+- Overlap coverage for coordinate-vector and molecule-frame overlap checks.
 - Topology support for explicit CHARMM type assignment from already-trusted
   atom-aligned type vectors or atom-name/type tables, with no PDB-name
   inference and no partial mutation on validation failure.
@@ -47,6 +50,8 @@ behavior oracle.
 - CHARMM topology parsing, patching, atom completeness checks, and atom
   reordering remain separate design work.
 - BIOMT subset operations remain deferred.
+- VMD/view extension behavior remains deferred as an optional adapter rather
+  than portable core behavior.
 - Fixed/free atom DCD variants, DCD unit-cell writing, and true random-access
   DCD seeking remain unsupported unless fixtures and policy are added.
 - Large DCD workflows should use explicit streaming APIs; whole-trajectory DCD

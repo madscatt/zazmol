@@ -1423,6 +1423,7 @@ IoStatus DcdWriter::write_dcd_frames(const std::filesystem::path& filename,
                                      const Molecule& molecule,
                                      std::size_t start, std::size_t end,
                                      const DcdWriteOptions& options) {
+  (void)close_dcd_write();
   if (start >= end || end > molecule.number_of_frames()) {
     return {IoCode::format_error,
             "DCD frame range must be non-empty and inside the molecule."};

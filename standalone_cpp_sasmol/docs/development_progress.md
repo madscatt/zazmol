@@ -53,3 +53,14 @@ The safer parity direction is a non-mutating report API. Python now exposes
 exposes `sasmol::Molecule::moltype_by_segname_report() const`. Both report
 mixed moltype segments, DNA/RNA-overlap residue names, and DNA/RNA-specific
 evidence without logging, relabeling, or changing `read_pdb()` behavior.
+
+## Python Extension Promotion
+
+The old Python extension modules should be treated as behavior sources, not as
+public C++ naming or ABI templates. DCD behavior belongs in `file_io`,
+matrix/vector helpers belong in `linear_algebra`, dihedral mask behavior belongs
+in `subset`, and overlap checks belong in a named `overlap` module. VMD/view
+integration remains an optional adapter outside the portable core.
+
+The current mapping for Python developers is documented in
+`docs/python_extension_migration_readme.md`.

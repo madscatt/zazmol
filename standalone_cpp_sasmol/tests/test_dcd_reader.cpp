@@ -890,6 +890,24 @@ void test_write_dcd_frames_rejects_invalid_ranges() {
   assert(!writer.is_open());
 }
 
+void test_write_dcd_frames_invalid_range_closes_existing_writer() {
+  sasmol::Molecule mol(1, 2);
+  sasmol::DcdWriter writer;
+  const auto open_output = temp_dcd_path("sasmol_open_before_invalid_range.dcd");
+  const auto invalid_output = temp_dcd_path("sasmol_invalid_range_after_open.dcd");
+
+  auto status = writer.open_dcd_write(open_output);
+  assert(status.ok());
+  assert(writer.is_open());
+
+  status = writer.write_dcd_frames(invalid_output, mol, 1, 1);
+  assert(status.code == sasmol::IoCode::format_error);
+  assert(!writer.is_open());
+
+  std::filesystem::remove(open_output);
+  std::filesystem::remove(invalid_output);
+}
+
 void test_read_dcd_failure_closes_reader() {
   const auto source = fixture_path("1ATM.dcd");
   const auto truncated = temp_dcd_path("sasmol_truncated_read_dcd.dcd");
@@ -1049,6 +1067,7 @@ int main() {
   test_write_dcd_frames_writes_first_and_last_fixture_frames();
   test_write_dcd_frames_writes_generated_middle_range();
   test_write_dcd_frames_rejects_invalid_ranges();
+  test_write_dcd_frames_invalid_range_closes_existing_writer();
   test_read_dcd_failure_closes_reader();
   test_single_step_past_end_closes_reader();
   test_writer_rejects_unit_cell_option();

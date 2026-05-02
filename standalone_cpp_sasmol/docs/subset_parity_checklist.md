@@ -14,6 +14,7 @@ Subset has a useful first-pass C++ surface for atom selection workflows:
   molecule copy, and value-returning copy helpers
 - descriptor get/set helpers for built-in string, integer, and calculation
   descriptors
+- dihedral subset masks for protein and RNA torsion neighborhoods
 - extension descriptor map preservation during copy and merge
 - duplicate and merge helpers with structured errors
 - no-mutation failure behavior for bad masks, bad indices, bad frames, shape
@@ -41,6 +42,7 @@ Implemented explicit-index operations:
 Implemented 0/1 mask compatibility wrappers:
 
 - `get_indices_from_mask(molecule, mask)`
+- `get_dihedral_subset_mask(molecule, flexible_residues, molecule_type)`
 - `get_coordinates_using_mask(molecule, frame, mask)`
 - `set_coordinates_using_mask(molecule, source, frame, mask)`
 - `with_coordinates_using_indices(target, source, frame, indices)`
@@ -97,6 +99,8 @@ Behavior notes:
 - merge preserves `mol1.index()` and regenerates `mol2.index()` sequentially
 - merge validates input shape before mutating the output molecule
 - merge copies connectivity by value
+- dihedral subset masks preserve the legacy protein/RNA atom-name windows used
+  by the old `mask` extension while returning structured errors for bad inputs
 
 ## Deferred
 

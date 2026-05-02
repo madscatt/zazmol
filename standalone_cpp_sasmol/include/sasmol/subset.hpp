@@ -79,12 +79,23 @@ struct CalcSelection {
   [[nodiscard]] bool ok() const noexcept { return errors.empty(); }
 };
 
+struct MaskMatrixSelection {
+  std::vector<std::vector<int>> masks;
+  std::vector<std::string> errors;
+
+  [[nodiscard]] bool ok() const noexcept { return errors.empty(); }
+};
+
 struct MergeOptions {
   bool report_skipped_descriptors{false};
 };
 
 [[nodiscard]] IndexSelection get_indices_from_mask(
     const Molecule& molecule, const std::vector<int>& mask);
+
+[[nodiscard]] MaskMatrixSelection get_dihedral_subset_mask(
+    const Molecule& molecule, const std::vector<int>& flexible_residues,
+    int molecule_type);
 
 [[nodiscard]] CoordinateSelection get_coordinates_using_indices(
     const Molecule& molecule, std::size_t frame,
