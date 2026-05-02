@@ -18,9 +18,10 @@ the hard-earned Python behavior before it becomes the default path:
 - keep element-resolution behavior explicit and test-backed
 - preserve the all-zero coordinate column guard used before writing
 
-The initial C++ API therefore exposes `PdbReadOptions` and `PdbWriteOptions`,
-but parsing and writing return `IoCode::not_implemented` until fixture parity
-tests are in place.
+The C++ API exposes `PdbReadOptions` and `PdbWriteOptions`. The current
+implementation covers the first tolerant read/write parity surface with fixture
+tests and Python cross-reader validation tooling; additional unusual PDB shapes
+should still be added only with fixtures and reviewed behavior notes.
 
 The detailed PDB implementation gate is tracked in
 [`pdb_parity_checklist.md`](pdb_parity_checklist.md).

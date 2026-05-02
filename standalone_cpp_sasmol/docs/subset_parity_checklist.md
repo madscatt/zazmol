@@ -6,6 +6,24 @@ higher-level operations. The standalone C++ port should build this area from
 explicit index operations first, then add mask-shaped compatibility wrappers
 where useful.
 
+## Current Parity Checkpoint
+
+Subset has a useful first-pass C++ surface for atom selection workflows:
+
+- index and 0/1 mask forms for coordinate extraction, coordinate replacement,
+  molecule copy, and value-returning copy helpers
+- descriptor get/set helpers for built-in string, integer, and calculation
+  descriptors
+- extension descriptor map preservation during copy and merge
+- duplicate and merge helpers with structured errors
+- no-mutation failure behavior for bad masks, bad indices, bad frames, shape
+  mismatches, and invalid merge sources
+
+The remaining subset work is not a blocker for ordinary selection/copy/merge
+use. BIOMT remains the main deferred behavior because it is more than a wrapper:
+it changes coordinates through supplied transforms and should be ported with
+dedicated fixtures.
+
 ## First Implemented Slice
 
 Implemented explicit-index operations:

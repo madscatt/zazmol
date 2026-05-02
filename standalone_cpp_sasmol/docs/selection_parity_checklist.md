@@ -5,6 +5,21 @@ arrays. The standalone C++ library must not reproduce arbitrary evaluation as
 the default selection mechanism. Selection support should grow through an
 explicit, safe grammar and typed helper APIs.
 
+## Current Parity Checkpoint
+
+Selection has a safe first-pass C++ surface:
+
+- explicit index helpers for common descriptor selections
+- bounded expression parsing for the Python-style basis expressions we have
+  intentionally admitted
+- named `all` and `heavy` basis helpers
+- 0/1 mask bridge helpers for compatibility with subset APIs
+- structured failure returns with no partial indices on failure
+
+The C++ selection layer is intentionally narrower than Python `eval`. That is a
+feature, not an accidental gap: unsupported grammar should fail clearly rather
+than executing arbitrary Python-like expressions.
+
 ## First Implemented Slice
 
 Implemented explicit index helpers:
@@ -69,8 +84,6 @@ and stop rather than guessing.
 
 ## Deferred
 
-- mask objects and 0/1 mask arrays
-- copy/get/set coordinate using mask or indices
 - distance, angle, and hydrogen-bond selections
 - contextual named selections such as `backbone` or `calpha`
 - arbitrary Python calls, slicing, arithmetic, and list membership
