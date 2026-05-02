@@ -47,6 +47,22 @@ double axis_alignment(const sasmol::Molecule& mol, std::size_t frame,
   return std::fabs(dot) / std::sqrt(expected_norm);
 }
 
+double selected_rmsd(const sasmol::Molecule& first,
+                     const sasmol::Molecule& second,
+                     const std::vector<std::size_t>& indices,
+                     std::size_t frame) {
+  double sum{};
+  for (const auto atom : indices) {
+    const auto lhs = first.coordinate(frame, atom);
+    const auto rhs = second.coordinate(frame, atom);
+    const auto dx = static_cast<double>(lhs.x - rhs.x);
+    const auto dy = static_cast<double>(lhs.y - rhs.y);
+    const auto dz = static_cast<double>(lhs.z - rhs.z);
+    sum += dx * dx + dy * dy + dz * dz;
+  }
+  return std::sqrt(sum / static_cast<double>(indices.size()));
+}
+
 std::vector<std::size_t> all_atom_indices(const sasmol::Molecule& molecule) {
   std::vector<std::size_t> indices;
   indices.reserve(molecule.natoms());
@@ -259,6 +275,29 @@ void test_align_ca_subset_moves_whole_molecule_com() {
   assert_close_double(result_com.z, expected_com.z, 0.02);
 }
 
+void test_align_ca_subset_matches_reference_basis_coordinates() {
+  sasmol::PdbReader reader;
+  sasmol::Molecule reference;
+  sasmol::Molecule moving;
+  auto status = reader.read_pdb(fixture_path("pdb_common", "1CRN.pdb"),
+                                reference);
+  assert(status.ok());
+  status = reader.read_pdb(fixture_path("pdb_common", "1CRN.pdb"), moving);
+  assert(status.ok());
+  const auto selected = sasmol::select_indices(
+      reference, "name[i] == \"CA\" and (resid[i] >= 20 and resid[i] <= 31)");
+  assert(selected.ok());
+  sasmol::rotate(moving, 0, sasmol::Axis::z, std::acos(-1.0) / 2.0);
+  sasmol::translate(moving, 0, {15.0, -8.0, 3.0});
+
+  const auto plan = sasmol::initialize_alignment(
+      moving, reference, selected.indices, selected.indices, 0);
+  sasmol::align(moving, plan, 0);
+
+  assert_close_double(selected_rmsd(reference, moving, selected.indices, 0),
+                      0.0, 0.02);
+}
+
 }  // namespace
 
 int main() {
@@ -276,5 +315,6 @@ int main() {
   test_align_full_basis_rotated_fixture();
   test_align_full_basis_rotated_shifted_fixture();
   test_align_ca_subset_moves_whole_molecule_com();
+  test_align_ca_subset_matches_reference_basis_coordinates();
   return 0;
 }

@@ -79,6 +79,8 @@ Behavior notes:
 - C++ callers provide explicit atom indices rather than Python basis strings
 - the transform is applied to the whole moving molecule frame, not just the
   basis atoms
+- alignment centers each selected basis on its own mass-weighted basis center
+  of mass, matching Python's subset-copy alignment path
 - pure `aligned(...)` returns a copy and leaves the source molecule unchanged
 
 Deferred from Python `align`:

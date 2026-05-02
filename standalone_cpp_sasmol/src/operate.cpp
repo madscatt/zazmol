@@ -245,6 +245,51 @@ std::vector<Vec3> centered_coordinates(const Molecule& molecule,
   return coordinates;
 }
 
+CalcVec3 selected_center_of_mass(const Molecule& molecule,
+                                 const std::vector<std::size_t>& indices,
+                                 std::size_t frame) {
+  if (frame >= molecule.number_of_frames()) {
+    throw std::out_of_range("selected center of mass frame is out of range");
+  }
+  if (indices.empty()) {
+    throw std::invalid_argument("selected center of mass requires atoms");
+  }
+
+  auto mass_source = molecule;
+  if (mass_source.mass().size() != mass_source.natoms() ||
+      mass_source.total_mass() <= calc_type{}) {
+    const auto mass_result = calculate_mass(mass_source);
+    if (!mass_result.ok()) {
+      throw std::invalid_argument(
+          "selected center of mass requires known element masses");
+    }
+  }
+
+  CalcVec3 center;
+  calc_type total_mass{};
+  for (const auto atom : indices) {
+    if (atom >= mass_source.natoms()) {
+      throw std::out_of_range("selected center of mass atom is out of range");
+    }
+    const auto xyz = mass_source.coordinate(frame, atom);
+    const auto mass = mass_source.mass()[atom];
+    center.x += mass * static_cast<calc_type>(xyz.x);
+    center.y += mass * static_cast<calc_type>(xyz.y);
+    center.z += mass * static_cast<calc_type>(xyz.z);
+    total_mass += mass;
+  }
+
+  if (total_mass <= calc_type{}) {
+    throw std::invalid_argument(
+        "selected center of mass requires positive mass");
+  }
+
+  center.x /= total_mass;
+  center.y /= total_mass;
+  center.z /= total_mass;
+  return center;
+}
+
 }  // namespace
 
 Rotation axis_rotation(Axis axis, calc_type theta) {
@@ -467,13 +512,12 @@ AlignmentPlan initialize_alignment(
     throw std::out_of_range("alignment frame is out of range");
   }
 
-  auto reference_copy = reference;
-  auto moving_copy = moving;
   AlignmentPlan plan;
   plan.moving_basis_indices = moving_basis_indices;
   const auto reference_center =
-      calculate_center_of_mass(reference_copy, frame);
-  const auto moving_center = calculate_center_of_mass(moving_copy, frame);
+      selected_center_of_mass(reference, reference_basis_indices, frame);
+  const auto moving_center =
+      selected_center_of_mass(moving, moving_basis_indices, frame);
   plan.reference_center_of_mass = reference_center;
   plan.centered_reference_basis =
       centered_coordinates(reference, reference_basis_indices, frame,
@@ -491,8 +535,8 @@ void align(Molecule& moving, const AlignmentPlan& plan, std::size_t frame) {
     throw std::out_of_range("alignment frame is out of range");
   }
 
-  auto moving_for_mass = moving;
-  const auto moving_center = calculate_center_of_mass(moving_for_mass, frame);
+  const auto moving_center =
+      selected_center_of_mass(moving, plan.moving_basis_indices, frame);
   const auto moving_centered =
       centered_coordinates(moving, plan.moving_basis_indices, frame,
                            moving_center);
