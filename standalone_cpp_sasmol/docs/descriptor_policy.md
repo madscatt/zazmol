@@ -23,6 +23,15 @@ used by Python `zazmol`:
 force-field descriptor. `residue_flag()` is part of the stable atom-aligned core
 state and is sized with `natoms`.
 
+## PDB I/O Scope
+
+PDB read/write populates and emits the descriptors actually represented by PDB
+ATOM/HETATM records. On read, `residue_flag()` is initialized to zero for each
+atom, matching Python's `False` default. `charmm_type()` is intentionally left
+empty by PDB reading because CHARMM atom type data is not a standard PDB column;
+topology/CHARMM workflows should populate it explicitly when that information is
+available.
+
 ## Extension Descriptors
 
 Developer or one-off descriptors can live in typed extension maps:

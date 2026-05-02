@@ -359,6 +359,8 @@ void test_read_pdb_single_frame_2aad_descriptors() {
   assert(mol.element()[0] == "N");
   assert(mol.charge()[0] == "  ");
   assert(mol.moltype()[0] == "protein");
+  assert(mol.residue_flag()[0] == 0);
+  assert(mol.charmm_type().empty());
   assert(mol.name()[14] == "CG2");
   const auto xyz = mol.coordinate(0, 14);
   assert_close(xyz.x, 76.970F);

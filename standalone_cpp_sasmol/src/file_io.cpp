@@ -428,6 +428,7 @@ IoStatus PdbReader::read_pdb(const std::filesystem::path& filename,
       molecule.segname()[atom_index] = atom.segname;
       molecule.element()[atom_index] = atom.element;
       molecule.charge()[atom_index] = atom.charge;
+      molecule.residue_flag()[atom_index] = 0;
       molecule.moltype()[atom_index] = moltype_for_resname(atom.resname);
     }
     molecule.set_coordinate(frame_index, atom_index, atom.coordinate);
