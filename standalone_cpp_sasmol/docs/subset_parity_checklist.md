@@ -24,6 +24,11 @@ use. BIOMT remains the main deferred behavior because it is more than a wrapper:
 it changes coordinates through supplied transforms and should be ported with
 dedicated fixtures.
 
+At this checkpoint, subset is complete for v1 ordinary selection-driven
+workflows: index and 0/1 mask conversion, coordinate extraction/replacement,
+copy/value-copy, descriptor get/set, duplication, merge, and structured
+failure handling.
+
 ## First Implemented Slice
 
 Implemented explicit-index operations:
@@ -95,6 +100,8 @@ Behavior notes:
 
 ## Deferred
 
-- expanded `merge_two_molecules` behavior; design captured in
-  `docs/merge_two_molecules_design.md`
 - BIOMT operations
+
+The current merge behavior is documented in `docs/merge_two_molecules_design.md`.
+Future merge expansion should be reviewed separately rather than folded into
+ordinary mask/copy cleanup.

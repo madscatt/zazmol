@@ -56,14 +56,14 @@ behavior oracle.
 
 ## Recommended Next Slice
 
-Do a small selection/subset documentation cleanup before new feature work:
+Selection/subset documentation cleanup is complete. The remaining work in this
+area is feature work, not cleanup:
 
-- update stale deferred notes that still imply mask/subset bridge operations are
-  missing
-- add a concise selection/subset checkpoint like the operate and topology
-  checkpoints
-- then decide whether to tackle BIOMT or broader Python expression coverage as
-  a reviewed design choice
+- BIOMT should be planned with dedicated transform fixtures.
+- Broader Python expression coverage should start with a real usage survey and
+  a documented grammar extension.
+- Contextual named selections such as `backbone` or `calpha` should remain
+  deferred unless Python and C++ SasMol add the same reviewed behavior.
 
 The next implementation-heavy step should not be a CHARMM parser or arbitrary
 selection evaluator without a separate plan.

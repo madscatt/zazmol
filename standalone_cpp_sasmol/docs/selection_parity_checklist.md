@@ -20,6 +20,10 @@ The C++ selection layer is intentionally narrower than Python `eval`. That is a
 feature, not an accidental gap: unsupported grammar should fail clearly rather
 than executing arbitrary Python-like expressions.
 
+At this checkpoint, selection is complete for v1 ordinary atom-index and
+mask-producing workflows. Future expansion should be driven by surveyed real
+Python/SASSIE expressions, not by trying to recreate open-ended `eval`.
+
 ## First Implemented Slice
 
 Implemented explicit index helpers:
@@ -88,3 +92,6 @@ and stop rather than guessing.
 - contextual named selections such as `backbone` or `calpha`
 - arbitrary Python calls, slicing, arithmetic, and list membership
 - full Python expression compatibility
+
+These remain explicit non-v1 features. They should not be added without
+fixtures, a documented grammar extension, and failure-mode tests.

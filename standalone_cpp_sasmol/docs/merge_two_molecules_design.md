@@ -29,7 +29,7 @@ This keeps the API readable, memory-safe, and backend-neutral while preserving
 the behavior that matters to users: atom order, coordinates, descriptor values,
 index regeneration for the second molecule, and non-aliased connectivity.
 
-## Proposed API
+## Implemented API
 
 ```cpp
 struct MergeOptions {
@@ -81,9 +81,9 @@ when the worker reports errors.
   - unit cell is copied from `mol1`
   - FASTA is concatenated only when either input has FASTA text
 
-## First Implementation Slice
+## Implemented Slice
 
-Implement the core merge without BIOMT or force-field-specific extensions:
+The core merge is implemented without BIOMT or force-field-specific inference:
 
 - coordinates
 - core descriptors
@@ -92,8 +92,10 @@ Implement the core merge without BIOMT or force-field-specific extensions:
 - connectivity
 - index regeneration
 - one-frame merged output
+- `charmm_type()`
+- typed extension descriptor maps
 
-Add focused tests for:
+Focused tests cover:
 
 - 1-atom + 2AAD fixture merge
 - mol2 index regeneration
@@ -102,10 +104,15 @@ Add focused tests for:
 - coordinate shape/integrity error without output mutation
 - optional numeric descriptor skip/report behavior
 - non-aliased `CONECT`
+- typed extension descriptor merging and skipped-descriptor reporting
+- value-returning wrapper behavior
 
 ## Deferred
 
-- Python-style dynamic descriptors such as `_charmm_type`
 - caller-defined required descriptor sets
 - BIOMT-aware merge behavior
 - formula/residue-charge recalculation policies beyond direct concatenation
+
+`charmm_type()` is no longer deferred; it is a typed C++ descriptor. New
+one-off or experimental atom-aligned data should use typed extension descriptor
+maps first, then graduate into explicit molecule fields only after review.
