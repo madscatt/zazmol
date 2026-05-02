@@ -16,6 +16,37 @@ Internal implementation should be shared on explicit coordinate views and
 owned SasMol types. Public APIs must not expose Eigen or backend-specific
 storage.
 
+## Current Parity Checkpoint
+
+Operate now has a solid first-pass C++ parity base for the stable numerical
+behavior in Python `zazmol.operate`.
+
+Covered:
+
+- in-place and pure copy-returning translate, center, axis rotation,
+  general-axis rotation, Euler rotation, PMI alignment, and explicit-index
+  basis alignment APIs
+- Python row/column multiplication conventions for the different rotation
+  paths
+- Python's legacy non-unit `rotate_general_axis` behavior
+- rigid-rotation invariants for true rotation paths
+- PMI axis alignment without assuming arbitrary eigenvector signs
+- PMI eigenvalue preservation and centered output after PMI alignment
+- explicit-index basis alignment against full and subset fixtures
+- selected-basis center-of-mass behavior matching Python's subset-copy
+  alignment path
+- clear pre-mutation failure behavior for bad alignment inputs
+- ASAN-backed regression runs for the implemented surface
+
+Remaining operate work is not a blocker for moving to another module. The main
+deferred Python-specific surface is the old `align(..., mode='initialization' /
+'production', align_variables=...)` keyword workflow and basis-string wrapper.
+The C++ core intentionally exposes the lower-level `AlignmentPlan` plus explicit
+indices instead, which is easier to type-check and safer for standalone use.
+
+Recommended next step: pause operate feature expansion and move to the next
+module unless a Python-facing compatibility wrapper is explicitly needed now.
+
 ## First Implemented Slice
 
 Implemented primitive frame operations:
