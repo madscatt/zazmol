@@ -18,6 +18,33 @@ PDB reading intentionally does not populate `charmm_type()`. Ordinary
 user-supplied PDB files often do not follow CHARMM atom naming closely enough
 for safe automatic assignment.
 
+## Current Parity Checkpoint
+
+Topology support is intentionally narrow and safe at this stage. The C++ core
+can store CHARMM-related descriptors and can accept explicit caller-provided
+CHARMM type assignments, but it does not infer types and does not parse CHARMM
+topology files yet.
+
+Implemented:
+
+- `Molecule::charmm_type()` as an optional atom-aligned descriptor
+- `assign_charmm_types(molecule, types)` for already-known atom-aligned type
+  lists
+- `assign_charmm_types_from_atom_table(molecule, assignments)` for explicit
+  atom-ordered `(atom name, CHARMM type)` rows, such as data parsed from a PSF
+  or caller table
+- no-partial-mutation failure behavior for length mismatches, atom-name
+  mismatches, and molecule name-vector mismatches
+
+This is enough for workflows that already have trustworthy CHARMM type data.
+It is not a topology engine. A full CHARMM topology parser would be a separate
+design step because Python `CharmmTopology` includes residue parsing, patches,
+completeness checks, and possible atom reordering.
+
+Recommended next step: pause topology feature expansion unless a caller needs
+one more explicit table-driven helper. Do not start parser work without a
+separate reviewed plan and fixtures.
+
 ## Safety Rule
 
 Never infer CHARMM atom types from PDB atom names alone.
