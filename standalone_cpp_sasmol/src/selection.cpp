@@ -22,6 +22,9 @@ enum class TokenKind {
   comparison,
   logical_and,
   logical_or,
+  logical_not,
+  null_literal,
+  bool_literal,
   end,
 };
 
@@ -75,6 +78,12 @@ std::vector<Token> tokenize(const std::string& expression) {
         tokens.push_back({TokenKind::logical_and, text});
       } else if (text == "or") {
         tokens.push_back({TokenKind::logical_or, text});
+      } else if (text == "not") {
+        tokens.push_back({TokenKind::logical_not, text});
+      } else if (text == "None") {
+        tokens.push_back({TokenKind::null_literal, text});
+      } else if (text == "True" || text == "False") {
+        tokens.push_back({TokenKind::bool_literal, text});
       } else {
         tokens.push_back({TokenKind::identifier, text});
       }
@@ -187,9 +196,9 @@ class Parser {
   }
 
   Predicate parse_and() {
-    auto left = parse_primary();
+    auto left = parse_unary();
     while (match(TokenKind::logical_and)) {
-      auto right = parse_primary();
+      auto right = parse_unary();
       auto left_eval = std::move(left.eval);
       auto right_eval = std::move(right.eval);
       left.eval = [left_eval, right_eval](std::size_t atom) {
@@ -197,6 +206,15 @@ class Parser {
       };
     }
     return left;
+  }
+
+  Predicate parse_unary() {
+    if (match(TokenKind::logical_not)) {
+      auto predicate = parse_unary();
+      auto eval = std::move(predicate.eval);
+      return {[eval](std::size_t atom) { return !eval(atom); }};
+    }
+    return parse_primary();
   }
 
   Predicate parse_primary() {
@@ -217,39 +235,68 @@ class Parser {
           selection_error("only atom index variable 'i' is supported"));
     }
     expect(TokenKind::right_bracket, "']'");
+    std::optional<int> string_offset;
+    if (match(TokenKind::left_bracket)) {
+      const auto offset = expect(TokenKind::integer, "string offset").text;
+      const auto parsed_offset = parse_int(offset);
+      if (!parsed_offset || *parsed_offset < 0) {
+        throw std::invalid_argument(selection_error("invalid string offset"));
+      }
+      string_offset = *parsed_offset;
+      expect(TokenKind::right_bracket, "']'");
+    }
     const auto op = expect(TokenKind::comparison, "comparison operator").text;
     const auto value = current();
-    if (value.kind != TokenKind::string_literal && value.kind != TokenKind::integer) {
+    if (value.kind != TokenKind::string_literal &&
+        value.kind != TokenKind::integer && value.kind != TokenKind::null_literal &&
+        value.kind != TokenKind::bool_literal) {
       throw std::invalid_argument(
-          selection_error("comparison value must be a string or integer literal"));
+          selection_error("comparison value must be a string, integer, None, or bool literal"));
     }
     ++position_;
 
-    if (field == "name" || field == "resname" || field == "chain" ||
-        field == "segname" || field == "element" || field == "moltype") {
-      if (value.kind != TokenKind::string_literal) {
+    if (field == "record" || field == "name" || field == "loc" ||
+        field == "resname" || field == "chain" || field == "rescode" ||
+        field == "occupancy" || field == "beta" || field == "segname" ||
+        field == "element" || field == "charge" || field == "moltype" ||
+        field == "charmm_type") {
+      if (value.kind != TokenKind::string_literal &&
+          value.kind != TokenKind::null_literal) {
         throw std::invalid_argument(
-            selection_error("descriptor '" + field + "' requires a string literal"));
+            selection_error("descriptor '" + field + "' requires a string or None literal"));
       }
-      return string_comparison(field, op, value.text);
+      return string_comparison(field, op, value.text, string_offset,
+                               value.kind == TokenKind::null_literal);
+    }
+    if (string_offset) {
+      throw std::invalid_argument(
+          selection_error("string offsets are only supported for string descriptors"));
     }
     if (field == "resid" || field == "index" || field == "original_index" ||
-        field == "original_resid") {
-      if (value.kind != TokenKind::integer) {
+        field == "original_resid" || field == "residue_flag") {
+      if (value.kind != TokenKind::integer && value.kind != TokenKind::bool_literal) {
         throw std::invalid_argument(
-            selection_error("descriptor '" + field + "' requires an integer literal"));
+            selection_error("descriptor '" + field + "' requires an integer or bool literal"));
       }
-      const auto parsed = parse_int(value.text);
-      if (!parsed) {
-        throw std::invalid_argument(selection_error("invalid integer literal"));
+      int expected{};
+      if (value.kind == TokenKind::bool_literal) {
+        expected = value.text == "True" ? 1 : 0;
+      } else {
+        const auto parsed = parse_int(value.text);
+        if (!parsed) {
+          throw std::invalid_argument(selection_error("invalid integer literal"));
+        }
+        expected = *parsed;
       }
-      return int_comparison(field, op, *parsed);
+      return int_comparison(field, op, expected);
     }
     throw std::invalid_argument(selection_error("unsupported descriptor '" + field + "'"));
   }
 
   Predicate string_comparison(const std::string& field, const std::string& op,
-                              const std::string& expected) const {
+                              const std::string& expected,
+                              std::optional<int> string_offset,
+                              bool expected_none) const {
     if (op != "==" && op != "!=") {
       throw std::invalid_argument(
           selection_error("string descriptor '" + field +
@@ -257,8 +304,17 @@ class Parser {
     }
     const auto& values = string_descriptor(field);
     require_length(field, values.size());
-    return {[values = &values, op, expected](std::size_t atom) {
-      const auto equal = (*values)[atom] == expected;
+    return {[values = &values, op, expected, string_offset,
+             expected_none](std::size_t atom) {
+      bool equal = false;
+      if (!expected_none) {
+        auto actual = (*values)[atom];
+        if (string_offset) {
+          const auto offset = static_cast<std::size_t>(*string_offset);
+          actual = offset < actual.size() ? actual.substr(offset, 1) : std::string{};
+        }
+        equal = actual == expected;
+      }
       return op == "==" ? equal : !equal;
     }};
   }
@@ -279,11 +335,18 @@ class Parser {
 
   const std::vector<std::string>& string_descriptor(
       const std::string& field) const {
+    if (field == "record") return molecule_.record();
     if (field == "name") return molecule_.name();
+    if (field == "loc") return molecule_.loc();
     if (field == "resname") return molecule_.resname();
     if (field == "chain") return molecule_.chain();
+    if (field == "rescode") return molecule_.rescode();
+    if (field == "occupancy") return molecule_.occupancy();
+    if (field == "beta") return molecule_.beta();
     if (field == "segname") return molecule_.segname();
     if (field == "element") return molecule_.element();
+    if (field == "charge") return molecule_.charge();
+    if (field == "charmm_type") return molecule_.charmm_type();
     return molecule_.moltype();
   }
 
@@ -291,6 +354,7 @@ class Parser {
     if (field == "resid") return molecule_.resid();
     if (field == "index") return molecule_.index();
     if (field == "original_index") return molecule_.original_index();
+    if (field == "residue_flag") return molecule_.residue_flag();
     return molecule_.original_resid();
   }
 

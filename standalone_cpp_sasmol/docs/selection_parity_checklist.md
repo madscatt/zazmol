@@ -22,12 +22,18 @@ Supported grammar:
 
 - `all`
 - descriptor comparisons of the form `descriptor[i] OP literal`
+- unary `not` before a comparison or parenthesized expression
+- first-character string checks of the form `descriptor[i][0] OP literal`
 - `and`, `or`, and parentheses
-- string descriptors: `name`, `resname`, `chain`, `segname`, `element`,
-  `moltype`
+- string descriptors: `record`, `name`, `loc`, `resname`, `chain`, `rescode`,
+  `occupancy`, `beta`, `segname`, `element`, `charge`, `moltype`,
+  `charmm_type`
 - integer descriptors: `resid`, `index`, `original_index`, `original_resid`
+- boolean/integer descriptor: `residue_flag`
 - string operators: `==`, `!=`
 - integer operators: `==`, `!=`, `<`, `<=`, `>`, `>=`
+- `None` comparisons for string descriptors, primarily to support historical
+  expressions such as `not name[i] == None`
 
 Failure policy:
 
@@ -46,4 +52,5 @@ and stop rather than guessing.
 - copy/get/set coordinate using mask or indices
 - distance, angle, and hydrogen-bond selections
 - named selection aliases such as backbone or calpha
+- arbitrary Python calls, slicing, arithmetic, and list membership
 - full Python expression compatibility

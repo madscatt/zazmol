@@ -79,6 +79,44 @@ void test_safe_expression_supports_or_and_not_equal() {
   assert(result.indices.size() > 2);
 }
 
+void test_safe_expression_supports_unary_not() {
+  const auto mol = read_fixture("2AAD.pdb");
+
+  const auto all = sasmol::select_indices(mol, "not name[i] == None");
+  assert(all.ok());
+  assert(all.indices.size() == mol.natoms());
+
+  const auto not_ca = sasmol::select_indices(mol, "not name[i] == \"CA\"");
+  assert(not_ca.ok());
+  for (const auto atom : not_ca.indices) {
+    assert(mol.name()[atom] != "CA");
+  }
+}
+
+void test_safe_expression_supports_string_offset_for_heavy_atoms() {
+  sasmol::Molecule mol(4);
+  mol.name() = {"H1", "CA", "N", ""};
+
+  const auto result = sasmol::select_indices(mol, "not name[i][0] == \"H\"");
+
+  assert(result.ok());
+  assert((result.indices == std::vector<std::size_t>{1, 2, 3}));
+}
+
+void test_safe_expression_supports_additional_python_mask_descriptors() {
+  sasmol::Molecule mol(3);
+  mol.loc() = {" ", "A", " "};
+  mol.residue_flag() = {0, 1, 1};
+
+  auto result = sasmol::select_indices(mol, "loc[i] == \" \"");
+  assert(result.ok());
+  assert((result.indices == std::vector<std::size_t>{0, 2}));
+
+  result = sasmol::select_indices(mol, "residue_flag[i] == True");
+  assert(result.ok());
+  assert((result.indices == std::vector<std::size_t>{1, 2}));
+}
+
 void test_unsupported_expression_fails_without_indices() {
   const auto mol = read_fixture("1CRN.pdb");
 
@@ -125,6 +163,9 @@ int main() {
   test_select_all_keyword();
   test_safe_expression_matches_align_basis_example();
   test_safe_expression_supports_or_and_not_equal();
+  test_safe_expression_supports_unary_not();
+  test_safe_expression_supports_string_offset_for_heavy_atoms();
+  test_safe_expression_supports_additional_python_mask_descriptors();
   test_unsupported_expression_fails_without_indices();
   test_unsupported_descriptor_fails_without_indices();
   test_no_match_is_error_without_indices();
