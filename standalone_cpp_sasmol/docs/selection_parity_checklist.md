@@ -14,6 +14,17 @@ Implemented explicit index helpers:
 - `indices_by_resname(molecule, resname)`
 - `indices_by_resid_range(molecule, first_resid, last_resid)`
 
+Implemented named basis helpers:
+
+- `basis_expression("all")` -> `not name[i] == None`
+- `basis_expression("heavy")` -> `not name[i][0] == "H"`
+- `select_named_basis(molecule, basis_name)`
+
+`backbone` is intentionally not supported as a generic named basis. Current
+Python/SASSIE practice uses different backbone definitions for protein overlap,
+protein constraints, and nucleic acid workflows, so a generic C++ alias would
+hide real caller intent.
+
 Implemented a bounded expression parser:
 
 - `select_indices(molecule, expression)`
@@ -51,6 +62,6 @@ and stop rather than guessing.
 - mask objects and 0/1 mask arrays
 - copy/get/set coordinate using mask or indices
 - distance, angle, and hydrogen-bond selections
-- named selection aliases such as backbone or calpha
+- contextual named selections such as `backbone` or `calpha`
 - arbitrary Python calls, slicing, arithmetic, and list membership
 - full Python expression compatibility

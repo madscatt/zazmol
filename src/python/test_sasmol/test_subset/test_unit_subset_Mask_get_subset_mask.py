@@ -142,6 +142,40 @@ class Test_unit_subset_Mask_get_subset_mask(unittest.TestCase):
         self.assertEqual(error, [])
         self.assertEqual(list(mask), [0, 1, 0])
 
+    def test_named_basis_filter_all(self):
+        error, basis_filter = self.o.named_basis_filter('all')
+        self.assertEqual(error, [])
+        self.assertEqual(basis_filter, 'not name[i] == None')
+
+    def test_named_subset_mask_all(self):
+        self.configure_simple_molecule(['H1', 'CA', 'N'], [1, 1, 1])
+
+        error, mask = self.o.get_named_subset_mask('all')
+
+        self.assertEqual(error, [])
+        self.assertEqual(list(mask), [1, 1, 1])
+
+    def test_named_subset_mask_heavy(self):
+        self.configure_simple_molecule(['H1', 'CA', 'N', 'HA'], [1, 1, 1, 1])
+
+        error, mask = self.o.get_named_subset_mask('heavy')
+
+        self.assertEqual(error, [])
+        self.assertEqual(list(mask), [0, 1, 1, 0])
+
+    def test_named_subset_mask_backbone_is_not_supported(self):
+        self.configure_simple_molecule(['N', 'CA', 'C', 'O'], [1, 1, 1, 1])
+
+        error, mask = self.o.get_named_subset_mask('backbone')
+
+        self.assertEqual(len(error) > 0, True)
+        self.assertEqual(mask, [])
+
+    def test_named_basis_filter_requires_string(self):
+        error, basis_filter = self.o.named_basis_filter(None)
+        self.assertEqual(len(error) > 0, True)
+        self.assertEqual(basis_filter, '')
+
 
 if __name__ == '__main__':
     main()

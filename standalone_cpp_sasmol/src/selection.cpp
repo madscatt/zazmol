@@ -5,6 +5,7 @@
 #include <functional>
 #include <optional>
 #include <stdexcept>
+#include <string>
 #include <string_view>
 #include <utility>
 
@@ -431,6 +432,25 @@ SelectionResult indices_by_resid_range(const Molecule& molecule, int first_resid
                           molecule.resid()[atom] <= last_resid;
                  },
                  "selection found no atoms in resid range");
+}
+
+std::optional<std::string> basis_expression(const std::string& basis_name) {
+  if (basis_name == "all") {
+    return "not name[i] == None";
+  }
+  if (basis_name == "heavy") {
+    return "not name[i][0] == \"H\"";
+  }
+  return std::nullopt;
+}
+
+SelectionResult select_named_basis(const Molecule& molecule,
+                                   const std::string& basis_name) {
+  const auto expression = basis_expression(basis_name);
+  if (!expression) {
+    return {{}, {"unsupported named basis: " + basis_name}};
+  }
+  return select_indices(molecule, *expression);
 }
 
 SelectionResult select_indices(const Molecule& molecule,

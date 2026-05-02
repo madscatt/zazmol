@@ -3,6 +3,7 @@
 #include "sasmol/molecule.hpp"
 
 #include <cstddef>
+#include <optional>
 #include <string>
 #include <vector>
 
@@ -24,6 +25,10 @@ struct SelectionResult {
                                                      int first_resid,
                                                      int last_resid);
 
+[[nodiscard]] std::optional<std::string> basis_expression(
+    const std::string& basis_name);
+[[nodiscard]] SelectionResult select_named_basis(const Molecule& molecule,
+                                                 const std::string& basis_name);
 [[nodiscard]] SelectionResult select_indices(const Molecule& molecule,
                                              const std::string& expression);
 

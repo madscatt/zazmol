@@ -67,6 +67,44 @@ class Mask(object):
     []
     """
 
+    _named_basis_filters = {
+        'all': 'not name[i] == None',
+        'heavy': 'not name[i][0] == "H"',
+    }
+
+    def named_basis_filter(self, basis_name):
+        '''
+        Return the explicit selection expression for a supported named basis.
+
+        Supported names are intentionally limited to unambiguous selections.
+        ``backbone`` is not included because protein, DNA, RNA, overlap, and
+        constraint workflows use different backbone definitions.
+        '''
+
+        try:
+            normalized = basis_name.lower()
+        except Exception:
+            return ['basis name must be a string'], ''
+
+        try:
+            return [], self._named_basis_filters[normalized]
+        except KeyError:
+            return ['unsupported named basis: ' + str(basis_name)], ''
+
+    def get_named_subset_mask(self, basis_name):
+        '''
+        Build a subset mask from a supported named basis.
+
+        This is a thin convenience wrapper over ``get_subset_mask``. It does
+        not change the expression syntax accepted by ``get_subset_mask``.
+        '''
+
+        error, basis_filter = self.named_basis_filter(basis_name)
+        if len(error) > 0:
+            return error, []
+
+        return self.get_subset_mask(basis_filter)
+
     def get_dihedral_subset_mask(self, flexible_residues, mtype):
         '''
         This method creates an array of ones and/or zeros

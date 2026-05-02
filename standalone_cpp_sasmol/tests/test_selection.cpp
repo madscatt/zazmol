@@ -54,6 +54,45 @@ void test_select_all_keyword() {
   assert(result.indices.size() == 15);
 }
 
+void test_named_basis_expression_all_and_heavy() {
+  const auto all = sasmol::basis_expression("all");
+  assert(all);
+  assert(*all == "not name[i] == None");
+
+  const auto heavy = sasmol::basis_expression("heavy");
+  assert(heavy);
+  assert(*heavy == "not name[i][0] == \"H\"");
+}
+
+void test_select_named_basis_all() {
+  const auto mol = read_fixture("2AAD.pdb");
+
+  const auto result = sasmol::select_named_basis(mol, "all");
+
+  assert(result.ok());
+  assert(result.indices.size() == mol.natoms());
+}
+
+void test_select_named_basis_heavy() {
+  sasmol::Molecule mol(4);
+  mol.name() = {"H1", "CA", "N", "HA"};
+
+  const auto result = sasmol::select_named_basis(mol, "heavy");
+
+  assert(result.ok());
+  assert((result.indices == std::vector<std::size_t>{1, 2}));
+}
+
+void test_named_basis_backbone_is_not_supported() {
+  const auto expression = sasmol::basis_expression("backbone");
+  assert(!expression);
+
+  const sasmol::Molecule mol(1);
+  const auto result = sasmol::select_named_basis(mol, "backbone");
+  assert(!result.ok());
+  assert(result.indices.empty());
+}
+
 void test_safe_expression_matches_align_basis_example() {
   const auto mol = read_fixture("1CRN.pdb");
 
@@ -161,6 +200,10 @@ int main() {
   test_indices_all();
   test_explicit_helpers();
   test_select_all_keyword();
+  test_named_basis_expression_all_and_heavy();
+  test_select_named_basis_all();
+  test_select_named_basis_heavy();
+  test_named_basis_backbone_is_not_supported();
   test_safe_expression_matches_align_basis_example();
   test_safe_expression_supports_or_and_not_equal();
   test_safe_expression_supports_unary_not();
