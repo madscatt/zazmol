@@ -38,11 +38,13 @@ than guessed.
 
    - `assign_charmm_types(molecule, types)`
 
-2. **Topology Table Helper**
+2. **PSF/Caller Atom Table Helper**
 
-   Add a reviewed table-based helper that maps `(resname, atom name)` or a more
-   specific key to CHARMM type and charge. It should return detailed unmatched
-   and ambiguous atom reports.
+   If needed, add a helper that mirrors the SASSIE TAMC usage: consume an
+   atom-ordered table of `(atom name, CHARMM type)` values from an explicit
+   force-field source such as a PSF, validate it against `Molecule::name()`,
+   and assign `charmm_type()` only if every atom matches. This should be stricter
+   than the historical Python caller: no partial mutation after a mismatch.
 
 3. **Topology Parser Subsystem**
 
@@ -59,6 +61,7 @@ than guessed.
 ## Non-Goals For Now
 
 - no hidden CHARMM typing during PDB read
+- no simple `(resname, atom name)` type inference as if it were Python parity
 - no best-effort guessing for unknown residues
 - no automatic atom reordering as a side effect of reading PDB
 - no partial mutation when topology validation fails

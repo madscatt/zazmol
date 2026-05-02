@@ -30,6 +30,10 @@ Future CHARMM typing should therefore be explicit:
 - PDB read leaves `charmm_type()` empty
 - topology/CHARMM workflows may populate it after they have a real topology
   source
+- SASSIE currently assigns CHARMM types from a PSF atom table, then uses those
+  atom-aligned values for torsion parameter matching
+- a future C++ helper can mirror that PSF/caller-table workflow by validating
+  atom names and refusing partial mutation on mismatch
 - helper APIs should report unmatched or ambiguous atoms instead of guessing
 - a full topology parser is a separate subsystem, not a hidden PDB-read feature
 
