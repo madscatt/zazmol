@@ -21,6 +21,7 @@ Implemented 0/1 mask compatibility wrappers:
 - `get_coordinates_using_mask(molecule, frame, mask)`
 - `set_coordinates_using_mask(molecule, source, frame, mask)`
 - `copy_molecule_using_mask(source, destination, mask, frame)`
+- `copied_molecule_using_mask(source, mask, frame)`
 
 Selection masks can be produced by `selection` helpers:
 

@@ -199,6 +199,19 @@ void test_copied_molecule_using_indices_returns_value() {
   assert(subset.index()[1] == source.index()[1]);
 }
 
+void test_copied_molecule_using_mask_returns_value() {
+  const auto source = read_fixture("2AAD.pdb");
+
+  const auto subset = sasmol::copied_molecule_using_mask(
+      source, {1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1}, 0);
+
+  assert(subset.natoms() == 3);
+  assert(subset.name()[0] == source.name()[0]);
+  assert(subset.name()[1] == source.name()[4]);
+  assert(subset.name()[2] == source.name()[14]);
+  assert_vec_close(subset.coordinate(0, 1), source.coordinate(0, 4));
+}
+
 void test_duplicate_molecule_returns_deep_value_copies() {
   auto source = read_fixture("2AAD.pdb");
   source.formula() = {{"C", 2}, {"N", 1}};
@@ -581,6 +594,7 @@ int main() {
   test_copy_molecule_using_mask_preserves_descriptors();
   test_copy_molecule_using_indices_preserves_extended_descriptors();
   test_copied_molecule_using_indices_returns_value();
+  test_copied_molecule_using_mask_returns_value();
   test_duplicate_molecule_returns_deep_value_copies();
   test_duplicate_molecule_allows_zero_duplicates();
   test_merge_two_molecules_combines_core_descriptors_and_coordinates();

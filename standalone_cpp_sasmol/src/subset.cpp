@@ -609,6 +609,17 @@ Molecule copied_molecule_using_indices(const Molecule& source,
   return destination;
 }
 
+Molecule copied_molecule_using_mask(const Molecule& source,
+                                    const std::vector<int>& mask,
+                                    std::size_t frame) {
+  Molecule destination;
+  const auto result = copy_molecule_using_mask(source, destination, mask, frame);
+  if (!result.ok()) {
+    throw std::invalid_argument(result.errors.front());
+  }
+  return destination;
+}
+
 std::vector<Molecule> duplicate_molecule(const Molecule& molecule,
                                          std::size_t number_of_duplicates) {
   std::vector<Molecule> duplicates;

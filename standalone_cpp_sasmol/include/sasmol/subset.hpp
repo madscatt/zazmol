@@ -113,6 +113,9 @@ struct MergeOptions {
     const Molecule& source, const std::vector<std::size_t>& indices,
     std::size_t frame);
 
+[[nodiscard]] Molecule copied_molecule_using_mask(
+    const Molecule& source, const std::vector<int>& mask, std::size_t frame);
+
 [[nodiscard]] std::vector<Molecule> duplicate_molecule(
     const Molecule& molecule, std::size_t number_of_duplicates);
 
