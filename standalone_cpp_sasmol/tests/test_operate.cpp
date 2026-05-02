@@ -6,6 +6,7 @@
 #include <cassert>
 #include <cmath>
 #include <filesystem>
+#include <stdexcept>
 #include <vector>
 
 namespace {
@@ -94,6 +95,25 @@ std::vector<std::size_t> all_atom_indices(const sasmol::Molecule& molecule) {
     indices.push_back(atom);
   }
   return indices;
+}
+
+sasmol::Molecule small_carbon_molecule() {
+  sasmol::Molecule mol(3, 1);
+  mol.element() = {"C", "C", "C"};
+  mol.set_coordinate(0, 0, {1.0F, 2.0F, 3.0F});
+  mol.set_coordinate(0, 1, {-4.0F, 5.0F, 6.0F});
+  mol.set_coordinate(0, 2, {7.0F, -8.0F, 9.0F});
+  return mol;
+}
+
+void assert_coordinates_unchanged(const sasmol::Molecule& molecule,
+                                  const sasmol::Molecule& before,
+                                  std::size_t frame = 0) {
+  assert(molecule.natoms() == before.natoms());
+  for (std::size_t atom = 0; atom < molecule.natoms(); ++atom) {
+    assert_vec_close(molecule.coordinate(frame, atom),
+                     before.coordinate(frame, atom));
+  }
 }
 
 void test_translate_mutates_only_selected_frame() {
@@ -443,6 +463,120 @@ void test_align_ca_subset_matches_reference_basis_coordinates() {
                       0.0, 0.02);
 }
 
+void test_initialize_alignment_rejects_mismatched_basis_sizes() {
+  const auto moving = small_carbon_molecule();
+  const auto reference = small_carbon_molecule();
+
+  bool threw = false;
+  try {
+    (void)sasmol::initialize_alignment(moving, reference, {0, 1}, {0}, 0);
+  } catch (const std::invalid_argument&) {
+    threw = true;
+  }
+
+  assert(threw);
+}
+
+void test_initialize_alignment_rejects_empty_basis() {
+  const auto moving = small_carbon_molecule();
+  const auto reference = small_carbon_molecule();
+
+  bool threw = false;
+  try {
+    (void)sasmol::initialize_alignment(moving, reference, {}, {}, 0);
+  } catch (const std::invalid_argument&) {
+    threw = true;
+  }
+
+  assert(threw);
+}
+
+void test_initialize_alignment_rejects_bad_frame() {
+  const auto moving = small_carbon_molecule();
+  const auto reference = small_carbon_molecule();
+
+  bool threw = false;
+  try {
+    (void)sasmol::initialize_alignment(moving, reference, {0, 1, 2}, {0, 1, 2},
+                                      1);
+  } catch (const std::out_of_range&) {
+    threw = true;
+  }
+
+  assert(threw);
+}
+
+void test_initialize_alignment_rejects_bad_basis_index() {
+  const auto moving = small_carbon_molecule();
+  const auto reference = small_carbon_molecule();
+
+  bool threw = false;
+  try {
+    (void)sasmol::initialize_alignment(moving, reference, {0, 1, 99},
+                                      {0, 1, 2}, 0);
+  } catch (const std::out_of_range&) {
+    threw = true;
+  }
+
+  assert(threw);
+}
+
+void test_align_rejects_incomplete_plan_without_mutation() {
+  auto moving = small_carbon_molecule();
+  const auto before = moving;
+  const sasmol::AlignmentPlan plan;
+
+  bool threw = false;
+  try {
+    sasmol::align(moving, plan, 0);
+  } catch (const std::invalid_argument&) {
+    threw = true;
+  }
+
+  assert(threw);
+  assert_coordinates_unchanged(moving, before);
+}
+
+void test_align_rejects_bad_frame_without_mutation() {
+  auto moving = small_carbon_molecule();
+  const auto before = moving;
+  sasmol::AlignmentPlan plan;
+  plan.moving_basis_indices = {0, 1, 2};
+  plan.centered_reference_basis = {{1.0F, 2.0F, 3.0F},
+                                   {-4.0F, 5.0F, 6.0F},
+                                   {7.0F, -8.0F, 9.0F}};
+
+  bool threw = false;
+  try {
+    sasmol::align(moving, plan, 1);
+  } catch (const std::out_of_range&) {
+    threw = true;
+  }
+
+  assert(threw);
+  assert_coordinates_unchanged(moving, before);
+}
+
+void test_align_rejects_bad_plan_index_without_mutation() {
+  auto moving = small_carbon_molecule();
+  const auto before = moving;
+  sasmol::AlignmentPlan plan;
+  plan.moving_basis_indices = {0, 1, 99};
+  plan.centered_reference_basis = {{1.0F, 2.0F, 3.0F},
+                                   {-4.0F, 5.0F, 6.0F},
+                                   {7.0F, -8.0F, 9.0F}};
+
+  bool threw = false;
+  try {
+    sasmol::align(moving, plan, 0);
+  } catch (const std::out_of_range&) {
+    threw = true;
+  }
+
+  assert(threw);
+  assert_coordinates_unchanged(moving, before);
+}
+
 }  // namespace
 
 int main() {
@@ -468,5 +602,12 @@ int main() {
   test_align_full_basis_rotated_shifted_fixture();
   test_align_ca_subset_moves_whole_molecule_com();
   test_align_ca_subset_matches_reference_basis_coordinates();
+  test_initialize_alignment_rejects_mismatched_basis_sizes();
+  test_initialize_alignment_rejects_empty_basis();
+  test_initialize_alignment_rejects_bad_frame();
+  test_initialize_alignment_rejects_bad_basis_index();
+  test_align_rejects_incomplete_plan_without_mutation();
+  test_align_rejects_bad_frame_without_mutation();
+  test_align_rejects_bad_plan_index_without_mutation();
   return 0;
 }

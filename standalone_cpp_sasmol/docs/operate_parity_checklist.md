@@ -89,6 +89,9 @@ Behavior notes:
 - alignment centers each selected basis on its own mass-weighted basis center
   of mass, matching Python's subset-copy alignment path
 - pure `aligned(...)` returns a copy and leaves the source molecule unchanged
+- invalid alignment setup fails before coordinate mutation: mismatched or empty
+  bases, bad frames, incomplete plans, and out-of-range plan indices are all
+  covered by regression tests
 
 Deferred from Python `align`:
 
