@@ -226,6 +226,15 @@ void assert_close_double(double actual, double expected, double tolerance) {
   assert(std::fabs(actual - expected) <= tolerance);
 }
 
+sasmol::Vec3 generated_coordinate(std::size_t frame, std::size_t atom) {
+  const auto frame_value = static_cast<float>(frame);
+  const auto atom_value = static_cast<float>(atom);
+  const auto shell = static_cast<float>(atom % 7);
+  return {frame_value * 0.125F + atom_value * 0.5F,
+          -frame_value * 0.25F + shell * 1.25F,
+          frame_value * 0.375F - atom_value * 0.125F};
+}
+
 double coordinate_sum(const sasmol::Molecule& mol) {
   double total = 0.0;
   for (const auto value : mol.coor()) {
@@ -242,6 +251,43 @@ double coordinate_sum(const std::vector<sasmol::Vec3>& coordinates) {
     total += static_cast<double>(xyz.z);
   }
   return total;
+}
+
+double expected_generated_sum(std::size_t nframes, std::size_t natoms) {
+  double total = 0.0;
+  for (std::size_t frame = 0; frame < nframes; ++frame) {
+    for (std::size_t atom = 0; atom < natoms; ++atom) {
+      const auto xyz = generated_coordinate(frame, atom);
+      total += static_cast<double>(xyz.x);
+      total += static_cast<double>(xyz.y);
+      total += static_cast<double>(xyz.z);
+    }
+  }
+  return total;
+}
+
+std::filesystem::path generate_streaming_dcd(const char* name,
+                                             std::size_t natoms,
+                                             std::size_t nframes) {
+  const auto output = temp_dcd_path(name);
+  sasmol::Molecule frame(natoms, 1);
+  sasmol::DcdWriter writer;
+
+  auto status = writer.open_dcd_write(output);
+  assert(status.ok());
+  status = writer.write_dcd_header(frame, nframes);
+  assert(status.ok());
+  for (std::size_t frame_index = 0; frame_index < nframes; ++frame_index) {
+    for (std::size_t atom = 0; atom < natoms; ++atom) {
+      frame.set_coordinate(0, atom, generated_coordinate(frame_index, atom));
+    }
+    status = writer.write_dcd_step(frame, 0, frame_index + 1);
+    assert(status.ok());
+  }
+  status = writer.close_dcd_write();
+  assert(status.ok());
+
+  return output;
 }
 
 void test_sequential_frame_reads_1atm() {
@@ -389,6 +435,73 @@ void test_streaming_coordinates_supports_running_reduction() {
 
   status = reader.close_dcd_read();
   assert(status.ok());
+}
+
+void test_generated_dcd_streams_without_static_fixture() {
+  const std::size_t natoms = 37;
+  const std::size_t nframes = 257;
+  const auto generated =
+      generate_streaming_dcd("sasmol_generated_streaming.dcd", natoms, nframes);
+
+  sasmol::DcdReader reader;
+  sasmol::DcdHeader header;
+  std::vector<sasmol::Vec3> coordinates;
+  double total = 0.0;
+  std::size_t frames_read = 0;
+
+  auto status = reader.open_dcd_read(generated);
+  assert(status.ok());
+  status = reader.read_header(header);
+  assert(status.ok());
+  assert(header.natoms == natoms);
+  assert(header.nframes == nframes);
+
+  while (true) {
+    status = reader.read_next_frame_coordinates(coordinates);
+    if (status.code == sasmol::IoCode::end_of_file) {
+      break;
+    }
+    assert(status.ok());
+    assert(coordinates.size() == natoms);
+    if (frames_read == 128) {
+      const auto expected = generated_coordinate(frames_read, 17);
+      assert_close(coordinates[17].x, expected.x);
+      assert_close(coordinates[17].y, expected.y);
+      assert_close(coordinates[17].z, expected.z);
+    }
+    total += coordinate_sum(coordinates);
+    ++frames_read;
+  }
+
+  assert(frames_read == nframes);
+  assert_close_double(total, expected_generated_sum(nframes, natoms), 0.01);
+  status = reader.close_dcd_read();
+  assert(status.ok());
+
+  std::filesystem::remove(generated);
+}
+
+void test_generated_dcd_single_step_scans_to_late_frame() {
+  const std::size_t natoms = 37;
+  const std::size_t nframes = 257;
+  const std::size_t one_based_frame = 251;
+  const auto generated =
+      generate_streaming_dcd("sasmol_generated_single_step.dcd", natoms, nframes);
+
+  sasmol::DcdReader reader;
+  sasmol::Molecule mol;
+  const auto status = reader.read_single_dcd_step(generated, one_based_frame, mol);
+
+  assert(status.ok());
+  assert(mol.natoms() == natoms);
+  assert(mol.number_of_frames() == 1);
+  const auto expected = generated_coordinate(one_based_frame - 1, natoms - 1);
+  const auto actual = mol.coordinate(0, natoms - 1);
+  assert_close(actual.x, expected.x);
+  assert_close(actual.y, expected.y);
+  assert_close(actual.z, expected.z);
+
+  std::filesystem::remove(generated);
 }
 
 void test_single_step_reopen_scan_uses_one_based_frames() {
@@ -694,6 +807,8 @@ int main() {
   test_sequential_frame_reads_rna_final_sample();
   test_streaming_coordinates_reuses_caller_buffer_without_accumulation();
   test_streaming_coordinates_supports_running_reduction();
+  test_generated_dcd_streams_without_static_fixture();
+  test_generated_dcd_single_step_scans_to_late_frame();
   test_single_step_reopen_scan_uses_one_based_frames();
   test_single_step_rejects_zero_frame_number();
   test_truncated_frame_returns_status();

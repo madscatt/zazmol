@@ -15,9 +15,9 @@ behavior oracle.
   resolution, and Python cross-reader validation of generated C++ files.
 - Sequential DCD reader/writer coverage for normal full-coordinate files,
   explicit reopen-and-scan single-frame reads, whole-trajectory convenience
-  reads, caller-owned frame-buffer streaming, normal writes, C++ round trips,
-  Python cross-reader tooling, malformed input/status handling, and lifecycle
-  misuse checks.
+  reads, caller-owned frame-buffer streaming, generated multi-frame DCD
+  hardening, normal writes, C++ round trips, Python cross-reader tooling,
+  malformed input/status handling, and lifecycle misuse checks.
 - Calculation coverage for mass, molecular formula, residue charge, center of
   mass, radius of gyration, RMSD, min/max, DCD streaming min/max, and principal
   moments of inertia.

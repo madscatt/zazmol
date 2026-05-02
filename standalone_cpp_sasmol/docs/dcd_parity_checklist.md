@@ -267,7 +267,11 @@ Completed DCD streaming policy hardening:
    buffer.
 3. Verified running reductions can process each frame without storing a whole
    molecule trajectory.
-4. Kept huge generated DCD tests as optional stress coverage rather than normal
+4. Added an on-the-fly generated multi-frame DCD regression so hardening does
+   not require checked-in bulky fixtures.
+5. Changed `read_single_dcd_step` to scan with the streaming coordinate
+   primitive and store only the requested one-frame result.
+6. Kept huge generated DCD tests as optional stress coverage rather than normal
    CTest requirements.
 
 These paths pass in both the normal build and the sanitizer build.

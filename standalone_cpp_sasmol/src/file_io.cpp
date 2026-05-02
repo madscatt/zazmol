@@ -1203,18 +1203,25 @@ IoStatus DcdReader::read_single_dcd_step(const std::filesystem::path& filename,
     return status;
   }
 
-  Molecule trajectory;
+  DcdHeader header;
+  status = reader.read_header(header);
+  if (!status) {
+    (void)reader.close_dcd_read();
+    return status;
+  }
+
+  std::vector<Vec3> coordinates;
   for (std::size_t step = 0; step < frame; ++step) {
-    status = reader.read_next_frame(trajectory);
+    status = reader.read_next_frame_coordinates(coordinates);
     if (!status) {
       (void)reader.close_dcd_read();
       return status;
     }
   }
 
-  molecule.resize(trajectory.natoms(), 1);
-  for (std::size_t atom = 0; atom < trajectory.natoms(); ++atom) {
-    molecule.set_coordinate(0, atom, trajectory.coordinate(frame - 1, atom));
+  molecule.resize(header.natoms, 1);
+  for (std::size_t atom = 0; atom < header.natoms; ++atom) {
+    molecule.set_coordinate(0, atom, coordinates[atom]);
   }
 
   return reader.close_dcd_read();
