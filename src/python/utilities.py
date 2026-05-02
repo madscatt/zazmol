@@ -626,7 +626,6 @@ def parse_fasta(fasta_sequence, **kwargs):
         # check if line is empty
         if line.strip() == '':
             error = 'ERROR: empty lines in fasta sequence are not allowed'
-            print(error)
             return error
         # check if first character is the comment identifier
         elif line[0] == '>' or line[0] == ';':

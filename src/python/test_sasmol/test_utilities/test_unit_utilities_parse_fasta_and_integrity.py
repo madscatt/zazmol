@@ -2,6 +2,8 @@
     SASMOL: Copyright (C) 2011 Joseph E. Curtis, Ph.D.
 '''
 
+import contextlib
+import io
 import unittest
 
 import sasmol.system as system
@@ -30,10 +32,13 @@ class Test_unit_utilities_parse_fasta_and_integrity(unittest.TestCase):
             'TTT\n',
         ]
 
-        result = utilities.parse_fasta(fasta_lines)
+        stdout = io.StringIO()
+        with contextlib.redirect_stdout(stdout):
+            result = utilities.parse_fasta(fasta_lines)
 
         self.assertEqual(
             result, 'ERROR: empty lines in fasta sequence are not allowed')
+        self.assertEqual(stdout.getvalue(), '')
 
     def test_check_integrity_reports_expected_lengths_for_valid_object(self):
         molecule = system.Molecule_Maker(2)
