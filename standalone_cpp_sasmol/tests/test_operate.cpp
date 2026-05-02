@@ -31,6 +31,30 @@ void assert_vec_close(sasmol::Vec3 actual, sasmol::Vec3 expected,
   assert_close(actual.z, expected.z, tolerance);
 }
 
+double distance_between(sasmol::Vec3 first, sasmol::Vec3 second) {
+  const auto dx = static_cast<double>(first.x - second.x);
+  const auto dy = static_cast<double>(first.y - second.y);
+  const auto dz = static_cast<double>(first.z - second.z);
+  return std::sqrt(dx * dx + dy * dy + dz * dz);
+}
+
+void assert_pairwise_distances_preserved(const sasmol::Molecule& before,
+                                         const sasmol::Molecule& after,
+                                         std::size_t frame,
+                                         double tolerance = 1.0e-5) {
+  assert(before.natoms() == after.natoms());
+  for (std::size_t first = 0; first < before.natoms(); ++first) {
+    for (std::size_t second = first + 1; second < before.natoms(); ++second) {
+      assert_close_double(
+          distance_between(before.coordinate(frame, first),
+                           before.coordinate(frame, second)),
+          distance_between(after.coordinate(frame, first),
+                           after.coordinate(frame, second)),
+          tolerance);
+    }
+  }
+}
+
 double axis_alignment(const sasmol::Molecule& mol, std::size_t frame,
                       std::size_t pmi_eigenvector,
                       std::array<double, 3> expected_axis) {
@@ -165,6 +189,67 @@ void test_general_axis_preserves_python_non_unit_axis_behavior() {
 
   assert_vec_close(mol.coordinate(0, 0), {-215.775F, 167.484F, 356.058F},
                    0.001);
+}
+
+void test_axis_rotation_preserves_pairwise_distances() {
+  sasmol::Molecule mol(4, 1);
+  mol.set_coordinate(0, 0, {1.0F, 2.0F, 3.0F});
+  mol.set_coordinate(0, 1, {-4.0F, 5.0F, 6.0F});
+  mol.set_coordinate(0, 2, {7.0F, -8.0F, 9.0F});
+  mol.set_coordinate(0, 3, {2.0F, -3.0F, -4.0F});
+  const auto before = mol;
+
+  sasmol::rotate(mol, 0, sasmol::Axis::y, 0.37);
+
+  assert_pairwise_distances_preserved(before, mol, 0);
+}
+
+void test_unit_general_axis_rotation_preserves_pairwise_distances() {
+  sasmol::Molecule mol(4, 1);
+  mol.set_coordinate(0, 0, {1.0F, 2.0F, 3.0F});
+  mol.set_coordinate(0, 1, {-4.0F, 5.0F, 6.0F});
+  mol.set_coordinate(0, 2, {7.0F, -8.0F, 9.0F});
+  mol.set_coordinate(0, 3, {2.0F, -3.0F, -4.0F});
+  const auto before = mol;
+
+  sasmol::rotate_general_axis(mol, 0, 0.37, {0.0, 0.0, 1.0});
+
+  assert_pairwise_distances_preserved(before, mol, 0);
+}
+
+void test_euler_rotation_preserves_pairwise_distances() {
+  sasmol::Molecule mol(4, 1);
+  mol.set_coordinate(0, 0, {1.0F, 2.0F, 3.0F});
+  mol.set_coordinate(0, 1, {-4.0F, 5.0F, 6.0F});
+  mol.set_coordinate(0, 2, {7.0F, -8.0F, 9.0F});
+  mol.set_coordinate(0, 3, {2.0F, -3.0F, -4.0F});
+  const auto before = mol;
+
+  sasmol::rotate_euler(mol, 0, 0.23, -0.41, 0.67);
+
+  assert_pairwise_distances_preserved(before, mol, 0);
+}
+
+void test_rotated_variants_do_not_mutate_source() {
+  sasmol::Molecule mol(2, 1);
+  mol.set_coordinate(0, 0, {1.0F, 2.0F, 3.0F});
+  mol.set_coordinate(0, 1, {-4.0F, 5.0F, 6.0F});
+
+  const auto axis_copy = sasmol::rotated(mol, 0, sasmol::Axis::x, 0.37);
+  assert_vec_close(mol.coordinate(0, 0), {1.0F, 2.0F, 3.0F});
+  assert_vec_close(mol.coordinate(0, 1), {-4.0F, 5.0F, 6.0F});
+  assert_pairwise_distances_preserved(mol, axis_copy, 0);
+
+  const auto general_copy =
+      sasmol::rotated_general_axis(mol, 0, 0.37, {0.0, 0.0, 1.0});
+  assert_vec_close(mol.coordinate(0, 0), {1.0F, 2.0F, 3.0F});
+  assert_vec_close(mol.coordinate(0, 1), {-4.0F, 5.0F, 6.0F});
+  assert_pairwise_distances_preserved(mol, general_copy, 0);
+
+  const auto euler_copy = sasmol::rotated_euler(mol, 0, 0.23, -0.41, 0.67);
+  assert_vec_close(mol.coordinate(0, 0), {1.0F, 2.0F, 3.0F});
+  assert_vec_close(mol.coordinate(0, 1), {-4.0F, 5.0F, 6.0F});
+  assert_pairwise_distances_preserved(mol, euler_copy, 0);
 }
 
 void test_align_pmi_on_axis_matches_python_alignment_contract() {
@@ -369,6 +454,10 @@ int main() {
   test_general_axis_rotation_matches_python_row_vector_convention();
   test_euler_rotation_identity();
   test_general_axis_preserves_python_non_unit_axis_behavior();
+  test_axis_rotation_preserves_pairwise_distances();
+  test_unit_general_axis_rotation_preserves_pairwise_distances();
+  test_euler_rotation_preserves_pairwise_distances();
+  test_rotated_variants_do_not_mutate_source();
   test_align_pmi_on_axis_matches_python_alignment_contract();
   test_align_pmi_on_cardinal_axes_matches_python_contract();
   test_pmi_aligned_copy_does_not_mutate_source();

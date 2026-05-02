@@ -41,6 +41,10 @@ Behavior notes:
 - `rotate_general_axis` intentionally accepts non-unit axes because Python
   tests and legacy behavior use non-unit values despite the method name and
   docstring.
+- true rotation paths preserve pairwise distances: axis rotations, Euler
+  rotations, and general-axis rotations when the supplied axis is unit length.
+- pure rotation wrappers return rotated copies without mutating the source
+  molecule.
 
 ## Deferred
 
