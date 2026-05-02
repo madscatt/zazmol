@@ -35,9 +35,16 @@ second. The primary reader API is sequential:
 sasmol::DcdReader reader;
 reader.open_dcd_read("trajectory.dcd");
 reader.read_header(header);
-reader.read_next_frame(molecule);
+reader.read_next_frame_coordinates(coordinates);
 reader.close_dcd_read();
 ```
+
+For large trajectories, callers should process each frame and then reuse or
+discard the frame buffer. `read_next_frame(molecule)` is also sequential, but it
+writes into a molecule trajectory container. `read_dcd(filename, molecule)` is a
+whole-trajectory convenience wrapper and may allocate storage proportional to
+`natoms * nframes * 3`; it should be reserved for fixtures, tests, and
+moderate-size data.
 
 Random-frame behavior should not be hidden as normal seekable access. If
 supported, it should be explicit reopen/scan behavior through

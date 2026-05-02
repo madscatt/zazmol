@@ -23,7 +23,8 @@ Python `zazmol` and the existing `_dcdio` extension remain the behavior oracle.
 - Truncated or malformed headers raise a Python exception rather than crashing
   the caller.
 - `read_dcd(filename)` reads the whole trajectory into one molecule coordinate
-  array.
+  array. In the standalone C++ API this is a convenience path for small or
+  moderate trajectories, not the recommended large-DCD workflow.
 - `read_dcd_step(open_descriptor, frame)` reads the next frame from the current
   stream position. The `frame` argument is passed through to the C function as
   the `first` flag, but practical use is sequential.
@@ -55,8 +56,29 @@ Python `zazmol` and the existing `_dcdio` extension remain the behavior oracle.
 - The old code has machinery for fixed/free atoms through `NAMNF`; even if v1
   does not implement fixed atoms, it must fail with a precise status rather than
   silently corrupting coordinates.
-- Large-file behavior matters. The old tests exercise generated 1.0 GB through
-  6.4 GB DCDs behind `SASMOL_HUGETEST`.
+- Large-file behavior matters, but normal regression tests should prove
+  streaming behavior with small fixtures. Very large generated DCDs should
+  remain opt-in stress tests, not the default developer loop.
+
+## Streaming Policy Checkpoint
+
+Python `sasmol` production use normally treats DCD files as sequential streams:
+open the DCD, read one frame, process it, discard or reuse the frame buffer, and
+continue. This avoids loading very large trajectories into memory.
+
+The standalone C++ API preserves that policy:
+
+- `read_next_frame_coordinates(std::vector<Vec3>&)` is the lowest-level
+  streaming primitive. It overwrites/reuses the caller-owned coordinate vector
+  for the current frame.
+- `read_next_frame(Molecule&)` is still sequential, but it writes into a
+  molecule-sized trajectory container.
+- `read_dcd(filename, molecule)` is a whole-trajectory convenience wrapper. It
+  may allocate storage proportional to `natoms * nframes * 3`, so it should not
+  be the default path for large production DCDs.
+- Cycling back to an earlier frame should be explicit close/reopen/scan behavior
+  unless a future implementation adds true indexed random access with separate
+  tests and documentation.
 
 ## Minimum Fixture Parity
 
@@ -238,9 +260,23 @@ These paths pass in both the normal build and the sanitizer build.
 
 ## Proposed Next Implementation Slice
 
+Completed DCD streaming policy hardening:
+
+1. Documented frame-by-frame reading as the primary large-DCD usage policy.
+2. Added direct tests for `read_next_frame_coordinates` with a caller-owned
+   buffer.
+3. Verified running reductions can process each frame without storing a whole
+   molecule trajectory.
+4. Kept huge generated DCD tests as optional stress coverage rather than normal
+   CTest requirements.
+
+These paths pass in both the normal build and the sanitizer build.
+
+## Proposed Next Implementation Slice
+
 The remaining DCD hardening options are higher policy choices:
 
-1. Add larger generated-file tests.
+1. Add opt-in large streaming stress tests if a real workflow needs them.
 2. Add explicit unsupported fixtures for fixed/free atom DCDs if we have one.
 3. Add Python cross-reader checks to CI-like tooling rather than normal CTest.
 4. Move to PDB I/O contract/parity.

@@ -234,6 +234,16 @@ double coordinate_sum(const sasmol::Molecule& mol) {
   return total;
 }
 
+double coordinate_sum(const std::vector<sasmol::Vec3>& coordinates) {
+  double total = 0.0;
+  for (const auto& xyz : coordinates) {
+    total += static_cast<double>(xyz.x);
+    total += static_cast<double>(xyz.y);
+    total += static_cast<double>(xyz.z);
+  }
+  return total;
+}
+
 void test_sequential_frame_reads_1atm() {
   sasmol::DcdReader reader;
   sasmol::Molecule mol;
@@ -313,6 +323,72 @@ void test_sequential_frame_reads_rna_final_sample() {
   assert_close(xyz.y, 14.348F);
   assert_close(xyz.z, 20.914F);
   assert_close_double(coordinate_sum(mol), -430804.378, 0.1);
+}
+
+void test_streaming_coordinates_reuses_caller_buffer_without_accumulation() {
+  sasmol::DcdReader reader;
+  sasmol::DcdHeader header;
+  std::vector<sasmol::Vec3> coordinates;
+  coordinates.reserve(100);
+  const auto reserved_capacity = coordinates.capacity();
+
+  auto status = reader.open_dcd_read(fixture_path("2AAD.dcd"));
+  assert(status.ok());
+  status = reader.read_header(header);
+  assert(status.ok());
+  assert(header.natoms == 15);
+  assert(header.nframes == 3);
+
+  status = reader.read_next_frame_coordinates(coordinates);
+  assert(status.ok());
+  assert(coordinates.size() == 15);
+  assert(coordinates.capacity() == reserved_capacity);
+  const auto* first_buffer = coordinates.data();
+  assert_close(coordinates[0].x, 73.944F);
+  assert_close(coordinates[0].y, 41.799F);
+  assert_close(coordinates[0].z, 41.652F);
+
+  status = reader.read_next_frame_coordinates(coordinates);
+  assert(status.ok());
+  assert(coordinates.size() == 15);
+  assert(coordinates.capacity() == reserved_capacity);
+  assert(coordinates.data() == first_buffer);
+  assert_close(coordinates[0].x, -73.944F);
+  assert_close(coordinates[0].y, 41.799F);
+  assert_close(coordinates[0].z, 41.652F);
+
+  status = reader.close_dcd_read();
+  assert(status.ok());
+}
+
+void test_streaming_coordinates_supports_running_reduction() {
+  sasmol::DcdReader reader;
+  sasmol::DcdHeader header;
+  std::vector<sasmol::Vec3> coordinates;
+  double total = 0.0;
+  std::size_t frames_read = 0;
+
+  auto status = reader.open_dcd_read(fixture_path("2AAD.dcd"));
+  assert(status.ok());
+  status = reader.read_header(header);
+  assert(status.ok());
+
+  while (true) {
+    status = reader.read_next_frame_coordinates(coordinates);
+    if (status.code == sasmol::IoCode::end_of_file) {
+      break;
+    }
+    assert(status.ok());
+    assert(coordinates.size() == header.natoms);
+    total += coordinate_sum(coordinates);
+    ++frames_read;
+  }
+
+  assert(frames_read == header.nframes);
+  assert_close_double(total, 3644.294, 0.01);
+
+  status = reader.close_dcd_read();
+  assert(status.ok());
 }
 
 void test_single_step_reopen_scan_uses_one_based_frames() {
@@ -616,6 +692,8 @@ int main() {
   test_sequential_frame_reads_1atm();
   test_sequential_frame_reads_2aad_middle_and_final();
   test_sequential_frame_reads_rna_final_sample();
+  test_streaming_coordinates_reuses_caller_buffer_without_accumulation();
+  test_streaming_coordinates_supports_running_reduction();
   test_single_step_reopen_scan_uses_one_based_frames();
   test_single_step_rejects_zero_frame_number();
   test_truncated_frame_returns_status();

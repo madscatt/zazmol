@@ -15,8 +15,9 @@ behavior oracle.
   resolution, and Python cross-reader validation of generated C++ files.
 - Sequential DCD reader/writer coverage for normal full-coordinate files,
   explicit reopen-and-scan single-frame reads, whole-trajectory convenience
-  reads, normal writes, C++ round trips, Python cross-reader tooling, malformed
-  input/status handling, and lifecycle misuse checks.
+  reads, caller-owned frame-buffer streaming, normal writes, C++ round trips,
+  Python cross-reader tooling, malformed input/status handling, and lifecycle
+  misuse checks.
 - Calculation coverage for mass, molecular formula, residue charge, center of
   mass, radius of gyration, RMSD, min/max, DCD streaming min/max, and principal
   moments of inertia.
@@ -47,6 +48,8 @@ behavior oracle.
 - BIOMT subset operations remain deferred.
 - Fixed/free atom DCD variants remain unsupported unless fixtures and policy are
   added.
+- Large DCD workflows should use explicit streaming APIs; whole-trajectory DCD
+  reads remain convenience behavior for bounded data.
 - GPU/MPI/Python bindings remain architectural considerations, not v1
   dependencies.
 
@@ -58,8 +61,8 @@ Do a small selection/subset documentation cleanup before new feature work:
   missing
 - add a concise selection/subset checkpoint like the operate and topology
   checkpoints
-- then decide whether to tackle BIOMT, larger DCD fixtures, or broader Python
-  expression coverage as a reviewed design choice
+- then decide whether to tackle BIOMT, opt-in large DCD streaming stress tests,
+  or broader Python expression coverage as a reviewed design choice
 
 The next implementation-heavy step should not be a CHARMM parser or arbitrary
 selection evaluator without a separate plan.
