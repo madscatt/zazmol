@@ -40,11 +40,17 @@ than guessed.
 
 2. **PSF/Caller Atom Table Helper**
 
-   If needed, add a helper that mirrors the SASSIE TAMC usage: consume an
+   Implemented a helper that mirrors the SASSIE TAMC usage: consume an
    atom-ordered table of `(atom name, CHARMM type)` values from an explicit
    force-field source such as a PSF, validate it against `Molecule::name()`,
-   and assign `charmm_type()` only if every atom matches. This should be stricter
-   than the historical Python caller: no partial mutation after a mismatch.
+   and assign `charmm_type()` only if every atom matches.
+
+   Current helper:
+
+   - `assign_charmm_types_from_atom_table(molecule, assignments)`
+
+   This is stricter than the historical Python caller: no partial mutation
+   after a mismatch.
 
 3. **Topology Parser Subsystem**
 

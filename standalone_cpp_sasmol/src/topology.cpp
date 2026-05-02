@@ -13,4 +13,31 @@ SubsetResult assign_charmm_types(Molecule& molecule,
   return result;
 }
 
+SubsetResult assign_charmm_types_from_atom_table(
+    Molecule& molecule, const std::vector<CharmmTypeAssignment>& assignments) {
+  SubsetResult result;
+  if (assignments.size() != molecule.natoms()) {
+    result.errors.push_back("CHARMM atom table length does not match natoms");
+    return result;
+  }
+  if (molecule.name().size() != molecule.natoms()) {
+    result.errors.push_back("atom name length does not match natoms");
+    return result;
+  }
+
+  std::vector<std::string> types;
+  types.reserve(assignments.size());
+  for (std::size_t atom = 0; atom < assignments.size(); ++atom) {
+    if (assignments[atom].atom_name != molecule.name()[atom]) {
+      result.errors.push_back("CHARMM atom table name mismatch at atom " +
+                              std::to_string(atom));
+      return result;
+    }
+    types.push_back(assignments[atom].charmm_type);
+  }
+
+  molecule.charmm_type() = types;
+  return result;
+}
+
 }  // namespace sasmol
