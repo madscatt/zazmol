@@ -17,6 +17,7 @@ add_library(sasmol_standalone
   src/properties.cpp
   src/selection.cpp
   src/subset.cpp
+  src/topology.cpp
 )
 
 target_include_directories(sasmol_standalone
@@ -85,6 +86,10 @@ if(BUILD_TESTING)
     SASMOL_TEST_DATA_DIR="${CMAKE_CURRENT_SOURCE_DIR}/../src/python/test_sasmol/data"
   )
   add_test(NAME selection COMMAND test_selection)
+
+  add_executable(test_topology tests/test_topology.cpp)
+  target_link_libraries(test_topology PRIVATE sasmol_standalone)
+  add_test(NAME topology COMMAND test_topology)
 
   add_executable(test_subset tests/test_subset.cpp)
   target_link_libraries(test_subset PRIVATE sasmol_standalone)

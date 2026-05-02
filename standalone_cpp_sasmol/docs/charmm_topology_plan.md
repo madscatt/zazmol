@@ -28,11 +28,15 @@ than guessed.
 
 ## Recommended Implementation Path
 
-1. **Explicit Assignment Helper**
+1. **Explicit Assignment Helper** implemented
 
    Add a small helper that takes caller-provided atom-aligned values and assigns
    `charmm_type()` after validating length. This supports workflows that already
    know the types without adding topology parsing yet.
+
+   Current helper:
+
+   - `assign_charmm_types(molecule, types)`
 
 2. **Topology Table Helper**
 
