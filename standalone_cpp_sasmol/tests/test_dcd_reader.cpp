@@ -1,5 +1,7 @@
+#include "sasmol/calculate.hpp"
 #include "sasmol/file_io.hpp"
 
+#include <algorithm>
 #include <cassert>
 #include <cmath>
 #include <cstdint>
@@ -58,6 +60,14 @@ void write_bytes(const std::filesystem::path& path,
   std::ofstream out(path, std::ios::binary | std::ios::trunc);
   out.write(bytes.data(), static_cast<std::streamsize>(bytes.size()));
   assert(out.good());
+}
+
+void overwrite_i32(const std::filesystem::path& path, std::streamoff offset,
+                   std::int32_t value) {
+  std::fstream stream(path, std::ios::binary | std::ios::in | std::ios::out);
+  stream.seekp(offset, std::ios::beg);
+  stream.write(reinterpret_cast<const char*>(&value), sizeof(value));
+  assert(stream.good());
 }
 
 void append_i32(std::vector<char>& bytes, std::int32_t value) {
@@ -217,6 +227,23 @@ void test_oversized_atom_count_returns_unsupported_before_allocation() {
   std::filesystem::remove(oversized);
 }
 
+void test_fixed_free_atom_header_is_explicitly_unsupported() {
+  const auto fixed_free = temp_dcd_path("sasmol_fixed_free_header.dcd");
+  auto bytes = dcd_header_prefix(1, 1, 1);
+  append_valid_title_and_atom_count(bytes, 5);
+  write_bytes(fixed_free, bytes);
+
+  sasmol::DcdReader reader;
+  sasmol::DcdHeader header;
+
+  auto status = reader.open_dcd_read(fixed_free);
+  assert(status.ok());
+  status = reader.read_header(header);
+  assert(status.code == sasmol::IoCode::unsupported);
+
+  std::filesystem::remove(fixed_free);
+}
+
 void assert_close(sasmol::coord_type actual, sasmol::coord_type expected,
                   double tolerance = 0.001) {
   assert(std::fabs(static_cast<double>(actual - expected)) <= tolerance);
@@ -266,6 +293,24 @@ double expected_generated_sum(std::size_t nframes, std::size_t natoms) {
   return total;
 }
 
+sasmol::CoordinateBounds expected_generated_bounds(std::size_t nframes,
+                                                   std::size_t natoms) {
+  sasmol::CoordinateBounds bounds{
+      generated_coordinate(0, 0), generated_coordinate(0, 0)};
+  for (std::size_t frame = 0; frame < nframes; ++frame) {
+    for (std::size_t atom = 0; atom < natoms; ++atom) {
+      const auto xyz = generated_coordinate(frame, atom);
+      bounds.minimum.x = std::min(bounds.minimum.x, xyz.x);
+      bounds.minimum.y = std::min(bounds.minimum.y, xyz.y);
+      bounds.minimum.z = std::min(bounds.minimum.z, xyz.z);
+      bounds.maximum.x = std::max(bounds.maximum.x, xyz.x);
+      bounds.maximum.y = std::max(bounds.maximum.y, xyz.y);
+      bounds.maximum.z = std::max(bounds.maximum.z, xyz.z);
+    }
+  }
+  return bounds;
+}
+
 std::filesystem::path generate_streaming_dcd(const char* name,
                                              std::size_t natoms,
                                              std::size_t nframes) {
@@ -288,6 +333,17 @@ std::filesystem::path generate_streaming_dcd(const char* name,
   assert(status.ok());
 
   return output;
+}
+
+void assert_bounds_close(const sasmol::CoordinateBounds& actual,
+                         const sasmol::CoordinateBounds& expected,
+                         double tolerance = 0.001) {
+  assert_close(actual.minimum.x, expected.minimum.x, tolerance);
+  assert_close(actual.minimum.y, expected.minimum.y, tolerance);
+  assert_close(actual.minimum.z, expected.minimum.z, tolerance);
+  assert_close(actual.maximum.x, expected.maximum.x, tolerance);
+  assert_close(actual.maximum.y, expected.maximum.y, tolerance);
+  assert_close(actual.maximum.z, expected.maximum.z, tolerance);
 }
 
 void test_sequential_frame_reads_1atm() {
@@ -407,6 +463,24 @@ void test_streaming_coordinates_reuses_caller_buffer_without_accumulation() {
   assert(status.ok());
 }
 
+void test_streaming_coordinates_auto_reads_header() {
+  sasmol::DcdReader reader;
+  std::vector<sasmol::Vec3> coordinates;
+
+  auto status = reader.open_dcd_read(fixture_path("1ATM.dcd"));
+  assert(status.ok());
+  status = reader.read_next_frame_coordinates(coordinates);
+  assert(status.ok());
+
+  assert(coordinates.size() == 1);
+  assert_close(coordinates[0].x, 76.944F);
+  assert_close(coordinates[0].y, 41.799F);
+  assert_close(coordinates[0].z, 41.652F);
+
+  status = reader.close_dcd_read();
+  assert(status.ok());
+}
+
 void test_streaming_coordinates_supports_running_reduction() {
   sasmol::DcdReader reader;
   sasmol::DcdHeader header;
@@ -481,6 +555,29 @@ void test_generated_dcd_streams_without_static_fixture() {
   std::filesystem::remove(generated);
 }
 
+void test_generated_dcd_whole_read_and_minmax() {
+  const std::size_t natoms = 37;
+  const std::size_t nframes = 257;
+  const auto generated =
+      generate_streaming_dcd("sasmol_generated_whole_read.dcd", natoms, nframes);
+
+  sasmol::DcdReader reader;
+  sasmol::Molecule mol;
+  auto status = reader.read_dcd(generated, mol);
+  assert(status.ok());
+  assert(mol.natoms() == natoms);
+  assert(mol.number_of_frames() == nframes);
+  assert_close_double(coordinate_sum(mol), expected_generated_sum(nframes, natoms),
+                      0.01);
+
+  const auto expected_bounds = expected_generated_bounds(nframes, natoms);
+  const auto streamed_bounds =
+      sasmol::calculate_minimum_and_maximum_all_steps(generated);
+  assert_bounds_close(streamed_bounds, expected_bounds);
+
+  std::filesystem::remove(generated);
+}
+
 void test_generated_dcd_single_step_scans_to_late_frame() {
   const std::size_t natoms = 37;
   const std::size_t nframes = 257;
@@ -501,6 +598,31 @@ void test_generated_dcd_single_step_scans_to_late_frame() {
   assert_close(actual.y, expected.y);
   assert_close(actual.z, expected.z);
 
+  std::filesystem::remove(generated);
+}
+
+void test_generated_dcd_bad_frame_marker_returns_status() {
+  const std::size_t natoms = 37;
+  const std::size_t nframes = 3;
+  const auto generated =
+      generate_streaming_dcd("sasmol_generated_bad_marker.dcd", natoms, nframes);
+  const std::streamoff first_x_marker_offset = 276;
+  overwrite_i32(generated, first_x_marker_offset,
+                static_cast<std::int32_t>(natoms * sizeof(float) + 4));
+
+  sasmol::DcdReader reader;
+  sasmol::DcdHeader header;
+  std::vector<sasmol::Vec3> coordinates;
+
+  auto status = reader.open_dcd_read(generated);
+  assert(status.ok());
+  status = reader.read_header(header);
+  assert(status.ok());
+  status = reader.read_next_frame_coordinates(coordinates);
+  assert(status.code == sasmol::IoCode::format_error);
+
+  status = reader.close_dcd_read();
+  assert(status.ok());
   std::filesystem::remove(generated);
 }
 
@@ -802,13 +924,17 @@ int main() {
   test_invalid_title_count_returns_status();
   test_negative_header_count_returns_status();
   test_oversized_atom_count_returns_unsupported_before_allocation();
+  test_fixed_free_atom_header_is_explicitly_unsupported();
   test_sequential_frame_reads_1atm();
   test_sequential_frame_reads_2aad_middle_and_final();
   test_sequential_frame_reads_rna_final_sample();
   test_streaming_coordinates_reuses_caller_buffer_without_accumulation();
+  test_streaming_coordinates_auto_reads_header();
   test_streaming_coordinates_supports_running_reduction();
   test_generated_dcd_streams_without_static_fixture();
+  test_generated_dcd_whole_read_and_minmax();
   test_generated_dcd_single_step_scans_to_late_frame();
+  test_generated_dcd_bad_frame_marker_returns_status();
   test_single_step_reopen_scan_uses_one_based_frames();
   test_single_step_rejects_zero_frame_number();
   test_truncated_frame_returns_status();

@@ -271,7 +271,10 @@ Completed DCD streaming policy hardening:
    not require checked-in bulky fixtures.
 5. Changed `read_single_dcd_step` to scan with the streaming coordinate
    primitive and store only the requested one-frame result.
-6. Kept huge generated DCD tests as optional stress coverage rather than normal
+6. Added generated whole-read/min-max coverage, malformed generated frame-marker
+   coverage, implicit-header streaming coverage, and explicit fixed/free atom
+   unsupported-header coverage.
+7. Kept huge generated DCD tests as optional stress coverage rather than normal
    CTest requirements.
 
 These paths pass in both the normal build and the sanitizer build.
