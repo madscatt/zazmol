@@ -101,6 +101,14 @@ struct MergeOptions {
     Molecule& molecule, const Molecule& source, std::size_t frame,
     const std::vector<int>& mask);
 
+[[nodiscard]] Molecule with_coordinates_using_indices(
+    const Molecule& target, const Molecule& source, std::size_t frame,
+    const std::vector<std::size_t>& indices);
+
+[[nodiscard]] Molecule with_coordinates_using_mask(
+    const Molecule& target, const Molecule& source, std::size_t frame,
+    const std::vector<int>& mask);
+
 [[nodiscard]] SubsetResult copy_molecule_using_indices(
     const Molecule& source, Molecule& destination,
     const std::vector<std::size_t>& indices, std::size_t frame);

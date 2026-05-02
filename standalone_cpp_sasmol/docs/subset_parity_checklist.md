@@ -20,6 +20,8 @@ Implemented 0/1 mask compatibility wrappers:
 - `get_indices_from_mask(molecule, mask)`
 - `get_coordinates_using_mask(molecule, frame, mask)`
 - `set_coordinates_using_mask(molecule, source, frame, mask)`
+- `with_coordinates_using_indices(target, source, frame, indices)`
+- `with_coordinates_using_mask(target, source, frame, mask)`
 - `copy_molecule_using_mask(source, destination, mask, frame)`
 - `copied_molecule_using_mask(source, mask, frame)`
 

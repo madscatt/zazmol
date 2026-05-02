@@ -5,6 +5,7 @@
 #include <cassert>
 #include <cmath>
 #include <filesystem>
+#include <stdexcept>
 
 namespace {
 
@@ -476,6 +477,63 @@ void test_set_coordinates_rejects_shape_mismatch() {
   assert(!result.ok());
 }
 
+void test_with_coordinates_using_indices_returns_modified_copy() {
+  sasmol::Molecule target(3, 1);
+  target.set_coordinate(0, 0, {1.0F, 1.0F, 1.0F});
+  target.set_coordinate(0, 1, {2.0F, 2.0F, 2.0F});
+  target.set_coordinate(0, 2, {3.0F, 3.0F, 3.0F});
+  sasmol::Molecule source(2, 1);
+  source.set_coordinate(0, 0, {10.0F, 11.0F, 12.0F});
+  source.set_coordinate(0, 1, {20.0F, 21.0F, 22.0F});
+
+  const auto updated =
+      sasmol::with_coordinates_using_indices(target, source, 0, {0, 2});
+
+  assert_vec_close(updated.coordinate(0, 0), {10.0F, 11.0F, 12.0F});
+  assert_vec_close(updated.coordinate(0, 1), {2.0F, 2.0F, 2.0F});
+  assert_vec_close(updated.coordinate(0, 2), {20.0F, 21.0F, 22.0F});
+  assert_vec_close(target.coordinate(0, 0), {1.0F, 1.0F, 1.0F});
+  assert_vec_close(target.coordinate(0, 2), {3.0F, 3.0F, 3.0F});
+}
+
+void test_with_coordinates_using_mask_returns_modified_copy() {
+  sasmol::Molecule target(3, 1);
+  target.set_coordinate(0, 0, {1.0F, 1.0F, 1.0F});
+  target.set_coordinate(0, 1, {2.0F, 2.0F, 2.0F});
+  target.set_coordinate(0, 2, {3.0F, 3.0F, 3.0F});
+  sasmol::Molecule source(2, 1);
+  source.set_coordinate(0, 0, {10.0F, 11.0F, 12.0F});
+  source.set_coordinate(0, 1, {20.0F, 21.0F, 22.0F});
+
+  const auto updated =
+      sasmol::with_coordinates_using_mask(target, source, 0, {1, 0, 1});
+
+  assert_vec_close(updated.coordinate(0, 0), {10.0F, 11.0F, 12.0F});
+  assert_vec_close(updated.coordinate(0, 1), {2.0F, 2.0F, 2.0F});
+  assert_vec_close(updated.coordinate(0, 2), {20.0F, 21.0F, 22.0F});
+  assert_vec_close(target.coordinate(0, 0), {1.0F, 1.0F, 1.0F});
+  assert_vec_close(target.coordinate(0, 2), {3.0F, 3.0F, 3.0F});
+}
+
+void test_with_coordinates_rejects_bad_mask_without_mutating_target() {
+  sasmol::Molecule target(2, 1);
+  target.set_coordinate(0, 0, {1.0F, 1.0F, 1.0F});
+  target.set_coordinate(0, 1, {2.0F, 2.0F, 2.0F});
+  sasmol::Molecule source(1, 1);
+  source.set_coordinate(0, 0, {10.0F, 11.0F, 12.0F});
+
+  bool threw = false;
+  try {
+    (void)sasmol::with_coordinates_using_mask(target, source, 0, {1, 2});
+  } catch (const std::invalid_argument&) {
+    threw = true;
+  }
+
+  assert(threw);
+  assert_vec_close(target.coordinate(0, 0), {1.0F, 1.0F, 1.0F});
+  assert_vec_close(target.coordinate(0, 1), {2.0F, 2.0F, 2.0F});
+}
+
 void test_copy_conect_filters_to_selected_atoms() {
   sasmol::Molecule source(3, 1);
   source.index() = {1, 2, 3};
@@ -611,6 +669,9 @@ int main() {
   test_set_coordinates_using_mask_rejects_before_mutation();
   test_set_coordinates_using_indices_replaces_selected_atoms_only();
   test_set_coordinates_rejects_shape_mismatch();
+  test_with_coordinates_using_indices_returns_modified_copy();
+  test_with_coordinates_using_mask_returns_modified_copy();
+  test_with_coordinates_rejects_bad_mask_without_mutating_target();
   test_copy_conect_filters_to_selected_atoms();
   test_get_and_set_string_descriptor_using_indices();
   test_get_and_set_string_descriptor_using_mask();

@@ -526,6 +526,28 @@ SubsetResult set_coordinates_using_mask(
   return set_coordinates_using_indices(molecule, source, frame, selected.indices);
 }
 
+Molecule with_coordinates_using_indices(
+    const Molecule& target, const Molecule& source, std::size_t frame,
+    const std::vector<std::size_t>& indices) {
+  Molecule copy = target;
+  const auto result = set_coordinates_using_indices(copy, source, frame, indices);
+  if (!result.ok()) {
+    throw std::invalid_argument(result.errors.front());
+  }
+  return copy;
+}
+
+Molecule with_coordinates_using_mask(const Molecule& target,
+                                     const Molecule& source, std::size_t frame,
+                                     const std::vector<int>& mask) {
+  Molecule copy = target;
+  const auto result = set_coordinates_using_mask(copy, source, frame, mask);
+  if (!result.ok()) {
+    throw std::invalid_argument(result.errors.front());
+  }
+  return copy;
+}
+
 SubsetResult copy_molecule_using_indices(
     const Molecule& source, Molecule& destination,
     const std::vector<std::size_t>& indices, std::size_t frame) {
