@@ -16,3 +16,21 @@ That future expansion must keep the current failure contract:
 - failures return no partial indices
 - the parser must stop rather than guessing
 - arbitrary Python-style `eval` behavior must not become the default C++ path
+
+## CHARMM Type Assignment
+
+`Molecule::charmm_type()` is a first-class descriptor, but it must not be
+auto-guessed from ordinary PDB input. Many user-supplied PDB files do not follow
+CHARMM atom naming closely enough for automatic assignment to be safe. A wrong
+force-field type can be worse than a missing one because downstream calculations
+may treat it as authoritative.
+
+Future CHARMM typing should therefore be explicit:
+
+- PDB read leaves `charmm_type()` empty
+- topology/CHARMM workflows may populate it after they have a real topology
+  source
+- helper APIs should report unmatched or ambiguous atoms instead of guessing
+- a full topology parser is a separate subsystem, not a hidden PDB-read feature
+
+The staged topology direction is captured in `docs/charmm_topology_plan.md`.
