@@ -23,6 +23,26 @@ struct IntegrityReport {
   [[nodiscard]] bool ok() const noexcept { return issues.empty(); }
 };
 
+struct MoltypeSegmentReport {
+  std::string segname;
+  std::string status{"clean"};
+  std::vector<std::string> assigned_moltypes;
+  std::vector<std::string> resnames;
+  std::vector<std::string> ambiguous_resnames;
+  std::vector<std::string> dna_resname_evidence;
+  std::vector<std::string> rna_resname_evidence;
+  std::vector<std::string> rna_atom_evidence;
+  std::size_t atom_count{};
+  std::size_t residue_count{};
+  std::vector<std::string> evidence;
+};
+
+struct MoltypeReport {
+  std::string overall_status{"clean"};
+  std::map<std::string, MoltypeSegmentReport> segments;
+  std::vector<std::string> messages;
+};
+
 class Molecule {
  public:
   Molecule() = default;
@@ -209,6 +229,7 @@ class Molecule {
   [[nodiscard]] ConstCoordinateView coordinate_view(std::size_t frame) const;
 
   [[nodiscard]] IntegrityReport check_integrity(bool fast_check = false) const;
+  [[nodiscard]] MoltypeReport moltype_by_segname_report() const;
 
  private:
   [[nodiscard]] std::size_t offset(std::size_t frame,

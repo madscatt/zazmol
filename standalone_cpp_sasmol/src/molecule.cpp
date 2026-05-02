@@ -1,6 +1,9 @@
 #include "sasmol/molecule.hpp"
 
+#include <algorithm>
+#include <set>
 #include <stdexcept>
+#include <tuple>
 
 namespace sasmol {
 
@@ -17,6 +20,38 @@ template <typename T>
 void resize_descriptor(std::vector<T>& values, std::size_t natoms,
                        const T& default_value) {
   values.assign(natoms, default_value);
+}
+
+template <typename T>
+T value_or(const std::vector<T>& values, std::size_t index,
+           const T& default_value) {
+  if (index < values.size()) {
+    return values[index];
+  }
+  return default_value;
+}
+
+void append_unique(std::vector<std::string>& values,
+                   const std::string& value) {
+  if (std::find(values.begin(), values.end(), value) == values.end()) {
+    values.push_back(value);
+  }
+}
+
+bool contains(const std::set<std::string>& values, const std::string& value) {
+  return values.find(value) != values.end();
+}
+
+std::string join(const std::vector<std::string>& values,
+                 const std::string& separator) {
+  std::string result;
+  for (std::size_t i = 0; i < values.size(); ++i) {
+    if (i != 0) {
+      result += separator;
+    }
+    result += values[i];
+  }
+  return result;
 }
 
 }  // namespace
@@ -178,6 +213,125 @@ IntegrityReport Molecule::check_integrity(bool fast_check) const {
 
   if (fast_check && !report.issues.empty()) {
     report.issues.resize(1);
+  }
+
+  return report;
+}
+
+MoltypeReport Molecule::moltype_by_segname_report() const {
+  static const std::set<std::string> dna = {
+      "NUSA", "NUSG", "NUSC", "NUSU", "DA", "DG", "DC", "DT",
+      "ADE",  "GUA",  "CYT",  "THY"};
+  static const std::set<std::string> rna = {
+      "RNUS", "RNUA", "RUUG", "RNUC", "A", "C", "G", "U",
+      "ADE",  "CYT",  "GUA",  "URA"};
+  static const std::set<std::string> rna_atom_names = {"O2'", "O2*"};
+
+  const std::string empty;
+  MoltypeReport report;
+  std::map<std::string, std::set<std::tuple<int, std::string, std::string>>>
+      residues_by_segment;
+
+  for (std::size_t atom = 0; atom < natoms_; ++atom) {
+    const auto& seg = value_or(segname_, atom, empty);
+    const auto& resn = value_or(resname_, atom, empty);
+    const auto& atom_name = value_or(name_, atom, empty);
+    const auto& assigned_moltype = value_or(moltype_, atom, empty);
+    const int residue_id = value_or(resid_, atom, 0);
+    const auto& insertion_code = value_or(rescode_, atom, empty);
+
+    auto& segment = report.segments[seg];
+    if (segment.segname.empty()) {
+      segment.segname = seg;
+    }
+    ++segment.atom_count;
+    append_unique(segment.assigned_moltypes, assigned_moltype);
+    append_unique(segment.resnames, resn);
+    residues_by_segment[seg].insert({residue_id, insertion_code, resn});
+
+    if (contains(dna, resn) && contains(rna, resn)) {
+      append_unique(segment.ambiguous_resnames, resn);
+    }
+    if (contains(dna, resn) && !contains(rna, resn)) {
+      append_unique(segment.dna_resname_evidence, resn);
+    }
+    if (contains(rna, resn) && !contains(dna, resn)) {
+      append_unique(segment.rna_resname_evidence, resn);
+    }
+    if (contains(rna_atom_names, atom_name)) {
+      append_unique(segment.rna_atom_evidence, atom_name);
+    }
+  }
+
+  bool has_mixed = false;
+  bool has_ambiguous = false;
+  bool has_all_other = false;
+
+  for (auto& [seg, segment] : report.segments) {
+    segment.residue_count = residues_by_segment[seg].size();
+    std::vector<std::string> assigned;
+    for (const auto& moltype_value : segment.assigned_moltypes) {
+      if (!moltype_value.empty()) {
+        assigned.push_back(moltype_value);
+      }
+    }
+
+    const bool has_ambiguous_nucleic = !segment.ambiguous_resnames.empty();
+    const bool has_specific_nucleic_evidence =
+        !segment.dna_resname_evidence.empty() ||
+        !segment.rna_resname_evidence.empty() ||
+        !segment.rna_atom_evidence.empty();
+
+    if (assigned.size() > 1) {
+      segment.status = "mixed";
+      has_mixed = true;
+      const auto moltype_list = join(assigned, ", ");
+      segment.evidence.push_back("multiple assigned moltypes: " + moltype_list);
+      report.messages.push_back(
+          "Segment " + seg +
+          " contains multiple assigned moltypes: " + moltype_list + ".");
+    } else if (assigned.size() == 1 && assigned.front() == "other") {
+      segment.status = "all_other";
+      has_all_other = true;
+      segment.evidence.push_back("all atoms are assigned moltype other");
+      report.messages.push_back(
+          "Segment " + seg + " contains only moltype other assignments.");
+    } else if (has_ambiguous_nucleic && !has_specific_nucleic_evidence) {
+      segment.status = "ambiguous_nucleic";
+      has_ambiguous = true;
+      const auto resname_list = join(segment.ambiguous_resnames, ", ");
+      segment.evidence.push_back(
+          "DNA/RNA-overlap residue names without DNA- or RNA-specific "
+          "evidence: " +
+          resname_list);
+      report.messages.push_back(
+          "Segment " + seg +
+          " contains DNA/RNA-overlap residue names without DNA- or "
+          "RNA-specific evidence: " +
+          resname_list + ".");
+    } else {
+      segment.status = "clean";
+      if (!segment.dna_resname_evidence.empty()) {
+        segment.evidence.push_back("DNA-specific residue names: " +
+                                   join(segment.dna_resname_evidence, ", "));
+      }
+      if (!segment.rna_resname_evidence.empty()) {
+        segment.evidence.push_back("RNA-specific residue names: " +
+                                   join(segment.rna_resname_evidence, ", "));
+      }
+      if (!segment.rna_atom_evidence.empty()) {
+        segment.evidence.push_back("RNA atom-name evidence: " +
+                                   join(segment.rna_atom_evidence, ", "));
+      }
+    }
+  }
+
+  if (has_mixed) {
+    report.overall_status = "mixed_by_segname";
+  } else if (has_ambiguous) {
+    report.overall_status = "ambiguous_nucleic";
+  } else if (has_all_other) {
+    report.overall_status = "unknown";
   }
 
   return report;

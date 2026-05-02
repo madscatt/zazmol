@@ -341,6 +341,165 @@ class PDB(object):
 			
         return protein_resnames,dna_resnames,rna_resnames,nucleic_resnames,water_resnames
 
+    def moltype_by_segname_report(self):
+        '''
+        Build a non-mutating report of moltype assignments by segment.
+
+        The report does not alter ``moltype`` values assigned by ``read_pdb``.
+        It is intended for callers that need to understand when nucleic-acid
+        residue names are DNA/RNA-ambiguous or when a segment contains mixed
+        assigned moltypes.
+
+        Returns
+        -------
+        dict
+            report with ``overall_status``, ``segments``, and ``messages``.
+        '''
+
+        protein_resnames,dna_resnames,rna_resnames,nucleic_resnames,water_resnames = self.get_resnames()
+        dna_set = set(dna_resnames)
+        rna_set = set(rna_resnames)
+        ambiguous_nucleic = dna_set.intersection(rna_set)
+        rna_atom_names = set(["O2'", "O2*"])
+
+        def descriptor(name):
+            try:
+                return getattr(self, name)()
+            except Exception:
+                return []
+
+        def value_at(values, index, default):
+            try:
+                return values[index]
+            except Exception:
+                return default
+
+        def append_unique(values, value):
+            if value not in values:
+                values.append(value)
+
+        def append_message(report, message):
+            if message not in report['messages']:
+                report['messages'].append(message)
+
+        resnames = descriptor('resname')
+        names = descriptor('name')
+        segnames = descriptor('segname')
+        moltypes = descriptor('moltype')
+        resids = descriptor('resid')
+        rescodes = descriptor('rescode')
+
+        try:
+            natoms = self.natoms()
+        except Exception:
+            natoms = max(len(resnames), len(names), len(segnames), len(moltypes))
+
+        report = {
+            'overall_status': 'clean',
+            'segments': {},
+            'messages': []
+        }
+        residues_by_segment = {}
+
+        for i in range(natoms):
+            segname = value_at(segnames, i, '')
+            resname = value_at(resnames, i, '')
+            atom_name = value_at(names, i, '')
+            moltype = value_at(moltypes, i, '')
+            resid = value_at(resids, i, '')
+            rescode = value_at(rescodes, i, '')
+
+            if segname not in report['segments']:
+                report['segments'][segname] = {
+                    'status': 'clean',
+                    'assigned_moltypes': [],
+                    'resnames': [],
+                    'ambiguous_resnames': [],
+                    'dna_resname_evidence': [],
+                    'rna_resname_evidence': [],
+                    'rna_atom_evidence': [],
+                    'atom_count': 0,
+                    'residue_count': 0,
+                    'evidence': []
+                }
+                residues_by_segment[segname] = set()
+
+            segment = report['segments'][segname]
+            segment['atom_count'] += 1
+            append_unique(segment['assigned_moltypes'], moltype)
+            append_unique(segment['resnames'], resname)
+            residues_by_segment[segname].add((resid, rescode, resname))
+
+            if resname in ambiguous_nucleic:
+                append_unique(segment['ambiguous_resnames'], resname)
+            if resname in dna_set and resname not in rna_set:
+                append_unique(segment['dna_resname_evidence'], resname)
+            if resname in rna_set and resname not in dna_set:
+                append_unique(segment['rna_resname_evidence'], resname)
+            if atom_name in rna_atom_names:
+                append_unique(segment['rna_atom_evidence'], atom_name)
+
+        for segname, segment in report['segments'].items():
+            segment['residue_count'] = len(residues_by_segment[segname])
+
+            assigned = [x for x in segment['assigned_moltypes'] if x != '']
+            has_ambiguous_nucleic = len(segment['ambiguous_resnames']) > 0
+            has_specific_nucleic_evidence = (
+                len(segment['dna_resname_evidence']) > 0 or
+                len(segment['rna_resname_evidence']) > 0 or
+                len(segment['rna_atom_evidence']) > 0)
+
+            if len(assigned) > 1:
+                segment['status'] = 'mixed'
+                segment['evidence'].append(
+                    'multiple assigned moltypes: ' + ', '.join(assigned))
+                append_message(
+                    report,
+                    "Segment %s contains multiple assigned moltypes: %s." %
+                    (segname, ', '.join(assigned)))
+            elif len(assigned) == 1 and assigned[0] == 'other':
+                segment['status'] = 'all_other'
+                segment['evidence'].append(
+                    'all atoms are assigned moltype other')
+                append_message(
+                    report,
+                    "Segment %s contains only moltype other assignments." %
+                    segname)
+            elif has_ambiguous_nucleic and not has_specific_nucleic_evidence:
+                segment['status'] = 'ambiguous_nucleic'
+                segment['evidence'].append(
+                    'DNA/RNA-overlap residue names without DNA- or RNA-specific evidence: ' +
+                    ', '.join(segment['ambiguous_resnames']))
+                append_message(
+                    report,
+                    "Segment %s contains DNA/RNA-overlap residue names without DNA- or RNA-specific evidence: %s." %
+                    (segname, ', '.join(segment['ambiguous_resnames'])))
+            else:
+                segment['status'] = 'clean'
+                if segment['dna_resname_evidence']:
+                    segment['evidence'].append(
+                        'DNA-specific residue names: ' +
+                        ', '.join(segment['dna_resname_evidence']))
+                if segment['rna_resname_evidence']:
+                    segment['evidence'].append(
+                        'RNA-specific residue names: ' +
+                        ', '.join(segment['rna_resname_evidence']))
+                if segment['rna_atom_evidence']:
+                    segment['evidence'].append(
+                        'RNA atom-name evidence: ' +
+                        ', '.join(segment['rna_atom_evidence']))
+
+        statuses = [segment['status']
+                    for segment in report['segments'].values()]
+        if 'mixed' in statuses:
+            report['overall_status'] = 'mixed_by_segname'
+        elif 'ambiguous_nucleic' in statuses:
+            report['overall_status'] = 'ambiguous_nucleic'
+        elif 'all_other' in statuses:
+            report['overall_status'] = 'unknown'
+
+        return report
+
     def initialize_children(self):
 
         '''

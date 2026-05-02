@@ -93,6 +93,81 @@ void test_integrity_reports_extra_descriptor_mismatch() {
   assert(report.lengths.at("extra_string_descriptors.trial") == 1);
 }
 
+void test_moltype_report_flags_ambiguous_nucleic_without_mutation() {
+  sasmol::Molecule mol(3, 1);
+  mol.segname() = {"DNA1", "DNA1", "DNA1"};
+  mol.resname() = {"ADE", "CYT", "GUA"};
+  mol.name() = {"N9", "N1", "N7"};
+  mol.resid() = {1, 2, 3};
+  mol.moltype() = {"rna", "rna", "rna"};
+
+  const auto report = mol.moltype_by_segname_report();
+
+  assert(report.overall_status == "ambiguous_nucleic");
+  assert(mol.moltype()[0] == "rna");
+  const auto& segment = report.segments.at("DNA1");
+  assert(segment.status == "ambiguous_nucleic");
+  assert(segment.assigned_moltypes.size() == 1);
+  assert(segment.assigned_moltypes[0] == "rna");
+  assert(segment.ambiguous_resnames.size() == 3);
+  assert(segment.ambiguous_resnames[0] == "ADE");
+  assert(segment.residue_count == 3);
+  assert(!segment.evidence.empty());
+}
+
+void test_moltype_report_keeps_specific_nucleic_segment_clean() {
+  sasmol::Molecule mol(2, 1);
+  mol.segname() = {"DNA1", "DNA1"};
+  mol.resname() = {"DA", "DT"};
+  mol.name() = {"P", "C5"};
+  mol.resid() = {1, 2};
+  mol.moltype() = {"dna", "dna"};
+
+  const auto report = mol.moltype_by_segname_report();
+
+  assert(report.overall_status == "clean");
+  const auto& segment = report.segments.at("DNA1");
+  assert(segment.status == "clean");
+  assert(segment.dna_resname_evidence.size() == 2);
+  assert(segment.dna_resname_evidence[0] == "DA");
+}
+
+void test_moltype_report_uses_rna_atom_name_evidence() {
+  sasmol::Molecule mol(2, 1);
+  mol.segname() = {"RNA1", "RNA1"};
+  mol.resname() = {"ADE", "GUA"};
+  mol.name() = {"O2'", "N9"};
+  mol.resid() = {1, 2};
+  mol.moltype() = {"rna", "rna"};
+
+  const auto report = mol.moltype_by_segname_report();
+
+  assert(report.overall_status == "clean");
+  const auto& segment = report.segments.at("RNA1");
+  assert(segment.status == "clean");
+  assert(segment.ambiguous_resnames.size() == 2);
+  assert(segment.rna_atom_evidence.size() == 1);
+  assert(segment.rna_atom_evidence[0] == "O2'");
+}
+
+void test_moltype_report_flags_mixed_segment() {
+  sasmol::Molecule mol(2, 1);
+  mol.segname() = {"MIXD", "MIXD"};
+  mol.resname() = {"ALA", "DA"};
+  mol.name() = {"CA", "P"};
+  mol.resid() = {1, 2};
+  mol.moltype() = {"protein", "dna"};
+
+  const auto report = mol.moltype_by_segname_report();
+
+  assert(report.overall_status == "mixed_by_segname");
+  const auto& segment = report.segments.at("MIXD");
+  assert(segment.status == "mixed");
+  assert(segment.assigned_moltypes.size() == 2);
+  assert(segment.assigned_moltypes[0] == "protein");
+  assert(segment.assigned_moltypes[1] == "dna");
+}
+
 void test_out_of_range_coordinates_throw() {
   sasmol::Molecule mol(1, 1);
   bool threw = false;
@@ -114,6 +189,10 @@ int main() {
   test_coordinate_views_mutate_selected_frame();
   test_integrity_reports_descriptor_mismatch();
   test_integrity_reports_extra_descriptor_mismatch();
+  test_moltype_report_flags_ambiguous_nucleic_without_mutation();
+  test_moltype_report_keeps_specific_nucleic_segment_clean();
+  test_moltype_report_uses_rna_atom_name_evidence();
+  test_moltype_report_flags_mixed_segment();
   test_out_of_range_coordinates_throw();
   return 0;
 }

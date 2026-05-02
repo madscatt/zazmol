@@ -38,3 +38,18 @@ Future CHARMM typing should therefore be explicit:
 - a full topology parser is a separate subsystem, not a hidden PDB-read feature
 
 The staged topology direction is captured in `docs/charmm_topology_plan.md`.
+
+## Moltype Assignment Reporting
+
+Python `read_pdb()` historically assigns atom-level `moltype` from residue-name
+tables in the order `protein`, `rna`, `dna`, `water`, then `other`. Shared
+nucleic residue names such as `ADE`, `GUA`, and `CYT` therefore remain assigned
+as `rna` by default. That behavior is intentionally unchanged because SASSIE
+and long-lived workflows branch on the exact existing strings and sometimes
+apply their own higher-level corrections.
+
+The safer parity direction is a non-mutating report API. Python now exposes
+`moltype_by_segname_report()` on the PDB/file-I/O mixin, and standalone C++
+exposes `sasmol::Molecule::moltype_by_segname_report() const`. Both report
+mixed moltype segments, DNA/RNA-overlap residue names, and DNA/RNA-specific
+evidence without logging, relabeling, or changing `read_pdb()` behavior.
