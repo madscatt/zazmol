@@ -204,6 +204,66 @@ void test_pmi_aligned_copy_does_not_mutate_source() {
   assert(axis_alignment(copy, 0, 2, {0.0, 0.0, 1.0}) > 0.9999);
 }
 
+void test_pmi_alignment_preserves_moments_and_centers_frame() {
+  sasmol::PdbReader reader;
+  sasmol::Molecule mol;
+  auto status = reader.read_pdb(fixture_path("pdb_common", "1CRN.pdb"), mol);
+  assert(status.ok());
+  auto before = mol;
+  const auto before_pmi =
+      sasmol::calculate_principal_moments_of_inertia(before, 0);
+
+  sasmol::align_pmi_on_cardinal_axes(mol, 0);
+
+  const auto center = sasmol::calculate_center_of_mass(mol, 0);
+  auto after = mol;
+  const auto after_pmi =
+      sasmol::calculate_principal_moments_of_inertia(after, 0);
+  assert_close_double(center.x, 0.0, 1.0e-5);
+  assert_close_double(center.y, 0.0, 1.0e-5);
+  assert_close_double(center.z, 0.0, 1.0e-5);
+  for (std::size_t i = 0; i < 3; ++i) {
+    const auto tolerance =
+        std::max<sasmol::calc_type>(1.0e-4,
+                                    std::fabs(before_pmi.eigenvalues[i]) *
+                                        1.0e-7);
+    assert_close_double(after_pmi.eigenvalues[i], before_pmi.eigenvalues[i],
+                        tolerance);
+  }
+}
+
+void test_pmi_alignment_rejects_bad_eigenvector_index() {
+  sasmol::Molecule mol(3, 1);
+  mol.element() = {"C", "C", "C"};
+  mol.set_coordinate(0, 0, {1.0F, 0.0F, 0.0F});
+  mol.set_coordinate(0, 1, {0.0F, 1.0F, 0.0F});
+  mol.set_coordinate(0, 2, {0.0F, 0.0F, 1.0F});
+
+  bool threw = false;
+  try {
+    sasmol::align_pmi_on_axis(mol, 0, 3, sasmol::Axis::x);
+  } catch (const std::out_of_range&) {
+    threw = true;
+  }
+
+  assert(threw);
+}
+
+void test_pmi_alignment_rejects_singular_tensor() {
+  sasmol::Molecule mol(1, 1);
+  mol.element()[0] = "C";
+  mol.set_coordinate(0, 0, {1.0F, 2.0F, 3.0F});
+
+  bool threw = false;
+  try {
+    sasmol::align_pmi_on_axis(mol, 0, 0, sasmol::Axis::x);
+  } catch (const std::invalid_argument&) {
+    threw = true;
+  }
+
+  assert(threw);
+}
+
 void test_align_full_basis_rotated_fixture() {
   sasmol::PdbReader reader;
   sasmol::Molecule reference;
@@ -312,6 +372,9 @@ int main() {
   test_align_pmi_on_axis_matches_python_alignment_contract();
   test_align_pmi_on_cardinal_axes_matches_python_contract();
   test_pmi_aligned_copy_does_not_mutate_source();
+  test_pmi_alignment_preserves_moments_and_centers_frame();
+  test_pmi_alignment_rejects_bad_eigenvector_index();
+  test_pmi_alignment_rejects_singular_tensor();
   test_align_full_basis_rotated_fixture();
   test_align_full_basis_rotated_shifted_fixture();
   test_align_ca_subset_moves_whole_molecule_com();

@@ -64,6 +64,35 @@ double absolute_eigenvector_dot(const sasmol::CalcMatrix3& eigenvectors,
   return std::fabs(dot);
 }
 
+void assert_pmi_eigenpairs_are_orthonormal(
+    const sasmol::PrincipalMomentsOfInertia& pmi,
+    double tolerance = 1.0e-6) {
+  for (std::size_t column = 0; column < 3; ++column) {
+    double norm{};
+    for (std::size_t row = 0; row < 3; ++row) {
+      norm += pmi.eigenvectors[row][column] * pmi.eigenvectors[row][column];
+    }
+    assert_close_double(norm, 1.0, tolerance);
+
+    for (std::size_t other = column + 1; other < 3; ++other) {
+      double dot{};
+      for (std::size_t row = 0; row < 3; ++row) {
+        dot += pmi.eigenvectors[row][column] * pmi.eigenvectors[row][other];
+      }
+      assert_close_double(dot, 0.0, tolerance);
+    }
+
+    for (std::size_t row = 0; row < 3; ++row) {
+      double left{};
+      for (std::size_t k = 0; k < 3; ++k) {
+        left += pmi.inertia[row][k] * pmi.eigenvectors[k][column];
+      }
+      const auto right = pmi.eigenvalues[column] * pmi.eigenvectors[row][column];
+      assert_close_double(left, right, tolerance);
+    }
+  }
+}
+
 void test_calculate_minimum_and_maximum_all_loaded_frames() {
   sasmol::Molecule mol(2, 2);
   mol.set_coordinate(0, 0, {1.0F, 2.0F, 3.0F});
@@ -96,6 +125,7 @@ void test_calculate_principal_moments_of_inertia_synthetic() {
   assert_close_double(result.eigenvalues[0], mass, 1.0e-6);
   assert_close_double(result.eigenvalues[1], mass, 1.0e-6);
   assert_close_double(result.eigenvalues[2], 2.0 * mass, 1.0e-6);
+  assert_pmi_eigenpairs_are_orthonormal(result);
 }
 
 void test_calculate_principal_moments_of_inertia_2aad_fixture() {
@@ -116,6 +146,9 @@ void test_calculate_principal_moments_of_inertia_2aad_fixture() {
   assert_close_double(result.eigenvalues[0], 391.910570545354, 1.0e-6);
   assert_close_double(result.eigenvalues[1], 1523.060334881807, 1.0e-6);
   assert_close_double(result.eigenvalues[2], 1614.281458831898, 1.0e-6);
+  assert(result.eigenvalues[0] <= result.eigenvalues[1]);
+  assert(result.eigenvalues[1] <= result.eigenvalues[2]);
+  assert_pmi_eigenpairs_are_orthonormal(result);
   assert(absolute_eigenvector_dot(result.eigenvectors, 0,
                                   {-0.91349702, -0.07447765,
                                    -0.39997034}) > 0.999999);

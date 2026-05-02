@@ -60,6 +60,9 @@ Behavior notes:
 - the rotation axis uses Python's `cross(target_axis, pmi_axis)` convention
   because this is coupled to the row-vector general-axis rotation path
 - tests assert absolute axis alignment, not eigenvector sign identity
+- tests assert eigenvalue preservation across PMI alignment rather than
+  arbitrary eigenvector signs
+- PMI alignment leaves the selected frame centered at the origin
 - singular PMI tensors are rejected explicitly
 
 ## Deferred
