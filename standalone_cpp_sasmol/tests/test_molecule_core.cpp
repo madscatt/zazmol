@@ -21,6 +21,11 @@ void test_defaults_and_integrity() {
   assert(mol.original_index()[1] == 2);
   assert(mol.occupancy()[0] == "1.00");
   assert(mol.beta()[0] == "0.00");
+  assert(mol.residue_flag()[0] == 0);
+  assert(mol.charmm_type().empty());
+  assert(mol.extra_string_descriptors().empty());
+  assert(mol.extra_int_descriptors().empty());
+  assert(mol.extra_calc_descriptors().empty());
 
   const auto report = mol.check_integrity();
   assert(report.ok());
@@ -78,6 +83,16 @@ void test_integrity_reports_descriptor_mismatch() {
   assert(report.issues[0].actual == 1);
 }
 
+void test_integrity_reports_extra_descriptor_mismatch() {
+  sasmol::Molecule mol(2, 1);
+  mol.extra_string_descriptors()["trial"] = {"A"};
+
+  const auto report = mol.check_integrity();
+
+  assert(!report.ok());
+  assert(report.lengths.at("extra_string_descriptors.trial") == 1);
+}
+
 void test_out_of_range_coordinates_throw() {
   sasmol::Molecule mol(1, 1);
   bool threw = false;
@@ -98,6 +113,7 @@ int main() {
   test_coordinates_are_frame_major_xyz_triplets();
   test_coordinate_views_mutate_selected_frame();
   test_integrity_reports_descriptor_mismatch();
+  test_integrity_reports_extra_descriptor_mismatch();
   test_out_of_range_coordinates_throw();
   return 0;
 }

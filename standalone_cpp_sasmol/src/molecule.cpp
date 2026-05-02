@@ -67,6 +67,8 @@ void Molecule::resize(std::size_t natoms, std::size_t number_of_frames) {
   resize_descriptor(charge_, natoms_, std::string{});
   resize_descriptor(atom_charge_, natoms_, calc_type{});
   resize_descriptor(atom_vdw_, natoms_, calc_type{});
+  resize_descriptor(residue_flag_, natoms_, 0);
+  charmm_type_.clear();
   resize_descriptor(moltype_, natoms_, std::string{});
   resize_descriptor(mass_, natoms_, calc_type{});
   resize_descriptor(residue_charge_, natoms_, calc_type{});
@@ -82,6 +84,9 @@ void Molecule::resize(std::size_t natoms, std::size_t number_of_frames) {
   formula_.clear();
   fasta_.clear();
   unitcell_.fill(calc_type{});
+  extra_string_descriptors_.clear();
+  extra_int_descriptors_.clear();
+  extra_calc_descriptors_.clear();
 }
 
 std::size_t Molecule::offset(std::size_t frame, std::size_t atom) const {
@@ -152,10 +157,24 @@ IntegrityReport Molecule::check_integrity(bool fast_check) const {
   add("charge", charge_);
   add("atom_charge", atom_charge_);
   add("atom_vdw", atom_vdw_);
+  add("residue_flag", residue_flag_);
+  if (!charmm_type_.empty()) {
+    add("charmm_type", charmm_type_);
+  }
   add("moltype", moltype_);
   add("mass", mass_);
   add("residue_charge", residue_charge_);
   add("conect", conect_);
+
+  for (const auto& [name, values] : extra_string_descriptors_) {
+    add("extra_string_descriptors." + name, values);
+  }
+  for (const auto& [name, values] : extra_int_descriptors_) {
+    add("extra_int_descriptors." + name, values);
+  }
+  for (const auto& [name, values] : extra_calc_descriptors_) {
+    add("extra_calc_descriptors." + name, values);
+  }
 
   if (fast_check && !report.issues.empty()) {
     report.issues.resize(1);

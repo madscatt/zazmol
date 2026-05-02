@@ -87,6 +87,8 @@ std::vector<std::string>& string_descriptor(Molecule& molecule,
       return molecule.element();
     case StringDescriptor::charge:
       return molecule.charge();
+    case StringDescriptor::charmm_type:
+      return molecule.charmm_type();
     case StringDescriptor::moltype:
       return molecule.moltype();
   }
@@ -118,6 +120,8 @@ const std::vector<std::string>& string_descriptor(
       return molecule.element();
     case StringDescriptor::charge:
       return molecule.charge();
+    case StringDescriptor::charmm_type:
+      return molecule.charmm_type();
     case StringDescriptor::moltype:
       return molecule.moltype();
   }
@@ -134,6 +138,8 @@ std::vector<int>& int_descriptor(Molecule& molecule, IntDescriptor descriptor) {
       return molecule.original_resid();
     case IntDescriptor::resid:
       return molecule.resid();
+    case IntDescriptor::residue_flag:
+      return molecule.residue_flag();
   }
   return molecule.index();
 }
@@ -149,6 +155,8 @@ const std::vector<int>& int_descriptor(const Molecule& molecule,
       return molecule.original_resid();
     case IntDescriptor::resid:
       return molecule.resid();
+    case IntDescriptor::residue_flag:
+      return molecule.residue_flag();
   }
   return molecule.index();
 }
@@ -238,6 +246,67 @@ void merge_optional_vector(const std::vector<T>& left,
   destination.reserve(left.size() + right.size());
   append_vector(destination, left);
   append_vector(destination, right);
+}
+
+template <typename T>
+void copy_selected_descriptor_map(
+    const std::map<std::string, std::vector<T>>& source,
+    std::map<std::string, std::vector<T>>& destination,
+    const std::vector<std::size_t>& indices) {
+  destination.clear();
+  for (const auto& [name, values] : source) {
+    std::vector<T> selected;
+    copy_selected_vector(values, selected, indices);
+    destination[name] = selected;
+  }
+}
+
+template <typename T>
+void validate_descriptor_map(const Molecule& molecule,
+                             const std::map<std::string, std::vector<T>>& map,
+                             const std::string& label,
+                             std::vector<std::string>& errors) {
+  for (const auto& [name, values] : map) {
+    validate_required_vector(molecule, values, label + "." + name, errors);
+  }
+}
+
+template <typename T>
+void merge_descriptor_map(const std::map<std::string, std::vector<T>>& left,
+                          std::size_t left_natoms,
+                          const std::map<std::string, std::vector<T>>& right,
+                          std::size_t right_natoms,
+                          std::map<std::string, std::vector<T>>& destination,
+                          const std::string& label,
+                          MergeOptions options,
+                          SubsetResult& result) {
+  destination.clear();
+  for (const auto& [name, values] : left) {
+    const auto found = right.find(name);
+    if (found == right.end()) {
+      if (right_natoms == 0) {
+        destination[name] = values;
+        continue;
+      }
+      if (options.report_skipped_descriptors) {
+        result.errors.push_back("skipped descriptor " + label + "." + name +
+                                " missing from mol2");
+      }
+      continue;
+    }
+    std::vector<T> merged;
+    merge_optional_vector(values, left_natoms, found->second, right_natoms,
+                          merged, label + "." + name, options, result);
+    if (!merged.empty() || (left_natoms == 0 && right_natoms == 0)) {
+      destination[name] = merged;
+    }
+  }
+  for (const auto& [name, values] : right) {
+    if (!left.contains(name) && options.report_skipped_descriptors) {
+      result.errors.push_back("skipped descriptor " + label + "." + name +
+                              " missing from mol1");
+    }
+  }
 }
 
 template <typename T>
@@ -354,10 +423,22 @@ std::vector<std::string> validate_merge_source(const Molecule& molecule,
     validate_required_vector(molecule, molecule.atom_vdw(),
                              label + " atom_vdw", errors);
   }
+  validate_required_vector(molecule, molecule.residue_flag(),
+                           label + " residue_flag", errors);
+  if (!molecule.charmm_type().empty()) {
+    validate_required_vector(molecule, molecule.charmm_type(),
+                             label + " charmm_type", errors);
+  }
   if (!molecule.residue_charge().empty()) {
     validate_required_vector(molecule, molecule.residue_charge(),
                              label + " residue_charge", errors);
   }
+  validate_descriptor_map(molecule, molecule.extra_string_descriptors(),
+                          label + " extra_string_descriptors", errors);
+  validate_descriptor_map(molecule, molecule.extra_int_descriptors(),
+                          label + " extra_int_descriptors", errors);
+  validate_descriptor_map(molecule, molecule.extra_calc_descriptors(),
+                          label + " extra_calc_descriptors", errors);
   return errors;
 }
 
@@ -475,8 +556,23 @@ SubsetResult copy_molecule_using_indices(
     copy_selected_vector(source.charge(), destination.charge(), indices);
     copy_selected_vector(source.atom_charge(), destination.atom_charge(), indices);
     copy_selected_vector(source.atom_vdw(), destination.atom_vdw(), indices);
+    copy_selected_vector(source.residue_flag(), destination.residue_flag(),
+                         indices);
+    if (!source.charmm_type().empty()) {
+      copy_selected_vector(source.charmm_type(), destination.charmm_type(),
+                           indices);
+    } else {
+      destination.charmm_type().clear();
+    }
     copy_selected_vector(source.moltype(), destination.moltype(), indices);
     copy_selected_vector(source.mass(), destination.mass(), indices);
+    copy_selected_descriptor_map(source.extra_string_descriptors(),
+                                 destination.extra_string_descriptors(),
+                                 indices);
+    copy_selected_descriptor_map(source.extra_int_descriptors(),
+                                 destination.extra_int_descriptors(), indices);
+    copy_selected_descriptor_map(source.extra_calc_descriptors(),
+                                 destination.extra_calc_descriptors(), indices);
 
     for (std::size_t selected = 0; selected < indices.size(); ++selected) {
       destination.set_coordinate(0, selected,
@@ -557,6 +653,8 @@ SubsetResult merge_two_molecules(const Molecule& mol1, const Molecule& mol2,
   merge_required_vector(mol1.segname(), mol2.segname(), candidate.segname());
   merge_required_vector(mol1.element(), mol2.element(), candidate.element());
   merge_required_vector(mol1.charge(), mol2.charge(), candidate.charge());
+  merge_required_vector(mol1.residue_flag(), mol2.residue_flag(),
+                        candidate.residue_flag());
   merge_required_vector(mol1.moltype(), mol2.moltype(), candidate.moltype());
   merge_required_vector(mol1.mass(), mol2.mass(), candidate.mass());
 
@@ -573,10 +671,25 @@ SubsetResult merge_two_molecules(const Molecule& mol1, const Molecule& mol2,
                         result);
   merge_optional_vector(mol1.atom_vdw(), natoms1, mol2.atom_vdw(), natoms2,
                         candidate.atom_vdw(), "atom_vdw", options, result);
+  merge_optional_vector(mol1.charmm_type(), natoms1, mol2.charmm_type(), natoms2,
+                        candidate.charmm_type(), "charmm_type", options,
+                        result);
   merge_optional_vector(mol1.residue_charge(), natoms1, mol2.residue_charge(),
                         natoms2,
                         candidate.residue_charge(), "residue_charge", options,
                         result);
+  merge_descriptor_map(mol1.extra_string_descriptors(), natoms1,
+                       mol2.extra_string_descriptors(), natoms2,
+                       candidate.extra_string_descriptors(),
+                       "extra_string_descriptors", options, result);
+  merge_descriptor_map(mol1.extra_int_descriptors(), natoms1,
+                       mol2.extra_int_descriptors(), natoms2,
+                       candidate.extra_int_descriptors(),
+                       "extra_int_descriptors", options, result);
+  merge_descriptor_map(mol1.extra_calc_descriptors(), natoms1,
+                       mol2.extra_calc_descriptors(), natoms2,
+                       candidate.extra_calc_descriptors(),
+                       "extra_calc_descriptors", options, result);
 
   for (std::size_t atom = 0; atom < natoms1; ++atom) {
     candidate.set_coordinate(0, atom, mol1.coordinate(0, atom));

@@ -58,6 +58,8 @@ Behavior notes:
 - `CONECT` entries are filtered to selected atoms only
 - descriptor APIs use typed descriptor enums instead of arbitrary descriptor
   object mutation
+- built-in and extension descriptor policy is documented in
+  `docs/descriptor_policy.md`
 - duplication returns independent value copies; zero requested duplicates returns
   an empty vector
 - merge copies frame 0 coordinates into a one-frame molecule

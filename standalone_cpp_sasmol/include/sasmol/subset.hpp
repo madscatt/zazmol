@@ -20,6 +20,7 @@ enum class StringDescriptor {
   segname,
   element,
   charge,
+  charmm_type,
   moltype,
 };
 
@@ -28,6 +29,7 @@ enum class IntDescriptor {
   original_index,
   original_resid,
   resid,
+  residue_flag,
 };
 
 enum class CalcDescriptor {

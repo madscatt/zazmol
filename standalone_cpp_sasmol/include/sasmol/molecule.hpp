@@ -121,6 +121,18 @@ class Molecule {
   [[nodiscard]] const std::vector<calc_type>& atom_vdw() const noexcept {
     return atom_vdw_;
   }
+  [[nodiscard]] std::vector<int>& residue_flag() noexcept {
+    return residue_flag_;
+  }
+  [[nodiscard]] const std::vector<int>& residue_flag() const noexcept {
+    return residue_flag_;
+  }
+  [[nodiscard]] std::vector<std::string>& charmm_type() noexcept {
+    return charmm_type_;
+  }
+  [[nodiscard]] const std::vector<std::string>& charmm_type() const noexcept {
+    return charmm_type_;
+  }
   [[nodiscard]] std::vector<std::string>& moltype() noexcept {
     return moltype_;
   }
@@ -161,6 +173,30 @@ class Molecule {
   [[nodiscard]] const std::vector<std::vector<int>>& conect() const noexcept {
     return conect_;
   }
+  [[nodiscard]] std::map<std::string, std::vector<std::string>>&
+  extra_string_descriptors() noexcept {
+    return extra_string_descriptors_;
+  }
+  [[nodiscard]] const std::map<std::string, std::vector<std::string>>&
+  extra_string_descriptors() const noexcept {
+    return extra_string_descriptors_;
+  }
+  [[nodiscard]] std::map<std::string, std::vector<int>>&
+  extra_int_descriptors() noexcept {
+    return extra_int_descriptors_;
+  }
+  [[nodiscard]] const std::map<std::string, std::vector<int>>&
+  extra_int_descriptors() const noexcept {
+    return extra_int_descriptors_;
+  }
+  [[nodiscard]] std::map<std::string, std::vector<calc_type>>&
+  extra_calc_descriptors() noexcept {
+    return extra_calc_descriptors_;
+  }
+  [[nodiscard]] const std::map<std::string, std::vector<calc_type>>&
+  extra_calc_descriptors() const noexcept {
+    return extra_calc_descriptors_;
+  }
 
   [[nodiscard]] std::vector<coord_type>& coor() noexcept { return coor_; }
   [[nodiscard]] const std::vector<coord_type>& coor() const noexcept {
@@ -199,6 +235,8 @@ class Molecule {
   std::vector<std::string> charge_;
   std::vector<calc_type> atom_charge_;
   std::vector<calc_type> atom_vdw_;
+  std::vector<int> residue_flag_;
+  std::vector<std::string> charmm_type_;
   std::vector<std::string> moltype_;
   std::vector<calc_type> mass_;
 
@@ -208,6 +246,9 @@ class Molecule {
   std::string fasta_;
   std::array<calc_type, 6> unitcell_{};
   std::vector<std::vector<int>> conect_;
+  std::map<std::string, std::vector<std::string>> extra_string_descriptors_;
+  std::map<std::string, std::vector<int>> extra_int_descriptors_;
+  std::map<std::string, std::vector<calc_type>> extra_calc_descriptors_;
 };
 
 }  // namespace sasmol

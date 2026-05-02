@@ -126,6 +126,38 @@ void test_copy_molecule_using_mask_preserves_descriptors() {
   assert(subset.name()[2] == source.name()[14]);
 }
 
+void test_copy_molecule_using_indices_preserves_extended_descriptors() {
+  auto source = read_fixture("2AAD.pdb");
+  source.residue_flag()[0] = 1;
+  source.residue_flag()[4] = 1;
+  source.charmm_type().assign(source.natoms(), "");
+  source.charmm_type()[0] = "CT1";
+  source.charmm_type()[4] = "NH1";
+  source.extra_string_descriptors()["trial_name"] =
+      std::vector<std::string>(source.natoms(), "");
+  source.extra_string_descriptors()["trial_name"][4] = "keep";
+  source.extra_int_descriptors()["trial_int"] =
+      std::vector<int>(source.natoms(), 0);
+  source.extra_int_descriptors()["trial_int"][4] = 7;
+  source.extra_calc_descriptors()["trial_calc"] =
+      std::vector<sasmol::calc_type>(source.natoms(), 0.0);
+  source.extra_calc_descriptors()["trial_calc"][4] = 3.5;
+  sasmol::Molecule subset;
+
+  const auto result =
+      sasmol::copy_molecule_using_indices(source, subset, {0, 4}, 0);
+
+  assert(result.ok());
+  assert((subset.residue_flag() == std::vector<int>{1, 1}));
+  assert((subset.charmm_type() == std::vector<std::string>{"CT1", "NH1"}));
+  assert((subset.extra_string_descriptors().at("trial_name") ==
+          std::vector<std::string>{"", "keep"}));
+  assert((subset.extra_int_descriptors().at("trial_int") ==
+          std::vector<int>{0, 7}));
+  assert(std::fabs(subset.extra_calc_descriptors().at("trial_calc")[1] - 3.5) <
+         1.0e-12);
+}
+
 void test_copied_molecule_using_indices_returns_value() {
   const auto source = read_fixture("2AAD.pdb");
 
@@ -190,6 +222,50 @@ void test_merge_two_molecules_combines_core_descriptors_and_coordinates() {
   assert(merged.resid()[mol1.natoms()] == mol2.resid()[0]);
   assert_vec_close(merged.coordinate(0, 0), mol1.coordinate(0, 0));
   assert_vec_close(merged.coordinate(0, mol1.natoms()), mol2.coordinate(0, 0));
+}
+
+void test_merge_two_molecules_combines_extended_descriptors() {
+  sasmol::Molecule mol1(1, 1);
+  sasmol::Molecule mol2(1, 1);
+  mol1.residue_flag()[0] = 1;
+  mol2.residue_flag()[0] = 0;
+  mol1.charmm_type() = {"CT1"};
+  mol2.charmm_type() = {"NH1"};
+  mol1.extra_string_descriptors()["trial"] = {"left"};
+  mol2.extra_string_descriptors()["trial"] = {"right"};
+  mol1.extra_int_descriptors()["trial"] = {1};
+  mol2.extra_int_descriptors()["trial"] = {2};
+  mol1.extra_calc_descriptors()["trial"] = {1.5};
+  mol2.extra_calc_descriptors()["trial"] = {2.5};
+  sasmol::Molecule merged;
+
+  const auto result = sasmol::merge_two_molecules(mol1, mol2, merged);
+
+  assert(result.ok());
+  assert((merged.residue_flag() == std::vector<int>{1, 0}));
+  assert((merged.charmm_type() == std::vector<std::string>{"CT1", "NH1"}));
+  assert((merged.extra_string_descriptors().at("trial") ==
+          std::vector<std::string>{"left", "right"}));
+  assert((merged.extra_int_descriptors().at("trial") ==
+          std::vector<int>{1, 2}));
+  assert(std::fabs(merged.extra_calc_descriptors().at("trial")[0] - 1.5) <
+         1.0e-12);
+  assert(std::fabs(merged.extra_calc_descriptors().at("trial")[1] - 2.5) <
+         1.0e-12);
+}
+
+void test_merge_two_molecules_reports_skipped_extra_descriptor() {
+  sasmol::Molecule mol1(1, 1);
+  sasmol::Molecule mol2(1, 1);
+  mol1.extra_string_descriptors()["trial"] = {"left"};
+  sasmol::Molecule merged;
+
+  const auto result = sasmol::merge_two_molecules(
+      mol1, mol2, merged, {.report_skipped_descriptors = true});
+
+  assert(!result.ok());
+  assert(merged.natoms() == 2);
+  assert(merged.extra_string_descriptors().empty());
 }
 
 void test_merge_two_molecules_regenerates_second_indices() {
@@ -470,10 +546,13 @@ int main() {
   test_mask_rejects_bad_shape_and_values();
   test_copy_molecule_using_indices_preserves_descriptors();
   test_copy_molecule_using_mask_preserves_descriptors();
+  test_copy_molecule_using_indices_preserves_extended_descriptors();
   test_copied_molecule_using_indices_returns_value();
   test_duplicate_molecule_returns_deep_value_copies();
   test_duplicate_molecule_allows_zero_duplicates();
   test_merge_two_molecules_combines_core_descriptors_and_coordinates();
+  test_merge_two_molecules_combines_extended_descriptors();
+  test_merge_two_molecules_reports_skipped_extra_descriptor();
   test_merge_two_molecules_regenerates_second_indices();
   test_merge_two_molecules_uses_frame_zero_only();
   test_merge_two_molecules_rejects_empty_first_molecule();
