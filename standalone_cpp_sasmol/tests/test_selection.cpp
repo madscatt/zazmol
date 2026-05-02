@@ -83,6 +83,44 @@ void test_select_named_basis_heavy() {
   assert((result.indices == std::vector<std::size_t>{1, 2}));
 }
 
+void test_mask_from_indices() {
+  const sasmol::Molecule mol(5);
+
+  const auto result = sasmol::mask_from_indices(mol, {0, 2, 4});
+
+  assert(result.ok());
+  assert((result.mask == std::vector<int>{1, 0, 1, 0, 1}));
+}
+
+void test_mask_from_indices_rejects_bad_index() {
+  const sasmol::Molecule mol(2);
+
+  const auto result = sasmol::mask_from_indices(mol, {0, 2});
+
+  assert(!result.ok());
+  assert(result.mask.empty());
+}
+
+void test_select_mask_from_expression() {
+  sasmol::Molecule mol(4);
+  mol.name() = {"H1", "CA", "N", "HA"};
+
+  const auto result = sasmol::select_mask(mol, "not name[i][0] == \"H\"");
+
+  assert(result.ok());
+  assert((result.mask == std::vector<int>{0, 1, 1, 0}));
+}
+
+void test_select_named_basis_mask_heavy() {
+  sasmol::Molecule mol(4);
+  mol.name() = {"H1", "CA", "N", "HA"};
+
+  const auto result = sasmol::select_named_basis_mask(mol, "heavy");
+
+  assert(result.ok());
+  assert((result.mask == std::vector<int>{0, 1, 1, 0}));
+}
+
 void test_named_basis_backbone_is_not_supported() {
   const auto expression = sasmol::basis_expression("backbone");
   assert(!expression);
@@ -203,6 +241,10 @@ int main() {
   test_named_basis_expression_all_and_heavy();
   test_select_named_basis_all();
   test_select_named_basis_heavy();
+  test_mask_from_indices();
+  test_mask_from_indices_rejects_bad_index();
+  test_select_mask_from_expression();
+  test_select_named_basis_mask_heavy();
   test_named_basis_backbone_is_not_supported();
   test_safe_expression_matches_align_basis_example();
   test_safe_expression_supports_or_and_not_equal();

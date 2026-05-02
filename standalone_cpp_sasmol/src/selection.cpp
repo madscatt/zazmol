@@ -468,4 +468,41 @@ SelectionResult select_indices(const Molecule& molecule,
   }
 }
 
+MaskSelectionResult mask_from_indices(const Molecule& molecule,
+                                      const std::vector<std::size_t>& indices) {
+  MaskSelectionResult result;
+  if (indices.empty()) {
+    result.errors.push_back("selection indices are empty");
+    return result;
+  }
+  result.mask.assign(molecule.natoms(), 0);
+  for (const auto atom : indices) {
+    if (atom >= molecule.natoms()) {
+      result.mask.clear();
+      result.errors.push_back("selection atom index is out of range");
+      return result;
+    }
+    result.mask[atom] = 1;
+  }
+  return result;
+}
+
+MaskSelectionResult select_mask(const Molecule& molecule,
+                                const std::string& expression) {
+  const auto selected = select_indices(molecule, expression);
+  if (!selected.ok()) {
+    return {{}, selected.errors};
+  }
+  return mask_from_indices(molecule, selected.indices);
+}
+
+MaskSelectionResult select_named_basis_mask(const Molecule& molecule,
+                                            const std::string& basis_name) {
+  const auto selected = select_named_basis(molecule, basis_name);
+  if (!selected.ok()) {
+    return {{}, selected.errors};
+  }
+  return mask_from_indices(molecule, selected.indices);
+}
+
 }  // namespace sasmol

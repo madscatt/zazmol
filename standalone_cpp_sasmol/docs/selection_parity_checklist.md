@@ -20,6 +20,16 @@ Implemented named basis helpers:
 - `basis_expression("heavy")` -> `not name[i][0] == "H"`
 - `select_named_basis(molecule, basis_name)`
 
+Implemented selection-to-mask bridge helpers:
+
+- `mask_from_indices(molecule, indices)`
+- `select_mask(molecule, expression)`
+- `select_named_basis_mask(molecule, basis_name)`
+
+These return 0/1 atom masks compatible with the subset mask APIs while keeping
+the explicit-index selection API available for callers that do not need Python
+mask-shaped compatibility.
+
 `backbone` is intentionally not supported as a generic named basis. Current
 Python/SASSIE practice uses different backbone definitions for protein overlap,
 protein constraints, and nucleic acid workflows, so a generic C++ alias would

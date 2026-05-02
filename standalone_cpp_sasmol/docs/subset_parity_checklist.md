@@ -22,6 +22,11 @@ Implemented 0/1 mask compatibility wrappers:
 - `set_coordinates_using_mask(molecule, source, frame, mask)`
 - `copy_molecule_using_mask(source, destination, mask, frame)`
 
+Selection masks can be produced by `selection` helpers:
+
+- `select_mask(molecule, expression)`
+- `select_named_basis_mask(molecule, basis_name)`
+
 Implemented descriptor get/set helpers:
 
 - `get_string_descriptor_using_indices(...)`

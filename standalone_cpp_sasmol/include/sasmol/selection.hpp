@@ -16,6 +16,13 @@ struct SelectionResult {
   [[nodiscard]] bool ok() const noexcept { return errors.empty(); }
 };
 
+struct MaskSelectionResult {
+  std::vector<int> mask;
+  std::vector<std::string> errors;
+
+  [[nodiscard]] bool ok() const noexcept { return errors.empty(); }
+};
+
 [[nodiscard]] SelectionResult indices_all(const Molecule& molecule);
 [[nodiscard]] SelectionResult indices_by_name(const Molecule& molecule,
                                               const std::string& name);
@@ -31,5 +38,11 @@ struct SelectionResult {
                                                  const std::string& basis_name);
 [[nodiscard]] SelectionResult select_indices(const Molecule& molecule,
                                              const std::string& expression);
+[[nodiscard]] MaskSelectionResult mask_from_indices(
+    const Molecule& molecule, const std::vector<std::size_t>& indices);
+[[nodiscard]] MaskSelectionResult select_mask(const Molecule& molecule,
+                                              const std::string& expression);
+[[nodiscard]] MaskSelectionResult select_named_basis_mask(
+    const Molecule& molecule, const std::string& basis_name);
 
 }  // namespace sasmol

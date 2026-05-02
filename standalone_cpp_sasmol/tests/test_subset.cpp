@@ -77,6 +77,37 @@ void test_get_coordinates_using_mask_delegates_to_indices() {
   assert_vec_close(result.coordinates[1], mol.coordinate(0, 4));
 }
 
+void test_select_mask_flows_into_coordinate_subset() {
+  const auto mol = read_fixture("2AAD.pdb");
+
+  const auto selected = sasmol::select_mask(mol, "name[i] == \"CA\"");
+  assert(selected.ok());
+  const auto result = sasmol::get_coordinates_using_mask(mol, 0, selected.mask);
+
+  assert(result.ok());
+  assert(result.coordinates.size() == 2);
+  assert_vec_close(result.coordinates[0], mol.coordinate(0, 1));
+  assert_vec_close(result.coordinates[1], mol.coordinate(0, 9));
+}
+
+void test_named_basis_mask_flows_into_copy_subset() {
+  auto source = read_fixture("2AAD.pdb");
+  source.name()[0] = "H1";
+  source.name()[4] = "HA";
+  sasmol::Molecule subset;
+
+  const auto selected = sasmol::select_named_basis_mask(source, "heavy");
+  assert(selected.ok());
+  const auto result =
+      sasmol::copy_molecule_using_mask(source, subset, selected.mask, 0);
+
+  assert(result.ok());
+  assert(subset.natoms() == source.natoms() - 2);
+  for (const auto& name : subset.name()) {
+    assert(name.empty() || name.front() != 'H');
+  }
+}
+
 void test_mask_rejects_bad_shape_and_values() {
   const auto mol = read_fixture("2AAD.pdb");
 
@@ -543,6 +574,8 @@ int main() {
   test_get_coordinates_rejects_bad_index();
   test_get_indices_from_mask();
   test_get_coordinates_using_mask_delegates_to_indices();
+  test_select_mask_flows_into_coordinate_subset();
+  test_named_basis_mask_flows_into_copy_subset();
   test_mask_rejects_bad_shape_and_values();
   test_copy_molecule_using_indices_preserves_descriptors();
   test_copy_molecule_using_mask_preserves_descriptors();
