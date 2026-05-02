@@ -293,6 +293,20 @@ double expected_generated_sum(std::size_t nframes, std::size_t natoms) {
   return total;
 }
 
+double expected_generated_sum(std::size_t start, std::size_t end,
+                              std::size_t natoms) {
+  double total = 0.0;
+  for (std::size_t frame = start; frame < end; ++frame) {
+    for (std::size_t atom = 0; atom < natoms; ++atom) {
+      const auto xyz = generated_coordinate(frame, atom);
+      total += static_cast<double>(xyz.x);
+      total += static_cast<double>(xyz.y);
+      total += static_cast<double>(xyz.z);
+    }
+  }
+  return total;
+}
+
 sasmol::CoordinateBounds expected_generated_bounds(std::size_t nframes,
                                                    std::size_t natoms) {
   sasmol::CoordinateBounds bounds{
@@ -788,6 +802,94 @@ void test_writer_convenience_round_trips_rna() {
   std::filesystem::remove(output);
 }
 
+void test_write_dcd_frames_writes_first_and_last_fixture_frames() {
+  sasmol::DcdReader reader;
+  sasmol::Molecule source;
+  auto status = reader.read_dcd(fixture_path("1ATM.dcd"), source);
+  assert(status.ok());
+
+  const auto first_output = temp_dcd_path("sasmol_cpp_1atm_first_frame.dcd");
+  sasmol::DcdWriter writer;
+  status = writer.write_dcd_frames(first_output, source, 0, 1);
+  assert(status.ok());
+
+  sasmol::Molecule first;
+  status = reader.read_dcd(first_output, first);
+  assert(status.ok());
+  assert(first.natoms() == 1);
+  assert(first.number_of_frames() == 1);
+  auto xyz = first.coordinate(0, 0);
+  assert_close(xyz.x, 76.944F);
+  assert_close(xyz.y, 41.799F);
+  assert_close(xyz.z, 41.652F);
+
+  const auto last_output = temp_dcd_path("sasmol_cpp_1atm_last_frame.dcd");
+  status = writer.write_dcd_frames(last_output, source, 1, 2);
+  assert(status.ok());
+
+  sasmol::Molecule last;
+  status = reader.read_dcd(last_output, last);
+  assert(status.ok());
+  assert(last.natoms() == 1);
+  assert(last.number_of_frames() == 1);
+  xyz = last.coordinate(0, 0);
+  assert_close(xyz.x, 73.944F);
+  assert_close(xyz.y, 38.799F);
+  assert_close(xyz.z, 41.652F);
+
+  std::filesystem::remove(first_output);
+  std::filesystem::remove(last_output);
+}
+
+void test_write_dcd_frames_writes_generated_middle_range() {
+  const std::size_t natoms = 37;
+  const std::size_t nframes = 257;
+  const std::size_t start = 120;
+  const std::size_t end = 128;
+  const auto source_path =
+      generate_streaming_dcd("sasmol_generated_range_source.dcd", natoms,
+                             nframes);
+
+  sasmol::DcdReader reader;
+  sasmol::Molecule source;
+  auto status = reader.read_dcd(source_path, source);
+  assert(status.ok());
+
+  const auto output = temp_dcd_path("sasmol_generated_range_output.dcd");
+  sasmol::DcdWriter writer;
+  status = writer.write_dcd_frames(output, source, start, end);
+  assert(status.ok());
+
+  sasmol::Molecule range;
+  status = reader.read_dcd(output, range);
+  assert(status.ok());
+  assert(range.natoms() == natoms);
+  assert(range.number_of_frames() == end - start);
+  assert_close_double(coordinate_sum(range),
+                      expected_generated_sum(start, end, natoms), 0.01);
+  const auto expected = generated_coordinate(start + 3, 17);
+  const auto actual = range.coordinate(3, 17);
+  assert_close(actual.x, expected.x);
+  assert_close(actual.y, expected.y);
+  assert_close(actual.z, expected.z);
+
+  std::filesystem::remove(source_path);
+  std::filesystem::remove(output);
+}
+
+void test_write_dcd_frames_rejects_invalid_ranges() {
+  sasmol::Molecule mol(1, 2);
+  sasmol::DcdWriter writer;
+  const auto output = temp_dcd_path("sasmol_invalid_range.dcd");
+
+  auto status = writer.write_dcd_frames(output, mol, 1, 1);
+  assert(status.code == sasmol::IoCode::format_error);
+  assert(!writer.is_open());
+  status = writer.write_dcd_frames(output, mol, 0, 3);
+  assert(status.code == sasmol::IoCode::format_error);
+  assert(!writer.is_open());
+}
+
 void test_read_dcd_failure_closes_reader() {
   const auto source = fixture_path("1ATM.dcd");
   const auto truncated = temp_dcd_path("sasmol_truncated_read_dcd.dcd");
@@ -944,6 +1046,9 @@ int main() {
   test_writer_round_trips_1atm();
   test_writer_round_trips_2aad();
   test_writer_convenience_round_trips_rna();
+  test_write_dcd_frames_writes_first_and_last_fixture_frames();
+  test_write_dcd_frames_writes_generated_middle_range();
+  test_write_dcd_frames_rejects_invalid_ranges();
   test_read_dcd_failure_closes_reader();
   test_single_step_past_end_closes_reader();
   test_writer_rejects_unit_cell_option();

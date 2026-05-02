@@ -104,8 +104,9 @@ Write parity must include:
 - PDB to DCD to readback for `1ATM`, `2AAD`, `rna`, `rna-1to10`, and `1CRN`
 - `write_dcd_frames` for first frame, last frame, and full range where fixtures
   exist
-- generated files must round-trip through the C++ reader and Python `zazmol`
-  before replacing any legacy path
+- generated files should round-trip through the C++ reader, and Python
+  `zazmol` cross-reader validation remains available as manual tooling before
+  replacing any legacy path
 
 ## Implementation Guardrails
 
@@ -175,7 +176,8 @@ Completed first DCD writing slice with the same narrowness:
    normal full-coordinate files.
 3. Round-tripped C++ written DCDs through the C++ reader for `1ATM` and `2AAD`
    first.
-4. Deferred huge-file and cross-reader Python validation to a separate slice.
+4. Deferred huge-file and cross-reader Python validation to separate optional
+   tooling.
 
 ## Proposed Next Implementation Slice
 
@@ -279,11 +281,24 @@ Completed DCD streaming policy hardening:
 
 These paths pass in both the normal build and the sanitizer build.
 
-## Proposed Next Implementation Slice
+## Completed DCD V1 Closeout
 
-The remaining DCD hardening options are higher policy choices:
+Completed normal full-coordinate DCD parity coverage:
 
-1. Add opt-in large streaming stress tests if a real workflow needs them.
-2. Add explicit unsupported fixtures for fixed/free atom DCDs if we have one.
-3. Add Python cross-reader checks to CI-like tooling rather than normal CTest.
-4. Move to PDB I/O contract/parity.
+1. Added `DcdWriter::write_dcd_frames(filename, molecule, start, end)` with
+   zero-based `[start, end)` range semantics matching Python `sasmol` usage.
+2. Covered first-frame, last-frame, generated middle-range, and invalid-range
+   writes.
+3. Kept range writes on the same normal full-coordinate, no-unit-cell writer
+   path as `write_dcd`.
+4. Left fixed/free atom DCDs, DCD unit-cell writing, and true random-access DCD
+   seeking as explicit non-v1 features. They should not be added without real
+   fixtures and a separate reviewed policy.
+5. Left giant generated DCDs as opt-in stress validation only; the checked-in
+   suite generates temporary small/mid-sized DCDs on the fly and does not store
+   large trajectory files in the repository.
+
+At this checkpoint, DCD v1 is considered complete for standalone C++ normal
+full-coordinate streaming reads, whole reads, single-frame reopen/scan reads,
+normal writes, selected-frame writes, malformed-input handling, and lifecycle
+misuse handling.

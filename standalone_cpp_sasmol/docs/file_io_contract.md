@@ -46,6 +46,11 @@ whole-trajectory convenience wrapper and may allocate storage proportional to
 `natoms * nframes * 3`; it should be reserved for fixtures, tests, and
 moderate-size data.
 
+Writing supports normal full-coordinate DCD files through explicit
+open/header/step/close calls, all-frame `write_dcd(...)`, and bounded
+`write_dcd_frames(filename, molecule, start, end)` using zero-based
+`[start, end)` frame ranges.
+
 Random-frame behavior should not be hidden as normal seekable access. If
 supported, it should be explicit reopen/scan behavior through
 `read_single_dcd_step(...)` or a similarly named API. This matches the observed
@@ -61,6 +66,7 @@ The DCD parity pass must cover:
 - sequential frame reading
 - explicit close/reopen behavior for cycling or random-frame consumers
 - write/read round trips
+- selected-frame range writes
 - failure modes that return library status instead of terminating callers
 
 The detailed DCD implementation gate is tracked in

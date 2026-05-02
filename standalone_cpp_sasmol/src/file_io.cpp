@@ -1415,19 +1415,32 @@ IoStatus DcdWriter::close_dcd_write() {
 IoStatus DcdWriter::write_dcd(const std::filesystem::path& filename,
                               const Molecule& molecule,
                               const DcdWriteOptions& options) {
+  return write_dcd_frames(filename, molecule, 0, molecule.number_of_frames(),
+                          options);
+}
+
+IoStatus DcdWriter::write_dcd_frames(const std::filesystem::path& filename,
+                                     const Molecule& molecule,
+                                     std::size_t start, std::size_t end,
+                                     const DcdWriteOptions& options) {
+  if (start >= end || end > molecule.number_of_frames()) {
+    return {IoCode::format_error,
+            "DCD frame range must be non-empty and inside the molecule."};
+  }
+
   auto status = open_dcd_write(filename, options);
   if (!status) {
     return status;
   }
 
-  status = write_dcd_header(molecule, molecule.number_of_frames());
+  status = write_dcd_header(molecule, end - start);
   if (!status) {
     (void)close_dcd_write();
     return status;
   }
 
-  for (std::size_t frame = 0; frame < molecule.number_of_frames(); ++frame) {
-    status = write_dcd_step(molecule, frame, frame + 1);
+  for (std::size_t frame = start; frame < end; ++frame) {
+    status = write_dcd_step(molecule, frame, frame - start + 1);
     if (!status) {
       (void)close_dcd_write();
       return status;

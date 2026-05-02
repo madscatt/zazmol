@@ -16,8 +16,9 @@ behavior oracle.
 - Sequential DCD reader/writer coverage for normal full-coordinate files,
   explicit reopen-and-scan single-frame reads, whole-trajectory convenience
   reads, caller-owned frame-buffer streaming, generated multi-frame DCD
-  hardening, normal writes, C++ round trips, Python cross-reader tooling,
-  malformed input/status handling, and lifecycle misuse checks.
+  hardening, normal writes, selected-frame range writes, C++ round trips,
+  Python cross-reader tooling, malformed input/status handling, and lifecycle
+  misuse checks.
 - Calculation coverage for mass, molecular formula, residue charge, center of
   mass, radius of gyration, RMSD, min/max, DCD streaming min/max, and principal
   moments of inertia.
@@ -46,8 +47,8 @@ behavior oracle.
 - CHARMM topology parsing, patching, atom completeness checks, and atom
   reordering remain separate design work.
 - BIOMT subset operations remain deferred.
-- Fixed/free atom DCD variants remain unsupported unless fixtures and policy are
-  added.
+- Fixed/free atom DCD variants, DCD unit-cell writing, and true random-access
+  DCD seeking remain unsupported unless fixtures and policy are added.
 - Large DCD workflows should use explicit streaming APIs; whole-trajectory DCD
   reads remain convenience behavior for bounded data.
 - GPU/MPI/Python bindings remain architectural considerations, not v1
@@ -61,8 +62,8 @@ Do a small selection/subset documentation cleanup before new feature work:
   missing
 - add a concise selection/subset checkpoint like the operate and topology
   checkpoints
-- then decide whether to tackle BIOMT, opt-in large DCD streaming stress tests,
-  or broader Python expression coverage as a reviewed design choice
+- then decide whether to tackle BIOMT or broader Python expression coverage as
+  a reviewed design choice
 
 The next implementation-heavy step should not be a CHARMM parser or arbitrary
 selection evaluator without a separate plan.
