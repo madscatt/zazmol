@@ -222,6 +222,34 @@ void test_parse_pdb_atom_record_rejects_bad_required_numbers() {
   assert(status.code == sasmol::IoCode::format_error);
 }
 
+void test_parse_pdb_atom_record_missing_optional_defaults() {
+  sasmol::PdbReader reader;
+  sasmol::PdbAtomRecord atom;
+  std::string line =
+      "ATOM      1  CA  ALA A   1      11.100  12.200  13.300";
+  line.resize(80, ' ');
+
+  auto status = reader.parse_pdb_atom_record(line, atom);
+
+  assert(status.ok());
+  assert(atom.loc == " ");
+  assert(atom.occupancy == "  1.00");
+  assert(atom.beta == "  0.00");
+  assert(atom.segname == "A");
+  assert(atom.charge == "  ");
+
+  sasmol::PdbReadOptions options;
+  options.pdbscan = true;
+  status = reader.parse_pdb_atom_record(line, atom, options);
+
+  assert(status.ok());
+  assert(atom.loc == " ");
+  assert(atom.occupancy == "");
+  assert(atom.beta == "");
+  assert(atom.segname == "");
+  assert(atom.charge == "");
+}
+
 void test_resolve_pdb_element_matches_python_core_cases() {
   sasmol::PdbReader reader;
 
@@ -483,6 +511,41 @@ void test_read_pdb_check_zero_coor_guard() {
   assert_close(xyz.x, 1.0e-10F);
   assert_close(xyz.y, 1.0F);
   assert_close(xyz.z, 1.0e-10F);
+
+  std::filesystem::remove(path);
+}
+
+void test_read_pdb_failure_does_not_mutate_existing_molecule() {
+  const auto path =
+      std::filesystem::temp_directory_path() / "sasmol_bad_mid_parse.pdb";
+  {
+    std::ofstream out(path);
+    out << "ATOM      1  C   GLY A   1       1.000   2.000   3.000  1.00  0.00           C\n";
+    out << "ATOM      X  O   GLY A   1       2.000   3.000   4.000  1.00  0.00           O\n";
+    out << "END\n";
+  }
+
+  sasmol::Molecule mol(1, 1);
+  mol.record()[0] = "ATOM";
+  mol.name()[0] = "KEEP";
+  mol.resname()[0] = "GLY";
+  mol.chain()[0] = "A";
+  mol.resid()[0] = 7;
+  mol.original_index()[0] = 77;
+  mol.index()[0] = 1;
+  mol.set_coordinate(0, 0, {9.0F, 8.0F, 7.0F});
+  const auto original_coor = mol.coor();
+
+  sasmol::PdbReader reader;
+  const auto status = reader.read_pdb(path, mol);
+
+  assert(status.code == sasmol::IoCode::format_error);
+  assert(mol.natoms() == 1);
+  assert(mol.number_of_frames() == 1);
+  assert(mol.name()[0] == "KEEP");
+  assert(mol.resid()[0] == 7);
+  assert(mol.original_index()[0] == 77);
+  assert(mol.coor() == original_coor);
 
   std::filesystem::remove(path);
 }
@@ -909,6 +972,7 @@ int main() {
   test_parse_pdb_atom_record_uses_sasmol_field_names();
   test_parse_pdb_atom_record_preserves_altloc_in_pdbscan_mode();
   test_parse_pdb_atom_record_rejects_bad_required_numbers();
+  test_parse_pdb_atom_record_missing_optional_defaults();
   test_resolve_pdb_element_matches_python_core_cases();
   test_resolve_pdb_element_table_fixtures();
   test_parse_pdb_atom_record_resolves_blank_element();
@@ -920,6 +984,7 @@ int main() {
   test_read_pdb_accepts_single_frame_without_end();
   test_read_pdb_accepts_trailing_blank_lines();
   test_read_pdb_check_zero_coor_guard();
+  test_read_pdb_failure_does_not_mutate_existing_molecule();
   test_read_pdb_pdbscan_conect_parsing();
   test_read_pdb_records_biomt_metadata_without_coordinate_changes();
   test_write_pdb_single_frame_1atm_round_trip();

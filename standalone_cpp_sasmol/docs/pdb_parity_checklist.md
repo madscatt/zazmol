@@ -151,20 +151,21 @@ cross-reader validation for generated C++ outputs.
 The next PDB work should be hardening, not broadening. Do not add a new parser
 mode, topology inference, BIOMT transform behavior, or stricter PDB schema.
 
-Recommended next implementation slice:
+Completed hardening slice:
 
-1. Make `PdbReader::read_pdb` failure-atomic.
+1. Made `PdbReader::read_pdb` failure-atomic.
    Parse into a temporary `Molecule`, including coordinates, descriptors,
    `CONECT`, all-zero guard, and BIOMT metadata. Assign to the caller's molecule
    only after the whole read succeeds.
-2. Add a generated malformed PDB test proving an existing destination molecule is
+2. Added a generated malformed PDB test proving an existing destination molecule is
    unchanged after a mid-parse format error.
-3. Add a generated missing-optional-field read test to lock ordinary mode
+3. Added a generated missing-optional-field read test to lock ordinary mode
    defaults versus `pdbscan` literal preservation.
-4. Run normal and ASAN C++ tests.
+4. Ran normal and ASAN C++ tests.
 
-Suggested stop point:
+Next PDB stop point:
 
-- Stop after read-failure atomicity and the two generated read-side hardening
-  tests. Leave new PDB syntax support, CHARMM/topology behavior, and Python
-  cross-reader expansion for separate decisions.
+- Stop here for PDB unless a specific real-world input exposes a tolerated Python
+  behavior that the C++ reader still rejects. Leave new PDB syntax support,
+  CHARMM/topology behavior, and Python cross-reader expansion for separate
+  decisions.

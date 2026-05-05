@@ -532,7 +532,7 @@ IoStatus PdbReader::read_pdb(const std::filesystem::path& filename,
     return {IoCode::file_error, "Failed to open PDB file: " + filename.string()};
   }
 
-  molecule.resize(scan.natoms, scan.nframes);
+  Molecule parsed_molecule(scan.natoms, scan.nframes);
   std::size_t frame_index = 0;
   std::size_t atom_index = 0;
   std::vector<std::string> header_lines;
@@ -565,9 +565,10 @@ IoStatus PdbReader::read_pdb(const std::filesystem::path& filename,
         const auto indices = parse_conect_line(line);
         if (indices.size() > 1) {
           const int base = indices.front();
-          for (std::size_t atom = 0; atom < molecule.natoms(); ++atom) {
-            if (molecule.original_index()[atom] == base) {
-              molecule.conect()[atom].assign(indices.begin() + 1, indices.end());
+          for (std::size_t atom = 0; atom < parsed_molecule.natoms(); ++atom) {
+            if (parsed_molecule.original_index()[atom] == base) {
+              parsed_molecule.conect()[atom].assign(indices.begin() + 1,
+                                                    indices.end());
               break;
             }
           }
@@ -589,25 +590,25 @@ IoStatus PdbReader::read_pdb(const std::filesystem::path& filename,
       return {IoCode::format_error, "PDB contains more frames than pre-scan."};
     }
     if (frame_index == 0) {
-      molecule.record()[atom_index] = atom.record;
-      molecule.original_index()[atom_index] = atom.original_index;
-      molecule.index()[atom_index] = static_cast<int>(atom_index + 1);
-      molecule.name()[atom_index] = atom.name;
-      molecule.loc()[atom_index] = atom.loc;
-      molecule.resname()[atom_index] = atom.resname;
-      molecule.chain()[atom_index] = atom.chain;
-      molecule.resid()[atom_index] = atom.resid;
-      molecule.original_resid()[atom_index] = atom.resid;
-      molecule.rescode()[atom_index] = atom.rescode;
-      molecule.occupancy()[atom_index] = atom.occupancy;
-      molecule.beta()[atom_index] = atom.beta;
-      molecule.segname()[atom_index] = atom.segname;
-      molecule.element()[atom_index] = atom.element;
-      molecule.charge()[atom_index] = atom.charge;
-      molecule.residue_flag()[atom_index] = 0;
-      molecule.moltype()[atom_index] = moltype_for_resname(atom.resname);
+      parsed_molecule.record()[atom_index] = atom.record;
+      parsed_molecule.original_index()[atom_index] = atom.original_index;
+      parsed_molecule.index()[atom_index] = static_cast<int>(atom_index + 1);
+      parsed_molecule.name()[atom_index] = atom.name;
+      parsed_molecule.loc()[atom_index] = atom.loc;
+      parsed_molecule.resname()[atom_index] = atom.resname;
+      parsed_molecule.chain()[atom_index] = atom.chain;
+      parsed_molecule.resid()[atom_index] = atom.resid;
+      parsed_molecule.original_resid()[atom_index] = atom.resid;
+      parsed_molecule.rescode()[atom_index] = atom.rescode;
+      parsed_molecule.occupancy()[atom_index] = atom.occupancy;
+      parsed_molecule.beta()[atom_index] = atom.beta;
+      parsed_molecule.segname()[atom_index] = atom.segname;
+      parsed_molecule.element()[atom_index] = atom.element;
+      parsed_molecule.charge()[atom_index] = atom.charge;
+      parsed_molecule.residue_flag()[atom_index] = 0;
+      parsed_molecule.moltype()[atom_index] = moltype_for_resname(atom.resname);
     }
-    molecule.set_coordinate(frame_index, atom_index, atom.coordinate);
+    parsed_molecule.set_coordinate(frame_index, atom_index, atom.coordinate);
     ++atom_index;
   }
 
@@ -622,14 +623,15 @@ IoStatus PdbReader::read_pdb(const std::filesystem::path& filename,
 
   if (options.apply_all_zero_coordinate_guard) {
     PdbWriter writer;
-    status = writer.check_for_all_zero_columns(molecule);
+    status = writer.check_for_all_zero_columns(parsed_molecule);
     if (!status) {
       return status;
     }
   }
 
-  molecule.set_biomt(parse_biomt_header_records(header_lines));
+  parsed_molecule.set_biomt(parse_biomt_header_records(header_lines));
 
+  molecule = std::move(parsed_molecule);
   return IoStatus::success();
 }
 
