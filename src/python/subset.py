@@ -980,8 +980,7 @@ class Mask(object):
 
     def apply_biomt(self, frame, selection, U, M, **kwargs):
         """
-        Apply biological unit transforms (BIOMT) to the coordinates of the
-        chosen selection and frame.
+        Apply one BIOMT transform to selected atoms in a chosen frame.
 
         Information on BIOMT available at:
         http://pdb101.rcsb.org/learn/guide-to-understanding-pdb-data/biological-assemblies
@@ -1007,7 +1006,27 @@ class Mask(object):
         Returns
         -------
         None
-            updated self._coor 
+            updated self._coor
+
+        Plain speak contract
+        --------------------
+        This is an explicit, in-place coordinate edit helper. It does not:
+
+        - parse BIOMT information from PDB headers
+        - choose a biological assembly
+        - duplicate atoms or assign new segment names
+        - skip identity transforms
+        - run automatically from read_pdb()
+
+        The caller supplies the frame, atom selection, rotation matrix, and
+        translation vector.
+
+        Pseudocode intent
+        -----------------
+        1. Build mask from selection for this molecule.
+        2. Extract selected coordinates from the chosen frame.
+        3. Apply transform: transformed_xyz = U @ xyz + M
+        4. Write transformed coordinates back to this molecule.
 
         Examples
         -------
@@ -1036,9 +1055,7 @@ class Mask(object):
 
     def copy_apply_biomt(self, other, frame, selection, U, M, **kwargs):
         """
-        Copy selected atoms (with initial coordinates from the given frame)
-        to new Molecule object (other) and apply transforms taken from biological
-        unit (BIOMT) to the coordinates.
+        Copy selected atoms to another molecule, then apply one BIOMT transform.
 
         Information on BIOMT available at:
         http://pdb101.rcsb.org/learn/guide-to-understanding-pdb-data/biological-assemblies
@@ -1067,7 +1084,27 @@ class Mask(object):
         Returns
         -------
         None
-            updated self._coor 
+            updates ``other`` coordinates for the copied selection
+
+        Plain speak contract
+        --------------------
+        This helper is for copy-then-transform usage. Source coordinates in
+        ``self`` are not edited by this method. It does not:
+
+        - parse BIOMT information from PDB headers
+        - choose which BIOMT records to apply
+        - skip identity transforms
+        - merge transformed copies into an assembled model
+        - run automatically from read_pdb()
+
+        Higher-level builder code is responsible for BIOMT record selection,
+        identity filtering, repeated-copy assembly, and segment naming.
+
+        Pseudocode intent
+        -----------------
+        1. Build mask from selection in source molecule.
+        2. Copy selected atoms from source frame to ``other``.
+        3. Apply one BIOMT transform to copied coordinates in ``other``.
 
         Examples
         -------

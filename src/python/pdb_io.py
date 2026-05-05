@@ -75,6 +75,152 @@ class PDB(object):
         except (AttributeError, IndexError, TypeError):
             return default_value
 
+    def _empty_biomt_record(self):
+        return {
+            'subdivs': [],
+            'auth_bio_unit': '',
+            'soft_bio_unit': '',
+            'rot': [],
+            'trans': [],
+        }
+
+    def _parse_biomt_header_records(self, header_lines):
+        """
+        Parse BIOMT metadata from REMARK 350 header lines.
+
+        This parser is intentionally passive: it records metadata only and
+        does not alter coordinates or apply transforms.
+        """
+        biomt = {}
+
+        current_biomol_no = None
+        current_transform_id = None
+        current_rot = None
+        current_trans = None
+        next_row = 1
+
+        for line in header_lines:
+            if not line.startswith('REMARK 350'):
+                continue
+
+            text = line[10:].strip()
+            if not text:
+                continue
+
+            if text.startswith('BIOMOLECULE:'):
+                current_biomol_no = None
+                current_transform_id = None
+                current_rot = None
+                current_trans = None
+                next_row = 1
+
+                if ':' not in text:
+                    continue
+
+                biomol_txt = text.split(':', 1)[1]
+                for token in biomol_txt.split(','):
+                    token = token.strip()
+                    if token:
+                        try:
+                            current_biomol_no = int(token)
+                            break
+                        except Exception:
+                            continue
+
+                if current_biomol_no is not None and current_biomol_no not in biomt:
+                    biomt[current_biomol_no] = self._empty_biomt_record()
+                continue
+
+            if current_biomol_no is None:
+                continue
+
+            record = biomt[current_biomol_no]
+
+            if text.startswith('AUTHOR DETERMINED BIOLOGICAL UNIT:'):
+                if ':' in text:
+                    record['auth_bio_unit'] = text.split(':', 1)[1].strip()
+                continue
+
+            if text.startswith('SOFTWARE DETERMINED'):
+                if ':' in text:
+                    record['soft_bio_unit'] = text.split(':', 1)[1].strip()
+                continue
+
+            if text.startswith('APPLY THE FOLLOWING TO CHAINS:') or text.startswith('AND CHAINS:'):
+                if ':' in text:
+                    chains_txt = text.split(':', 1)[1]
+                    for chain in chains_txt.split(','):
+                        chain = chain.strip()
+                        if chain and chain not in record['subdivs']:
+                            record['subdivs'].append(chain)
+                continue
+
+            if not text.startswith('BIOMT'):
+                continue
+
+            cols = text.split()
+            if len(cols) < 6:
+                continue
+
+            row_token = cols[0]
+            if len(row_token) < 6:
+                continue
+
+            try:
+                row_num = int(row_token[-1])
+            except Exception:
+                continue
+
+            if row_num not in [1, 2, 3]:
+                continue
+
+            try:
+                transform_id = int(cols[1])
+                rot_values = [float(cols[2]), float(cols[3]), float(cols[4])]
+                trans_value = float(cols[5])
+            except Exception:
+                continue
+
+            if row_num == 1:
+                current_transform_id = transform_id
+                current_rot = numpy.zeros((3, 3), config.CALC_DTYPE)
+                current_trans = numpy.zeros(3, config.CALC_DTYPE)
+                next_row = 1
+
+            if current_transform_id is None:
+                continue
+
+            if transform_id != current_transform_id:
+                if row_num != 1:
+                    continue
+                current_transform_id = transform_id
+                current_rot = numpy.zeros((3, 3), config.CALC_DTYPE)
+                current_trans = numpy.zeros(3, config.CALC_DTYPE)
+                next_row = 1
+
+            if row_num != next_row:
+                if row_num != 1:
+                    continue
+                current_transform_id = transform_id
+                current_rot = numpy.zeros((3, 3), config.CALC_DTYPE)
+                current_trans = numpy.zeros(3, config.CALC_DTYPE)
+                next_row = 1
+
+            current_rot[row_num - 1] = numpy.array(rot_values, config.CALC_DTYPE)
+            current_trans[row_num - 1] = trans_value
+
+            if row_num == 3:
+                record['rot'].append(current_rot.copy())
+                record['trans'].append(current_trans.copy())
+                current_transform_id = None
+                current_rot = None
+                current_trans = None
+                next_row = 1
+            else:
+                next_row = row_num + 1
+
+        return biomt
+
     def print_error(self,name,my_message):
         '''
         Build a formatted error message list for element-name parsing failures.
@@ -968,6 +1114,11 @@ class PDB(object):
                 return error
 
         self._header = header
+        parsed_biomt = self._parse_biomt_header_records(header)
+        if hasattr(self, 'setBiomt'):
+            self.setBiomt(parsed_biomt)
+        else:
+            self._biomt = parsed_biomt
         self._conect = conect
 
         return 

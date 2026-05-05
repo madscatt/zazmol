@@ -117,6 +117,8 @@ class Atom(
         self._coor = None
         self._center_of_mass = None
         self._conect = []
+        self._header = []
+        self._biomt = {}
 
         if config.__logging_level__ == 'DEBUG':
             self._debug = True
@@ -503,6 +505,12 @@ class Molecule(Atom):
 
     def setHeader(self, newValue):
         self._header = newValue
+
+    def biomt(self):
+        return self._biomt
+
+    def setBiomt(self, newValue):
+        self._biomt = newValue
 
     def unitcell(self):
         return self._unitcell
