@@ -70,6 +70,10 @@ behavior oracle.
   than portable core behavior.
 - Fixed/free atom DCD variants, DCD unit-cell writing, and true random-access
   DCD seeking remain unsupported unless fixtures and policy are added.
+- Python multiprocessing support is experimental orchestration code and is not
+  planned for the standalone C++ core.
+- CHARMM36 support is tracked as separate joint Python/C++ design work, not as
+  part of this parity pass.
 - Large DCD workflows should use explicit streaming APIs; whole-trajectory DCD
   reads remain convenience behavior for bounded data.
 - GPU/MPI/Python bindings remain architectural considerations, not v1
@@ -77,20 +81,13 @@ behavior oracle.
 
 ## Recommended Next Slice
 
-The minimal CHARMM topology parity path is now present, but it should stay
-guarded:
+Start with DCD variant policy and fixtures:
 
-- update user-facing parity notes after each topology slice
-- validate any new parser behavior against Python oracle fixtures first
-- keep topology mutation behind explicit APIs
-- do not expand to CHARMM36 by guessing; open a tracked design issue for the
-  Python and C++ trees together
+- define exact status behavior for unsupported fixed/free atom files, unit-cell
+  records, and true random seek requests
+- add tiny generated fixtures before any broader reader/writer changes
+- keep sequential streaming as the default production path
 
-Other feature work remains intentionally deferred:
-
-- Do not expand BIOMT beyond the current metadata, selected-transform, and
-  assembly-helper surfaces without a real caller and fixtures.
-- Broader Python expression coverage should start with a real usage survey and
-  a documented grammar extension.
-- Contextual named selections such as `backbone` or `calpha` should remain
-  deferred unless Python and C++ SasMol add the same reviewed behavior.
+Then consider bounded selection grammar expansion from a real usage survey. VMD
+viewing should remain last and optional because it is an adapter boundary, not
+portable molecule behavior.

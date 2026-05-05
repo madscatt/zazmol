@@ -32,21 +32,35 @@ Status labels:
 | C++ BIOMT assembly helpers | C++ BIOMT tests | `sasmol/subset.hpp` | `implemented` | medium | Document as assembly helpers, not Python selected-transform parity. |
 | `charmm_topology.CharmmTopology` parser records | topology oracle fixtures | `sasmol/topology.hpp` | `implemented` | high | Validate new records against Python fixtures first. |
 | CHARMM residue atom lists, atom-only patches, order choice, reorder planning/copy/in-place | topology C++ tests | `sasmol/topology.hpp` | `implemented` | high | Keep mutation explicit and no-partial-mutation. |
-| CHARMM36 topology upgrade | planned GitHub issue | `sasmol/topology.hpp` | `deferred` | high | Handle as joint Python/C++ tracked work. |
+| CHARMM36 topology upgrade | planned GitHub issue | external tracking issue | `deferred` | high | Out of scope for this parity pass; handle as joint Python/C++ tracked work. |
 | `topology.Topology.create_fasta` | utilities/system FASTA tests | `sasmol/topology.hpp`, `sasmol/molecule.hpp` | `implemented` | low | Keep C++ result typed: sequence vector plus formatted FASTA string. |
 | `topology.Topology.renumber` | `test_topology/test_intg_topology_Topology.py`, `test_system/*index*`, `*resid*` | `sasmol/topology.hpp` | `implemented` | low-medium | Preserve explicit options for index/resid starts. |
 | `topology.Topology.make_constraint_pdb` | `test_topology/test_intg_topology_Topology.py` | `sasmol/topology.hpp`, `sasmol/file_io.hpp` | `implemented` | medium | C++ splits descriptor application from the PDB-writing wrapper. |
 | `topology.Topology.make_backbone_pdb_from_fasta` | `test_topology/test_intg_topology_Topology.py` | `sasmol/topology.hpp`, `sasmol/file_io.hpp` | `implemented` | medium-high | C++ exposes both molecule builder and PDB-writing wrapper. |
-| `multiprocessing_sasmol.Multiprocessing_SasMol` | no core C++ parity tests | optional adapter layer | `missing` | high | Defer unless standalone C++ needs orchestration parity. |
+| `multiprocessing_sasmol.Multiprocessing_SasMol` | no core C++ parity tests | none | `intentional difference` | low | Experimental Python orchestration helper; no C++ port planned. |
 | Python property tables: AMU, VDW, scattering lengths, amino-acid SLD | `test_properties/*` | `sasmol/properties.hpp` | `implemented` | medium | C++ table accessors are fixture-checked against Python oracle data. |
 | `charmm_topology.CharmmTopology.charmm_names` | `test_properties/test_unit_properties_Atomic_charmm_names.py` | `sasmol/topology.hpp` | `implemented` | medium | Pure CHARMM atom-name classification table fixture-checked against Python data. |
 | VMD/view helpers | `test_system/*send_coordinates_to_vmd*` | optional adapter | `deferred` | medium | Keep outside portable core. |
 
 ## Recommended Port Order
 
-The current high-priority parity items in this inventory are implemented. The
-next port slice should come from a fresh bounded inventory pass, not from
-expanding BIOMT, topology, or selection behavior by guesswork.
+The remaining in-scope work needs explicit guardrails. Recommended order:
+
+1. DCD variant policy and fixtures
+
+   Decide exact behavior for fixed/free atom variants, unit-cell records, and
+   true random seeking before implementation. Generated fixtures only; unsupported
+   variants must fail with precise status.
+
+2. Bounded selection grammar expansion
+
+   Survey real selection expressions first, then add only named grammar features
+   with Python/C++ parity tests. Do not recreate Python `eval`.
+
+3. VMD/view optional adapter boundary
+
+   Keep portable core independent of VMD. If added, expose a small adapter API
+   around coordinate buffers and clear validation errors.
 
 ## Policy-Gated Work
 
@@ -58,8 +72,7 @@ cleanup:
 - DCD fixed/free atom variants
 - DCD unit-cell writing
 - true random-access DCD seeking
-- CHARMM36 topology upgrade
-- multiprocessing and VMD/view adapter behavior
+- VMD/view adapter behavior
 
 ## Slice Rhythm
 
