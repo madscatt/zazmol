@@ -385,6 +385,146 @@ void test_patch_charmm_residue_atoms_reports_missing_patch() {
   assert(result.atom_names.empty());
 }
 
+sasmol::CharmmTopologyData residue_order_topology() {
+  sasmol::CharmmTopologyData topology;
+  topology.entries.push_back(
+      {.kind = sasmol::CharmmTopologyEntryKind::Residue,
+       .name = "ALA",
+       .total_charge = "0.00",
+       .atoms = {{"N", "NH1", "-0.47"},
+                 {"HN", "H", "0.31"},
+                 {"CA", "CT1", "0.07"},
+                 {"C", "C", "0.51"},
+                 {"O", "O", "-0.51"}}});
+  topology.entries.push_back(
+      {.kind = sasmol::CharmmTopologyEntryKind::Residue,
+       .name = "CYS",
+       .total_charge = "0.00",
+       .atoms = {{"N", "NH1", "-0.47"},
+                 {"CA", "CT1", "0.07"},
+                 {"SG", "S", "-0.23"},
+                 {"HG1", "HS", "0.16"},
+                 {"C", "C", "0.51"}}});
+  topology.entries.push_back(
+      {.kind = sasmol::CharmmTopologyEntryKind::Residue,
+       .name = "HIS",
+       .total_charge = "0.00",
+       .atoms = {{"N", "NH1", "-0.47"},
+                 {"HD1", "H", "0.30"},
+                 {"HE2", "H", "0.30"}}});
+  topology.entries.push_back(
+      {.kind = sasmol::CharmmTopologyEntryKind::Residue,
+       .name = "HSE",
+       .total_charge = "0.00",
+       .atoms = {{"N", "NH1", "-0.47"}, {"HE2", "H", "0.30"}}});
+  topology.entries.push_back(
+      {.kind = sasmol::CharmmTopologyEntryKind::Residue,
+       .name = "HSD",
+       .total_charge = "0.00",
+       .atoms = {{"N", "NH1", "-0.47"}, {"HD1", "H", "0.30"}}});
+  topology.entries.push_back(
+      {.kind = sasmol::CharmmTopologyEntryKind::Residue,
+       .name = "HSP",
+       .total_charge = "0.00",
+       .atoms = {{"N", "NH1", "-0.47"}, {"HD1", "H", "0.30"},
+                 {"HE2", "H", "0.30"}}});
+  topology.entries.push_back(
+      {.kind = sasmol::CharmmTopologyEntryKind::Patch,
+       .name = "NTER",
+       .total_charge = "1.00",
+       .atoms = {{"N", "NH3", "-0.30"},
+                 {"HT1", "HC", "0.33"},
+                 {"HT2", "HC", "0.33"},
+                 {"HT3", "HC", "0.33"}},
+       .deletes = {.atoms = {"HN"}}});
+  topology.entries.push_back(
+      {.kind = sasmol::CharmmTopologyEntryKind::Patch,
+       .name = "CTER",
+       .total_charge = "-1.00",
+       .atoms = {{"C", "CC", "0.34"}, {"OT1", "OC", "-0.67"}}});
+  return topology;
+}
+
+void test_choose_charmm_residue_atom_order_accepts_existing_match() {
+  const auto topology = residue_order_topology();
+  const auto residue_atoms = sasmol::setup_charmm_residue_atoms(topology);
+
+  const auto result = sasmol::choose_charmm_residue_atom_order(
+      topology, residue_atoms.residue_atoms, "ALA", 5, 1, 10,
+      {"CA", "O", "N", "HN", "C"});
+
+  assert(result.ok());
+  assert(result.topology_residue_name == "ALA");
+  assert((result.atom_order ==
+          std::vector<std::string>{"N", "HN", "CA", "C", "O"}));
+}
+
+void test_choose_charmm_residue_atom_order_applies_nter_patch() {
+  const auto topology = residue_order_topology();
+  const auto residue_atoms = sasmol::setup_charmm_residue_atoms(topology);
+
+  const auto result = sasmol::choose_charmm_residue_atom_order(
+      topology, residue_atoms.residue_atoms, "ALA", 1, 1, 10,
+      {"HT2", "CA", "N", "C", "O", "HT1", "HT3"});
+
+  assert(result.ok());
+  assert(result.topology_residue_name == "ALA_NTER");
+  assert((result.atom_order ==
+          std::vector<std::string>{"N", "HT1", "HT2", "HT3", "CA", "C",
+                                   "O"}));
+}
+
+void test_choose_charmm_residue_atom_order_applies_cter_patch() {
+  const auto topology = residue_order_topology();
+  const auto residue_atoms = sasmol::setup_charmm_residue_atoms(topology);
+
+  const auto result = sasmol::choose_charmm_residue_atom_order(
+      topology, residue_atoms.residue_atoms, "ALA", 10, 1, 10,
+      {"N", "HN", "CA", "O", "C", "OT1"});
+
+  assert(result.ok());
+  assert(result.topology_residue_name == "ALA_CTER");
+  assert((result.atom_order ==
+          std::vector<std::string>{"N", "HN", "CA", "O", "C", "OT1"}));
+}
+
+void test_choose_charmm_residue_atom_order_uses_disu_for_cys() {
+  const auto topology = residue_order_topology();
+  const auto residue_atoms = sasmol::setup_charmm_residue_atoms(topology);
+
+  const auto result = sasmol::choose_charmm_residue_atom_order(
+      topology, residue_atoms.residue_atoms, "CYS", 4, 1, 10,
+      {"N", "CA", "SG", "C"});
+
+  assert(result.ok());
+  assert(result.topology_residue_name == "DISU");
+  assert((result.atom_order == std::vector<std::string>{"N", "CA", "SG", "C"}));
+}
+
+void test_choose_charmm_residue_atom_order_uses_his_variant_fallback() {
+  const auto topology = residue_order_topology();
+  const auto residue_atoms = sasmol::setup_charmm_residue_atoms(topology);
+
+  const auto result = sasmol::choose_charmm_residue_atom_order(
+      topology, residue_atoms.residue_atoms, "HIS", 4, 1, 10, {"HD1", "N"});
+
+  assert(result.ok());
+  assert(result.topology_residue_name == "HSD");
+  assert((result.atom_order == std::vector<std::string>{"N", "HD1"}));
+}
+
+void test_choose_charmm_residue_atom_order_reports_mismatch() {
+  const auto topology = residue_order_topology();
+  const auto residue_atoms = sasmol::setup_charmm_residue_atoms(topology);
+
+  const auto result = sasmol::choose_charmm_residue_atom_order(
+      topology, residue_atoms.residue_atoms, "ALA", 5, 1, 10, {"N", "CA"});
+
+  assert(!result.ok());
+  assert(result.errors.size() == 1);
+  assert(result.atom_order.empty());
+}
+
 void test_parse_charmm_topology_globals_matches_python_oracle_fixture() {
   const auto result = sasmol::parse_charmm_topology_globals(
       topology_fixture("minimal_mass_only.rtf"));
@@ -930,6 +1070,12 @@ int main() {
   test_patch_charmm_residue_atoms_applies_cter_atom_patch();
   test_patch_charmm_residue_atoms_reports_missing_residue();
   test_patch_charmm_residue_atoms_reports_missing_patch();
+  test_choose_charmm_residue_atom_order_accepts_existing_match();
+  test_choose_charmm_residue_atom_order_applies_nter_patch();
+  test_choose_charmm_residue_atom_order_applies_cter_patch();
+  test_choose_charmm_residue_atom_order_uses_disu_for_cys();
+  test_choose_charmm_residue_atom_order_uses_his_variant_fallback();
+  test_choose_charmm_residue_atom_order_reports_mismatch();
   test_parse_charmm_topology_globals_matches_python_oracle_fixture();
   test_parse_charmm_topology_globals_reports_malformed_records();
   test_parse_charmm_topology_residue_atoms_match_python_oracle_fixture();

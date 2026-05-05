@@ -51,6 +51,9 @@ Implemented:
   convention, removing `HG1` from the CYS atom list
 - `patch_charmm_residue_atoms(...)` as a pure helper for Python's atom-only
   residue patch behavior, returning a patched topology entry and atom-name list
+- `choose_charmm_residue_atom_order(...)` as a pure helper that extracts the
+  per-residue topology-order decision from Python's mutating
+  `check_charmm_atomic_order_reorganize`
 - `parse_charmm_topology_globals(...)` for Python-matched `MASS`, `DECL`,
   `DEFA`, and `AUTO` records, preserving values as strings
 - `parse_charmm_topology(...)` for those global records plus Python-matched
@@ -210,10 +213,21 @@ than guessed.
    - still does not patch bonds, angles, or any other topology records, matching
      Python's documented limitation
 
+   Twelfth slice implemented:
+
+   - extracts Python's per-residue order decision into pure
+     `choose_charmm_residue_atom_order(...)`
+   - uses residue atom lists plus pure patch application to choose the topology
+     atom-name order
+   - preserves Python's CYS-to-DISU and HIS-to-HSE/HSD/HSP fallback behavior
+   - preserves Python's terminal patch selection for `NTER`, `GLYP`, `PROP`,
+     and `CTER`
+   - still does not mutate molecule descriptors or coordinates
+
    Future slices should port Python `CharmmTopology` behavior as its own module:
 
-   - integrate reviewed residue patch selection such as `NTER`, `CTER`, `GLYP`,
-     `PROP`, and disulfide/HIS variants into an order-check workflow
+   - integrate this order choice into a no-partial-mutation molecule reorder
+     workflow
    - validate missing, extra, duplicate, and ambiguous atoms
    - optionally reorder molecules only through an explicit API
 

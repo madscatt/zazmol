@@ -475,6 +475,112 @@ CharmmPatchResult patch_charmm_residue_atoms(const CharmmTopologyData& topology,
   return result;
 }
 
+CharmmResidueOrderResult choose_charmm_residue_atom_order(
+    const CharmmTopologyData& topology,
+    const std::map<std::string, std::vector<std::string>>& residue_atoms,
+    const std::string& residue_name,
+    int residue_id,
+    int segment_n_terminal_residue_id,
+    int segment_c_terminal_residue_id,
+    const std::vector<std::string>& observed_atom_names) {
+  CharmmResidueOrderResult result;
+  auto working_topology = topology;
+  auto working_residue_atoms = residue_atoms;
+  auto topology_residue_name = residue_name;
+
+  auto atom_order_for = [&](const std::string& name)
+      -> const std::vector<std::string>* {
+    const auto found = working_residue_atoms.find(name);
+    if (found == working_residue_atoms.end()) {
+      return nullptr;
+    }
+    return &found->second;
+  };
+
+  auto apply_patch = [&](const std::string& patch_name) -> bool {
+    auto patch_result =
+        patch_charmm_residue_atoms(working_topology, topology_residue_name,
+                                   patch_name);
+    if (!patch_result.ok()) {
+      result.errors.insert(result.errors.end(), patch_result.errors.begin(),
+                           patch_result.errors.end());
+      return false;
+    }
+    topology_residue_name += "_" + patch_name;
+    working_topology.entries.push_back(std::move(patch_result.patched_entry));
+    working_residue_atoms[topology_residue_name] =
+        std::move(patch_result.atom_names);
+    return true;
+  };
+
+  auto* atom_order = atom_order_for(topology_residue_name);
+  if (atom_order == nullptr) {
+    result.errors.push_back("For residue: " + topology_residue_name +
+                            "\nthe atom names doesn't match those in the "
+                            "charmm topology file!\n[]\n");
+    return result;
+  }
+
+  if (!compare_list_ignore_order(*atom_order, observed_atom_names)) {
+    if (topology_residue_name == "CYS") {
+      topology_residue_name = "DISU";
+      atom_order = atom_order_for(topology_residue_name);
+    }
+    if (topology_residue_name == "HIS") {
+      topology_residue_name = "HSE";
+      atom_order = atom_order_for(topology_residue_name);
+      if (atom_order == nullptr ||
+          !compare_list_ignore_order(*atom_order, observed_atom_names)) {
+        topology_residue_name = "HSD";
+        atom_order = atom_order_for(topology_residue_name);
+        if (atom_order == nullptr ||
+            !compare_list_ignore_order(*atom_order, observed_atom_names)) {
+          topology_residue_name = "HSP";
+          atom_order = atom_order_for(topology_residue_name);
+        }
+      }
+    }
+
+    if (residue_id == segment_n_terminal_residue_id) {
+      std::string patch = "NTER";
+      if (topology_residue_name == "GLY") {
+        patch = "GLYP";
+      } else if (topology_residue_name == "PRO" ||
+                 topology_residue_name == "PROP") {
+        patch = "PROP";
+      }
+      if (!apply_patch(patch)) {
+        return result;
+      }
+      atom_order = atom_order_for(topology_residue_name);
+    }
+    if (residue_id == segment_c_terminal_residue_id) {
+      if (!apply_patch("CTER")) {
+        return result;
+      }
+      atom_order = atom_order_for(topology_residue_name);
+    }
+    if (atom_order == nullptr ||
+        !compare_list_ignore_order(*atom_order, observed_atom_names)) {
+      result.errors.push_back("For residue: " + topology_residue_name +
+                              "\nthe atom names doesn't match those in the "
+                              "charmm topology file!");
+      return result;
+    }
+  }
+
+  atom_order = atom_order_for(topology_residue_name);
+  if (atom_order == nullptr) {
+    result.errors.push_back("For residue: " + topology_residue_name +
+                            "\nthe atom names doesn't match those in the "
+                            "charmm topology file!");
+    return result;
+  }
+  result.topology_residue_name = topology_residue_name;
+  result.atom_order = *atom_order;
+  return result;
+}
+
 SubsetResult assign_charmm_types(Molecule& molecule,
                                  const std::vector<std::string>& types) {
   SubsetResult result;
