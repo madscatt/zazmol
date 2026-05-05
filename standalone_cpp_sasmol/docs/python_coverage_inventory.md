@@ -33,7 +33,7 @@ Status labels:
 | CHARMM residue atom lists, atom-only patches, order choice, reorder planning/copy/in-place | topology C++ tests | `sasmol/topology.hpp` | `implemented` | high | Keep mutation explicit and no-partial-mutation. |
 | CHARMM36 topology upgrade | planned GitHub issue | `sasmol/topology.hpp` | `deferred` | high | Handle as joint Python/C++ tracked work. |
 | `topology.Topology.create_fasta` | utilities/system FASTA tests | `sasmol/topology.hpp`, `sasmol/molecule.hpp` | `implemented` | low | Keep C++ result typed: sequence vector plus formatted FASTA string. |
-| `topology.Topology.renumber` | `test_system/*index*`, `*resid*` | future topology/system helper | `missing` | low-medium | Port after `create_fasta`. |
+| `topology.Topology.renumber` | `test_topology/test_intg_topology_Topology.py`, `test_system/*index*`, `*resid*` | `sasmol/topology.hpp` | `implemented` | low-medium | Preserve explicit options for index/resid starts. |
 | `topology.Topology.make_constraint_pdb` | dedicated oracle fixture needed | future topology/file-IO helper | `missing` | medium | Require tiny Python output fixture before coding. |
 | `topology.Topology.make_backbone_pdb_from_fasta` | dedicated oracle fixture needed | future topology builder | `missing` | medium-high | Pause before coding; behavior is structural synthesis. |
 | `multiprocessing_sasmol.Multiprocessing_SasMol` | no core C++ parity tests | optional adapter layer | `missing` | high | Defer unless standalone C++ needs orchestration parity. |
@@ -42,32 +42,27 @@ Status labels:
 
 ## Recommended Port Order
 
-1. `topology.Topology.renumber`
-
-   Low to medium risk. This is deterministic descriptor mutation, but it must
-   preserve failure-before-mutation behavior where C++ can validate inputs.
-
-2. `operate.set_average_vdw`
+1. `operate.set_average_vdw`
 
    Low to medium risk. This is isolated, but may require a focused property-table
    expansion for VDW values.
 
-3. `topology.Topology.make_constraint_pdb`
+2. `topology.Topology.make_constraint_pdb`
 
    Medium risk. It combines selection, descriptor changes, and PDB writing, so a
    tiny Python oracle output should come first.
 
-4. `topology.Topology.make_backbone_pdb_from_fasta`
+3. `topology.Topology.make_backbone_pdb_from_fasta`
 
    Medium to high risk. This builds molecular structure from FASTA and should
    not be ported without dedicated fixtures for supported molecule types.
 
-5. Legacy `operate.Move.align(..., mode=...)` details
+4. Legacy `operate.Move.align(..., mode=...)` details
 
    High risk. Review mode-specific Python behavior before adding compatibility
    APIs.
 
-6. Python-style selected BIOMT `apply_biomt` / `copy_apply_biomt`
+5. Python-style selected BIOMT `apply_biomt` / `copy_apply_biomt`
 
    High risk. Keep separate from existing BIOMT metadata preservation and C++
    assembly helpers.

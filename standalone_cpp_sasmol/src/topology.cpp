@@ -604,6 +604,57 @@ SubsetResult create_fasta_in_place(Molecule& molecule,
   return result;
 }
 
+SubsetResult renumber(Molecule& molecule, const RenumberOptions& options) {
+  SubsetResult result;
+  const bool no_explicit_target = !options.index_start.has_value() &&
+                                  !options.resid_start.has_value();
+  const bool renumber_index =
+      no_explicit_target || options.index_start.has_value();
+  const bool renumber_resid =
+      no_explicit_target || options.resid_start.has_value();
+
+  if (renumber_index && molecule.index().size() != molecule.natoms()) {
+    result.errors.push_back("renumber requires descriptor 'index' length to "
+                            "match natoms");
+  }
+  if (renumber_resid && molecule.resid().size() != molecule.natoms()) {
+    result.errors.push_back("renumber requires descriptor 'resid' length to "
+                            "match natoms");
+  }
+  if (!result.ok()) {
+    return result;
+  }
+
+  if (renumber_index) {
+    const int start = options.index_start.value_or(1);
+    std::vector<int> index;
+    index.reserve(molecule.natoms());
+    for (std::size_t atom = 0; atom < molecule.natoms(); ++atom) {
+      index.push_back(start + static_cast<int>(atom));
+    }
+    molecule.index() = std::move(index);
+  }
+
+  if (renumber_resid) {
+    const int start = options.resid_start.value_or(1);
+    std::vector<int> resid;
+    resid.reserve(molecule.natoms());
+    int count = start;
+    int last_resid = 0;
+    for (std::size_t atom = 0; atom < molecule.natoms(); ++atom) {
+      const int current_resid = molecule.resid()[atom];
+      if (atom != 0 && current_resid != last_resid) {
+        ++count;
+      }
+      resid.push_back(count);
+      last_resid = current_resid;
+    }
+    molecule.resid() = std::move(resid);
+  }
+
+  return result;
+}
+
 bool compare_list_ignore_order(const std::vector<std::string>& first,
                                const std::vector<std::string>& second) {
   if (first.size() != second.size()) {

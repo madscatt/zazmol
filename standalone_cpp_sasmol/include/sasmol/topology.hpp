@@ -6,6 +6,7 @@
 #include <cstddef>
 #include <filesystem>
 #include <map>
+#include <optional>
 #include <string>
 #include <vector>
 
@@ -201,12 +202,20 @@ struct FastaResult {
   [[nodiscard]] bool ok() const noexcept { return errors.empty(); }
 };
 
+struct RenumberOptions {
+  std::optional<int> index_start;
+  std::optional<int> resid_start;
+};
+
 [[nodiscard]] FastaResult create_fasta(const Molecule& molecule,
                                        const FastaOptions& options = {});
 
 [[nodiscard]] SubsetResult create_fasta_in_place(
     Molecule& molecule,
     const FastaOptions& options = {});
+
+[[nodiscard]] SubsetResult renumber(Molecule& molecule,
+                                    const RenumberOptions& options = {});
 
 [[nodiscard]] SubsetResult assign_charmm_types(
     Molecule& molecule, const std::vector<std::string>& types);

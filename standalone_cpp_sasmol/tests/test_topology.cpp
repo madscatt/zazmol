@@ -105,6 +105,73 @@ void test_create_fasta_rejects_unknown_residue_without_mutation() {
   assert(molecule.fasta() == "old");
 }
 
+void test_renumber_default_updates_index_and_resid() {
+  sasmol::Molecule molecule(5, 1);
+  molecule.index() = {10, 11, 12, 13, 14};
+  molecule.resid() = {20, 20, 25, 25, 99};
+
+  const auto result = sasmol::renumber(molecule);
+
+  assert(result.ok());
+  assert((molecule.index() == std::vector<int>{1, 2, 3, 4, 5}));
+  assert((molecule.resid() == std::vector<int>{1, 1, 2, 2, 3}));
+}
+
+void test_renumber_index_only_preserves_resid() {
+  sasmol::Molecule molecule(3, 1);
+  molecule.index() = {1, 2, 3};
+  molecule.resid() = {7, 7, 8};
+  sasmol::RenumberOptions options;
+  options.index_start = 3;
+
+  const auto result = sasmol::renumber(molecule, options);
+
+  assert(result.ok());
+  assert((molecule.index() == std::vector<int>{3, 4, 5}));
+  assert((molecule.resid() == std::vector<int>{7, 7, 8}));
+}
+
+void test_renumber_resid_only_preserves_index() {
+  sasmol::Molecule molecule(4, 1);
+  molecule.index() = {4, 5, 6, 7};
+  molecule.resid() = {100, 100, 101, 105};
+  sasmol::RenumberOptions options;
+  options.resid_start = 8;
+
+  const auto result = sasmol::renumber(molecule, options);
+
+  assert(result.ok());
+  assert((molecule.index() == std::vector<int>{4, 5, 6, 7}));
+  assert((molecule.resid() == std::vector<int>{8, 8, 9, 10}));
+}
+
+void test_renumber_index_and_resid_custom_starts() {
+  sasmol::Molecule molecule(3, 1);
+  molecule.index() = {1, 2, 3};
+  molecule.resid() = {2, 3, 3};
+  sasmol::RenumberOptions options;
+  options.index_start = 223;
+  options.resid_start = 18;
+
+  const auto result = sasmol::renumber(molecule, options);
+
+  assert(result.ok());
+  assert((molecule.index() == std::vector<int>{223, 224, 225}));
+  assert((molecule.resid() == std::vector<int>{18, 19, 19}));
+}
+
+void test_renumber_rejects_descriptor_mismatch_without_mutation() {
+  sasmol::Molecule molecule(3, 1);
+  molecule.index() = {1, 2, 3};
+  molecule.resid() = {7, 8};
+
+  const auto result = sasmol::renumber(molecule);
+
+  assert(!result.ok());
+  assert((molecule.index() == std::vector<int>{1, 2, 3}));
+  assert((molecule.resid() == std::vector<int>{7, 8}));
+}
+
 void test_assign_charmm_types_sets_atom_aligned_values() {
   sasmol::Molecule mol(3, 1);
 
@@ -1364,6 +1431,11 @@ int main() {
   test_create_fasta_formatted_by_chain_and_segname();
   test_create_fasta_excludes_hetatm_when_requested();
   test_create_fasta_rejects_unknown_residue_without_mutation();
+  test_renumber_default_updates_index_and_resid();
+  test_renumber_index_only_preserves_resid();
+  test_renumber_resid_only_preserves_index();
+  test_renumber_index_and_resid_custom_starts();
+  test_renumber_rejects_descriptor_mismatch_without_mutation();
   test_assign_charmm_types_sets_atom_aligned_values();
   test_assign_charmm_types_rejects_length_mismatch_without_mutation();
   test_assign_charmm_types_allows_empty_molecule_empty_types();
