@@ -25,8 +25,9 @@ behavior oracle.
 - Linear algebra coverage for cross products, matrix multiplication, vector
   helpers, signed angles, dihedral angles, and ordinary three-point angles.
 - Operate coverage for translate, center, axis/general/Euler rotations, PMI
-  alignment, explicit-index basis alignment, pure copy-returning variants, row
-  and column convention preservation, legacy average vdW radius assignment, and
+  alignment, explicit-index and basis-expression alignment initialization and
+  production helpers, pure copy-returning variants, row and column convention
+  preservation, legacy average vdW radius assignment, and
   failure-before-mutation behavior.
 - Selection/subset coverage for a bounded safe expression grammar, named `all`
   and `heavy` bases, 0/1 mask bridge helpers, coordinate get/set/copy, molecule

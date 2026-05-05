@@ -23,7 +23,7 @@ Status labels:
 | BIOMT metadata preservation | `test_file_io/*biomt_metadata*` | `sasmol/file_io.hpp`, `sasmol/molecule.hpp` | `implemented` | low | Keep `read_pdb` passive. |
 | `calculate.Calculate` mass/formula/charge/COM/Rg/RMSD/minmax/PMI | `test_calculate/*` | `sasmol/calculate.hpp` | `implemented` | low | Add only fixture-backed edge hardening. |
 | `operate.Move` translate/center/rotate/PMI alignment | `test_operate/*` | `sasmol/operate.hpp` | `implemented` | low | Existing coverage is strong. |
-| `operate.Move.align(...)` legacy mode surface | `test_operate/*align*` | `sasmol/operate.hpp` | `partial` | high | Port only after mode-specific oracle review. |
+| `operate.Move.align(...)` legacy mode surface | `test_operate/*align*` | `sasmol/operate.hpp` | `implemented` | high | C++ exposes Python initialization/production semantics as explicit plan helpers rather than string mode dispatch. |
 | `operate.set_average_vdw` | `test_operate/test_unit_operate_set_average_vdw.py` | `sasmol/operate.hpp` | `implemented` | low-medium | C++ stores the usable legacy radius column as scalar `atom_vdw()`. |
 | `subset.Mask` named basis, masks, indices, copy, duplicate, merge, descriptors | `test_subset/*` | `sasmol/selection.hpp`, `sasmol/subset.hpp` | `implemented` | medium | Keep expanding only through explicit grammar decisions. |
 | `subset.Mask.get_subset_mask` open Python eval behavior | `test_subset/*get_subset_mask*` | `sasmol/selection.hpp` | `intentional difference` | high | Survey real expressions before any grammar expansion. |
@@ -42,12 +42,7 @@ Status labels:
 
 ## Recommended Port Order
 
-1. Legacy `operate.Move.align(..., mode=...)` details
-
-   High risk. Review mode-specific Python behavior before adding compatibility
-   APIs.
-
-2. Python-style selected BIOMT `apply_biomt` / `copy_apply_biomt`
+1. Python-style selected BIOMT `apply_biomt` / `copy_apply_biomt`
 
    High risk. Keep separate from existing BIOMT metadata preservation and C++
    assembly helpers.

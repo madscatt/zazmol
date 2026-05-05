@@ -5,6 +5,7 @@
 #include "sasmol/subset.hpp"
 
 #include <cstddef>
+#include <string>
 #include <vector>
 
 namespace sasmol {
@@ -34,6 +35,13 @@ struct AlignmentPlan {
   std::vector<std::size_t> moving_basis_indices;
   std::vector<Vec3> centered_reference_basis;
   CalcVec3 reference_center_of_mass{};
+};
+
+struct AlignmentInitializationResult {
+  AlignmentPlan plan;
+  std::vector<std::string> errors;
+
+  [[nodiscard]] bool ok() const noexcept { return errors.empty(); }
 };
 
 [[nodiscard]] Rotation axis_rotation(Axis axis, calc_type theta);
@@ -86,8 +94,15 @@ void align_pmi_on_cardinal_axes(Molecule& molecule, std::size_t frame);
     const Molecule& moving, const Molecule& reference,
     const std::vector<std::size_t>& moving_basis_indices,
     const std::vector<std::size_t>& reference_basis_indices, std::size_t frame);
+[[nodiscard]] AlignmentInitializationResult initialize_alignment_from_basis(
+    const Molecule& moving, const Molecule& reference,
+    const std::string& moving_basis_expression,
+    const std::string& reference_basis_expression, std::size_t frame = 0);
 
 void align(Molecule& moving, const AlignmentPlan& plan, std::size_t frame);
+[[nodiscard]] SubsetResult apply_alignment_plan(Molecule& moving,
+                                                const AlignmentPlan& plan,
+                                                std::size_t frame = 0);
 [[nodiscard]] Molecule aligned(const Molecule& moving, const AlignmentPlan& plan,
                                std::size_t frame);
 

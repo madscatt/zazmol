@@ -1,4 +1,5 @@
 #include "sasmol/operate.hpp"
+#include "sasmol/selection.hpp"
 
 #include <algorithm>
 #include <array>
@@ -561,6 +562,34 @@ AlignmentPlan initialize_alignment(
   return plan;
 }
 
+AlignmentInitializationResult initialize_alignment_from_basis(
+    const Molecule& moving, const Molecule& reference,
+    const std::string& moving_basis_expression,
+    const std::string& reference_basis_expression, std::size_t frame) {
+  AlignmentInitializationResult result;
+  const auto moving_selection = select_indices(moving, moving_basis_expression);
+  const auto reference_selection =
+      select_indices(reference, reference_basis_expression);
+  result.errors.insert(result.errors.end(), moving_selection.errors.begin(),
+                       moving_selection.errors.end());
+  result.errors.insert(result.errors.end(), reference_selection.errors.begin(),
+                       reference_selection.errors.end());
+  if (!result.ok()) {
+    return result;
+  }
+
+  try {
+    result.plan =
+        initialize_alignment(moving, reference, moving_selection.indices,
+                             reference_selection.indices, frame);
+  } catch (const std::exception& error) {
+    result.errors.push_back(error.what());
+  } catch (...) {
+    result.errors.push_back("alignment initialization failed");
+  }
+  return result;
+}
+
 void align(Molecule& moving, const AlignmentPlan& plan, std::size_t frame) {
   if (plan.moving_basis_indices.empty() ||
       plan.centered_reference_basis.size() != plan.moving_basis_indices.size()) {
@@ -592,6 +621,23 @@ void align(Molecule& moving, const AlignmentPlan& plan, std::size_t frame) {
                     static_cast<coord_type>(rotated_xyz.z +
                                             plan.reference_center_of_mass.z)});
   }
+}
+
+SubsetResult apply_alignment_plan(Molecule& moving, const AlignmentPlan& plan,
+                                  std::size_t frame) {
+  SubsetResult result;
+  auto candidate = moving;
+  try {
+    align(candidate, plan, frame);
+  } catch (const std::exception& error) {
+    result.errors.push_back(error.what());
+    return result;
+  } catch (...) {
+    result.errors.push_back("alignment failed");
+    return result;
+  }
+  moving = std::move(candidate);
+  return result;
 }
 
 Molecule aligned(const Molecule& moving, const AlignmentPlan& plan,

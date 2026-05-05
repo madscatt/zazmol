@@ -7,6 +7,7 @@
 #include <cmath>
 #include <filesystem>
 #include <stdexcept>
+#include <string>
 #include <vector>
 
 namespace {
@@ -500,6 +501,46 @@ void test_align_ca_subset_matches_reference_basis_coordinates() {
                       0.0, 0.02);
 }
 
+void test_initialize_alignment_from_basis_and_apply_plan_matches_subset() {
+  sasmol::PdbReader reader;
+  sasmol::Molecule reference;
+  sasmol::Molecule moving;
+  auto status = reader.read_pdb(fixture_path("pdb_common", "1CRN.pdb"),
+                                reference);
+  assert(status.ok());
+  status = reader.read_pdb(fixture_path("pdb_common", "1CRN.pdb"), moving);
+  assert(status.ok());
+  const std::string basis =
+      "name[i] == \"CA\" and (resid[i] >= 20 and resid[i] <= 31)";
+  const auto selected = sasmol::select_indices(reference, basis);
+  assert(selected.ok());
+
+  const auto initialization =
+      sasmol::initialize_alignment_from_basis(moving, reference, basis, basis,
+                                              0);
+  assert(initialization.ok());
+
+  sasmol::rotate(moving, 0, sasmol::Axis::z, std::acos(-1.0) / 2.0);
+  sasmol::translate(moving, 0, {15.0, -8.0, 3.0});
+
+  const auto result = sasmol::apply_alignment_plan(moving, initialization.plan,
+                                                   0);
+  assert(result.ok());
+  assert_close_double(selected_rmsd(reference, moving, selected.indices, 0),
+                      0.0, 0.02);
+}
+
+void test_initialize_alignment_from_basis_reports_selection_error() {
+  const auto moving = small_carbon_molecule();
+  const auto reference = small_carbon_molecule();
+
+  const auto initialization = sasmol::initialize_alignment_from_basis(
+      moving, reference, "name[i] ==", "name[i] ==", 0);
+
+  assert(!initialization.ok());
+  assert(!initialization.errors.empty());
+}
+
 void test_initialize_alignment_rejects_mismatched_basis_sizes() {
   const auto moving = small_carbon_molecule();
   const auto reference = small_carbon_molecule();
@@ -614,6 +655,18 @@ void test_align_rejects_bad_plan_index_without_mutation() {
   assert_coordinates_unchanged(moving, before);
 }
 
+void test_apply_alignment_plan_preserves_input_on_failure() {
+  auto moving = small_carbon_molecule();
+  const auto before = moving;
+  const sasmol::AlignmentPlan plan;
+
+  const auto result = sasmol::apply_alignment_plan(moving, plan, 0);
+
+  assert(!result.ok());
+  assert(!result.errors.empty());
+  assert_coordinates_unchanged(moving, before);
+}
+
 }  // namespace
 
 int main() {
@@ -642,6 +695,8 @@ int main() {
   test_align_full_basis_rotated_shifted_fixture();
   test_align_ca_subset_moves_whole_molecule_com();
   test_align_ca_subset_matches_reference_basis_coordinates();
+  test_initialize_alignment_from_basis_and_apply_plan_matches_subset();
+  test_initialize_alignment_from_basis_reports_selection_error();
   test_initialize_alignment_rejects_mismatched_basis_sizes();
   test_initialize_alignment_rejects_empty_basis();
   test_initialize_alignment_rejects_bad_frame();
@@ -649,5 +704,6 @@ int main() {
   test_align_rejects_incomplete_plan_without_mutation();
   test_align_rejects_bad_frame_without_mutation();
   test_align_rejects_bad_plan_index_without_mutation();
+  test_apply_alignment_plan_preserves_input_on_failure();
   return 0;
 }
