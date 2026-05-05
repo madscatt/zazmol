@@ -104,7 +104,9 @@ Behavior notes:
 
 ## Deferred
 
-- BIOMT operations
+- Python-style BIOMT `apply_biomt` / `copy_apply_biomt` transform parity remains
+  deferred. Current C++ BIOMT support is passive metadata preservation plus
+  optional coordinate-only assembly helpers.
 
 The current merge behavior is documented in `docs/merge_two_molecules_design.md`.
 Future merge expansion should be reviewed separately rather than folded into

@@ -5,6 +5,7 @@
 #include <cassert>
 #include <cmath>
 #include <filesystem>
+#include <limits>
 #include <stdexcept>
 
 namespace {
@@ -686,7 +687,7 @@ void test_descriptor_get_rejects_descriptor_length_mismatch() {
   assert(result.values.empty());
 }
 
-void test_apply_biomt_transforms_assembles_in_transform_order() {
+void test_assemble_biomt_transforms_assembles_in_transform_order() {
   sasmol::Molecule source(1, 1);
   source.name()[0] = "N";
   source.set_coordinate(0, 0, {1.0F, 2.0F, 3.0F});
@@ -700,7 +701,7 @@ void test_apply_biomt_transforms_assembles_in_transform_order() {
 
   sasmol::Molecule transformed;
   const auto result =
-      sasmol::apply_biomt_transforms(source, 0, transforms, transformed);
+      sasmol::assemble_biomt_transforms(source, 0, transforms, transformed);
 
   assert(result.ok());
   assert(transformed.number_of_frames() == 1);
@@ -709,7 +710,7 @@ void test_apply_biomt_transforms_assembles_in_transform_order() {
   assert_vec_close(transformed.coordinate(0, 1), {11.0F, 1.0F, 3.5F});
 }
 
-void test_biomt_transformed_returns_value_without_mutating_source() {
+void test_biomt_assembly_returns_value_without_mutating_source() {
   sasmol::Molecule source(2, 1);
   source.name() = {"A", "B"};
   source.set_coordinate(0, 0, {0.0F, 0.0F, 0.0F});
@@ -721,7 +722,7 @@ void test_biomt_transformed_returns_value_without_mutating_source() {
        {5.0, 0.0, 0.0}},
   };
 
-  const auto transformed = sasmol::biomt_transformed(source, 0, transforms);
+  const auto transformed = sasmol::biomt_assembly(source, 0, transforms);
 
   assert(transformed.natoms() == 2);
   assert_vec_close(transformed.coordinate(0, 0), {5.0F, 0.0F, 0.0F});
@@ -729,7 +730,7 @@ void test_biomt_transformed_returns_value_without_mutating_source() {
   assert(source.coor() == original);
 }
 
-void test_apply_biomt_transforms_from_metadata_uses_recorded_transforms() {
+void test_assemble_biomt_transforms_from_metadata_uses_recorded_transforms() {
   sasmol::Molecule source(1, 1);
   source.name()[0] = "N";
   source.set_coordinate(0, 0, {2.0F, 0.0F, 0.0F});
@@ -743,7 +744,7 @@ void test_apply_biomt_transforms_from_metadata_uses_recorded_transforms() {
 
   sasmol::Molecule transformed;
   const auto result =
-      sasmol::apply_biomt_transforms_from_metadata(source, 0, 1, transformed);
+      sasmol::assemble_biomt_transforms_from_metadata(source, 0, 1, transformed);
 
   assert(result.ok());
   assert(transformed.natoms() == 2);
@@ -751,7 +752,29 @@ void test_apply_biomt_transforms_from_metadata_uses_recorded_transforms() {
   assert_vec_close(transformed.coordinate(0, 1), {-1.0F, 0.0F, 0.0F});
 }
 
-void test_apply_biomt_transforms_rejects_invalid_inputs_without_mutation() {
+void test_assemble_biomt_transforms_clears_conect() {
+  sasmol::Molecule source(2, 1);
+  source.name() = {"A", "B"};
+  source.original_index() = {10, 20};
+  source.conect()[0] = {20};
+  source.conect()[1] = {10};
+  source.set_coordinate(0, 0, {0.0F, 0.0F, 0.0F});
+  source.set_coordinate(0, 1, {1.0F, 0.0F, 0.0F});
+
+  const std::vector<sasmol::BiomtTransform> transforms{
+      {{{{1.0, 0.0, 0.0}, {0.0, 1.0, 0.0}, {0.0, 0.0, 1.0}}},
+       {0.0, 0.0, 0.0}},
+  };
+
+  const auto assembled = sasmol::biomt_assembly(source, 0, transforms);
+
+  assert(assembled.conect().size() == assembled.natoms());
+  for (const auto& links : assembled.conect()) {
+    assert(links.empty());
+  }
+}
+
+void test_assemble_biomt_transforms_rejects_invalid_inputs_without_mutation() {
   sasmol::Molecule source(1, 1);
   source.name()[0] = "N";
   source.set_coordinate(0, 0, {1.0F, 1.0F, 1.0F});
@@ -760,21 +783,24 @@ void test_apply_biomt_transforms_rejects_invalid_inputs_without_mutation() {
   transformed.name()[0] = "KEEP";
   transformed.set_coordinate(0, 0, {9.0F, 9.0F, 9.0F});
 
-  auto result = sasmol::apply_biomt_transforms(source, 0, {}, transformed);
+  auto result = sasmol::assemble_biomt_transforms(source, 0, {}, transformed);
   assert(!result.ok());
   assert(transformed.natoms() == 1);
   assert(transformed.name()[0] == "KEEP");
   assert_vec_close(transformed.coordinate(0, 0), {9.0F, 9.0F, 9.0F});
 
   const std::vector<sasmol::BiomtTransform> non_finite{
-      {{{{1.0, 0.0, 0.0}, {0.0, NAN, 0.0}, {0.0, 0.0, 1.0}}},
+      {{{{1.0, 0.0, 0.0},
+         {0.0, std::numeric_limits<sasmol::calc_type>::quiet_NaN(), 0.0},
+         {0.0, 0.0, 1.0}}},
        {0.0, 0.0, 0.0}},
   };
-  result = sasmol::apply_biomt_transforms(source, 0, non_finite, transformed);
+  result = sasmol::assemble_biomt_transforms(source, 0, non_finite, transformed);
   assert(!result.ok());
   assert(transformed.name()[0] == "KEEP");
 
-  result = sasmol::apply_biomt_transforms_from_metadata(source, 0, 9, transformed);
+  result = sasmol::assemble_biomt_transforms_from_metadata(source, 0, 9,
+                                                           transformed);
   assert(!result.ok());
   assert(transformed.name()[0] == "KEEP");
 }
@@ -823,9 +849,10 @@ int main() {
   test_get_and_set_calc_descriptor_using_mask();
   test_descriptor_set_rejects_bad_mask_before_mutation();
   test_descriptor_get_rejects_descriptor_length_mismatch();
-  test_apply_biomt_transforms_assembles_in_transform_order();
-  test_biomt_transformed_returns_value_without_mutating_source();
-  test_apply_biomt_transforms_from_metadata_uses_recorded_transforms();
-  test_apply_biomt_transforms_rejects_invalid_inputs_without_mutation();
+  test_assemble_biomt_transforms_assembles_in_transform_order();
+  test_biomt_assembly_returns_value_without_mutating_source();
+  test_assemble_biomt_transforms_from_metadata_uses_recorded_transforms();
+  test_assemble_biomt_transforms_clears_conect();
+  test_assemble_biomt_transforms_rejects_invalid_inputs_without_mutation();
   return 0;
 }

@@ -870,9 +870,9 @@ Molecule merged_two_molecules(const Molecule& mol1, const Molecule& mol2,
   return merged;
 }
 
-SubsetResult apply_biomt_transforms(const Molecule& source, std::size_t frame,
-                                    const std::vector<BiomtTransform>& transforms,
-                                    Molecule& transformed) {
+SubsetResult assemble_biomt_transforms(
+    const Molecule& source, std::size_t frame,
+    const std::vector<BiomtTransform>& transforms, Molecule& assembled_output) {
   SubsetResult result;
   if (source.natoms() == 0) {
     result.errors.push_back("biomt source has no atoms");
@@ -929,41 +929,42 @@ SubsetResult apply_biomt_transforms(const Molecule& source, std::size_t frame,
     assembled = std::move(merged);
   }
 
-  transformed = std::move(assembled);
+  assembled.conect().assign(assembled.natoms(), {});
+  assembled_output = std::move(assembled);
   return result;
 }
 
-Molecule biomt_transformed(const Molecule& source, std::size_t frame,
-                           const std::vector<BiomtTransform>& transforms) {
-  Molecule transformed;
+Molecule biomt_assembly(const Molecule& source, std::size_t frame,
+                        const std::vector<BiomtTransform>& transforms) {
+  Molecule assembled;
   const auto result =
-      apply_biomt_transforms(source, frame, transforms, transformed);
+      assemble_biomt_transforms(source, frame, transforms, assembled);
   if (!result.ok()) {
     throw std::invalid_argument(result.errors.front());
   }
-  return transformed;
+  return assembled;
 }
 
-SubsetResult apply_biomt_transforms_from_metadata(const Molecule& source,
-                                                  std::size_t frame, int biomol_id,
-                                                  Molecule& transformed) {
+SubsetResult assemble_biomt_transforms_from_metadata(
+    const Molecule& source, std::size_t frame, int biomol_id,
+    Molecule& assembled) {
   SubsetResult result;
   auto transforms = metadata_transforms_for_biomol(source, biomol_id, result);
   if (!result.ok()) {
     return result;
   }
-  return apply_biomt_transforms(source, frame, transforms, transformed);
+  return assemble_biomt_transforms(source, frame, transforms, assembled);
 }
 
-Molecule biomt_transformed_from_metadata(const Molecule& source,
-                                         std::size_t frame, int biomol_id) {
-  Molecule transformed;
-  const auto result = apply_biomt_transforms_from_metadata(source, frame, biomol_id,
-                                                           transformed);
+Molecule biomt_assembly_from_metadata(const Molecule& source, std::size_t frame,
+                                      int biomol_id) {
+  Molecule assembled;
+  const auto result =
+      assemble_biomt_transforms_from_metadata(source, frame, biomol_id, assembled);
   if (!result.ok()) {
     throw std::invalid_argument(result.errors.front());
   }
-  return transformed;
+  return assembled;
 }
 
 StringSelection get_string_descriptor_using_indices(

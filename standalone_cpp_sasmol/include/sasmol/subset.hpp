@@ -151,19 +151,21 @@ struct BiomtTransform {
 [[nodiscard]] Molecule merged_two_molecules(
     const Molecule& mol1, const Molecule& mol2, MergeOptions options = {});
 
-[[nodiscard]] SubsetResult apply_biomt_transforms(
+// Coordinate-only convenience assembly: each transform contributes one
+// transformed copy of the source frame. Connectivity is not remapped.
+[[nodiscard]] SubsetResult assemble_biomt_transforms(
     const Molecule& source, std::size_t frame,
-    const std::vector<BiomtTransform>& transforms, Molecule& transformed);
+    const std::vector<BiomtTransform>& transforms, Molecule& assembled);
 
-[[nodiscard]] Molecule biomt_transformed(
+[[nodiscard]] Molecule biomt_assembly(
     const Molecule& source, std::size_t frame,
     const std::vector<BiomtTransform>& transforms);
 
-[[nodiscard]] SubsetResult apply_biomt_transforms_from_metadata(
+[[nodiscard]] SubsetResult assemble_biomt_transforms_from_metadata(
     const Molecule& source, std::size_t frame, int biomol_id,
-    Molecule& transformed);
+    Molecule& assembled);
 
-[[nodiscard]] Molecule biomt_transformed_from_metadata(
+[[nodiscard]] Molecule biomt_assembly_from_metadata(
     const Molecule& source, std::size_t frame, int biomol_id);
 
 [[nodiscard]] StringSelection get_string_descriptor_using_indices(

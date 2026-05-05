@@ -34,8 +34,8 @@ Behavior reference changed in Python commit `da1d399`:
 - Added passive BIOMT metadata parsing from `REMARK 350` headers during
   `read_pdb()`.
 - Added BIOMT metadata storage accessors on `Molecule`.
-- Clarified `apply_biomt` and `copy_apply_biomt` as explicit transform helpers
-  that do not parse headers or assemble full biological units.
+- Clarified `apply_biomt` and `copy_apply_biomt` as explicit Python transform
+  helpers that do not parse headers or assemble full biological units.
 
 ## Phase 3 Design Decision
 
@@ -49,8 +49,8 @@ molecule's BIOMT map after a successful PDB read, just as Python does after
 header capture. Reading must not apply BIOMT transforms or resize/duplicate
 coordinate storage.
 
-Transform helpers remain subset/operate-style coordinate APIs and should be
-implemented later, after metadata parity is complete.
+Optional assembly helpers remain subset/operate-style coordinate APIs. They are
+separate from Python `apply_biomt` parity and must stay out of PDB reading.
 
 ## Approved C++ Metadata API Shape
 
@@ -96,23 +96,29 @@ Parser boundary:
 - clear BIOMT metadata on `Molecule::resize`, matching the rest of molecule
   state reset behavior
 
-## Transform API Shape (Deferred Review Target)
+## Optional Assembly Helper Shape
 
-Transform helper candidates:
+The C++ helper currently provided after metadata parity is not Python
+`apply_biomt` parity. It is an optional coordinate-only assembly convenience:
+each transform contributes one transformed copy of the source frame.
 
-In-place worker:
+It must not be used by `read_pdb()` and it does not process or remap `CONECT`.
+Assembled outputs carry empty connectivity so callers do not mistake copied PDB
+connectivity records for remapped assembly topology.
+
+Non-throwing worker:
 
 ```cpp
-[[nodiscard]] SubsetResult apply_biomt_transforms(
-    Molecule& molecule, std::size_t frame,
-    const std::vector<BiomtTransform>& transforms);
+[[nodiscard]] SubsetResult assemble_biomt_transforms(
+    const Molecule& source, std::size_t frame,
+    const std::vector<BiomtTransform>& transforms, Molecule& assembled);
 ```
 
 Pure value-returning helper:
 
 ```cpp
-[[nodiscard]] Molecule biomt_transformed(
-    const Molecule& molecule, std::size_t frame,
+[[nodiscard]] Molecule biomt_assembly(
+    const Molecule& source, std::size_t frame,
     const std::vector<BiomtTransform>& transforms);
 ```
 
@@ -150,7 +156,7 @@ Notes:
 8. Numeric policy:
    Rotation and translation values are parsed into `calc_type`.
 
-## Transform Semantics To Lock Before Implementation
+## Assembly Helper Semantics
 
 1. Transform order:
    Apply transforms in input order. Output assembly order must match transform
@@ -161,24 +167,27 @@ Notes:
    Each transform contributes one transformed copy of the source coordinates.
 4. Coordinate precision:
    Calculations use `calc_type`, storage follows `coord_type` policy.
-5. Validation:
+5. Connectivity:
+   Output `conect()` is present but empty for each assembled atom. BIOMT assembly
+   helpers do not process, preserve, or remap connectivity.
+6. Validation:
    Reject bad frame, empty transform set, non-finite matrix/translation entries,
    and non-rigid rotation matrices if policy requires rigidity checks.
-6. Failure mode:
+7. Failure mode:
    Non-throwing worker returns structured errors with no partial mutation.
 
 ## Test Scaffolding In This Step
 
-`tests/test_biomt_fixture_semantics.cpp` adds generated fixture-style checks for:
+`tests/test_biomt_fixture_semantics.cpp` added generated fixture-style checks for:
 
 - deterministic transform-order behavior
 - explicit frame targeting
 - source-coordinate immutability while assembling transformed outputs
 
-These tests do not call BIOMT production APIs yet. They lock fixture semantics
-and expected transformed coordinates for the implementation step.
+These tests lock fixture semantics and expected transformed coordinates for
+optional assembly helper behavior.
 
-`tests/test_biomt_metadata_fixture_semantics.cpp` adds generated fixture-style
+`tests/test_biomt_metadata_fixture_semantics.cpp` added generated fixture-style
 checks for:
 
 - empty metadata when no BIOMT header lines are present
@@ -186,12 +195,11 @@ checks for:
 - multi-chain continuation parsing (`APPLY...` + `AND CHAINS...`)
 - incomplete BIOMT triplets being ignored
 
-These tests also avoid production BIOMT APIs and lock parsing expectations
-before implementation.
+These tests lock parsing expectations for passive metadata capture.
 
-## Next Implementation Slice
+## Completed Metadata Slice
 
-Implement metadata parity only:
+Metadata parity was implemented separately:
 
 1. Add `BiomtRecord` and `BiomtMap` to `sasmol/molecule.hpp`.
 2. Add `Molecule::biomt()` accessors and reset behavior.
@@ -202,8 +210,8 @@ Implement metadata parity only:
 6. Add a PDB-read test proving identity BIOMT metadata does not mutate
    coordinates.
 
-Stop after this slice. Do not implement coordinate transform helpers in the same
-commit.
+The later coordinate assembly helper slice was kept explicit and manual-only.
+Python-style selected `apply_biomt` / `copy_apply_biomt` parity remains deferred.
 
 ## Explicit Non-Goals In This Step
 
