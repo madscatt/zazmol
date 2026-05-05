@@ -130,6 +130,29 @@ void parse_internal_coordinate_record(
   records.push_back({std::vector<std::string>(tokens.begin() + 1, end)});
 }
 
+void parse_delete_record(const std::vector<std::string>& tokens,
+                         std::size_t line_number,
+                         CharmmTopologyDeleteRecords& records,
+                         std::vector<std::string>& errors) {
+  if (tokens.size() < 2) {
+    errors.push_back(
+        line_context(line_number, "DELE record requires a delete type"));
+    return;
+  }
+
+  const auto delete_type = tokens[1].substr(0, 4);
+  if (delete_type == "ATOM") {
+    if (tokens.size() < 3) {
+      errors.push_back(
+          line_context(line_number, "DELE ATOM record requires atom name"));
+      return;
+    }
+    records.atoms.push_back(tokens[2]);
+  } else if (delete_type == "ANGL") {
+    records.angles.emplace_back(tokens.begin() + 2, tokens.end());
+  }
+}
+
 std::map<std::string, int> count_atom_names(const std::vector<std::string>& names) {
   std::map<std::string, int> counts;
   for (const auto& name : names) {
@@ -230,7 +253,8 @@ CharmmTopologyParseResult parse_charmm_topology_impl(
            .cmaps = {},
            .donors = {},
            .acceptors = {},
-           .internal_coordinates = {}});
+           .internal_coordinates = {},
+           .deletes = {}});
       current_entry = &result.topology.entries.back();
     } else if (include_entries && record == "ATOM") {
       if (current_entry == nullptr) {
@@ -305,6 +329,14 @@ CharmmTopologyParseResult parse_charmm_topology_impl(
       }
       parse_internal_coordinate_record(tokens,
                                        current_entry->internal_coordinates);
+    } else if (include_entries && record.starts_with("DELE")) {
+      if (current_entry == nullptr) {
+        result.errors.push_back(line_context(
+            line_number, "DELE record appeared before RESI or PRES"));
+        continue;
+      }
+      parse_delete_record(tokens, line_number, current_entry->deletes,
+                          result.errors);
     }
   }
 

@@ -53,7 +53,7 @@ C++ parity checkpoint:
   preserved.
 - `parse_charmm_topology(...)` parses those same global records plus `RESI`,
   `PRES`, `ATOM`, `BOND`, `DOUBLE`, `ANGL`, `THET`, `DIHE`, `IMPR`, and
-  `CMAP`, `DONO`, `ACCE`, and `IC` records.
+  `CMAP`, `DONO`, `ACCE`, `IC`, and `DELE` records.
 - The C++ tests for `minimal_resi_atoms.rtf` and `minimal_pres_atoms_dele.rtf`
   match Python's string-preserving residue, patch, total-charge, and atom-record
   shape.
@@ -67,8 +67,10 @@ C++ parity checkpoint:
   `DONO` and `ACCE` string-list shapes.
 - The C++ test for `minimal_resi_ic.rtf` matches Python's ordered `IC`
   `words[1:10]` shape.
-- The C++ parser deliberately ignores `DELE` and other remaining section records
-  for this slice.
+- The C++ test for `minimal_pres_atoms_dele.rtf` matches Python's nested `DELE`
+  shape for `ATOM` and `ANGL` deletes.
+- The C++ parser deliberately ignores unknown `DELE` types and other remaining
+  section records for this slice.
 
 Residue and patch records:
 
@@ -91,6 +93,7 @@ Residue and patch records:
   does not validate that all nine fields are present.
 - `DELE ATOM HN` is stored under `DELE.ATOM` as the string `HN`.
 - `DELE ANGL HT1 N CA` is stored under `DELE.ANGL` as a token list.
+- unknown `DELE` types are ignored by the current Python parser.
 
 Comment behavior:
 

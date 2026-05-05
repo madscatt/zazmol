@@ -25,8 +25,8 @@ can store CHARMM-related descriptors, can accept explicit caller-provided
 CHARMM type assignments, and can parse the first reviewed global-record subset
 from CHARMM topology files. It can also parse `RESI`/`PRES` headers and their
 ordered `ATOM`, `BOND`, `DOUBLE`, `ANGL`, `THET`, `DIHE`, `IMPR`, and `CMAP`
-rows, plus `DONO`, `ACCE`, and `IC` rows, as data-only records. It does not
-infer types, apply patches, or mutate molecules from topology files yet.
+rows, plus `DONO`, `ACCE`, `IC`, and `DELE` rows, as data-only records. It does
+not infer types, apply patches, or mutate molecules from topology files yet.
 
 Implemented:
 
@@ -47,8 +47,8 @@ Implemented:
   `DEFA`, and `AUTO` records, preserving values as strings
 - `parse_charmm_topology(...)` for those global records plus Python-matched
   `RESI`/`PRES` headers and ordered `ATOM`, `BOND`, `DOUBLE`, `ANGL`, `THET`,
-  `DIHE`, `IMPR`, `CMAP`, `DONO`, `ACCE`, and `IC` rows, preserving total
-  charge and atom charges as strings
+  `DIHE`, `IMPR`, `CMAP`, `DONO`, `ACCE`, `IC`, and `DELE` rows, preserving
+  total charge and atom charges as strings
 - no-partial-mutation failure behavior for length mismatches, atom-name
   mismatches, and molecule name-vector mismatches
 
@@ -57,9 +57,9 @@ It is not a topology engine. The parser slices are data-only and do not assign
 descriptors to a molecule. Patch application, completeness checks, and possible
 atom reordering remain separate reviewed steps.
 
-Recommended next step: validate the next parser slice against tiny Python-oracle
-fixtures before any production topology summary work. Do not parse patch-delete
-or reorder behavior without a separate fixture-backed slice.
+Recommended next step: pause before moving from passive parsing to any topology
+operation. Do not apply patches, build residue atom lists, or reorder atoms
+without a separate fixture-backed design slice.
 
 The Python oracle harness for future parser work is recorded in
 `docs/charmm_topology_python_oracle.md`.
@@ -166,9 +166,16 @@ than guessed.
    - does not validate internal-coordinate geometry or require a full nine-token
      record, matching Python's passive storage behavior
 
+   Eighth slice implemented:
+
+   - parses `DELE ATOM` as ordered atom-name strings, preserving Python's
+     first-token-only behavior after `DELE ATOM`
+   - parses `DELE ANGL` as ordered string vectors, preserving Python's
+     `words[2:]` shape
+   - ignores unknown `DELE` types, matching Python's current parser behavior
+
    Future slices should port Python `CharmmTopology` behavior as its own module:
 
-   - parse `DELE`
    - build residue atom lists
    - support reviewed residue patches such as `NTER`, `CTER`, `GLYP`, `PROP`,
      and disulfide/HIS variants

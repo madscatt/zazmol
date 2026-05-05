@@ -82,6 +82,11 @@ struct CharmmTopologyInternalCoordinateRecord {
   std::vector<std::string> fields;
 };
 
+struct CharmmTopologyDeleteRecords {
+  std::vector<std::string> atoms;
+  std::vector<std::vector<std::string>> angles;
+};
+
 struct CharmmTopologyEntry {
   CharmmTopologyEntryKind kind{};
   std::string name;
@@ -97,6 +102,7 @@ struct CharmmTopologyEntry {
   std::vector<std::string> donors;
   std::vector<std::string> acceptors;
   std::vector<CharmmTopologyInternalCoordinateRecord> internal_coordinates;
+  CharmmTopologyDeleteRecords deletes;
 };
 
 struct CharmmTopologyData {

@@ -316,6 +316,10 @@ void test_parse_charmm_topology_patch_atoms_match_python_oracle_fixture() {
   assert(nter.atoms[3].name == "HT3");
   assert(nter.atoms[3].charmm_type == "HC");
   assert(nter.atoms[3].atom_charge == "0.33");
+  assert((nter.deletes.atoms == std::vector<std::string>{"HN"}));
+  assert(nter.deletes.angles.size() == 1);
+  assert((nter.deletes.angles[0] ==
+          std::vector<std::string>{"HT1", "N", "CA"}));
 }
 
 void test_parse_charmm_topology_bond_pairs_match_python_oracle_fixture() {
@@ -441,6 +445,60 @@ void test_parse_charmm_topology_ic_preserves_short_python_slice() {
   assert(result.topology.entries[0].internal_coordinates.size() == 1);
   assert((result.topology.entries[0].internal_coordinates[0].fields ==
           std::vector<std::string>{"N", "CA", "C"}));
+}
+
+void test_parse_charmm_topology_dele_records_match_python_oracle_fixture() {
+  const auto result = sasmol::parse_charmm_topology(
+      topology_fixture("minimal_pres_atoms_dele.rtf"));
+
+  assert(result.ok());
+  assert(result.topology.entries.size() == 2);
+
+  const auto& gly = result.topology.entries[0];
+  assert(gly.deletes.atoms.empty());
+  assert(gly.deletes.angles.empty());
+
+  const auto& nter = result.topology.entries[1];
+  assert((nter.deletes.atoms == std::vector<std::string>{"HN"}));
+  assert(nter.deletes.angles.size() == 1);
+  assert((nter.deletes.angles[0] ==
+          std::vector<std::string>{"HT1", "N", "CA"}));
+}
+
+void test_parse_charmm_topology_dele_atom_keeps_python_first_atom_only() {
+  const auto path = std::filesystem::temp_directory_path() /
+                    "sasmol_dele_atom_extra_topology.rtf";
+  {
+    std::ofstream output(path);
+    output << "PRES NTER 1.00\n";
+    output << "DELE ATOM HN EXTRA_IGNORED\n";
+  }
+
+  const auto result = sasmol::parse_charmm_topology(path);
+  std::filesystem::remove(path);
+
+  assert(result.ok());
+  assert(result.topology.entries.size() == 1);
+  assert((result.topology.entries[0].deletes.atoms ==
+          std::vector<std::string>{"HN"}));
+}
+
+void test_parse_charmm_topology_dele_unknown_type_is_ignored() {
+  const auto path =
+      std::filesystem::temp_directory_path() / "sasmol_dele_unknown_topology.rtf";
+  {
+    std::ofstream output(path);
+    output << "PRES NTER 1.00\n";
+    output << "DELE BOND HT1 N\n";
+  }
+
+  const auto result = sasmol::parse_charmm_topology(path);
+  std::filesystem::remove(path);
+
+  assert(result.ok());
+  assert(result.topology.entries.size() == 1);
+  assert(result.topology.entries[0].deletes.atoms.empty());
+  assert(result.topology.entries[0].deletes.angles.empty());
 }
 
 void test_parse_charmm_topology_bond_pairs_stop_at_inline_comment() {
@@ -702,6 +760,9 @@ int main() {
   test_parse_charmm_topology_donor_acceptor_match_python_oracle_fixture();
   test_parse_charmm_topology_ic_records_match_python_oracle_fixture();
   test_parse_charmm_topology_ic_preserves_short_python_slice();
+  test_parse_charmm_topology_dele_records_match_python_oracle_fixture();
+  test_parse_charmm_topology_dele_atom_keeps_python_first_atom_only();
+  test_parse_charmm_topology_dele_unknown_type_is_ignored();
   test_parse_charmm_topology_bond_pairs_stop_at_inline_comment();
   test_parse_charmm_topology_angle_triples_stop_at_inline_comment();
   test_parse_charmm_topology_quad_terms_stop_at_inline_comment();
