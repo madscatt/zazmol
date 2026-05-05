@@ -120,6 +120,16 @@ void parse_quad_record(const std::vector<std::string>& tokens,
   }
 }
 
+void parse_internal_coordinate_record(
+    const std::vector<std::string>& tokens,
+    std::vector<CharmmTopologyInternalCoordinateRecord>& records) {
+  auto end = tokens.end();
+  if (tokens.size() > 10) {
+    end = tokens.begin() + 10;
+  }
+  records.push_back({std::vector<std::string>(tokens.begin() + 1, end)});
+}
+
 std::map<std::string, int> count_atom_names(const std::vector<std::string>& names) {
   std::map<std::string, int> counts;
   for (const auto& name : names) {
@@ -219,7 +229,8 @@ CharmmTopologyParseResult parse_charmm_topology_impl(
            .impropers = {},
            .cmaps = {},
            .donors = {},
-           .acceptors = {}});
+           .acceptors = {},
+           .internal_coordinates = {}});
       current_entry = &result.topology.entries.back();
     } else if (include_entries && record == "ATOM") {
       if (current_entry == nullptr) {
@@ -286,6 +297,14 @@ CharmmTopologyParseResult parse_charmm_topology_impl(
                                                  : current_entry->acceptors;
       parse_single_record(tokens, record.starts_with("DONO") ? "DONO" : "ACCE",
                           line_number, records, result.errors);
+    } else if (include_entries && record == "IC") {
+      if (current_entry == nullptr) {
+        result.errors.push_back(
+            line_context(line_number, "IC record appeared before RESI or PRES"));
+        continue;
+      }
+      parse_internal_coordinate_record(tokens,
+                                       current_entry->internal_coordinates);
     }
   }
 

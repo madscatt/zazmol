@@ -78,6 +78,10 @@ struct CharmmTopologyQuadRecord {
   std::string fourth;
 };
 
+struct CharmmTopologyInternalCoordinateRecord {
+  std::vector<std::string> fields;
+};
+
 struct CharmmTopologyEntry {
   CharmmTopologyEntryKind kind{};
   std::string name;
@@ -92,6 +96,7 @@ struct CharmmTopologyEntry {
   std::vector<CharmmTopologyQuadRecord> cmaps;
   std::vector<std::string> donors;
   std::vector<std::string> acceptors;
+  std::vector<CharmmTopologyInternalCoordinateRecord> internal_coordinates;
 };
 
 struct CharmmTopologyData {

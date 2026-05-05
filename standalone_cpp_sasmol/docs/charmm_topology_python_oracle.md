@@ -29,11 +29,12 @@ The tool deliberately preserves Python's parsed shape:
 - `minimal_resi_angles.rtf`
 - `minimal_resi_four_terms.rtf`
 - `minimal_resi_donor_acceptor.rtf`
+- `minimal_resi_ic.rtf`
 - `minimal_pres_atoms_dele.rtf`
 - `minimal_comments_blank_lines.rtf`
 - `minimal_multiple_residues.rtf`
 
-All nine fixtures currently parse through Python with `errors == []`.
+All ten fixtures currently parse through Python with `errors == []`.
 
 ## Observed Python Shapes
 
@@ -52,7 +53,7 @@ C++ parity checkpoint:
   preserved.
 - `parse_charmm_topology(...)` parses those same global records plus `RESI`,
   `PRES`, `ATOM`, `BOND`, `DOUBLE`, `ANGL`, `THET`, `DIHE`, `IMPR`, and
-  `CMAP`, `DONO`, and `ACCE` records.
+  `CMAP`, `DONO`, `ACCE`, and `IC` records.
 - The C++ tests for `minimal_resi_atoms.rtf` and `minimal_pres_atoms_dele.rtf`
   match Python's string-preserving residue, patch, total-charge, and atom-record
   shape.
@@ -64,6 +65,8 @@ C++ parity checkpoint:
   `DIHE`, `IMPR`, and `CMAP` four-token shapes.
 - The C++ test for `minimal_resi_donor_acceptor.rtf` matches Python's ordered
   `DONO` and `ACCE` string-list shapes.
+- The C++ test for `minimal_resi_ic.rtf` matches Python's ordered `IC`
+  `words[1:10]` shape.
 - The C++ parser deliberately ignores `DELE` and other remaining section records
   for this slice.
 
@@ -84,6 +87,8 @@ Residue and patch records:
   parser.
 - `DONO` records are stored as ordered strings.
 - `ACCE` records are stored as ordered strings.
+- `IC` records are stored as ordered string lists from `words[1:10]`; Python
+  does not validate that all nine fields are present.
 - `DELE ATOM HN` is stored under `DELE.ATOM` as the string `HN`.
 - `DELE ANGL HT1 N CA` is stored under `DELE.ANGL` as a token list.
 

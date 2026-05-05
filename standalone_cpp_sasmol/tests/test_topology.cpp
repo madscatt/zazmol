@@ -404,6 +404,45 @@ void test_parse_charmm_topology_donor_acceptor_match_python_oracle_fixture() {
   assert((ser.acceptors == std::vector<std::string>{"O", "OG"}));
 }
 
+void test_parse_charmm_topology_ic_records_match_python_oracle_fixture() {
+  const auto result =
+      sasmol::parse_charmm_topology(topology_fixture("minimal_resi_ic.rtf"));
+
+  assert(result.ok());
+  assert(result.topology.entries.size() == 1);
+
+  const auto& gly = result.topology.entries[0];
+  assert(gly.name == "GLY");
+  assert(gly.internal_coordinates.size() == 2);
+  assert((gly.internal_coordinates[0].fields ==
+          std::vector<std::string>{"-C", "N", "CA", "C", "1.3551",
+                                   "126.4900", "180.0000", "114.4400",
+                                   "1.5390"}));
+  assert((gly.internal_coordinates[1].fields ==
+          std::vector<std::string>{"N", "CA", "C", "O", "1.4592",
+                                   "114.4400", "180.0000", "120.9900",
+                                   "1.2310"}));
+}
+
+void test_parse_charmm_topology_ic_preserves_short_python_slice() {
+  const auto path =
+      std::filesystem::temp_directory_path() / "sasmol_short_ic_topology.rtf";
+  {
+    std::ofstream output(path);
+    output << "RESI GLY 0.00\n";
+    output << "IC N CA C\n";
+  }
+
+  const auto result = sasmol::parse_charmm_topology(path);
+  std::filesystem::remove(path);
+
+  assert(result.ok());
+  assert(result.topology.entries.size() == 1);
+  assert(result.topology.entries[0].internal_coordinates.size() == 1);
+  assert((result.topology.entries[0].internal_coordinates[0].fields ==
+          std::vector<std::string>{"N", "CA", "C"}));
+}
+
 void test_parse_charmm_topology_bond_pairs_stop_at_inline_comment() {
   const auto path =
       std::filesystem::temp_directory_path() / "sasmol_bond_comment_topology.rtf";
@@ -661,6 +700,8 @@ int main() {
   test_parse_charmm_topology_angle_triples_match_python_oracle_fixture();
   test_parse_charmm_topology_quad_terms_match_python_oracle_fixture();
   test_parse_charmm_topology_donor_acceptor_match_python_oracle_fixture();
+  test_parse_charmm_topology_ic_records_match_python_oracle_fixture();
+  test_parse_charmm_topology_ic_preserves_short_python_slice();
   test_parse_charmm_topology_bond_pairs_stop_at_inline_comment();
   test_parse_charmm_topology_angle_triples_stop_at_inline_comment();
   test_parse_charmm_topology_quad_terms_stop_at_inline_comment();
