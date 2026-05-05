@@ -42,17 +42,17 @@ Status labels:
 | `charmm_topology.CharmmTopology.charmm_names` | `test_properties/test_unit_properties_Atomic_charmm_names.py` | `sasmol/topology.hpp` | `implemented` | medium | Pure CHARMM atom-name classification table fixture-checked against Python data. |
 | VMD/view helpers | `test_system/*send_coordinates_to_vmd*` | `sasmol/view.hpp` | `implemented` | medium | Python-style coordinate extraction is portable; legacy IMD/VMD C sender is optional behind `SASMOL_ENABLE_VMD_ADAPTER`. |
 
-## Recommended Port Order
+## Recommended Next Work
 
-No broad in-scope core module remains as an obvious next port target. Future
-work should be driven by a named caller need or fixture-backed parity gap.
+No broad in-scope core module remains as an obvious next port target. The active
+next work is validation:
 
-Useful optional follow-ups:
+1. selection compatibility validation from surveyed SASSIE/ZAZZIE basis strings
+2. end-to-end molecule workflow smoke tests
 
-- selection grammar expansion from a real usage survey
+See `workflow_validation_plan.md`.
 
-  Add only named grammar features with Python/C++ parity tests. Do not recreate
-  Python `eval`.
+Backlog:
 
 - VMD/view runtime smoke test
 
@@ -63,6 +63,11 @@ Useful optional follow-ups:
 
   Add only when a concrete PDB, DCD, topology, or selection fixture shows a
   behavior gap.
+
+- Python binding planning
+
+  Separate design work covering API exposure order, Python names, NumPy
+  ownership/conversion, and status/error mapping.
 
 ## Policy-Gated Work
 

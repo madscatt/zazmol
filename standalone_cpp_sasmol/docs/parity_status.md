@@ -85,8 +85,8 @@ behavior oracle.
 
 ## Recommended Next Slice
 
-No broad in-scope core module remains as an obvious next port target. The next
-slice should be chosen from a concrete caller need or fixture-backed parity gap:
-selection grammar expansion from surveyed real expressions, real-VMD runtime
-smoke testing if that workflow matters, or unusual PDB/DCD/topology fixture
-hardening.
+No broad in-scope core module remains as an obvious next port target. The active
+next slice is validation: keep exercising surveyed SASSIE/ZAZZIE selection
+strings and add end-to-end molecule workflow smoke tests. Real VMD runtime
+testing and Python binding planning are backlog items, not blockers for the
+standalone C++ core.

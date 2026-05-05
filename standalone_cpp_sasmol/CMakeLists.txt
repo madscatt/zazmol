@@ -124,6 +124,13 @@ if(BUILD_TESTING)
   )
   add_test(NAME selection COMMAND test_selection)
 
+  add_executable(test_workflow_validation tests/test_workflow_validation.cpp)
+  target_link_libraries(test_workflow_validation PRIVATE sasmol_standalone)
+  target_compile_definitions(test_workflow_validation PRIVATE
+    SASMOL_TEST_DATA_DIR="${CMAKE_CURRENT_SOURCE_DIR}/../src/python/test_sasmol/data"
+  )
+  add_test(NAME workflow_validation COMMAND test_workflow_validation)
+
   add_executable(test_topology tests/test_topology.cpp)
   target_link_libraries(test_topology PRIVATE sasmol_standalone)
   target_compile_definitions(test_topology PRIVATE
