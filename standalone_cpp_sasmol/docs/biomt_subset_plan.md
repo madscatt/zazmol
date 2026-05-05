@@ -37,9 +37,24 @@ Behavior reference changed in Python commit `da1d399`:
 - Clarified `apply_biomt` and `copy_apply_biomt` as explicit transform helpers
   that do not parse headers or assemble full biological units.
 
-## Proposed C++ API Shape (Review Target)
+## Phase 3 Design Decision
 
-Metadata record candidate:
+BIOMT metadata should be molecule-owned, not parser-owned. This mirrors Python's
+`Molecule.biomt()` storage and keeps metadata available after `read_pdb()`
+returns.
+
+The PDB reader should be responsible for passive `REMARK 350` parsing because
+the metadata is part of file input behavior. The reader must populate the
+molecule's BIOMT map after a successful PDB read, just as Python does after
+header capture. Reading must not apply BIOMT transforms or resize/duplicate
+coordinate storage.
+
+Transform helpers remain subset/operate-style coordinate APIs and should be
+implemented later, after metadata parity is complete.
+
+## Approved C++ Metadata API Shape
+
+Metadata record:
 
 ```cpp
 struct BiomtRecord {
@@ -51,18 +66,37 @@ struct BiomtRecord {
 };
 ```
 
-Metadata container candidate:
+Metadata container:
 
 ```cpp
 using BiomtMap = std::map<int, BiomtRecord>;
 ```
 
-Metadata parse helper candidate:
+Molecule accessors:
+
+```cpp
+[[nodiscard]] BiomtMap& biomt() noexcept;
+[[nodiscard]] const BiomtMap& biomt() const noexcept;
+void set_biomt(BiomtMap value);
+```
+
+PDB parse helper:
 
 ```cpp
 [[nodiscard]] BiomtMap parse_biomt_header_records(
     const std::vector<std::string>& header_lines);
 ```
+
+Parser boundary:
+
+- expose the helper from `sasmol/file_io.hpp` so parser behavior can be unit
+  tested without constructing a PDB file
+- call the same helper from `PdbReader::read_pdb`
+- store the result on `Molecule::biomt()`
+- clear BIOMT metadata on `Molecule::resize`, matching the rest of molecule
+  state reset behavior
+
+## Transform API Shape (Deferred Review Target)
 
 Transform helper candidates:
 
@@ -93,7 +127,7 @@ struct BiomtTransform {
 
 Notes:
 
-- API names are review targets, not finalized ABI.
+- transform API names remain review targets, not finalized ABI.
 - Frame argument is explicit; no implicit current-frame behavior.
 - Transform sequence order is caller-defined and preserved.
 
@@ -111,6 +145,10 @@ Notes:
    Accept only complete row triplets (`BIOMT1/2/3`) per transform id.
 6. Robustness:
    Ignore malformed lines rather than guessing.
+7. Read behavior:
+   Empty or absent BIOMT headers produce an empty map.
+8. Numeric policy:
+   Rotation and translation values are parsed into `calc_type`.
 
 ## Transform Semantics To Lock Before Implementation
 
@@ -150,6 +188,22 @@ checks for:
 
 These tests also avoid production BIOMT APIs and lock parsing expectations
 before implementation.
+
+## Next Implementation Slice
+
+Implement metadata parity only:
+
+1. Add `BiomtRecord` and `BiomtMap` to `sasmol/molecule.hpp`.
+2. Add `Molecule::biomt()` accessors and reset behavior.
+3. Add `parse_biomt_header_records(...)` in file I/O.
+4. Wire `PdbReader::read_pdb` to store parsed metadata after successful header
+   capture.
+5. Convert metadata fixture semantics tests to call production APIs.
+6. Add a PDB-read test proving identity BIOMT metadata does not mutate
+   coordinates.
+
+Stop after this slice. Do not implement coordinate transform helpers in the same
+commit.
 
 ## Explicit Non-Goals In This Step
 
