@@ -1,5 +1,7 @@
 #include "sasmol/topology.hpp"
 
+#include "sasmol/file_io.hpp"
+
 #include <algorithm>
 #include <cctype>
 #include <cstddef>
@@ -73,6 +75,49 @@ std::string wrap_sequence(const std::string& sequence, std::size_t width) {
     wrapped += sequence.substr(offset, width);
   }
   return wrapped;
+}
+
+bool is_constraint_selected(const Molecule& molecule,
+                            std::size_t atom,
+                            ConstraintBasis basis) {
+  switch (basis) {
+    case ConstraintBasis::backbone:
+      return molecule.name()[atom] == "N" || molecule.name()[atom] == "CA" ||
+             molecule.name()[atom] == "C" || molecule.name()[atom] == "O";
+    case ConstraintBasis::heavy:
+      return !molecule.name()[atom].empty() && molecule.name()[atom][0] != 'H';
+    case ConstraintBasis::protein:
+      return molecule.moltype()[atom] == "protein";
+    case ConstraintBasis::nucleic:
+      return molecule.moltype()[atom] == "nucleic";
+    case ConstraintBasis::solute:
+      return molecule.moltype()[atom] == "protein" ||
+             molecule.moltype()[atom] == "nucleic";
+  }
+  return false;
+}
+
+std::vector<std::string>& constraint_descriptor(Molecule& molecule,
+                                                ConstraintField field) {
+  switch (field) {
+    case ConstraintField::beta:
+      return molecule.beta();
+    case ConstraintField::occupancy:
+      return molecule.occupancy();
+  }
+  return molecule.beta();
+}
+
+const std::vector<std::string>& constraint_descriptor_const(
+    const Molecule& molecule,
+    ConstraintField field) {
+  switch (field) {
+    case ConstraintField::beta:
+      return molecule.beta();
+    case ConstraintField::occupancy:
+      return molecule.occupancy();
+  }
+  return molecule.beta();
 }
 
 bool is_charmm_atom_reference_token(const std::string& token) {
@@ -652,6 +697,75 @@ SubsetResult renumber(Molecule& molecule, const RenumberOptions& options) {
     molecule.resid() = std::move(resid);
   }
 
+  return result;
+}
+
+SubsetResult apply_constraint_descriptor(Molecule& molecule,
+                                         ConstraintBasis basis,
+                                         const ConstraintPdbOptions& options) {
+  SubsetResult result;
+  const bool needs_name = basis == ConstraintBasis::backbone ||
+                          basis == ConstraintBasis::heavy;
+  const bool needs_moltype = basis == ConstraintBasis::protein ||
+                             basis == ConstraintBasis::nucleic ||
+                             basis == ConstraintBasis::solute;
+
+  if (needs_name && molecule.name().size() != molecule.natoms()) {
+    result.errors.push_back(
+        "make_constraint_pdb requires descriptor 'name' length to match natoms");
+  }
+  if (needs_moltype && molecule.moltype().size() != molecule.natoms()) {
+    result.errors.push_back("make_constraint_pdb requires descriptor 'moltype' "
+                            "length to match natoms");
+  }
+  if (!options.reset &&
+      constraint_descriptor_const(molecule, options.field).size() !=
+          molecule.natoms()) {
+    result.errors.push_back("make_constraint_pdb requires selected output "
+                            "descriptor length to match natoms when reset is "
+                            "false");
+  }
+  if (!result.ok()) {
+    return result;
+  }
+
+  auto descriptor = options.reset
+                        ? std::vector<std::string>(molecule.natoms(), "0.00")
+                        : constraint_descriptor_const(molecule, options.field);
+  for (std::size_t atom = 0; atom < molecule.natoms(); ++atom) {
+    if (is_constraint_selected(molecule, atom, basis)) {
+      descriptor[atom] = "1.00";
+    }
+  }
+  constraint_descriptor(molecule, options.field) = std::move(descriptor);
+  return result;
+}
+
+SubsetResult make_constraint_pdb(Molecule& molecule,
+                                 const std::filesystem::path& filename,
+                                 ConstraintBasis basis,
+                                 const ConstraintPdbOptions& options) {
+  SubsetResult result;
+  auto candidate = molecule;
+  auto constraint_result =
+      apply_constraint_descriptor(candidate, basis, options);
+  if (!constraint_result.ok()) {
+    result.errors.insert(result.errors.end(), constraint_result.errors.begin(),
+                         constraint_result.errors.end());
+    return result;
+  }
+
+  PdbWriter writer;
+  PdbWriteOptions write_options;
+  write_options.frame = 0;
+  const auto status = writer.write_pdb(filename, candidate, write_options);
+  if (!status.ok()) {
+    result.errors.push_back(status.message);
+    return result;
+  }
+
+  constraint_descriptor(molecule, options.field) =
+      constraint_descriptor_const(candidate, options.field);
   return result;
 }
 

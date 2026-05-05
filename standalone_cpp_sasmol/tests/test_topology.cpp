@@ -1,5 +1,7 @@
 #include "sasmol/topology.hpp"
 
+#include "sasmol/file_io.hpp"
+
 #include <cassert>
 #include <cmath>
 #include <filesystem>
@@ -24,6 +26,29 @@ sasmol::Molecule fasta_test_molecule() {
   molecule.chain() = {"A", "A", "A", "A", "B", "B", "W"};
   molecule.segname() = {"SEG1", "SEG1", "SEG1", "SEG1", "SEG2", "SEG2",
                         "WAT"};
+  return molecule;
+}
+
+sasmol::Molecule constraint_test_molecule() {
+  sasmol::Molecule molecule(4, 1);
+  molecule.record() = {"ATOM", "ATOM", "ATOM", "HETATM"};
+  molecule.index() = {1, 2, 3, 4};
+  molecule.name() = {"N", "H", "P", "O"};
+  molecule.loc() = {" ", " ", " ", " "};
+  molecule.resname() = {"ALA", "ALA", "ADE", "HOH"};
+  molecule.chain() = {"A", "A", "B", "W"};
+  molecule.resid() = {1, 1, 2, 3};
+  molecule.rescode() = {" ", " ", " ", " "};
+  molecule.occupancy() = {"0.25", "0.25", "0.25", "0.25"};
+  molecule.beta() = {"0.50", "0.50", "0.50", "0.50"};
+  molecule.segname() = {"SEG1", "SEG1", "SEG2", "WAT"};
+  molecule.element() = {"N", "H", "P", "O"};
+  molecule.charge() = {" ", " ", " ", " "};
+  molecule.moltype() = {"protein", "protein", "nucleic", "water"};
+  molecule.set_coordinate(0, 0, {1.0F, 0.0F, 0.0F});
+  molecule.set_coordinate(0, 1, {0.0F, 1.0F, 0.0F});
+  molecule.set_coordinate(0, 2, {0.0F, 0.0F, 1.0F});
+  molecule.set_coordinate(0, 3, {1.0F, 1.0F, 1.0F});
   return molecule;
 }
 
@@ -170,6 +195,88 @@ void test_renumber_rejects_descriptor_mismatch_without_mutation() {
   assert(!result.ok());
   assert((molecule.index() == std::vector<int>{1, 2, 3}));
   assert((molecule.resid() == std::vector<int>{7, 8}));
+}
+
+void test_apply_constraint_descriptor_sets_heavy_beta() {
+  auto molecule = constraint_test_molecule();
+
+  const auto result =
+      sasmol::apply_constraint_descriptor(molecule, sasmol::ConstraintBasis::heavy);
+
+  assert(result.ok());
+  assert((molecule.beta() ==
+          std::vector<std::string>{"1.00", "0.00", "1.00", "1.00"}));
+}
+
+void test_apply_constraint_descriptor_sets_basis_types() {
+  auto molecule = constraint_test_molecule();
+
+  auto result = sasmol::apply_constraint_descriptor(
+      molecule, sasmol::ConstraintBasis::protein);
+  assert(result.ok());
+  assert((molecule.beta() ==
+          std::vector<std::string>{"1.00", "1.00", "0.00", "0.00"}));
+
+  result =
+      sasmol::apply_constraint_descriptor(molecule, sasmol::ConstraintBasis::nucleic);
+  assert(result.ok());
+  assert((molecule.beta() ==
+          std::vector<std::string>{"0.00", "0.00", "1.00", "0.00"}));
+
+  result =
+      sasmol::apply_constraint_descriptor(molecule, sasmol::ConstraintBasis::solute);
+  assert(result.ok());
+  assert((molecule.beta() ==
+          std::vector<std::string>{"1.00", "1.00", "1.00", "0.00"}));
+}
+
+void test_apply_constraint_descriptor_occupancy_and_reset_false() {
+  auto molecule = constraint_test_molecule();
+  sasmol::ConstraintPdbOptions options;
+  options.field = sasmol::ConstraintField::occupancy;
+  options.reset = false;
+
+  const auto result = sasmol::apply_constraint_descriptor(
+      molecule, sasmol::ConstraintBasis::nucleic, options);
+
+  assert(result.ok());
+  assert((molecule.occupancy() ==
+          std::vector<std::string>{"0.25", "0.25", "1.00", "0.25"}));
+  assert((molecule.beta() ==
+          std::vector<std::string>{"0.50", "0.50", "0.50", "0.50"}));
+}
+
+void test_apply_constraint_descriptor_rejects_mismatch_without_mutation() {
+  auto molecule = constraint_test_molecule();
+  molecule.name().clear();
+
+  const auto result = sasmol::apply_constraint_descriptor(
+      molecule, sasmol::ConstraintBasis::backbone);
+
+  assert(!result.ok());
+  assert((molecule.beta() ==
+          std::vector<std::string>{"0.50", "0.50", "0.50", "0.50"}));
+}
+
+void test_make_constraint_pdb_writes_frame_zero_and_updates_descriptor() {
+  auto molecule = constraint_test_molecule();
+  const auto path = std::filesystem::temp_directory_path() /
+                    "sasmol_constraint_pdb_test.pdb";
+
+  const auto result =
+      sasmol::make_constraint_pdb(molecule, path, sasmol::ConstraintBasis::solute);
+
+  assert(result.ok());
+  assert((molecule.beta() ==
+          std::vector<std::string>{"1.00", "1.00", "1.00", "0.00"}));
+
+  sasmol::Molecule written;
+  const auto status = sasmol::PdbReader{}.read_pdb(path, written);
+  std::filesystem::remove(path);
+
+  assert(status.ok());
+  assert((written.beta() ==
+          std::vector<std::string>{"1.00", "1.00", "1.00", "0.00"}));
 }
 
 void test_assign_charmm_types_sets_atom_aligned_values() {
@@ -1436,6 +1543,11 @@ int main() {
   test_renumber_resid_only_preserves_index();
   test_renumber_index_and_resid_custom_starts();
   test_renumber_rejects_descriptor_mismatch_without_mutation();
+  test_apply_constraint_descriptor_sets_heavy_beta();
+  test_apply_constraint_descriptor_sets_basis_types();
+  test_apply_constraint_descriptor_occupancy_and_reset_false();
+  test_apply_constraint_descriptor_rejects_mismatch_without_mutation();
+  test_make_constraint_pdb_writes_frame_zero_and_updates_descriptor();
   test_assign_charmm_types_sets_atom_aligned_values();
   test_assign_charmm_types_rejects_length_mismatch_without_mutation();
   test_assign_charmm_types_allows_empty_molecule_empty_types();

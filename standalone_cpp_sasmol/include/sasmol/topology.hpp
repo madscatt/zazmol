@@ -186,6 +186,19 @@ enum class FastaSplitMode {
   by_segname,
 };
 
+enum class ConstraintBasis {
+  backbone,
+  heavy,
+  protein,
+  nucleic,
+  solute,
+};
+
+enum class ConstraintField {
+  beta,
+  occupancy,
+};
+
 struct FastaOptions {
   bool fasta_format{false};
   bool exclude_hetatm{false};
@@ -207,6 +220,11 @@ struct RenumberOptions {
   std::optional<int> resid_start;
 };
 
+struct ConstraintPdbOptions {
+  ConstraintField field{ConstraintField::beta};
+  bool reset{true};
+};
+
 [[nodiscard]] FastaResult create_fasta(const Molecule& molecule,
                                        const FastaOptions& options = {});
 
@@ -216,6 +234,17 @@ struct RenumberOptions {
 
 [[nodiscard]] SubsetResult renumber(Molecule& molecule,
                                     const RenumberOptions& options = {});
+
+[[nodiscard]] SubsetResult apply_constraint_descriptor(
+    Molecule& molecule,
+    ConstraintBasis basis,
+    const ConstraintPdbOptions& options = {});
+
+[[nodiscard]] SubsetResult make_constraint_pdb(
+    Molecule& molecule,
+    const std::filesystem::path& filename,
+    ConstraintBasis basis,
+    const ConstraintPdbOptions& options = {});
 
 [[nodiscard]] SubsetResult assign_charmm_types(
     Molecule& molecule, const std::vector<std::string>& types);

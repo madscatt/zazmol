@@ -34,7 +34,7 @@ Status labels:
 | CHARMM36 topology upgrade | planned GitHub issue | `sasmol/topology.hpp` | `deferred` | high | Handle as joint Python/C++ tracked work. |
 | `topology.Topology.create_fasta` | utilities/system FASTA tests | `sasmol/topology.hpp`, `sasmol/molecule.hpp` | `implemented` | low | Keep C++ result typed: sequence vector plus formatted FASTA string. |
 | `topology.Topology.renumber` | `test_topology/test_intg_topology_Topology.py`, `test_system/*index*`, `*resid*` | `sasmol/topology.hpp` | `implemented` | low-medium | Preserve explicit options for index/resid starts. |
-| `topology.Topology.make_constraint_pdb` | dedicated oracle fixture needed | future topology/file-IO helper | `missing` | medium | Require tiny Python output fixture before coding. |
+| `topology.Topology.make_constraint_pdb` | `test_topology/test_intg_topology_Topology.py` | `sasmol/topology.hpp`, `sasmol/file_io.hpp` | `implemented` | medium | C++ splits descriptor application from the PDB-writing wrapper. |
 | `topology.Topology.make_backbone_pdb_from_fasta` | dedicated oracle fixture needed | future topology builder | `missing` | medium-high | Pause before coding; behavior is structural synthesis. |
 | `multiprocessing_sasmol.Multiprocessing_SasMol` | no core C++ parity tests | optional adapter layer | `missing` | high | Defer unless standalone C++ needs orchestration parity. |
 | Python property tables: AMU, VDW, scattering lengths, CHARMM names, amino-acid SLD | `test_properties/*` | `sasmol/properties.hpp` | `partial` | medium | Expand table-by-table only when a caller or helper needs it. |
@@ -42,22 +42,17 @@ Status labels:
 
 ## Recommended Port Order
 
-1. `topology.Topology.make_constraint_pdb`
-
-   Medium risk. It combines selection, descriptor changes, and PDB writing, so a
-   tiny Python oracle output should come first.
-
-2. `topology.Topology.make_backbone_pdb_from_fasta`
+1. `topology.Topology.make_backbone_pdb_from_fasta`
 
    Medium to high risk. This builds molecular structure from FASTA and should
    not be ported without dedicated fixtures for supported molecule types.
 
-3. Legacy `operate.Move.align(..., mode=...)` details
+2. Legacy `operate.Move.align(..., mode=...)` details
 
    High risk. Review mode-specific Python behavior before adding compatibility
    APIs.
 
-4. Python-style selected BIOMT `apply_biomt` / `copy_apply_biomt`
+3. Python-style selected BIOMT `apply_biomt` / `copy_apply_biomt`
 
    High risk. Keep separate from existing BIOMT metadata preservation and C++
    assembly helpers.
