@@ -45,6 +45,10 @@ Implemented:
   and duplicate atom reports
 - `compare_list_ignore_order(...)` matching Python's helper behavior used by
   `check_charmm_atomic_order_reorganize`
+- `setup_charmm_residue_atoms(...)` as a pure data helper that builds
+  residue/patch names to ordered atom-name lists from parsed topology entries
+- `setup_cys_patch_atoms_simple(...)` as a pure helper for the Python `DISU`
+  convention, removing `HG1` from the CYS atom list
 - `parse_charmm_topology_globals(...)` for Python-matched `MASS`, `DECL`,
   `DEFA`, and `AUTO` records, preserving values as strings
 - `parse_charmm_topology(...)` for those global records plus Python-matched
@@ -183,9 +187,18 @@ than guessed.
    - preserves the Python helper behavior exactly; this is less strict than
      `validate_charmm_residue_atoms(...)` and exists for future reorder parity
 
+   Tenth slice implemented:
+
+   - ports Python's `setup_charmm_residue_atoms` behavior as a pure
+     `setup_charmm_residue_atoms(...)` data helper
+   - ports Python's `setup_cys_patch_atoms_simple` behavior as
+     `setup_cys_patch_atoms_simple(...)`
+   - adds `DISU` from the CYS atom list when CYS is present
+   - avoids Python's hard failure on tiny topology fixtures without CYS by
+     omitting `DISU` when no CYS atom list exists
+
    Future slices should port Python `CharmmTopology` behavior as its own module:
 
-   - build residue atom lists
    - support reviewed residue patches such as `NTER`, `CTER`, `GLYP`, `PROP`,
      and disulfide/HIS variants
    - validate missing, extra, duplicate, and ambiguous atoms

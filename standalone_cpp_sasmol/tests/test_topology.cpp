@@ -242,6 +242,75 @@ void test_compare_list_ignore_order_preserves_python_duplicate_first_list() {
                                            {"N", "CA", "C"}));
 }
 
+void test_setup_cys_patch_atoms_simple_removes_hg1() {
+  const auto atoms = sasmol::setup_cys_patch_atoms_simple(
+      {"N", "HN", "CA", "CB", "SG", "HG1", "C", "O"});
+
+  assert((atoms == std::vector<std::string>{"N", "HN", "CA", "CB", "SG", "C",
+                                            "O"}));
+}
+
+void test_setup_charmm_residue_atoms_builds_atom_name_lists() {
+  sasmol::CharmmTopologyData topology;
+  topology.entries.push_back(
+      {.kind = sasmol::CharmmTopologyEntryKind::Residue,
+       .name = "GLY",
+       .total_charge = "0.00",
+       .atoms = {{"N", "NH1", "-0.47"},
+                 {"CA", "CT2", "-0.02"},
+                 {"C", "C", "0.51"},
+                 {"O", "O", "-0.51"}}});
+  topology.entries.push_back(
+      {.kind = sasmol::CharmmTopologyEntryKind::Patch,
+       .name = "NTER",
+       .total_charge = "1.00",
+       .atoms = {{"N", "NH3", "-0.30"}, {"HT1", "HC", "0.33"}}});
+
+  const auto result = sasmol::setup_charmm_residue_atoms(topology);
+
+  assert(result.ok());
+  assert(result.residue_atoms.size() == 2);
+  assert((result.residue_atoms.at("GLY") ==
+          std::vector<std::string>{"N", "CA", "C", "O"}));
+  assert((result.residue_atoms.at("NTER") ==
+          std::vector<std::string>{"N", "HT1"}));
+}
+
+void test_setup_charmm_residue_atoms_adds_disu_from_cys() {
+  sasmol::CharmmTopologyData topology;
+  topology.entries.push_back(
+      {.kind = sasmol::CharmmTopologyEntryKind::Residue,
+       .name = "CYS",
+       .total_charge = "0.00",
+       .atoms = {{"N", "NH1", "-0.47"},
+                 {"CA", "CT1", "0.07"},
+                 {"SG", "S", "-0.23"},
+                 {"HG1", "HS", "0.16"},
+                 {"C", "C", "0.51"}}});
+
+  const auto result = sasmol::setup_charmm_residue_atoms(topology);
+
+  assert(result.ok());
+  assert((result.residue_atoms.at("CYS") ==
+          std::vector<std::string>{"N", "CA", "SG", "HG1", "C"}));
+  assert((result.residue_atoms.at("DISU") ==
+          std::vector<std::string>{"N", "CA", "SG", "C"}));
+}
+
+void test_setup_charmm_residue_atoms_omits_disu_without_cys() {
+  sasmol::CharmmTopologyData topology;
+  topology.entries.push_back(
+      {.kind = sasmol::CharmmTopologyEntryKind::Residue,
+       .name = "GLY",
+       .total_charge = "0.00",
+       .atoms = {{"N", "NH1", "-0.47"}}});
+
+  const auto result = sasmol::setup_charmm_residue_atoms(topology);
+
+  assert(result.ok());
+  assert(result.residue_atoms.find("DISU") == result.residue_atoms.end());
+}
+
 void test_parse_charmm_topology_globals_matches_python_oracle_fixture() {
   const auto result = sasmol::parse_charmm_topology_globals(
       topology_fixture("minimal_mass_only.rtf"));
@@ -779,6 +848,10 @@ int main() {
   test_compare_list_ignore_order_rejects_missing_item();
   test_compare_list_ignore_order_rejects_duplicate_in_second_list();
   test_compare_list_ignore_order_preserves_python_duplicate_first_list();
+  test_setup_cys_patch_atoms_simple_removes_hg1();
+  test_setup_charmm_residue_atoms_builds_atom_name_lists();
+  test_setup_charmm_residue_atoms_adds_disu_from_cys();
+  test_setup_charmm_residue_atoms_omits_disu_without_cys();
   test_parse_charmm_topology_globals_matches_python_oracle_fixture();
   test_parse_charmm_topology_globals_reports_malformed_records();
   test_parse_charmm_topology_residue_atoms_match_python_oracle_fixture();

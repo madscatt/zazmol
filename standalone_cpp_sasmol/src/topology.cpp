@@ -369,6 +369,39 @@ bool compare_list_ignore_order(const std::vector<std::string>& first,
   return true;
 }
 
+std::vector<std::string> setup_cys_patch_atoms_simple(
+    const std::vector<std::string>& cys_atom_names) {
+  std::vector<std::string> atoms;
+  atoms.reserve(cys_atom_names.size());
+  for (const auto& atom_name : cys_atom_names) {
+    if (atom_name != "HG1") {
+      atoms.push_back(atom_name);
+    }
+  }
+  return atoms;
+}
+
+CharmmResidueAtomListResult setup_charmm_residue_atoms(
+    const CharmmTopologyData& topology) {
+  CharmmResidueAtomListResult result;
+  for (const auto& entry : topology.entries) {
+    if (entry.atoms.empty()) {
+      continue;
+    }
+    auto& atom_names = result.residue_atoms[entry.name];
+    atom_names.reserve(entry.atoms.size());
+    for (const auto& atom : entry.atoms) {
+      atom_names.push_back(atom.name);
+    }
+  }
+
+  const auto cys = result.residue_atoms.find("CYS");
+  if (cys != result.residue_atoms.end()) {
+    result.residue_atoms["DISU"] = setup_cys_patch_atoms_simple(cys->second);
+  }
+  return result;
+}
+
 SubsetResult assign_charmm_types(Molecule& molecule,
                                  const std::vector<std::string>& types) {
   SubsetResult result;

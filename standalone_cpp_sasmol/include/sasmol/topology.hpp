@@ -4,6 +4,7 @@
 #include "sasmol/subset.hpp"
 
 #include <filesystem>
+#include <map>
 #include <string>
 #include <vector>
 
@@ -120,6 +121,13 @@ struct CharmmTopologyParseResult {
   [[nodiscard]] bool ok() const noexcept { return errors.empty(); }
 };
 
+struct CharmmResidueAtomListResult {
+  std::map<std::string, std::vector<std::string>> residue_atoms;
+  std::vector<std::string> errors;
+
+  [[nodiscard]] bool ok() const noexcept { return errors.empty(); }
+};
+
 [[nodiscard]] SubsetResult assign_charmm_types(
     Molecule& molecule, const std::vector<std::string>& types);
 
@@ -140,6 +148,12 @@ struct CharmmTopologyParseResult {
 [[nodiscard]] bool compare_list_ignore_order(
     const std::vector<std::string>& first,
     const std::vector<std::string>& second);
+
+[[nodiscard]] std::vector<std::string> setup_cys_patch_atoms_simple(
+    const std::vector<std::string>& cys_atom_names);
+
+[[nodiscard]] CharmmResidueAtomListResult setup_charmm_residue_atoms(
+    const CharmmTopologyData& topology);
 
 [[nodiscard]] CharmmTopologyParseResult parse_charmm_topology(
     const std::filesystem::path& filename);
