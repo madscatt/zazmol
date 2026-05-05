@@ -25,7 +25,7 @@ std::vector<std::string> split_tokens(const std::string& line) {
   return tokens;
 }
 
-bool is_charmm_pair_token(const std::string& token) {
+bool is_charmm_atom_reference_token(const std::string& token) {
   if (token.empty()) {
     return false;
   }
@@ -40,8 +40,8 @@ void parse_pair_record(const std::vector<std::string>& tokens,
                        std::vector<std::string>& errors) {
   std::size_t token = 1;
   while (token + 1 < tokens.size() && !tokens[token].starts_with("!")) {
-    if (!is_charmm_pair_token(tokens[token]) ||
-        !is_charmm_pair_token(tokens[token + 1])) {
+    if (!is_charmm_atom_reference_token(tokens[token]) ||
+        !is_charmm_atom_reference_token(tokens[token + 1])) {
       errors.push_back(line_context(line_number,
                                     record_name + " record has invalid pair"));
       return;
@@ -52,6 +52,29 @@ void parse_pair_record(const std::vector<std::string>& tokens,
   if (token < tokens.size() && !tokens[token].starts_with("!")) {
     errors.push_back(line_context(line_number,
                                   record_name + " record has incomplete pair"));
+  }
+}
+
+void parse_triple_record(const std::vector<std::string>& tokens,
+                         const std::string& record_name,
+                         std::size_t line_number,
+                         std::vector<CharmmTopologyTripleRecord>& records,
+                         std::vector<std::string>& errors) {
+  std::size_t token = 1;
+  while (token + 2 < tokens.size() && !tokens[token].starts_with("!")) {
+    if (!is_charmm_atom_reference_token(tokens[token]) ||
+        !is_charmm_atom_reference_token(tokens[token + 1]) ||
+        !is_charmm_atom_reference_token(tokens[token + 2])) {
+      errors.push_back(line_context(line_number,
+                                    record_name + " record has invalid triple"));
+      return;
+    }
+    records.push_back({tokens[token], tokens[token + 1], tokens[token + 2]});
+    token += 3;
+  }
+  if (token < tokens.size() && !tokens[token].starts_with("!")) {
+    errors.push_back(line_context(
+        line_number, record_name + " record has incomplete triple"));
   }
 }
 
@@ -147,7 +170,9 @@ CharmmTopologyParseResult parse_charmm_topology_impl(
            .total_charge = tokens[2],
            .atoms = {},
            .bonds = {},
-           .doubles = {}});
+           .doubles = {},
+           .angles = {},
+           .thetas = {}});
       current_entry = &result.topology.entries.back();
     } else if (include_entries && record == "ATOM") {
       if (current_entry == nullptr) {
@@ -173,6 +198,17 @@ CharmmTopologyParseResult parse_charmm_topology_impl(
                                                  : current_entry->doubles;
       parse_pair_record(tokens, record.starts_with("BOND") ? "BOND" : "DOUB",
                         line_number, records, result.errors);
+    } else if (include_entries && (record.starts_with("ANGL") ||
+                                   record.starts_with("THET"))) {
+      if (current_entry == nullptr) {
+        result.errors.push_back(line_context(
+            line_number, record + " record appeared before RESI or PRES"));
+        continue;
+      }
+      auto& records = record.starts_with("ANGL") ? current_entry->angles
+                                                 : current_entry->thetas;
+      parse_triple_record(tokens, record.starts_with("ANGL") ? "ANGL" : "THET",
+                          line_number, records, result.errors);
     }
   }
 

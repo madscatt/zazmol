@@ -26,11 +26,12 @@ The tool deliberately preserves Python's parsed shape:
 - `minimal_mass_only.rtf`
 - `minimal_resi_atoms.rtf`
 - `minimal_resi_atoms_bonds.rtf`
+- `minimal_resi_angles.rtf`
 - `minimal_pres_atoms_dele.rtf`
 - `minimal_comments_blank_lines.rtf`
 - `minimal_multiple_residues.rtf`
 
-All six fixtures currently parse through Python with `errors == []`.
+All seven fixtures currently parse through Python with `errors == []`.
 
 ## Observed Python Shapes
 
@@ -48,12 +49,14 @@ C++ parity checkpoint:
   `MASS` values remain strings, and `DECL`, `DEFA`, and `AUTO` token order is
   preserved.
 - `parse_charmm_topology(...)` parses those same global records plus `RESI`,
-  `PRES`, `ATOM`, `BOND`, and `DOUBLE` records.
+  `PRES`, `ATOM`, `BOND`, `DOUBLE`, `ANGL`, and `THET` records.
 - The C++ tests for `minimal_resi_atoms.rtf` and `minimal_pres_atoms_dele.rtf`
   match Python's string-preserving residue, patch, total-charge, and atom-record
   shape.
 - The C++ test for `minimal_resi_atoms_bonds.rtf` matches Python's ordered
   `BOND` pair shape and Python's `DOUBLE` to `DOUB` behavior.
+- The C++ test for `minimal_resi_angles.rtf` matches Python's ordered `ANGL`
+  and `THET` triple shapes.
 - The C++ parser deliberately ignores `DELE` and other remaining section records
   for this slice.
 
@@ -66,6 +69,8 @@ Residue and patch records:
   charge string.
 - `BOND` records are stored as ordered two-token lists.
 - `DOUBLE` records are stored under the key `DOUB`.
+- `ANGL` records are stored as ordered three-token lists.
+- `THET` records are stored as ordered three-token lists.
 - `DELE ATOM HN` is stored under `DELE.ATOM` as the string `HN`.
 - `DELE ANGL HT1 N CA` is stored under `DELE.ANGL` as a token list.
 
@@ -75,6 +80,8 @@ Comment behavior:
 - full-line comments beginning with `!` are ignored.
 - inline comments in pair-token records such as `BOND` stop pair parsing when the
   parser reaches the `!` token.
+- inline comments in triple-token records such as `ANGL` stop triple parsing
+  when the parser reaches the `!` token.
 - inline comments after `ATOM` records do not affect the stored atom record
   because Python keeps only `words[1:4]`.
 
