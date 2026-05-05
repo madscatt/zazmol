@@ -48,11 +48,13 @@ C++ parity checkpoint:
   `MASS` values remain strings, and `DECL`, `DEFA`, and `AUTO` token order is
   preserved.
 - `parse_charmm_topology(...)` parses those same global records plus `RESI`,
-  `PRES`, and `ATOM` records.
+  `PRES`, `ATOM`, `BOND`, and `DOUBLE` records.
 - The C++ tests for `minimal_resi_atoms.rtf` and `minimal_pres_atoms_dele.rtf`
   match Python's string-preserving residue, patch, total-charge, and atom-record
   shape.
-- The C++ parser deliberately ignores `BOND`, `DELE`, and other section records
+- The C++ test for `minimal_resi_atoms_bonds.rtf` matches Python's ordered
+  `BOND` pair shape and Python's `DOUBLE` to `DOUB` behavior.
+- The C++ parser deliberately ignores `DELE` and other remaining section records
   for this slice.
 
 Residue and patch records:

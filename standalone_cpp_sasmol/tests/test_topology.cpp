@@ -318,6 +318,84 @@ void test_parse_charmm_topology_patch_atoms_match_python_oracle_fixture() {
   assert(nter.atoms[3].atom_charge == "0.33");
 }
 
+void test_parse_charmm_topology_bond_pairs_match_python_oracle_fixture() {
+  const auto result = sasmol::parse_charmm_topology(
+      topology_fixture("minimal_resi_atoms_bonds.rtf"));
+
+  assert(result.ok());
+  assert(result.topology.entries.size() == 1);
+
+  const auto& gly = result.topology.entries[0];
+  assert(gly.name == "GLY");
+  assert(gly.bonds.size() == 3);
+  assert(gly.bonds[0].first == "N");
+  assert(gly.bonds[0].second == "CA");
+  assert(gly.bonds[1].first == "CA");
+  assert(gly.bonds[1].second == "C");
+  assert(gly.bonds[2].first == "C");
+  assert(gly.bonds[2].second == "O");
+  assert(gly.doubles.size() == 1);
+  assert(gly.doubles[0].first == "C");
+  assert(gly.doubles[0].second == "O");
+}
+
+void test_parse_charmm_topology_bond_pairs_stop_at_inline_comment() {
+  const auto path =
+      std::filesystem::temp_directory_path() / "sasmol_bond_comment_topology.rtf";
+  {
+    std::ofstream output(path);
+    output << "RESI GLY 0.00\n";
+    output << "BOND N CA ! CA C ignored\n";
+  }
+
+  const auto result = sasmol::parse_charmm_topology(path);
+  std::filesystem::remove(path);
+
+  assert(result.ok());
+  assert(result.topology.entries.size() == 1);
+  assert(result.topology.entries[0].bonds.size() == 1);
+  assert(result.topology.entries[0].bonds[0].first == "N");
+  assert(result.topology.entries[0].bonds[0].second == "CA");
+}
+
+void test_parse_charmm_topology_reports_malformed_bond_pair() {
+  const auto path =
+      std::filesystem::temp_directory_path() / "sasmol_bad_bond_topology.rtf";
+  {
+    std::ofstream output(path);
+    output << "RESI GLY 0.00\n";
+    output << "BOND N !\n";
+  }
+
+  const auto result = sasmol::parse_charmm_topology(path);
+  std::filesystem::remove(path);
+
+  assert(!result.ok());
+  assert(result.errors.size() == 1);
+  assert(result.topology.entries.size() == 1);
+  assert(result.topology.entries[0].bonds.empty());
+}
+
+void test_parse_charmm_topology_reports_incomplete_bond_pair() {
+  const auto path = std::filesystem::temp_directory_path() /
+                    "sasmol_incomplete_bond_topology.rtf";
+  {
+    std::ofstream output(path);
+    output << "RESI GLY 0.00\n";
+    output << "BOND N CA C\n";
+  }
+
+  const auto result = sasmol::parse_charmm_topology(path);
+  std::filesystem::remove(path);
+
+  assert(!result.ok());
+  assert(result.errors.size() == 1);
+  assert(result.topology.entries.size() == 1);
+  assert(result.topology.entries[0].bonds.size() == 1);
+  assert(result.topology.entries[0].bonds[0].first == "N");
+  assert(result.topology.entries[0].bonds[0].second == "CA");
+}
+
 void test_parse_charmm_topology_reports_atom_before_residue_or_patch() {
   const auto path =
       std::filesystem::temp_directory_path() / "sasmol_bad_atom_topology.rtf";
@@ -357,6 +435,10 @@ int main() {
   test_parse_charmm_topology_globals_reports_malformed_records();
   test_parse_charmm_topology_residue_atoms_match_python_oracle_fixture();
   test_parse_charmm_topology_patch_atoms_match_python_oracle_fixture();
+  test_parse_charmm_topology_bond_pairs_match_python_oracle_fixture();
+  test_parse_charmm_topology_bond_pairs_stop_at_inline_comment();
+  test_parse_charmm_topology_reports_malformed_bond_pair();
+  test_parse_charmm_topology_reports_incomplete_bond_pair();
   test_parse_charmm_topology_reports_atom_before_residue_or_patch();
   return 0;
 }

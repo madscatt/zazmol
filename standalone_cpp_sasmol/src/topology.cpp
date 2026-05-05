@@ -1,5 +1,6 @@
 #include "sasmol/topology.hpp"
 
+#include <cctype>
 #include <cstddef>
 #include <fstream>
 #include <map>
@@ -22,6 +23,36 @@ std::vector<std::string> split_tokens(const std::string& line) {
     tokens.push_back(token);
   }
   return tokens;
+}
+
+bool is_charmm_pair_token(const std::string& token) {
+  if (token.empty()) {
+    return false;
+  }
+  const auto first = static_cast<unsigned char>(token.front());
+  return std::isalnum(first) || token.front() == '+' || token.front() == '-';
+}
+
+void parse_pair_record(const std::vector<std::string>& tokens,
+                       const std::string& record_name,
+                       std::size_t line_number,
+                       std::vector<CharmmTopologyPairRecord>& records,
+                       std::vector<std::string>& errors) {
+  std::size_t token = 1;
+  while (token + 1 < tokens.size() && !tokens[token].starts_with("!")) {
+    if (!is_charmm_pair_token(tokens[token]) ||
+        !is_charmm_pair_token(tokens[token + 1])) {
+      errors.push_back(line_context(line_number,
+                                    record_name + " record has invalid pair"));
+      return;
+    }
+    records.push_back({tokens[token], tokens[token + 1]});
+    token += 2;
+  }
+  if (token < tokens.size() && !tokens[token].starts_with("!")) {
+    errors.push_back(line_context(line_number,
+                                  record_name + " record has incomplete pair"));
+  }
 }
 
 std::map<std::string, int> count_atom_names(const std::vector<std::string>& names) {
@@ -114,7 +145,9 @@ CharmmTopologyParseResult parse_charmm_topology_impl(
                                     : CharmmTopologyEntryKind::Patch,
            .name = tokens[1],
            .total_charge = tokens[2],
-           .atoms = {}});
+           .atoms = {},
+           .bonds = {},
+           .doubles = {}});
       current_entry = &result.topology.entries.back();
     } else if (include_entries && record == "ATOM") {
       if (current_entry == nullptr) {
@@ -129,6 +162,17 @@ CharmmTopologyParseResult parse_charmm_topology_impl(
         continue;
       }
       current_entry->atoms.push_back({tokens[1], tokens[2], tokens[3]});
+    } else if (include_entries && (record.starts_with("BOND") ||
+                                   record.starts_with("DOUB"))) {
+      if (current_entry == nullptr) {
+        result.errors.push_back(line_context(
+            line_number, record + " record appeared before RESI or PRES"));
+        continue;
+      }
+      auto& records = record.starts_with("BOND") ? current_entry->bonds
+                                                 : current_entry->doubles;
+      parse_pair_record(tokens, record.starts_with("BOND") ? "BOND" : "DOUB",
+                        line_number, records, result.errors);
     }
   }
 

@@ -24,8 +24,9 @@ Topology support is intentionally narrow and safe at this stage. The C++ core
 can store CHARMM-related descriptors, can accept explicit caller-provided
 CHARMM type assignments, and can parse the first reviewed global-record subset
 from CHARMM topology files. It can also parse `RESI`/`PRES` headers and their
-ordered `ATOM` rows as data-only records. It does not infer types, apply
-patches, parse connectivity, or mutate molecules from topology files yet.
+ordered `ATOM`, `BOND`, and `DOUBLE` rows as data-only records. It does not
+infer types, apply patches, parse angle/dihedral/improper records, or mutate
+molecules from topology files yet.
 
 Implemented:
 
@@ -45,19 +46,21 @@ Implemented:
 - `parse_charmm_topology_globals(...)` for Python-matched `MASS`, `DECL`,
   `DEFA`, and `AUTO` records, preserving values as strings
 - `parse_charmm_topology(...)` for those global records plus Python-matched
-  `RESI`/`PRES` headers and ordered `ATOM` rows, preserving total charge and
-  atom charges as strings
+  `RESI`/`PRES` headers and ordered `ATOM`, `BOND`, and `DOUBLE` rows,
+  preserving total charge and atom charges as strings
 - no-partial-mutation failure behavior for length mismatches, atom-name
   mismatches, and molecule name-vector mismatches
 
 This is enough for workflows that already have trustworthy CHARMM type data.
 It is not a topology engine. The parser slices are data-only and do not assign
-descriptors to a molecule. Bond parsing, patch application, completeness checks,
-and possible atom reordering remain separate reviewed steps.
+descriptors to a molecule. Angle/dihedral parsing, patch application,
+completeness checks, and possible atom reordering remain separate reviewed
+steps.
 
 Recommended next step: validate the next parser slice against tiny Python-oracle
-fixtures before any production topology summary work. Do not parse bonds, apply
-patches, or reorder atoms without a separate fixture-backed slice.
+fixtures before any production topology summary work. Do not parse angle,
+dihedral, improper, patch-delete, or reorder behavior without a separate
+fixture-backed slice.
 
 The Python oracle harness for future parser work is recorded in
 `docs/charmm_topology_python_oracle.md`.
@@ -127,12 +130,20 @@ than guessed.
    - stores residue and patch total charges as strings
    - stores `ATOM` records as ordered `(atom name, CHARMM type, charge)` string
      triples
-   - deliberately ignores `BOND`, `DELE`, and other section records for this
+   - deliberately ignored `BOND`, `DELE`, and other section records in that
      slice
+
+   Third slice implemented:
+
+   - parses `BOND` as ordered two-token string pairs
+   - parses `DOUBLE` under Python's `DOUB` behavior as ordered two-token string
+     pairs
+   - stops pair parsing at inline comments beginning with `!`
 
    Future slices should port Python `CharmmTopology` behavior as its own module:
 
-   - parse `BOND`, `DOUBLE`, `IMPR`, `CMAP`, `DONO`, `ACCE`, `IC`, and `DELE`
+   - parse `ANGL`, `THET`, `DIHE`, `IMPR`, `CMAP`, `DONO`, `ACCE`, `IC`, and
+     `DELE`
    - build residue atom lists
    - support reviewed residue patches such as `NTER`, `CTER`, `GLYP`, `PROP`,
      and disulfide/HIS variants

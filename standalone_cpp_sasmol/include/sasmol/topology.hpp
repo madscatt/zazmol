@@ -60,11 +60,18 @@ struct CharmmTopologyAtomRecord {
   std::string atom_charge;
 };
 
+struct CharmmTopologyPairRecord {
+  std::string first;
+  std::string second;
+};
+
 struct CharmmTopologyEntry {
   CharmmTopologyEntryKind kind{};
   std::string name;
   std::string total_charge;
   std::vector<CharmmTopologyAtomRecord> atoms;
+  std::vector<CharmmTopologyPairRecord> bonds;
+  std::vector<CharmmTopologyPairRecord> doubles;
 };
 
 struct CharmmTopologyData {
