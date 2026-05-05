@@ -49,7 +49,9 @@ behavior oracle.
 - PDB reading does not infer CHARMM atom types.
 - CHARMM topology parsing, patching, atom completeness checks, and atom
   reordering remain separate design work.
-- BIOMT subset operations remain deferred.
+- Python-style selected BIOMT `apply_biomt` / `copy_apply_biomt` parity remains
+  deferred. Passive BIOMT metadata preservation and optional coordinate-only
+  assembly helpers are already present.
 - VMD/view extension behavior remains deferred as an optional adapter rather
   than portable core behavior.
 - Fixed/free atom DCD variants, DCD unit-cell writing, and true random-access
@@ -64,7 +66,8 @@ behavior oracle.
 Selection/subset documentation cleanup is complete. The remaining work in this
 area is feature work, not cleanup:
 
-- BIOMT should be planned with dedicated transform fixtures.
+- Do not expand BIOMT further unless a real caller needs Python-style selected
+  `apply_biomt` parity.
 - Broader Python expression coverage should start with a real usage survey and
   a documented grammar extension.
 - Contextual named selections such as `backbone` or `calpha` should remain

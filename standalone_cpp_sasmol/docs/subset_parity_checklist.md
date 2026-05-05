@@ -21,9 +21,10 @@ Subset has a useful first-pass C++ surface for atom selection workflows:
   mismatches, and invalid merge sources
 
 The remaining subset work is not a blocker for ordinary selection/copy/merge
-use. BIOMT remains the main deferred behavior because it is more than a wrapper:
-it changes coordinates through supplied transforms and should be ported with
-dedicated fixtures.
+use. BIOMT metadata preservation is implemented, and the current C++ transform
+surface is limited to optional coordinate-only assembly helpers. Python-style
+selected `apply_biomt` / `copy_apply_biomt` parity remains deferred unless a real
+caller needs it.
 
 At this checkpoint, subset is complete for v1 ordinary selection-driven
 workflows: index and 0/1 mask conversion, coordinate extraction/replacement,

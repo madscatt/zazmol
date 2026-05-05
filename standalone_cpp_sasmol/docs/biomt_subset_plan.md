@@ -1,4 +1,4 @@
-# BIOMT Plan (Metadata + Transform, Fixture-First)
+# BIOMT Plan (Metadata + Optional Assembly, Fixture-First)
 
 Python BIOMT behavior now has two explicit layers that must stay separate in
 standalone C++ parity work:
@@ -9,11 +9,13 @@ standalone C++ parity work:
 This document defines the guardrails and fixture-backed contracts for both
 layers so c5.3 can proceed without guessing.
 
-## Scope For The Next Implementation Slices
+## Scope Boundary
 
-- Add BIOMT metadata parity before BIOMT transform implementation parity.
+- Preserve BIOMT metadata passively as the parity feature.
 - Keep metadata parsing passive: record only, no coordinate mutation.
-- Keep transform APIs explicit and manual-only.
+- Keep optional coordinate assembly APIs explicit and manual-only.
+- Keep Python-style selected `apply_biomt` / `copy_apply_biomt` parity deferred
+  unless a real caller needs it.
 - Do not combine BIOMT work with selection grammar expansion, topology parser
   work, DCD policy changes, or merge policy expansion.
 
@@ -213,9 +215,10 @@ Metadata parity was implemented separately:
 The later coordinate assembly helper slice was kept explicit and manual-only.
 Python-style selected `apply_biomt` / `copy_apply_biomt` parity remains deferred.
 
-## Explicit Non-Goals In This Step
+## Explicit Non-Goals
 
-- no BIOMT implementation in `src/subset.cpp`
-- no BIOMT metadata implementation in `src/file_io.cpp` or parser internals yet
+- no automatic BIOMT application during PDB read
+- no Python-style selected `apply_biomt` / `copy_apply_biomt` parity yet
+- no BIOMT connectivity processing or remapping
 - no parser/selection alias expansion
 - no topology parser or PDB-driven force-field inference
