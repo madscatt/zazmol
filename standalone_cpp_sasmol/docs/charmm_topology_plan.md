@@ -30,9 +30,13 @@ Implemented:
 - `Molecule::charmm_type()` as an optional atom-aligned descriptor
 - `assign_charmm_types(molecule, types)` for already-known atom-aligned type
   lists
+- `assign_atom_charges(molecule, charges)` for already-known atom-aligned charge
+  values
 - `assign_charmm_types_from_atom_table(molecule, assignments)` for explicit
   atom-ordered `(atom name, CHARMM type)` rows, such as data parsed from a PSF
   or caller table
+- `assign_charmm_types_and_atom_charges_from_atom_table(molecule, assignments)`
+  for explicit atom-ordered `(atom name, CHARMM type, atom charge)` rows
 - no-partial-mutation failure behavior for length mismatches, atom-name
   mismatches, and molecule name-vector mismatches
 
@@ -58,23 +62,26 @@ than guessed.
 1. **Explicit Assignment Helper** implemented
 
    Add a small helper that takes caller-provided atom-aligned values and assigns
-   `charmm_type()` after validating length. This supports workflows that already
-   know the types without adding topology parsing yet.
+   `charmm_type()` or `atom_charge()` after validating length. This supports
+   workflows that already know the force-field descriptors without adding
+   topology parsing yet.
 
-   Current helper:
+   Current helpers:
 
    - `assign_charmm_types(molecule, types)`
+   - `assign_atom_charges(molecule, charges)`
 
 2. **PSF/Caller Atom Table Helper**
 
-   Implemented a helper that mirrors the SASSIE TAMC usage: consume an
-   atom-ordered table of `(atom name, CHARMM type)` values from an explicit
-   force-field source such as a PSF, validate it against `Molecule::name()`,
-   and assign `charmm_type()` only if every atom matches.
+   Implemented helpers that mirror the SASSIE TAMC usage: consume atom-ordered
+   table values from an explicit force-field source such as a PSF, validate them
+   against `Molecule::name()`, and assign descriptors only if every atom
+   matches.
 
-   Current helper:
+   Current helpers:
 
    - `assign_charmm_types_from_atom_table(molecule, assignments)`
+   - `assign_charmm_types_and_atom_charges_from_atom_table(molecule, assignments)`
 
    This is stricter than the historical Python caller: no partial mutation
    after a mismatch.
