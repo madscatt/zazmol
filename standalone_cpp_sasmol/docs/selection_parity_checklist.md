@@ -13,6 +13,7 @@ Selection has a safe first-pass C++ surface:
 - bounded expression parsing for the Python-style basis expressions we have
   intentionally admitted
 - named `all` and `heavy` basis helpers
+- SASSIE/VMD-like basis string translation for surveyed real workflow syntax
 - 0/1 mask bridge helpers for compatibility with subset APIs
 - structured failure returns with no partial indices on failure
 
@@ -50,10 +51,23 @@ These return 0/1 atom masks compatible with the subset mask APIs while keeping
 the explicit-index selection API available for callers that do not need Python
 mask-shaped compatibility.
 
-`backbone` is intentionally not supported as a generic named basis. Current
-Python/SASSIE practice uses different backbone definitions for protein overlap,
-protein constraints, and nucleic acid workflows, so a generic C++ alias would
-hide real caller intent.
+Implemented SASSIE basis compatibility helpers:
+
+- `sassie_basis_expression(basis, context)`
+- `select_sassie_basis(molecule, basis, context)`
+- `select_sassie_basis_mask(molecule, basis, context)`
+- `sassie_segment_basis_expressions(basis, segnames, contexts)`
+
+The compatibility layer accepts surveyed SASSIE/VMD-like shorthand such as
+`name CA`, `resid > 43`, `segname HC1 and (resid >= 210 and resid <= 214)`,
+single-atom basis names such as `CA`, and `=` as an alias for `==`. It translates
+to the existing safe expression grammar instead of evaluating arbitrary code.
+
+`backbone` is intentionally context-dependent. Current Python/SASSIE practice
+uses different backbone definitions for protein overlap, protein constraints,
+and nucleic acid workflows, so C++ requires an explicit
+`SassieBasisContext::protein`, `SassieBasisContext::nucleic`, or
+`SassieBasisContext::nucleic_overlap` context.
 
 Implemented a bounded expression parser:
 
@@ -72,6 +86,8 @@ Supported grammar:
 - integer descriptors: `resid`, `index`, `original_index`, `original_resid`
 - boolean/integer descriptor: `residue_flag`
 - string operators: `==`, `!=`
+- string comparison operators: `<`, `<=`, `>`, `>=` for SASSIE-translated
+  string fields such as `occupancy`
 - integer operators: `==`, `!=`, `<`, `<=`, `>`, `>=`
 - `None` comparisons for string descriptors, primarily to support historical
   expressions such as `not name[i] == None`
@@ -90,7 +106,8 @@ and stop rather than guessing.
 ## Deferred
 
 - distance, angle, and hydrogen-bond selections
-- contextual named selections such as `backbone` or `calpha`
+- frame/scalar filters such as `rg[i]` and `x2[i]`; these are chi-square
+  weight filters, not atom selections
 - arbitrary Python calls, slicing, arithmetic, and list membership
 - full Python expression compatibility
 

@@ -4,6 +4,7 @@
 #include <charconv>
 #include <functional>
 #include <optional>
+#include <sstream>
 #include <stdexcept>
 #include <string>
 #include <string_view>
@@ -48,6 +49,18 @@ std::string lower_ascii(std::string value) {
         std::tolower(static_cast<unsigned char>(character)));
   }
   return value;
+}
+
+std::string trim(std::string_view value) {
+  auto begin = value.begin();
+  auto end = value.end();
+  while (begin != end && std::isspace(static_cast<unsigned char>(*begin))) {
+    ++begin;
+  }
+  while (begin != end && std::isspace(static_cast<unsigned char>(*(end - 1)))) {
+    --end;
+  }
+  return {begin, end};
 }
 
 bool is_identifier_start(char value) {
@@ -147,6 +160,9 @@ std::vector<Token> tokenize(const std::string& expression) {
         ++offset;
       }
       auto text = expression.substr(start, offset - start);
+      if (text == "=") {
+        text = "==";
+      }
       if (text != "==" && text != "!=" && text != "<" && text != "<=" &&
           text != ">" && text != ">=") {
         throw std::invalid_argument(selection_error("unsupported comparison '" +
@@ -307,9 +323,10 @@ class Parser {
                               std::optional<int> string_offset,
                               bool expected_none) const {
     if (op != "==" && op != "!=") {
-      throw std::invalid_argument(
-          selection_error("string descriptor '" + field +
-                          "' only supports == and !="));
+      if (expected_none) {
+        throw std::invalid_argument(
+            selection_error("None comparisons only support == and !="));
+      }
     }
     const auto& values = string_descriptor(field);
     require_length(field, values.size());
@@ -323,6 +340,10 @@ class Parser {
           actual = offset < actual.size() ? actual.substr(offset, 1) : std::string{};
         }
         equal = actual == expected;
+        if (op == "<") return actual < expected;
+        if (op == "<=") return actual <= expected;
+        if (op == ">") return actual > expected;
+        if (op == ">=") return actual >= expected;
       }
       return op == "==" ? equal : !equal;
     }};
@@ -394,6 +415,210 @@ SelectionResult collect(const Molecule& molecule,
   return result;
 }
 
+bool is_comparison_token(const std::string& token) {
+  return token == "=" || token == "==" || token == "!=" || token == "<" ||
+         token == "<=" || token == ">" || token == ">=";
+}
+
+bool is_descriptor_token(const std::string& token) {
+  const auto lower = lower_ascii(token);
+  return lower == "record" || lower == "name" || lower == "loc" ||
+         lower == "resname" || lower == "chain" || lower == "rescode" ||
+         lower == "occupancy" || lower == "beta" || lower == "segname" ||
+         lower == "element" || lower == "charge" || lower == "moltype" ||
+         lower == "charmm_type" || lower == "resid" || lower == "index" ||
+         lower == "original_index" || lower == "original_resid" ||
+         lower == "residue_flag";
+}
+
+bool is_integer_descriptor_token(const std::string& token) {
+  const auto lower = lower_ascii(token);
+  return lower == "resid" || lower == "index" || lower == "original_index" ||
+         lower == "original_resid" || lower == "residue_flag";
+}
+
+bool looks_like_python_expression(const std::string& basis) {
+  return basis.find("[i]") != std::string::npos;
+}
+
+std::string quote_string_literal(const std::string& value) {
+  if (value.find('"') == std::string::npos) {
+    return "\"" + value + "\"";
+  }
+  if (value.find('\'') == std::string::npos) {
+    return "'" + value + "'";
+  }
+  throw std::invalid_argument(
+      "SASSIE basis string values cannot contain both quote types");
+}
+
+std::string comparison_token(std::string token) {
+  if (token == "=") {
+    return "==";
+  }
+  return token;
+}
+
+std::vector<std::string> tokenize_sassie_basis(const std::string& basis) {
+  std::vector<std::string> tokens;
+  for (std::size_t offset = 0; offset < basis.size();) {
+    const auto value = basis[offset];
+    if (std::isspace(static_cast<unsigned char>(value))) {
+      ++offset;
+      continue;
+    }
+    if (value == '(' || value == ')') {
+      tokens.push_back(std::string(1, value));
+      ++offset;
+      continue;
+    }
+    if (value == '"' || value == '\'') {
+      const auto quote = value;
+      const auto start = ++offset;
+      while (offset < basis.size() && basis[offset] != quote) {
+        ++offset;
+      }
+      if (offset == basis.size()) {
+        throw std::invalid_argument("unterminated SASSIE basis string literal");
+      }
+      tokens.push_back(basis.substr(start, offset - start));
+      ++offset;
+      continue;
+    }
+    if (value == '=' || value == '!' || value == '<' || value == '>') {
+      const auto start = offset++;
+      if (offset < basis.size() && basis[offset] == '=') {
+        ++offset;
+      }
+      tokens.push_back(basis.substr(start, offset - start));
+      continue;
+    }
+    const auto start = offset++;
+    while (offset < basis.size() &&
+           !std::isspace(static_cast<unsigned char>(basis[offset])) &&
+           basis[offset] != '(' && basis[offset] != ')' && basis[offset] != '=' &&
+           basis[offset] != '!' && basis[offset] != '<' && basis[offset] != '>') {
+      ++offset;
+    }
+    tokens.push_back(basis.substr(start, offset - start));
+  }
+  return tokens;
+}
+
+std::string join_or_name_equals(const std::vector<std::string>& names) {
+  std::string expression;
+  for (std::size_t index = 0; index < names.size(); ++index) {
+    if (index != 0) {
+      expression += " or ";
+    }
+    expression += "name[i] == " + quote_string_literal(names[index]);
+  }
+  return "(" + expression + ")";
+}
+
+BasisExpressionResult alias_expression(const std::string& basis,
+                                       SassieBasisContext context) {
+  const auto normalized = lower_ascii(trim(basis));
+  if (normalized == "all") {
+    return {"not name[i] == None", {}};
+  }
+  if (normalized == "heavy") {
+    return {"not name[i][0] == \"H\"", {}};
+  }
+  if (normalized == "calpha") {
+    return {"name[i] == \"CA\"", {}};
+  }
+  if (normalized == "backbone") {
+    if (context == SassieBasisContext::protein) {
+      return {join_or_name_equals({"N", "CA", "C"}), {}};
+    }
+    if (context == SassieBasisContext::nucleic) {
+      return {join_or_name_equals({"P", "O5'", "C5'", "C4'", "C3'", "O3'"}),
+              {}};
+    }
+    if (context == SassieBasisContext::nucleic_overlap) {
+      return {join_or_name_equals(
+                  {"O2P", "O1P", "P", "O5'", "C5'", "C4'", "C3'", "O3'"}),
+              {}};
+    }
+    return {{}, {"SASSIE backbone basis requires an explicit molecule context"}};
+  }
+  return {{}, {"not an alias"}};
+}
+
+std::string value_literal(const std::string& field, const std::string& value) {
+  if (value == "None" || value == "True" || value == "False") {
+    return value;
+  }
+  if (is_integer_descriptor_token(field) && parse_int(value)) {
+    return value;
+  }
+  return quote_string_literal(value);
+}
+
+std::string translate_sassie_tokens(const std::vector<std::string>& tokens) {
+  std::string expression;
+  const auto append = [&expression](const std::string& text) {
+    if (!expression.empty()) {
+      expression += ' ';
+    }
+    expression += text;
+  };
+  for (std::size_t index = 0; index < tokens.size();) {
+    const auto token = tokens[index];
+    const auto lower = lower_ascii(token);
+    if (token == "(" || token == ")") {
+      append(token);
+      ++index;
+      continue;
+    }
+    if (lower == "and" || lower == "or" || lower == "not") {
+      append(lower);
+      ++index;
+      continue;
+    }
+    if (is_comparison_token(token)) {
+      throw std::invalid_argument("unexpected comparison operator '" + token + "'");
+    }
+
+    std::string field = "name";
+    std::string value = token;
+    std::string op = "==";
+    if (is_descriptor_token(token)) {
+      field = lower;
+      if (index + 1 >= tokens.size()) {
+        throw std::invalid_argument("descriptor '" + token + "' has no value");
+      }
+      if (is_comparison_token(tokens[index + 1])) {
+        op = comparison_token(tokens[index + 1]);
+        if (index + 2 >= tokens.size()) {
+          throw std::invalid_argument("descriptor '" + token + "' has no comparison value");
+        }
+        value = tokens[index + 2];
+        index += 3;
+      } else {
+        value = tokens[index + 1];
+        index += 2;
+      }
+    } else {
+      ++index;
+    }
+
+    append(field + "[i] " + op + " " + value_literal(field, value));
+  }
+  return expression;
+}
+
+std::vector<std::string> split_commas(const std::string& value) {
+  std::vector<std::string> parts;
+  std::stringstream stream(value);
+  std::string part;
+  while (std::getline(stream, part, ',')) {
+    parts.push_back(trim(part));
+  }
+  return parts;
+}
+
 }  // namespace
 
 SelectionResult indices_all(const Molecule& molecule) {
@@ -453,6 +678,66 @@ std::optional<std::string> basis_expression(const std::string& basis_name) {
   return std::nullopt;
 }
 
+BasisExpressionResult sassie_basis_expression(const std::string& basis,
+                                              SassieBasisContext context) {
+  try {
+    const auto trimmed = trim(basis);
+    if (trimmed.empty()) {
+      return {{}, {"SASSIE basis string is empty"}};
+    }
+    const auto alias = alias_expression(trimmed, context);
+    if (alias.ok()) {
+      return alias;
+    }
+    if (lower_ascii(trimmed) == "backbone") {
+      return alias;
+    }
+    if (looks_like_python_expression(trimmed)) {
+      return {trimmed, {}};
+    }
+    return {translate_sassie_tokens(tokenize_sassie_basis(trimmed)), {}};
+  } catch (const std::exception& error) {
+    return {{}, {"SASSIE basis parse failed: " + std::string(error.what())}};
+  }
+}
+
+SegmentBasisExpressionResult sassie_segment_basis_expressions(
+    const std::string& basis, const std::vector<std::string>& segnames,
+    const std::vector<SassieBasisContext>& contexts) {
+  if (!contexts.empty() && contexts.size() != segnames.size()) {
+    return {{}, {"SASSIE basis contexts must match segment count"}};
+  }
+  const auto parts = split_commas(basis);
+  if (parts.empty() || segnames.empty()) {
+    return {{}, {"SASSIE segment basis requires basis and segment names"}};
+  }
+
+  const bool single_keyword =
+      parts.size() == 1 &&
+      (lower_ascii(parts[0]) == "all" || lower_ascii(parts[0]) == "heavy" ||
+       lower_ascii(parts[0]) == "backbone");
+  if (!single_keyword && parts.size() != segnames.size()) {
+    return {{}, {"SASSIE comma basis count must match segment count"}};
+  }
+
+  SegmentBasisExpressionResult result;
+  result.expressions.reserve(segnames.size());
+  for (std::size_t index = 0; index < segnames.size(); ++index) {
+    const auto context = contexts.empty() ? SassieBasisContext::generic : contexts[index];
+    const auto& basis_part = single_keyword ? parts[0] : parts[index];
+    auto expression = sassie_basis_expression(basis_part, context);
+    if (!expression.ok()) {
+      result.expressions.clear();
+      result.errors = expression.errors;
+      return result;
+    }
+    result.expressions.push_back("segname[i] == " +
+                                 quote_string_literal(segnames[index]) +
+                                 " and ( " + expression.expression + " )");
+  }
+  return result;
+}
+
 SelectionResult select_named_basis(const Molecule& molecule,
                                    const std::string& basis_name) {
   const auto expression = basis_expression(basis_name);
@@ -460,6 +745,16 @@ SelectionResult select_named_basis(const Molecule& molecule,
     return {{}, {"unsupported named basis: " + basis_name}};
   }
   return select_indices(molecule, *expression);
+}
+
+SelectionResult select_sassie_basis(const Molecule& molecule,
+                                    const std::string& basis,
+                                    SassieBasisContext context) {
+  const auto expression = sassie_basis_expression(basis, context);
+  if (!expression.ok()) {
+    return {{}, expression.errors};
+  }
+  return select_indices(molecule, expression.expression);
 }
 
 SelectionResult select_indices(const Molecule& molecule,
@@ -508,6 +803,16 @@ MaskSelectionResult select_mask(const Molecule& molecule,
 MaskSelectionResult select_named_basis_mask(const Molecule& molecule,
                                             const std::string& basis_name) {
   const auto selected = select_named_basis(molecule, basis_name);
+  if (!selected.ok()) {
+    return {{}, selected.errors};
+  }
+  return mask_from_indices(molecule, selected.indices);
+}
+
+MaskSelectionResult select_sassie_basis_mask(const Molecule& molecule,
+                                             const std::string& basis,
+                                             SassieBasisContext context) {
+  const auto selected = select_sassie_basis(molecule, basis, context);
   if (!selected.ok()) {
     return {{}, selected.errors};
   }

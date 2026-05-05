@@ -30,11 +30,12 @@ behavior oracle.
   production helpers, pure copy-returning variants, row and column convention
   preservation, legacy average vdW radius assignment, and
   failure-before-mutation behavior.
-- Selection/subset coverage for a bounded safe expression grammar, named `all`
-  and `heavy` bases, 0/1 mask bridge helpers, coordinate get/set/copy, molecule
-  copy/duplicate/merge, dihedral subset masks, descriptor get/set, extension
-  descriptors, Python-style selected BIOMT apply/copy-apply helpers, and
-  structured failure returns.
+- Selection/subset coverage for a bounded safe expression grammar, surveyed
+  SASSIE/VMD-like basis translation, named `all` and `heavy` bases, contextual
+  `backbone`/`calpha` compatibility helpers, 0/1 mask bridge helpers,
+  coordinate get/set/copy, molecule copy/duplicate/merge, dihedral subset masks,
+  descriptor get/set, extension descriptors, Python-style selected BIOMT
+  apply/copy-apply helpers, and structured failure returns.
 - Overlap coverage for coordinate-vector and molecule-frame overlap checks.
 - Property table coverage for atomic masses, amino-acid SLD values, element,
   nucleotide, DNA, RNA, and protein scattering lengths, and van der Waals radii
@@ -55,8 +56,9 @@ behavior oracle.
 - This is not a drop-in Python binding yet; it is a standalone C++ core.
 - Python `eval` selection compatibility is intentionally not reproduced. The C++
   parser is bounded and fails rather than guessing.
-- Generic `backbone` selection remains deferred because Python/SASSIE usage is
-  context-dependent across protein and nucleic-acid workflows.
+- Generic `backbone` selection remains rejected without context because
+  Python/SASSIE usage is context-dependent across protein and nucleic-acid
+  workflows. C++ exposes explicit protein, nucleic, and nucleic-overlap contexts.
 - `rotate_general_axis` preserves legacy Python behavior for non-unit axes; only
   unit-axis use is treated as a true rigid rotation.
 - PDB reading does not infer CHARMM atom types.

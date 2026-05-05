@@ -141,6 +141,86 @@ void test_named_basis_backbone_is_not_supported() {
   assert(result.indices.empty());
 }
 
+void test_sassie_basis_translates_vmd_like_descriptor_syntax() {
+  const auto expression = sasmol::sassie_basis_expression(
+      "segname HC1 and (resid >= 210 and resid <= 214)");
+
+  assert(expression.ok());
+  assert(expression.expression ==
+         "segname[i] == \"HC1\" and ( resid[i] >= 210 and resid[i] <= 214 )");
+}
+
+void test_sassie_basis_accepts_equal_alias_and_single_atom_names() {
+  auto expression = sasmol::sassie_basis_expression("index = 523");
+  assert(expression.ok());
+  assert(expression.expression == "index[i] == 523");
+
+  expression = sasmol::sassie_basis_expression("CA");
+  assert(expression.ok());
+  assert(expression.expression == "name[i] == \"CA\"");
+}
+
+void test_sassie_basis_supports_contextual_backbone_aliases() {
+  auto expression = sasmol::sassie_basis_expression(
+      "backbone", sasmol::SassieBasisContext::protein);
+  assert(expression.ok());
+  assert(expression.expression ==
+         "(name[i] == \"N\" or name[i] == \"CA\" or name[i] == \"C\")");
+
+  expression = sasmol::sassie_basis_expression(
+      "backbone", sasmol::SassieBasisContext::nucleic);
+  assert(expression.ok());
+  assert(expression.expression.find("O5'") != std::string::npos);
+
+  expression = sasmol::sassie_basis_expression(
+      "backbone", sasmol::SassieBasisContext::generic);
+  assert(!expression.ok());
+}
+
+void test_sassie_basis_supports_nucleic_overlap_backbone() {
+  const auto expression = sasmol::sassie_basis_expression(
+      "backbone", sasmol::SassieBasisContext::nucleic_overlap);
+
+  assert(expression.ok());
+  assert(expression.expression.find("O2P") != std::string::npos);
+  assert(expression.expression.find("O1P") != std::string::npos);
+}
+
+void test_select_sassie_basis_matches_translated_expression() {
+  sasmol::Molecule mol(4);
+  mol.name() = {"H1", "CA", "N", "P"};
+  mol.resid() = {1, 2, 3, 4};
+  mol.segname() = {"HC1", "HC1", "HC2", "HC1"};
+
+  const auto selected =
+      sasmol::select_sassie_basis(mol, "segname HC1 and not name H1");
+
+  assert(selected.ok());
+  assert((selected.indices == std::vector<std::size_t>{1, 3}));
+}
+
+void test_sassie_segment_basis_expressions_support_keyword_and_comma_forms() {
+  auto result = sasmol::sassie_segment_basis_expressions(
+      "heavy", {"A", "B"});
+  assert(result.ok());
+  assert(result.expressions.size() == 2);
+  assert(result.expressions[0] ==
+         "segname[i] == \"A\" and ( not name[i][0] == \"H\" )");
+
+  result = sasmol::sassie_segment_basis_expressions("CA,P", {"A", "B"});
+  assert(result.ok());
+  assert(result.expressions[0] ==
+         "segname[i] == \"A\" and ( name[i] == \"CA\" )");
+  assert(result.expressions[1] ==
+         "segname[i] == \"B\" and ( name[i] == \"P\" )");
+}
+
+void test_sassie_frame_filters_are_not_atom_selection_expressions() {
+  const auto expression = sasmol::sassie_basis_expression("rg < 10");
+
+  assert(!expression.ok());
+}
+
 void test_safe_expression_matches_align_basis_example() {
   const auto mol = read_fixture("1CRN.pdb");
 
@@ -257,6 +337,13 @@ int main() {
   test_select_mask_from_expression();
   test_select_named_basis_mask_heavy();
   test_named_basis_backbone_is_not_supported();
+  test_sassie_basis_translates_vmd_like_descriptor_syntax();
+  test_sassie_basis_accepts_equal_alias_and_single_atom_names();
+  test_sassie_basis_supports_contextual_backbone_aliases();
+  test_sassie_basis_supports_nucleic_overlap_backbone();
+  test_select_sassie_basis_matches_translated_expression();
+  test_sassie_segment_basis_expressions_support_keyword_and_comma_forms();
+  test_sassie_frame_filters_are_not_atom_selection_expressions();
   test_safe_expression_matches_align_basis_example();
   test_safe_expression_supports_or_and_not_equal();
   test_safe_expression_supports_unary_not();
