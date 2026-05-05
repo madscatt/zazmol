@@ -1,5 +1,6 @@
 #include "sasmol/subset.hpp"
 
+#include <cmath>
 #include <stdexcept>
 #include <set>
 
@@ -442,6 +443,72 @@ std::vector<std::string> validate_merge_source(const Molecule& molecule,
   return errors;
 }
 
+bool finite_transform(const BiomtTransform& transform) {
+  for (const auto& row : transform.rotation) {
+    for (const auto value : row) {
+      if (!std::isfinite(value)) {
+        return false;
+      }
+    }
+  }
+  for (const auto value : transform.translation) {
+    if (!std::isfinite(value)) {
+      return false;
+    }
+  }
+  return true;
+}
+
+Vec3 apply_biomt_transform(Vec3 xyz, const BiomtTransform& transform) {
+  const auto x = static_cast<calc_type>(xyz.x);
+  const auto y = static_cast<calc_type>(xyz.y);
+  const auto z = static_cast<calc_type>(xyz.z);
+  const auto nx = transform.rotation[0][0] * x + transform.rotation[0][1] * y +
+                  transform.rotation[0][2] * z + transform.translation[0];
+  const auto ny = transform.rotation[1][0] * x + transform.rotation[1][1] * y +
+                  transform.rotation[1][2] * z + transform.translation[1];
+  const auto nz = transform.rotation[2][0] * x + transform.rotation[2][1] * y +
+                  transform.rotation[2][2] * z + transform.translation[2];
+  return {static_cast<coord_type>(nx), static_cast<coord_type>(ny),
+          static_cast<coord_type>(nz)};
+}
+
+std::vector<BiomtTransform> metadata_transforms_for_biomol(
+    const Molecule& source, int biomol_id, SubsetResult& result) {
+  std::vector<BiomtTransform> transforms;
+  if (biomol_id <= 0) {
+    result.errors.push_back("biomt biomol_id must be positive");
+    return transforms;
+  }
+  const auto found = source.biomt().find(biomol_id);
+  if (found == source.biomt().end()) {
+    result.errors.push_back("biomt biomol_id is not present in metadata");
+    return transforms;
+  }
+  const auto& record = found->second;
+  if (record.rot.size() != record.trans.size()) {
+    result.errors.push_back("biomt metadata rot/trans size mismatch");
+    return transforms;
+  }
+  if (record.rot.empty()) {
+    result.errors.push_back("biomt metadata has no transforms");
+    return transforms;
+  }
+  transforms.reserve(record.rot.size());
+  for (std::size_t i = 0; i < record.rot.size(); ++i) {
+    BiomtTransform transform;
+    transform.rotation = record.rot[i];
+    transform.translation = record.trans[i];
+    if (!finite_transform(transform)) {
+      result.errors.push_back("biomt metadata contains non-finite transform values");
+      transforms.clear();
+      return transforms;
+    }
+    transforms.push_back(transform);
+  }
+  return transforms;
+}
+
 }  // namespace
 
 IndexSelection get_indices_from_mask(const Molecule& molecule,
@@ -801,6 +868,102 @@ Molecule merged_two_molecules(const Molecule& mol1, const Molecule& mol2,
     throw std::invalid_argument(result.errors.front());
   }
   return merged;
+}
+
+SubsetResult apply_biomt_transforms(const Molecule& source, std::size_t frame,
+                                    const std::vector<BiomtTransform>& transforms,
+                                    Molecule& transformed) {
+  SubsetResult result;
+  if (source.natoms() == 0) {
+    result.errors.push_back("biomt source has no atoms");
+    return result;
+  }
+  if (frame >= source.number_of_frames()) {
+    result.errors.push_back("biomt frame is out of range");
+    return result;
+  }
+  if (transforms.empty()) {
+    result.errors.push_back("biomt transforms are empty");
+    return result;
+  }
+  for (const auto& transform : transforms) {
+    if (!finite_transform(transform)) {
+      result.errors.push_back("biomt transform contains non-finite values");
+      return result;
+    }
+  }
+
+  std::vector<std::size_t> indices(source.natoms());
+  for (std::size_t atom = 0; atom < source.natoms(); ++atom) {
+    indices[atom] = atom;
+  }
+
+  Molecule assembled;
+  for (std::size_t i = 0; i < transforms.size(); ++i) {
+    Molecule transformed_copy;
+    auto copy_result =
+        copy_molecule_using_indices(source, transformed_copy, indices, frame);
+    if (!copy_result.ok()) {
+      result.errors = std::move(copy_result.errors);
+      return result;
+    }
+
+    for (std::size_t atom = 0; atom < transformed_copy.natoms(); ++atom) {
+      transformed_copy.set_coordinate(
+          0, atom,
+          apply_biomt_transform(transformed_copy.coordinate(0, atom),
+                                transforms[i]));
+    }
+
+    if (i == 0) {
+      assembled = std::move(transformed_copy);
+      continue;
+    }
+
+    Molecule merged;
+    auto merge_result = merge_two_molecules(assembled, transformed_copy, merged);
+    if (!merge_result.ok()) {
+      result.errors = std::move(merge_result.errors);
+      return result;
+    }
+    assembled = std::move(merged);
+  }
+
+  transformed = std::move(assembled);
+  return result;
+}
+
+Molecule biomt_transformed(const Molecule& source, std::size_t frame,
+                           const std::vector<BiomtTransform>& transforms) {
+  Molecule transformed;
+  const auto result =
+      apply_biomt_transforms(source, frame, transforms, transformed);
+  if (!result.ok()) {
+    throw std::invalid_argument(result.errors.front());
+  }
+  return transformed;
+}
+
+SubsetResult apply_biomt_transforms_from_metadata(const Molecule& source,
+                                                  std::size_t frame, int biomol_id,
+                                                  Molecule& transformed) {
+  SubsetResult result;
+  auto transforms = metadata_transforms_for_biomol(source, biomol_id, result);
+  if (!result.ok()) {
+    return result;
+  }
+  return apply_biomt_transforms(source, frame, transforms, transformed);
+}
+
+Molecule biomt_transformed_from_metadata(const Molecule& source,
+                                         std::size_t frame, int biomol_id) {
+  Molecule transformed;
+  const auto result = apply_biomt_transforms_from_metadata(source, frame, biomol_id,
+                                                           transformed);
+  if (!result.ok()) {
+    throw std::invalid_argument(result.errors.front());
+  }
+  return transformed;
 }
 
 StringSelection get_string_descriptor_using_indices(

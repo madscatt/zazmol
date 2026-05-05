@@ -686,6 +686,99 @@ void test_descriptor_get_rejects_descriptor_length_mismatch() {
   assert(result.values.empty());
 }
 
+void test_apply_biomt_transforms_assembles_in_transform_order() {
+  sasmol::Molecule source(1, 1);
+  source.name()[0] = "N";
+  source.set_coordinate(0, 0, {1.0F, 2.0F, 3.0F});
+
+  const std::vector<sasmol::BiomtTransform> transforms{
+      {{{{1.0, 0.0, 0.0}, {0.0, 1.0, 0.0}, {0.0, 0.0, 1.0}}},
+       {0.0, 0.0, 0.0}},
+      {{{{1.0, 0.0, 0.0}, {0.0, 1.0, 0.0}, {0.0, 0.0, 1.0}}},
+       {10.0, -1.0, 0.5}},
+  };
+
+  sasmol::Molecule transformed;
+  const auto result =
+      sasmol::apply_biomt_transforms(source, 0, transforms, transformed);
+
+  assert(result.ok());
+  assert(transformed.number_of_frames() == 1);
+  assert(transformed.natoms() == 2);
+  assert_vec_close(transformed.coordinate(0, 0), {1.0F, 2.0F, 3.0F});
+  assert_vec_close(transformed.coordinate(0, 1), {11.0F, 1.0F, 3.5F});
+}
+
+void test_biomt_transformed_returns_value_without_mutating_source() {
+  sasmol::Molecule source(2, 1);
+  source.name() = {"A", "B"};
+  source.set_coordinate(0, 0, {0.0F, 0.0F, 0.0F});
+  source.set_coordinate(0, 1, {2.0F, 3.0F, 4.0F});
+  const auto original = source.coor();
+
+  const std::vector<sasmol::BiomtTransform> transforms{
+      {{{{0.0, -1.0, 0.0}, {1.0, 0.0, 0.0}, {0.0, 0.0, 1.0}}},
+       {5.0, 0.0, 0.0}},
+  };
+
+  const auto transformed = sasmol::biomt_transformed(source, 0, transforms);
+
+  assert(transformed.natoms() == 2);
+  assert_vec_close(transformed.coordinate(0, 0), {5.0F, 0.0F, 0.0F});
+  assert_vec_close(transformed.coordinate(0, 1), {2.0F, 2.0F, 4.0F});
+  assert(source.coor() == original);
+}
+
+void test_apply_biomt_transforms_from_metadata_uses_recorded_transforms() {
+  sasmol::Molecule source(1, 1);
+  source.name()[0] = "N";
+  source.set_coordinate(0, 0, {2.0F, 0.0F, 0.0F});
+
+  sasmol::BiomtRecord record;
+  record.rot.push_back({{{1.0, 0.0, 0.0}, {0.0, 1.0, 0.0}, {0.0, 0.0, 1.0}}});
+  record.trans.push_back({0.0, 0.0, 0.0});
+  record.rot.push_back({{{-1.0, 0.0, 0.0}, {0.0, 1.0, 0.0}, {0.0, 0.0, 1.0}}});
+  record.trans.push_back({1.0, 0.0, 0.0});
+  source.biomt()[1] = record;
+
+  sasmol::Molecule transformed;
+  const auto result =
+      sasmol::apply_biomt_transforms_from_metadata(source, 0, 1, transformed);
+
+  assert(result.ok());
+  assert(transformed.natoms() == 2);
+  assert_vec_close(transformed.coordinate(0, 0), {2.0F, 0.0F, 0.0F});
+  assert_vec_close(transformed.coordinate(0, 1), {-1.0F, 0.0F, 0.0F});
+}
+
+void test_apply_biomt_transforms_rejects_invalid_inputs_without_mutation() {
+  sasmol::Molecule source(1, 1);
+  source.name()[0] = "N";
+  source.set_coordinate(0, 0, {1.0F, 1.0F, 1.0F});
+
+  sasmol::Molecule transformed(1, 1);
+  transformed.name()[0] = "KEEP";
+  transformed.set_coordinate(0, 0, {9.0F, 9.0F, 9.0F});
+
+  auto result = sasmol::apply_biomt_transforms(source, 0, {}, transformed);
+  assert(!result.ok());
+  assert(transformed.natoms() == 1);
+  assert(transformed.name()[0] == "KEEP");
+  assert_vec_close(transformed.coordinate(0, 0), {9.0F, 9.0F, 9.0F});
+
+  const std::vector<sasmol::BiomtTransform> non_finite{
+      {{{{1.0, 0.0, 0.0}, {0.0, NAN, 0.0}, {0.0, 0.0, 1.0}}},
+       {0.0, 0.0, 0.0}},
+  };
+  result = sasmol::apply_biomt_transforms(source, 0, non_finite, transformed);
+  assert(!result.ok());
+  assert(transformed.name()[0] == "KEEP");
+
+  result = sasmol::apply_biomt_transforms_from_metadata(source, 0, 9, transformed);
+  assert(!result.ok());
+  assert(transformed.name()[0] == "KEEP");
+}
+
 }  // namespace
 
 int main() {
@@ -730,5 +823,9 @@ int main() {
   test_get_and_set_calc_descriptor_using_mask();
   test_descriptor_set_rejects_bad_mask_before_mutation();
   test_descriptor_get_rejects_descriptor_length_mismatch();
+  test_apply_biomt_transforms_assembles_in_transform_order();
+  test_biomt_transformed_returns_value_without_mutating_source();
+  test_apply_biomt_transforms_from_metadata_uses_recorded_transforms();
+  test_apply_biomt_transforms_rejects_invalid_inputs_without_mutation();
   return 0;
 }

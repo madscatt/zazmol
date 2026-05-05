@@ -2,6 +2,7 @@
 
 #include "sasmol/molecule.hpp"
 
+#include <array>
 #include <cstddef>
 #include <string>
 #include <vector>
@@ -90,6 +91,11 @@ struct MergeOptions {
   bool report_skipped_descriptors{false};
 };
 
+struct BiomtTransform {
+  std::array<std::array<calc_type, 3>, 3> rotation{};
+  std::array<calc_type, 3> translation{};
+};
+
 [[nodiscard]] IndexSelection get_indices_from_mask(
     const Molecule& molecule, const std::vector<int>& mask);
 
@@ -144,6 +150,21 @@ struct MergeOptions {
 
 [[nodiscard]] Molecule merged_two_molecules(
     const Molecule& mol1, const Molecule& mol2, MergeOptions options = {});
+
+[[nodiscard]] SubsetResult apply_biomt_transforms(
+    const Molecule& source, std::size_t frame,
+    const std::vector<BiomtTransform>& transforms, Molecule& transformed);
+
+[[nodiscard]] Molecule biomt_transformed(
+    const Molecule& source, std::size_t frame,
+    const std::vector<BiomtTransform>& transforms);
+
+[[nodiscard]] SubsetResult apply_biomt_transforms_from_metadata(
+    const Molecule& source, std::size_t frame, int biomol_id,
+    Molecule& transformed);
+
+[[nodiscard]] Molecule biomt_transformed_from_metadata(
+    const Molecule& source, std::size_t frame, int biomol_id);
 
 [[nodiscard]] StringSelection get_string_descriptor_using_indices(
     const Molecule& molecule, StringDescriptor descriptor,
