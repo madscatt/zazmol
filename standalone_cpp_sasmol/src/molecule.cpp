@@ -119,6 +119,7 @@ void Molecule::resize(std::size_t natoms, std::size_t number_of_frames) {
   formula_.clear();
   fasta_.clear();
   unitcell_.fill(calc_type{});
+  biomt_.clear();
   extra_string_descriptors_.clear();
   extra_int_descriptors_.clear();
   extra_calc_descriptors_.clear();

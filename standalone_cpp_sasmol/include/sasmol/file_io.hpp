@@ -83,6 +83,9 @@ struct PdbWriteOptions {
   bool final{false};
 };
 
+[[nodiscard]] BiomtMap parse_biomt_header_records(
+    const std::vector<std::string>& header_lines);
+
 class PdbReader {
  public:
   [[nodiscard]] IoStatus read_pdb(const std::filesystem::path& filename,

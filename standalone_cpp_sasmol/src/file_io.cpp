@@ -337,12 +337,186 @@ std::vector<int> parse_conect_line(const std::string& line) {
   return indices;
 }
 
+std::vector<std::string> split_csv_tokens(const std::string& text) {
+  std::vector<std::string> tokens;
+  std::stringstream stream(text);
+  std::string token;
+  while (std::getline(stream, token, ',')) {
+    token = trim_copy(token);
+    if (!token.empty()) {
+      tokens.push_back(token);
+    }
+  }
+  return tokens;
+}
+
 }  // namespace
 
 IoStatus IoStatus::success() { return {}; }
 
 IoStatus IoStatus::not_implemented(std::string message) {
   return {IoCode::not_implemented, std::move(message)};
+}
+
+BiomtMap parse_biomt_header_records(
+    const std::vector<std::string>& header_lines) {
+  BiomtMap biomt;
+  int current_biomol_no = -1;
+  int current_transform_id = -1;
+  std::array<std::array<calc_type, 3>, 3> current_rot{};
+  std::array<calc_type, 3> current_trans{};
+  int next_row = 1;
+
+  for (const auto& line : header_lines) {
+    if (line.rfind("REMARK 350", 0) != 0) {
+      continue;
+    }
+    const auto text = trim_copy(line.size() > 10 ? line.substr(10) : "");
+    if (text.empty()) {
+      continue;
+    }
+
+    if (text.rfind("BIOMOLECULE:", 0) == 0) {
+      current_biomol_no = -1;
+      current_transform_id = -1;
+      next_row = 1;
+
+      const auto colon = text.find(':');
+      if (colon == std::string::npos) {
+        continue;
+      }
+      for (const auto& token : split_csv_tokens(text.substr(colon + 1))) {
+        try {
+          current_biomol_no = std::stoi(token);
+          break;
+        } catch (...) {
+          continue;
+        }
+      }
+      if (current_biomol_no != -1 &&
+          biomt.find(current_biomol_no) == biomt.end()) {
+        biomt[current_biomol_no] = BiomtRecord{};
+      }
+      continue;
+    }
+
+    if (current_biomol_no == -1) {
+      continue;
+    }
+
+    auto& record = biomt[current_biomol_no];
+
+    if (text.rfind("AUTHOR DETERMINED BIOLOGICAL UNIT:", 0) == 0) {
+      const auto colon = text.find(':');
+      if (colon != std::string::npos) {
+        record.auth_bio_unit = trim_copy(text.substr(colon + 1));
+      }
+      continue;
+    }
+
+    if (text.rfind("SOFTWARE DETERMINED", 0) == 0) {
+      const auto colon = text.find(':');
+      if (colon != std::string::npos) {
+        record.soft_bio_unit = trim_copy(text.substr(colon + 1));
+      }
+      continue;
+    }
+
+    if (text.rfind("APPLY THE FOLLOWING TO CHAINS:", 0) == 0 ||
+        text.rfind("AND CHAINS:", 0) == 0) {
+      const auto colon = text.find(':');
+      if (colon != std::string::npos) {
+        for (const auto& chain : split_csv_tokens(text.substr(colon + 1))) {
+          if (std::find(record.subdivs.begin(), record.subdivs.end(), chain) ==
+              record.subdivs.end()) {
+            record.subdivs.push_back(chain);
+          }
+        }
+      }
+      continue;
+    }
+
+    if (text.rfind("BIOMT", 0) != 0) {
+      continue;
+    }
+
+    std::stringstream cols(text);
+    std::string row_token;
+    std::string transform_id_token;
+    std::string c1;
+    std::string c2;
+    std::string c3;
+    std::string t;
+    cols >> row_token >> transform_id_token >> c1 >> c2 >> c3 >> t;
+    if (row_token.empty() || transform_id_token.empty() || c1.empty() ||
+        c2.empty() || c3.empty() || t.empty()) {
+      continue;
+    }
+    if (row_token.size() < 6) {
+      continue;
+    }
+
+    int row = 0;
+    int transform_id = -1;
+    calc_type r0 = 0.0;
+    calc_type r1 = 0.0;
+    calc_type r2 = 0.0;
+    calc_type trans = 0.0;
+    try {
+      row = std::stoi(row_token.substr(row_token.size() - 1));
+      transform_id = std::stoi(transform_id_token);
+      r0 = static_cast<calc_type>(std::stod(c1));
+      r1 = static_cast<calc_type>(std::stod(c2));
+      r2 = static_cast<calc_type>(std::stod(c3));
+      trans = static_cast<calc_type>(std::stod(t));
+    } catch (...) {
+      continue;
+    }
+    if (row < 1 || row > 3) {
+      continue;
+    }
+
+    if (row == 1) {
+      current_transform_id = transform_id;
+      current_rot = {};
+      current_trans = {};
+      next_row = 1;
+    }
+    if (current_transform_id == -1) {
+      continue;
+    }
+    if (transform_id != current_transform_id) {
+      if (row != 1) {
+        continue;
+      }
+      current_transform_id = transform_id;
+      current_rot = {};
+      current_trans = {};
+      next_row = 1;
+    }
+    if (row != next_row) {
+      if (row != 1) {
+        continue;
+      }
+      current_transform_id = transform_id;
+      current_rot = {};
+      current_trans = {};
+      next_row = 1;
+    }
+
+    current_rot[static_cast<std::size_t>(row - 1)] = {r0, r1, r2};
+    current_trans[static_cast<std::size_t>(row - 1)] = trans;
+    if (row == 3) {
+      record.rot.push_back(current_rot);
+      record.trans.push_back(current_trans);
+      current_transform_id = -1;
+      next_row = 1;
+    } else {
+      next_row = row + 1;
+    }
+  }
+
+  return biomt;
 }
 
 IoStatus PdbReader::read_pdb(const std::filesystem::path& filename,
@@ -361,6 +535,7 @@ IoStatus PdbReader::read_pdb(const std::filesystem::path& filename,
   molecule.resize(scan.natoms, scan.nframes);
   std::size_t frame_index = 0;
   std::size_t atom_index = 0;
+  std::vector<std::string> header_lines;
   std::string line;
   while (std::getline(input, line)) {
     const auto record = pdb_record_name(line);
@@ -385,6 +560,7 @@ IoStatus PdbReader::read_pdb(const std::filesystem::path& filename,
       continue;
     }
     if (!is_pdb_coordinate_record(record)) {
+      header_lines.push_back(line);
       if (record == "CONECT" && options.pdbscan) {
         const auto indices = parse_conect_line(line);
         if (indices.size() > 1) {
@@ -451,6 +627,8 @@ IoStatus PdbReader::read_pdb(const std::filesystem::path& filename,
       return status;
     }
   }
+
+  molecule.set_biomt(parse_biomt_header_records(header_lines));
 
   return IoStatus::success();
 }

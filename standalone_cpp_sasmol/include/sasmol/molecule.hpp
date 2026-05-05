@@ -6,6 +6,7 @@
 #include <cstddef>
 #include <map>
 #include <string>
+#include <utility>
 #include <vector>
 
 namespace sasmol {
@@ -42,6 +43,16 @@ struct MoltypeReport {
   std::map<std::string, MoltypeSegmentReport> segments;
   std::vector<std::string> messages;
 };
+
+struct BiomtRecord {
+  std::vector<std::string> subdivs;
+  std::string auth_bio_unit;
+  std::string soft_bio_unit;
+  std::vector<std::array<std::array<calc_type, 3>, 3>> rot;
+  std::vector<std::array<calc_type, 3>> trans;
+};
+
+using BiomtMap = std::map<int, BiomtRecord>;
 
 class Molecule {
  public:
@@ -193,6 +204,9 @@ class Molecule {
   [[nodiscard]] const std::vector<std::vector<int>>& conect() const noexcept {
     return conect_;
   }
+  [[nodiscard]] BiomtMap& biomt() noexcept { return biomt_; }
+  [[nodiscard]] const BiomtMap& biomt() const noexcept { return biomt_; }
+  void set_biomt(BiomtMap value) { biomt_ = std::move(value); }
   [[nodiscard]] std::map<std::string, std::vector<std::string>>&
   extra_string_descriptors() noexcept {
     return extra_string_descriptors_;
@@ -267,6 +281,7 @@ class Molecule {
   std::string fasta_;
   std::array<calc_type, 6> unitcell_{};
   std::vector<std::vector<int>> conect_;
+  BiomtMap biomt_;
   std::map<std::string, std::vector<std::string>> extra_string_descriptors_;
   std::map<std::string, std::vector<int>> extra_int_descriptors_;
   std::map<std::string, std::vector<calc_type>> extra_calc_descriptors_;

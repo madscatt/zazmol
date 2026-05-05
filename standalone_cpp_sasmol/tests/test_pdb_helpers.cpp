@@ -512,6 +512,49 @@ void test_read_pdb_pdbscan_conect_parsing() {
   std::filesystem::remove(path);
 }
 
+void test_read_pdb_records_biomt_metadata_without_coordinate_changes() {
+  const auto path = std::filesystem::temp_directory_path() / "sasmol_biomt_metadata.pdb";
+  {
+    std::ofstream out(path);
+    out << "REMARK 350 BIOMOLECULE: 1\n";
+    out << "REMARK 350 AUTHOR DETERMINED BIOLOGICAL UNIT: MONOMERIC\n";
+    out << "REMARK 350 APPLY THE FOLLOWING TO CHAINS: N\n";
+    out << "REMARK 350   BIOMT1   1  1.000000  0.000000  0.000000        0.00000\n";
+    out << "REMARK 350   BIOMT2   1  0.000000  1.000000  0.000000        0.00000\n";
+    out << "REMARK 350   BIOMT3   1  0.000000  0.000000  1.000000        0.00000\n";
+    out << "ATOM      1  N   ILE N 515      73.944  41.799  41.652  1.00 36.37           N\n";
+    out << "END\n";
+  }
+
+  sasmol::PdbReader reader;
+  sasmol::Molecule mol;
+  const auto status = reader.read_pdb(path, mol);
+
+  assert(status.ok());
+  assert(mol.natoms() == 1);
+  assert(mol.number_of_frames() == 1);
+  const auto xyz = mol.coordinate(0, 0);
+  assert_close(xyz.x, 73.944F);
+  assert_close(xyz.y, 41.799F);
+  assert_close(xyz.z, 41.652F);
+
+  const auto& biomt = mol.biomt();
+  assert(biomt.size() == 1);
+  const auto& record = biomt.at(1);
+  assert((record.subdivs == std::vector<std::string>{"N"}));
+  assert(record.auth_bio_unit == "MONOMERIC");
+  assert(record.rot.size() == 1);
+  assert(record.trans.size() == 1);
+  assert(record.rot[0][0][0] == static_cast<sasmol::calc_type>(1.0));
+  assert(record.rot[0][1][1] == static_cast<sasmol::calc_type>(1.0));
+  assert(record.rot[0][2][2] == static_cast<sasmol::calc_type>(1.0));
+  assert(record.trans[0][0] == static_cast<sasmol::calc_type>(0.0));
+  assert(record.trans[0][1] == static_cast<sasmol::calc_type>(0.0));
+  assert(record.trans[0][2] == static_cast<sasmol::calc_type>(0.0));
+
+  std::filesystem::remove(path);
+}
+
 void write_and_read_back_pdb(const char* area, const char* name,
                              const char* output_name, std::size_t natoms,
                              sasmol::Vec3 expected_last) {
@@ -878,6 +921,7 @@ int main() {
   test_read_pdb_accepts_trailing_blank_lines();
   test_read_pdb_check_zero_coor_guard();
   test_read_pdb_pdbscan_conect_parsing();
+  test_read_pdb_records_biomt_metadata_without_coordinate_changes();
   test_write_pdb_single_frame_1atm_round_trip();
   test_write_pdb_single_frame_2aad_round_trip();
   test_write_pdb_single_frame_1crn_round_trip();
