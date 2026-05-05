@@ -90,6 +90,13 @@ if(BUILD_TESTING)
   target_link_libraries(test_overlap PRIVATE sasmol_standalone)
   add_test(NAME overlap COMMAND test_overlap)
 
+  add_executable(test_properties tests/test_properties.cpp)
+  target_link_libraries(test_properties PRIVATE sasmol_standalone)
+  target_compile_definitions(test_properties PRIVATE
+    SASMOL_TEST_DATA_DIR="${CMAKE_CURRENT_SOURCE_DIR}/../src/python/test_sasmol/data"
+  )
+  add_test(NAME properties COMMAND test_properties)
+
   add_executable(test_selection tests/test_selection.cpp)
   target_link_libraries(test_selection PRIVATE sasmol_standalone)
   target_compile_definitions(test_selection PRIVATE

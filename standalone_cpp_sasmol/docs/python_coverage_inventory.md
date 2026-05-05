@@ -37,7 +37,8 @@ Status labels:
 | `topology.Topology.make_constraint_pdb` | `test_topology/test_intg_topology_Topology.py` | `sasmol/topology.hpp`, `sasmol/file_io.hpp` | `implemented` | medium | C++ splits descriptor application from the PDB-writing wrapper. |
 | `topology.Topology.make_backbone_pdb_from_fasta` | `test_topology/test_intg_topology_Topology.py` | `sasmol/topology.hpp`, `sasmol/file_io.hpp` | `implemented` | medium-high | C++ exposes both molecule builder and PDB-writing wrapper. |
 | `multiprocessing_sasmol.Multiprocessing_SasMol` | no core C++ parity tests | optional adapter layer | `missing` | high | Defer unless standalone C++ needs orchestration parity. |
-| Python property tables: AMU, VDW, scattering lengths, CHARMM names, amino-acid SLD | `test_properties/*` | `sasmol/properties.hpp` | `partial` | medium | Expand table-by-table only when a caller or helper needs it. |
+| Python property tables: AMU, VDW, scattering lengths, amino-acid SLD | `test_properties/*` | `sasmol/properties.hpp` | `implemented` | medium | C++ table accessors are fixture-checked against Python oracle data. |
+| `charmm_topology.CharmmTopology.charmm_names` | `test_properties/test_unit_properties_Atomic_charmm_names.py` | `sasmol/topology.hpp` | `missing` | medium | Port as a named CHARMM atom-name classification table if a caller needs it. |
 | VMD/view helpers | `test_system/*send_coordinates_to_vmd*` | optional adapter | `deferred` | medium | Keep outside portable core. |
 
 ## Recommended Port Order

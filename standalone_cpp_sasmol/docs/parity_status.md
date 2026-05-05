@@ -35,6 +35,9 @@ behavior oracle.
   descriptors, Python-style selected BIOMT apply/copy-apply helpers, and
   structured failure returns.
 - Overlap coverage for coordinate-vector and molecule-frame overlap checks.
+- Property table coverage for atomic masses, amino-acid SLD values, element,
+  nucleotide, DNA, RNA, and protein scattering lengths, and van der Waals radii
+  including Python `None` entries represented as empty optionals.
 - Topology support for explicit CHARMM type/charge assignment from
   already-trusted atom-aligned vectors or atom-name tables; Python-parity
   CHARMM topology parsing for reviewed record types; pure residue atom-list,
