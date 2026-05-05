@@ -700,6 +700,59 @@ void test_copy_reordered_charmm_molecule_rejects_descriptor_mismatch() {
   assert(result.molecule.natoms() == 0);
 }
 
+void test_reorder_charmm_molecule_in_place_reorders_after_success() {
+  const auto topology = residue_order_topology();
+  const auto residue_atoms = sasmol::setup_charmm_residue_atoms(topology);
+  sasmol::Molecule molecule(13, 2);
+  molecule.segname() = {"A", "A", "A", "A", "A", "A", "A",
+                        "A", "A", "A", "A", "A", "A"};
+  molecule.resid() = {1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2};
+  molecule.resname() = {"ALA", "ALA", "ALA", "ALA", "ALA", "ALA", "ALA",
+                        "ALA", "ALA", "ALA", "ALA", "ALA", "ALA"};
+  molecule.name() = {"HT2", "CA", "N", "C", "O", "HT1", "HT3",
+                     "N",   "HN", "CA", "O", "C",   "OT1"};
+  molecule.index() = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13};
+  molecule.set_coordinate(0, 0, {1.0F, 0.0F, 0.0F});
+  molecule.set_coordinate(0, 2, {3.0F, 0.0F, 0.0F});
+  molecule.set_coordinate(0, 7, {8.0F, 0.0F, 0.0F});
+  molecule.set_coordinate(1, 0, {11.0F, 0.0F, 0.0F});
+  molecule.set_coordinate(1, 2, {13.0F, 0.0F, 0.0F});
+  molecule.set_coordinate(1, 7, {18.0F, 0.0F, 0.0F});
+
+  const auto result = sasmol::reorder_charmm_molecule_in_place(
+      molecule, topology, residue_atoms.residue_atoms);
+
+  assert(result.ok());
+  assert((molecule.name() ==
+          std::vector<std::string>{"N", "HT1", "HT2", "HT3", "CA", "C",
+                                   "O", "N", "HN", "CA", "O", "C",
+                                   "OT1"}));
+  assert((molecule.index() ==
+          std::vector<int>{3, 6, 1, 7, 2, 4, 5, 8, 9, 10, 11, 12, 13}));
+  assert(molecule.coordinate(0, 0).x == 3.0F);
+  assert(molecule.coordinate(0, 7).x == 8.0F);
+  assert(molecule.coordinate(1, 0).x == 13.0F);
+  assert(molecule.coordinate(1, 7).x == 18.0F);
+}
+
+void test_reorder_charmm_molecule_in_place_preserves_input_on_failure() {
+  const auto topology = residue_order_topology();
+  const auto residue_atoms = sasmol::setup_charmm_residue_atoms(topology);
+  sasmol::Molecule molecule(2, 1);
+  molecule.segname() = {"A", "A"};
+  molecule.resid() = {1, 1};
+  molecule.resname() = {"ALA", "ALA"};
+  molecule.name() = {"N", "CA"};
+  molecule.index() = {1, 2};
+
+  const auto result = sasmol::reorder_charmm_molecule_in_place(
+      molecule, topology, residue_atoms.residue_atoms);
+
+  assert(!result.ok());
+  assert((molecule.name() == std::vector<std::string>{"N", "CA"}));
+  assert((molecule.index() == std::vector<int>{1, 2}));
+}
+
 void test_parse_charmm_topology_globals_matches_python_oracle_fixture() {
   const auto result = sasmol::parse_charmm_topology_globals(
       topology_fixture("minimal_mass_only.rtf"));
@@ -1261,6 +1314,8 @@ int main() {
   test_copy_reordered_charmm_molecule_reorders_copy_all_frames();
   test_copy_reordered_charmm_molecule_rejects_bad_plan();
   test_copy_reordered_charmm_molecule_rejects_descriptor_mismatch();
+  test_reorder_charmm_molecule_in_place_reorders_after_success();
+  test_reorder_charmm_molecule_in_place_preserves_input_on_failure();
   test_parse_charmm_topology_globals_matches_python_oracle_fixture();
   test_parse_charmm_topology_globals_reports_malformed_records();
   test_parse_charmm_topology_residue_atoms_match_python_oracle_fixture();

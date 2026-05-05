@@ -235,6 +235,11 @@ struct CharmmReorderedMoleculeResult {
     const Molecule& molecule,
     const CharmmMoleculeReorderPlan& plan);
 
+[[nodiscard]] SubsetResult reorder_charmm_molecule_in_place(
+    Molecule& molecule,
+    const CharmmTopologyData& topology,
+    const std::map<std::string, std::vector<std::string>>& residue_atoms);
+
 [[nodiscard]] CharmmTopologyParseResult parse_charmm_topology(
     const std::filesystem::path& filename);
 

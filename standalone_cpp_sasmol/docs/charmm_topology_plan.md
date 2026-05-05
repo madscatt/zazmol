@@ -62,6 +62,8 @@ Implemented:
 - `copy_reordered_charmm_molecule(...)` as a pure helper that applies a validated
   reorder plan to a copy, moving atom-aligned descriptors and all coordinate
   frames together
+- `reorder_charmm_molecule_in_place(...)` as a small mutating wrapper that
+  plans and copies first, then replaces the input molecule only after success
 - `parse_charmm_topology_globals(...)` for Python-matched `MASS`, `DECL`,
   `DEFA`, and `AUTO` records, preserving values as strings
 - `parse_charmm_topology(...)` for those global records plus Python-matched
@@ -263,10 +265,16 @@ than guessed.
      implementation only moved frame 0 in this path
    - still does not mutate the input molecule
 
+   Sixteenth slice implemented:
+
+   - adds `reorder_charmm_molecule_in_place(...)`
+   - composes the validated whole-molecule plan and pure reordered copy helper
+   - mutates the input molecule only after both planning and copying succeed
+   - preserves the original molecule on validation or copy failure
+   - keeps atom reordering behind an explicit API
+
    Future slices should port Python `CharmmTopology` behavior as its own module:
 
-   - add an in-place wrapper that swaps in the reordered copy only after all
-     planning and copying succeeds
    - validate missing, extra, duplicate, and ambiguous atoms
    - optionally reorder molecules only through an explicit API
 

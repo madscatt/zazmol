@@ -905,6 +905,29 @@ CharmmReorderedMoleculeResult copy_reordered_charmm_molecule(
   return result;
 }
 
+SubsetResult reorder_charmm_molecule_in_place(
+    Molecule& molecule,
+    const CharmmTopologyData& topology,
+    const std::map<std::string, std::vector<std::string>>& residue_atoms) {
+  SubsetResult result;
+  auto plan = plan_charmm_molecule_reorder(molecule, topology, residue_atoms);
+  if (!plan.ok()) {
+    result.errors.insert(result.errors.end(), plan.errors.begin(),
+                         plan.errors.end());
+    return result;
+  }
+
+  auto copy_result = copy_reordered_charmm_molecule(molecule, plan);
+  if (!copy_result.ok()) {
+    result.errors.insert(result.errors.end(), copy_result.errors.begin(),
+                         copy_result.errors.end());
+    return result;
+  }
+
+  molecule = std::move(copy_result.molecule);
+  return result;
+}
+
 SubsetResult assign_charmm_types(Molecule& molecule,
                                  const std::vector<std::string>& types) {
   SubsetResult result;
