@@ -617,6 +617,89 @@ void test_plan_charmm_molecule_reorder_reports_descriptor_mismatch() {
   assert(result.source_atom_indices.empty());
 }
 
+void test_copy_reordered_charmm_molecule_reorders_copy_all_frames() {
+  sasmol::Molecule molecule(3, 2);
+  molecule.record() = {"ATOM", "HETATM", "ATOM"};
+  molecule.index() = {10, 11, 12};
+  molecule.original_index() = {100, 101, 102};
+  molecule.original_resid() = {1, 1, 1};
+  molecule.name() = {"CA", "O", "N"};
+  molecule.loc() = {"A", "B", "C"};
+  molecule.resname() = {"GLY", "GLY", "GLY"};
+  molecule.chain() = {"A", "A", "A"};
+  molecule.resid() = {7, 7, 7};
+  molecule.rescode() = {"", "", ""};
+  molecule.occupancy() = {"1.00", "0.50", "0.25"};
+  molecule.beta() = {"10.0", "20.0", "30.0"};
+  molecule.segname() = {"SEG", "SEG", "SEG"};
+  molecule.element() = {"C", "O", "N"};
+  molecule.charge() = {"0", "-1", "1"};
+  molecule.atom_charge() = {0.1, -0.2, 0.3};
+  molecule.atom_vdw() = {1.1, 1.2, 1.3};
+  molecule.residue_flag() = {0, 1, 0};
+  molecule.charmm_type() = {"CT2", "O", "NH1"};
+  molecule.moltype() = {"protein", "protein", "protein"};
+  molecule.mass() = {12.0, 16.0, 14.0};
+  molecule.residue_charge() = {0.2, 0.2, 0.2};
+  molecule.conect() = {{2}, {1, 3}, {2}};
+  molecule.extra_string_descriptors()["tag"] = {"ca", "o", "n"};
+  molecule.extra_int_descriptors()["rank"] = {1, 2, 3};
+  molecule.extra_calc_descriptors()["score"] = {1.5, 2.5, 3.5};
+  molecule.set_coordinate(0, 0, {1.0F, 2.0F, 3.0F});
+  molecule.set_coordinate(0, 1, {4.0F, 5.0F, 6.0F});
+  molecule.set_coordinate(0, 2, {7.0F, 8.0F, 9.0F});
+  molecule.set_coordinate(1, 0, {11.0F, 12.0F, 13.0F});
+  molecule.set_coordinate(1, 1, {14.0F, 15.0F, 16.0F});
+  molecule.set_coordinate(1, 2, {17.0F, 18.0F, 19.0F});
+
+  sasmol::CharmmMoleculeReorderPlan plan;
+  plan.source_atom_indices = {2, 0, 1};
+
+  const auto result = sasmol::copy_reordered_charmm_molecule(molecule, plan);
+
+  assert(result.ok());
+  assert((result.molecule.name() == std::vector<std::string>{"N", "CA", "O"}));
+  assert((result.molecule.index() == std::vector<int>{12, 10, 11}));
+  assert((result.molecule.charmm_type() ==
+          std::vector<std::string>{"NH1", "CT2", "O"}));
+  assert((result.molecule.extra_string_descriptors().at("tag") ==
+          std::vector<std::string>{"n", "ca", "o"}));
+  assert((result.molecule.extra_int_descriptors().at("rank") ==
+          std::vector<int>{3, 1, 2}));
+  assert_close(result.molecule.atom_charge()[0], 0.3);
+  assert_close(result.molecule.extra_calc_descriptors().at("score")[1], 1.5);
+  assert(result.molecule.coordinate(0, 0).x == 7.0F);
+  assert(result.molecule.coordinate(0, 1).x == 1.0F);
+  assert(result.molecule.coordinate(1, 0).x == 17.0F);
+  assert(result.molecule.coordinate(1, 1).x == 11.0F);
+  assert((molecule.name() == std::vector<std::string>{"CA", "O", "N"}));
+}
+
+void test_copy_reordered_charmm_molecule_rejects_bad_plan() {
+  sasmol::Molecule molecule(2, 1);
+  sasmol::CharmmMoleculeReorderPlan plan;
+  plan.source_atom_indices = {1};
+
+  const auto result = sasmol::copy_reordered_charmm_molecule(molecule, plan);
+
+  assert(!result.ok());
+  assert(result.errors.size() == 1);
+  assert(result.molecule.natoms() == 0);
+}
+
+void test_copy_reordered_charmm_molecule_rejects_descriptor_mismatch() {
+  sasmol::Molecule molecule(2, 1);
+  molecule.extra_string_descriptors()["bad"] = {"only-one"};
+  sasmol::CharmmMoleculeReorderPlan plan;
+  plan.source_atom_indices = {1, 0};
+
+  const auto result = sasmol::copy_reordered_charmm_molecule(molecule, plan);
+
+  assert(!result.ok());
+  assert(!result.errors.empty());
+  assert(result.molecule.natoms() == 0);
+}
+
 void test_parse_charmm_topology_globals_matches_python_oracle_fixture() {
   const auto result = sasmol::parse_charmm_topology_globals(
       topology_fixture("minimal_mass_only.rtf"));
@@ -1175,6 +1258,9 @@ int main() {
   test_plan_charmm_molecule_reorder_plans_terminal_residues();
   test_plan_charmm_molecule_reorder_reports_mixed_residue_names();
   test_plan_charmm_molecule_reorder_reports_descriptor_mismatch();
+  test_copy_reordered_charmm_molecule_reorders_copy_all_frames();
+  test_copy_reordered_charmm_molecule_rejects_bad_plan();
+  test_copy_reordered_charmm_molecule_rejects_descriptor_mismatch();
   test_parse_charmm_topology_globals_matches_python_oracle_fixture();
   test_parse_charmm_topology_globals_reports_malformed_records();
   test_parse_charmm_topology_residue_atoms_match_python_oracle_fixture();

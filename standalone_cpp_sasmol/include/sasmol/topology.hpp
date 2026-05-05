@@ -172,6 +172,13 @@ struct CharmmMoleculeReorderPlan {
   [[nodiscard]] bool ok() const noexcept { return errors.empty(); }
 };
 
+struct CharmmReorderedMoleculeResult {
+  Molecule molecule;
+  std::vector<std::string> errors;
+
+  [[nodiscard]] bool ok() const noexcept { return errors.empty(); }
+};
+
 [[nodiscard]] SubsetResult assign_charmm_types(
     Molecule& molecule, const std::vector<std::string>& types);
 
@@ -223,6 +230,10 @@ struct CharmmMoleculeReorderPlan {
     const Molecule& molecule,
     const CharmmTopologyData& topology,
     const std::map<std::string, std::vector<std::string>>& residue_atoms);
+
+[[nodiscard]] CharmmReorderedMoleculeResult copy_reordered_charmm_molecule(
+    const Molecule& molecule,
+    const CharmmMoleculeReorderPlan& plan);
 
 [[nodiscard]] CharmmTopologyParseResult parse_charmm_topology(
     const std::filesystem::path& filename);

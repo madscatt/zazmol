@@ -191,6 +191,51 @@ void require_atom_aligned(const Molecule& molecule,
   }
 }
 
+template <typename T>
+void require_optional_atom_aligned(const Molecule& molecule,
+                                   const std::vector<T>& values,
+                                   const std::string& field,
+                                   std::vector<std::string>& errors) {
+  if (!values.empty() && values.size() != molecule.natoms()) {
+    errors.push_back(field + " length does not match natoms");
+  }
+}
+
+template <typename T>
+void copy_required_reordered_vector(const std::vector<T>& source,
+                                    std::vector<T>& destination,
+                                    const std::vector<std::size_t>& order) {
+  for (std::size_t atom = 0; atom < order.size(); ++atom) {
+    destination[atom] = source[order[atom]];
+  }
+}
+
+template <typename T>
+void copy_optional_reordered_vector(const std::vector<T>& source,
+                                    std::vector<T>& destination,
+                                    const std::vector<std::size_t>& order) {
+  if (source.empty()) {
+    destination.clear();
+    return;
+  }
+  copy_required_reordered_vector(source, destination, order);
+}
+
+template <typename T>
+void copy_reordered_descriptor_map(
+    const std::map<std::string, std::vector<T>>& source,
+    std::map<std::string, std::vector<T>>& destination,
+    const std::vector<std::size_t>& order) {
+  destination.clear();
+  for (const auto& [name, values] : source) {
+    auto& output = destination[name];
+    output.resize(order.size());
+    for (std::size_t atom = 0; atom < order.size(); ++atom) {
+      output[atom] = values[order[atom]];
+    }
+  }
+}
+
 const CharmmTopologyEntry* find_topology_entry(
     const CharmmTopologyData& topology, const std::string& name) {
   for (const auto& entry : topology.entries) {
@@ -745,6 +790,118 @@ CharmmMoleculeReorderPlan plan_charmm_molecule_reorder(
     result.source_atom_indices.clear();
     result.residues.clear();
   }
+  return result;
+}
+
+CharmmReorderedMoleculeResult copy_reordered_charmm_molecule(
+    const Molecule& molecule,
+    const CharmmMoleculeReorderPlan& plan) {
+  CharmmReorderedMoleculeResult result;
+  if (!plan.ok()) {
+    result.errors.insert(result.errors.end(), plan.errors.begin(),
+                         plan.errors.end());
+    return result;
+  }
+  if (plan.source_atom_indices.size() != molecule.natoms()) {
+    result.errors.push_back("CHARMM reorder plan length does not match natoms");
+    return result;
+  }
+  for (const auto source_atom : plan.source_atom_indices) {
+    if (source_atom >= molecule.natoms()) {
+      result.errors.push_back("CHARMM reorder plan contains out-of-range atom "
+                              "index");
+      return result;
+    }
+  }
+
+  auto integrity = molecule.check_integrity();
+  if (!integrity.ok()) {
+    for (const auto& issue : integrity.issues) {
+      result.errors.push_back(issue.field + " length does not match natoms");
+    }
+    return result;
+  }
+
+  for (const auto& [name, values] : molecule.extra_string_descriptors()) {
+    require_optional_atom_aligned(molecule, values,
+                                  "extra_string_descriptors." + name,
+                                  result.errors);
+  }
+  for (const auto& [name, values] : molecule.extra_int_descriptors()) {
+    require_optional_atom_aligned(molecule, values,
+                                  "extra_int_descriptors." + name,
+                                  result.errors);
+  }
+  for (const auto& [name, values] : molecule.extra_calc_descriptors()) {
+    require_optional_atom_aligned(molecule, values,
+                                  "extra_calc_descriptors." + name,
+                                  result.errors);
+  }
+  if (!result.errors.empty()) {
+    return result;
+  }
+
+  result.molecule = molecule;
+  const auto& order = plan.source_atom_indices;
+  copy_required_reordered_vector(molecule.record(), result.molecule.record(),
+                                 order);
+  copy_required_reordered_vector(molecule.index(), result.molecule.index(),
+                                 order);
+  copy_required_reordered_vector(molecule.original_index(),
+                                 result.molecule.original_index(), order);
+  copy_required_reordered_vector(molecule.original_resid(),
+                                 result.molecule.original_resid(), order);
+  copy_required_reordered_vector(molecule.name(), result.molecule.name(), order);
+  copy_required_reordered_vector(molecule.loc(), result.molecule.loc(), order);
+  copy_required_reordered_vector(molecule.resname(), result.molecule.resname(),
+                                 order);
+  copy_required_reordered_vector(molecule.chain(), result.molecule.chain(),
+                                 order);
+  copy_required_reordered_vector(molecule.resid(), result.molecule.resid(),
+                                 order);
+  copy_required_reordered_vector(molecule.rescode(), result.molecule.rescode(),
+                                 order);
+  copy_required_reordered_vector(molecule.occupancy(),
+                                 result.molecule.occupancy(), order);
+  copy_required_reordered_vector(molecule.beta(), result.molecule.beta(), order);
+  copy_required_reordered_vector(molecule.segname(), result.molecule.segname(),
+                                 order);
+  copy_required_reordered_vector(molecule.element(), result.molecule.element(),
+                                 order);
+  copy_required_reordered_vector(molecule.charge(), result.molecule.charge(),
+                                 order);
+  copy_required_reordered_vector(molecule.atom_charge(),
+                                 result.molecule.atom_charge(), order);
+  copy_required_reordered_vector(molecule.atom_vdw(), result.molecule.atom_vdw(),
+                                 order);
+  copy_required_reordered_vector(molecule.residue_flag(),
+                                 result.molecule.residue_flag(), order);
+  copy_optional_reordered_vector(molecule.charmm_type(),
+                                 result.molecule.charmm_type(), order);
+  copy_required_reordered_vector(molecule.moltype(), result.molecule.moltype(),
+                                 order);
+  copy_required_reordered_vector(molecule.mass(), result.molecule.mass(), order);
+  copy_required_reordered_vector(molecule.residue_charge(),
+                                 result.molecule.residue_charge(), order);
+  copy_required_reordered_vector(molecule.conect(), result.molecule.conect(),
+                                 order);
+
+  copy_reordered_descriptor_map(molecule.extra_string_descriptors(),
+                                result.molecule.extra_string_descriptors(),
+                                order);
+  copy_reordered_descriptor_map(molecule.extra_int_descriptors(),
+                                result.molecule.extra_int_descriptors(), order);
+  copy_reordered_descriptor_map(molecule.extra_calc_descriptors(),
+                                result.molecule.extra_calc_descriptors(),
+                                order);
+
+  for (std::size_t frame = 0; frame < molecule.number_of_frames(); ++frame) {
+    for (std::size_t atom = 0; atom < molecule.natoms(); ++atom) {
+      result.molecule.set_coordinate(
+          frame, atom, molecule.coordinate(frame, order[atom]));
+    }
+  }
+
   return result;
 }
 
