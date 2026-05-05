@@ -805,6 +805,114 @@ void test_assemble_biomt_transforms_rejects_invalid_inputs_without_mutation() {
   assert(transformed.name()[0] == "KEEP");
 }
 
+void test_apply_biomt_transforms_selected_atoms_only() {
+  sasmol::Molecule mol(3, 2);
+  mol.name() = {"A", "B", "C"};
+  mol.set_coordinate(0, 0, {1.0F, 1.0F, 1.0F});
+  mol.set_coordinate(0, 1, {2.0F, 2.0F, 2.0F});
+  mol.set_coordinate(0, 2, {3.0F, 3.0F, 3.0F});
+  mol.set_coordinate(1, 0, {1.0F, 0.0F, 0.0F});
+  mol.set_coordinate(1, 1, {0.0F, 1.0F, 0.0F});
+  mol.set_coordinate(1, 2, {0.0F, 0.0F, 1.0F});
+
+  const sasmol::BiomtTransform transform{
+      {{{0.0, -1.0, 0.0}, {1.0, 0.0, 0.0}, {0.0, 0.0, 1.0}}},
+      {10.0, 0.5, -2.0}};
+
+  const auto result =
+      sasmol::apply_biomt(mol, 1, std::vector<std::size_t>{0, 2}, transform);
+
+  assert(result.ok());
+  assert_vec_close(mol.coordinate(0, 0), {1.0F, 1.0F, 1.0F});
+  assert_vec_close(mol.coordinate(1, 0), {10.0F, 1.5F, -2.0F});
+  assert_vec_close(mol.coordinate(1, 1), {0.0F, 1.0F, 0.0F});
+  assert_vec_close(mol.coordinate(1, 2), {10.0F, 0.5F, -1.0F});
+}
+
+void test_apply_biomt_selection_uses_bounded_selection() {
+  sasmol::Molecule mol(3, 1);
+  mol.name() = {"CA", "N", "CA"};
+  mol.resid() = {1, 1, 2};
+  mol.set_coordinate(0, 0, {1.0F, 0.0F, 0.0F});
+  mol.set_coordinate(0, 1, {0.0F, 1.0F, 0.0F});
+  mol.set_coordinate(0, 2, {0.0F, 0.0F, 1.0F});
+
+  const sasmol::BiomtTransform transform{
+      {{{1.0, 0.0, 0.0}, {0.0, 1.0, 0.0}, {0.0, 0.0, 1.0}}},
+      {2.0, 3.0, 4.0}};
+
+  const auto result = sasmol::apply_biomt(
+      mol, 0, "name[i] == \"CA\" and resid[i] == 2", transform);
+
+  assert(result.ok());
+  assert_vec_close(mol.coordinate(0, 0), {1.0F, 0.0F, 0.0F});
+  assert_vec_close(mol.coordinate(0, 1), {0.0F, 1.0F, 0.0F});
+  assert_vec_close(mol.coordinate(0, 2), {2.0F, 3.0F, 5.0F});
+}
+
+void test_copy_apply_biomt_copies_selection_and_preserves_source() {
+  sasmol::Molecule source(3, 1);
+  source.name() = {"CA", "N", "CA"};
+  source.resid() = {1, 1, 2};
+  source.set_coordinate(0, 0, {1.0F, 0.0F, 0.0F});
+  source.set_coordinate(0, 1, {0.0F, 1.0F, 0.0F});
+  source.set_coordinate(0, 2, {0.0F, 0.0F, 1.0F});
+  const auto original = source.coor();
+
+  sasmol::Molecule destination;
+  const sasmol::BiomtTransform transform{
+      {{{1.0, 0.0, 0.0}, {0.0, 1.0, 0.0}, {0.0, 0.0, 1.0}}},
+      {-1.0, 2.0, 0.5}};
+
+  const auto result = sasmol::copy_apply_biomt(
+      source, destination, 0, "name[i] == \"CA\"", transform);
+
+  assert(result.ok());
+  assert(source.coor() == original);
+  assert(destination.natoms() == 2);
+  assert(destination.name()[0] == "CA");
+  assert(destination.name()[1] == "CA");
+  assert_vec_close(destination.coordinate(0, 0), {0.0F, 2.0F, 0.5F});
+  assert_vec_close(destination.coordinate(0, 1), {-1.0F, 2.0F, 1.5F});
+}
+
+void test_biomt_selected_helpers_reject_invalid_inputs_without_mutation() {
+  sasmol::Molecule mol(2, 1);
+  mol.name() = {"A", "B"};
+  mol.set_coordinate(0, 0, {1.0F, 2.0F, 3.0F});
+  mol.set_coordinate(0, 1, {4.0F, 5.0F, 6.0F});
+  const auto before = mol.coor();
+
+  const sasmol::BiomtTransform valid{
+      {{{1.0, 0.0, 0.0}, {0.0, 1.0, 0.0}, {0.0, 0.0, 1.0}}},
+      {1.0, 0.0, 0.0}};
+  const sasmol::BiomtTransform non_finite{
+      {{{1.0, 0.0, 0.0},
+         {0.0, std::numeric_limits<sasmol::calc_type>::quiet_NaN(), 0.0},
+         {0.0, 0.0, 1.0}}},
+      {0.0, 0.0, 0.0}};
+
+  auto result =
+      sasmol::apply_biomt(mol, 0, std::vector<std::size_t>{0, 99}, valid);
+  assert(!result.ok());
+  assert(mol.coor() == before);
+
+  result =
+      sasmol::apply_biomt(mol, 0, std::vector<std::size_t>{0}, non_finite);
+  assert(!result.ok());
+  assert(mol.coor() == before);
+
+  sasmol::Molecule destination(1, 1);
+  destination.name()[0] = "KEEP";
+  destination.set_coordinate(0, 0, {9.0F, 9.0F, 9.0F});
+  result = sasmol::copy_apply_biomt(mol, destination, 2,
+                                    std::vector<std::size_t>{0}, valid);
+  assert(!result.ok());
+  assert(destination.natoms() == 1);
+  assert(destination.name()[0] == "KEEP");
+  assert_vec_close(destination.coordinate(0, 0), {9.0F, 9.0F, 9.0F});
+}
+
 }  // namespace
 
 int main() {
@@ -854,5 +962,9 @@ int main() {
   test_assemble_biomt_transforms_from_metadata_uses_recorded_transforms();
   test_assemble_biomt_transforms_clears_conect();
   test_assemble_biomt_transforms_rejects_invalid_inputs_without_mutation();
+  test_apply_biomt_transforms_selected_atoms_only();
+  test_apply_biomt_selection_uses_bounded_selection();
+  test_copy_apply_biomt_copies_selection_and_preserves_source();
+  test_biomt_selected_helpers_reject_invalid_inputs_without_mutation();
   return 0;
 }

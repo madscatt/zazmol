@@ -27,7 +27,7 @@ Status labels:
 | `operate.set_average_vdw` | `test_operate/test_unit_operate_set_average_vdw.py` | `sasmol/operate.hpp` | `implemented` | low-medium | C++ stores the usable legacy radius column as scalar `atom_vdw()`. |
 | `subset.Mask` named basis, masks, indices, copy, duplicate, merge, descriptors | `test_subset/*` | `sasmol/selection.hpp`, `sasmol/subset.hpp` | `implemented` | medium | Keep expanding only through explicit grammar decisions. |
 | `subset.Mask.get_subset_mask` open Python eval behavior | `test_subset/*get_subset_mask*` | `sasmol/selection.hpp` | `intentional difference` | high | Survey real expressions before any grammar expansion. |
-| `subset.Mask.apply_biomt`, `copy_apply_biomt` | future dedicated fixtures | `sasmol/subset.hpp` | `deferred` | high | Keep separate from metadata and assembly helpers. |
+| `subset.Mask.apply_biomt`, `copy_apply_biomt` | C++ selected-transform tests | `sasmol/subset.hpp` | `implemented` | high | C++ keeps these as one-transform selected-coordinate helpers, separate from metadata and assembly helpers. |
 | C++ BIOMT assembly helpers | C++ BIOMT tests | `sasmol/subset.hpp` | `implemented` | medium | Document as assembly helpers, not Python selected-transform parity. |
 | `charmm_topology.CharmmTopology` parser records | topology oracle fixtures | `sasmol/topology.hpp` | `implemented` | high | Validate new records against Python fixtures first. |
 | CHARMM residue atom lists, atom-only patches, order choice, reorder planning/copy/in-place | topology C++ tests | `sasmol/topology.hpp` | `implemented` | high | Keep mutation explicit and no-partial-mutation. |
@@ -42,10 +42,9 @@ Status labels:
 
 ## Recommended Port Order
 
-1. Python-style selected BIOMT `apply_biomt` / `copy_apply_biomt`
-
-   High risk. Keep separate from existing BIOMT metadata preservation and C++
-   assembly helpers.
+The current high-priority parity items in this inventory are implemented. The
+next port slice should come from a fresh bounded inventory pass, not from
+expanding BIOMT, topology, or selection behavior by guesswork.
 
 ## Policy-Gated Work
 

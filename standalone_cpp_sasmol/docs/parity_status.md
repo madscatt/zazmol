@@ -32,7 +32,8 @@ behavior oracle.
 - Selection/subset coverage for a bounded safe expression grammar, named `all`
   and `heavy` bases, 0/1 mask bridge helpers, coordinate get/set/copy, molecule
   copy/duplicate/merge, dihedral subset masks, descriptor get/set, extension
-  descriptors, and structured failure returns.
+  descriptors, Python-style selected BIOMT apply/copy-apply helpers, and
+  structured failure returns.
 - Overlap coverage for coordinate-vector and molecule-frame overlap checks.
 - Topology support for explicit CHARMM type/charge assignment from
   already-trusted atom-aligned vectors or atom-name tables; Python-parity
@@ -57,9 +58,9 @@ behavior oracle.
 - CHARMM topology support is still a minimal parity port, not a full topology
   engine. It preserves Python's current behavior and known limits, including
   atom-only patching and no automatic PDB-read typing or reordering.
-- Python-style selected BIOMT `apply_biomt` / `copy_apply_biomt` parity remains
-  deferred. Passive BIOMT metadata preservation and optional coordinate-only
-  assembly helpers are already present.
+- BIOMT support is deliberately split into passive metadata preservation,
+  Python-style selected one-transform helpers, and optional coordinate-only
+  assembly helpers. PDB reading still does not apply transforms automatically.
 - VMD/view extension behavior remains deferred as an optional adapter rather
   than portable core behavior.
 - Fixed/free atom DCD variants, DCD unit-cell writing, and true random-access
@@ -82,8 +83,8 @@ guarded:
 
 Other feature work remains intentionally deferred:
 
-- Do not expand BIOMT further unless a real caller needs Python-style selected
-  `apply_biomt` parity.
+- Do not expand BIOMT beyond the current metadata, selected-transform, and
+  assembly-helper surfaces without a real caller and fixtures.
 - Broader Python expression coverage should start with a real usage survey and
   a documented grammar extension.
 - Contextual named selections such as `backbone` or `calpha` should remain

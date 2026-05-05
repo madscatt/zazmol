@@ -168,6 +168,22 @@ struct BiomtTransform {
 [[nodiscard]] Molecule biomt_assembly_from_metadata(
     const Molecule& source, std::size_t frame, int biomol_id);
 
+[[nodiscard]] SubsetResult apply_biomt(
+    Molecule& molecule, std::size_t frame,
+    const std::vector<std::size_t>& indices, const BiomtTransform& transform);
+
+[[nodiscard]] SubsetResult apply_biomt(Molecule& molecule, std::size_t frame,
+                                        const std::string& selection,
+                                        const BiomtTransform& transform);
+
+[[nodiscard]] SubsetResult copy_apply_biomt(
+    const Molecule& source, Molecule& destination, std::size_t frame,
+    const std::vector<std::size_t>& indices, const BiomtTransform& transform);
+
+[[nodiscard]] SubsetResult copy_apply_biomt(
+    const Molecule& source, Molecule& destination, std::size_t frame,
+    const std::string& selection, const BiomtTransform& transform);
+
 [[nodiscard]] StringSelection get_string_descriptor_using_indices(
     const Molecule& molecule, StringDescriptor descriptor,
     const std::vector<std::size_t>& indices);

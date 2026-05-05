@@ -1,8 +1,9 @@
 #include "sasmol/subset.hpp"
+#include "sasmol/selection.hpp"
 
 #include <cmath>
-#include <stdexcept>
 #include <set>
+#include <stdexcept>
 
 namespace sasmol {
 namespace {
@@ -965,6 +966,84 @@ Molecule biomt_assembly_from_metadata(const Molecule& source, std::size_t frame,
     throw std::invalid_argument(result.errors.front());
   }
   return assembled;
+}
+
+SubsetResult apply_biomt(Molecule& molecule, std::size_t frame,
+                         const std::vector<std::size_t>& indices,
+                         const BiomtTransform& transform) {
+  SubsetResult result;
+  result.errors = validate_indices(molecule, indices, frame);
+  if (!result.ok()) {
+    return result;
+  }
+  if (!finite_transform(transform)) {
+    result.errors.push_back("biomt transform contains non-finite values");
+    return result;
+  }
+
+  auto candidate = molecule;
+  for (const auto atom : indices) {
+    candidate.set_coordinate(
+        frame, atom,
+        apply_biomt_transform(candidate.coordinate(frame, atom), transform));
+  }
+  molecule = std::move(candidate);
+  return result;
+}
+
+SubsetResult apply_biomt(Molecule& molecule, std::size_t frame,
+                         const std::string& selection,
+                         const BiomtTransform& transform) {
+  SubsetResult result;
+  const auto selected = select_indices(molecule, selection);
+  result.errors = selected.errors;
+  if (!result.ok()) {
+    return result;
+  }
+  return apply_biomt(molecule, frame, selected.indices, transform);
+}
+
+SubsetResult copy_apply_biomt(const Molecule& source, Molecule& destination,
+                              std::size_t frame,
+                              const std::vector<std::size_t>& indices,
+                              const BiomtTransform& transform) {
+  SubsetResult result;
+  if (!finite_transform(transform)) {
+    result.errors.push_back("biomt transform contains non-finite values");
+    return result;
+  }
+
+  Molecule candidate;
+  auto copy_result =
+      copy_molecule_using_indices(source, candidate, indices, frame);
+  if (!copy_result.ok()) {
+    return copy_result;
+  }
+
+  std::vector<std::size_t> copied_indices(candidate.natoms());
+  for (std::size_t atom = 0; atom < candidate.natoms(); ++atom) {
+    copied_indices[atom] = atom;
+  }
+  auto transform_result = apply_biomt(candidate, 0, copied_indices, transform);
+  if (!transform_result.ok()) {
+    return transform_result;
+  }
+
+  destination = std::move(candidate);
+  return result;
+}
+
+SubsetResult copy_apply_biomt(const Molecule& source, Molecule& destination,
+                              std::size_t frame, const std::string& selection,
+                              const BiomtTransform& transform) {
+  SubsetResult result;
+  const auto selected = select_indices(source, selection);
+  result.errors = selected.errors;
+  if (!result.ok()) {
+    return result;
+  }
+  return copy_apply_biomt(source, destination, frame, selected.indices,
+                          transform);
 }
 
 StringSelection get_string_descriptor_using_indices(
