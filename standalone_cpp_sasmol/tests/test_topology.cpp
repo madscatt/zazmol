@@ -525,6 +525,40 @@ void test_choose_charmm_residue_atom_order_reports_mismatch() {
   assert(result.atom_order.empty());
 }
 
+void test_plan_charmm_residue_reorder_indices_maps_topology_order() {
+  const auto result = sasmol::plan_charmm_residue_reorder_indices(
+      {"CA", "O", "N", "C"}, {"N", "CA", "C", "O"}, "GLY", 7);
+
+  assert(result.ok());
+  assert((result.observed_indices == std::vector<std::size_t>{2, 0, 3, 1}));
+}
+
+void test_plan_charmm_residue_reorder_indices_uses_first_duplicate_match() {
+  const auto result = sasmol::plan_charmm_residue_reorder_indices(
+      {"N", "CA", "N"}, {"N", "CA", "N"}, "DUP", 8);
+
+  assert(result.ok());
+  assert((result.observed_indices == std::vector<std::size_t>{0, 1, 0}));
+}
+
+void test_plan_charmm_residue_reorder_indices_reports_missing_atom() {
+  const auto result = sasmol::plan_charmm_residue_reorder_indices(
+      {"N", "CA", "C"}, {"N", "CA", "C", "O"}, "GLY", 7);
+
+  assert(!result.ok());
+  assert(result.errors.size() == 1);
+  assert(result.observed_indices.empty());
+}
+
+void test_plan_charmm_residue_reorder_indices_reports_length_mismatch() {
+  const auto result = sasmol::plan_charmm_residue_reorder_indices(
+      {"N", "CA", "C", "O", "CB"}, {"N", "CA", "C", "O"}, "GLY", 7);
+
+  assert(!result.ok());
+  assert(result.errors.size() == 1);
+  assert(result.observed_indices.empty());
+}
+
 void test_parse_charmm_topology_globals_matches_python_oracle_fixture() {
   const auto result = sasmol::parse_charmm_topology_globals(
       topology_fixture("minimal_mass_only.rtf"));
@@ -1076,6 +1110,10 @@ int main() {
   test_choose_charmm_residue_atom_order_uses_disu_for_cys();
   test_choose_charmm_residue_atom_order_uses_his_variant_fallback();
   test_choose_charmm_residue_atom_order_reports_mismatch();
+  test_plan_charmm_residue_reorder_indices_maps_topology_order();
+  test_plan_charmm_residue_reorder_indices_uses_first_duplicate_match();
+  test_plan_charmm_residue_reorder_indices_reports_missing_atom();
+  test_plan_charmm_residue_reorder_indices_reports_length_mismatch();
   test_parse_charmm_topology_globals_matches_python_oracle_fixture();
   test_parse_charmm_topology_globals_reports_malformed_records();
   test_parse_charmm_topology_residue_atoms_match_python_oracle_fixture();

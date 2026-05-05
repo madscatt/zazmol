@@ -54,6 +54,8 @@ Implemented:
 - `choose_charmm_residue_atom_order(...)` as a pure helper that extracts the
   per-residue topology-order decision from Python's mutating
   `check_charmm_atomic_order_reorganize`
+- `plan_charmm_residue_reorder_indices(...)` as a validation-only helper that
+  maps chosen topology atom order to observed residue atom indices
 - `parse_charmm_topology_globals(...)` for Python-matched `MASS`, `DECL`,
   `DEFA`, and `AUTO` records, preserving values as strings
 - `parse_charmm_topology(...)` for those global records plus Python-matched
@@ -222,6 +224,15 @@ than guessed.
    - preserves Python's CYS-to-DISU and HIS-to-HSE/HSD/HSP fallback behavior
    - preserves Python's terminal patch selection for `NTER`, `GLYP`, `PROP`,
      and `CTER`
+   - still does not mutate molecule descriptors or coordinates
+
+   Thirteenth slice implemented:
+
+   - ports Python's per-residue `child_names.index(name)` reorder planning into
+     pure `plan_charmm_residue_reorder_indices(...)`
+   - returns observed atom indices in topology order
+   - reports missing atoms and atom-count mismatches without partial output
+   - preserves Python's first-match behavior for duplicate atom names
    - still does not mutate molecule descriptors or coordinates
 
    Future slices should port Python `CharmmTopology` behavior as its own module:

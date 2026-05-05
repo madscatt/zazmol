@@ -4,6 +4,7 @@
 #include <cctype>
 #include <cstddef>
 #include <fstream>
+#include <iterator>
 #include <map>
 #include <sstream>
 #include <utility>
@@ -578,6 +579,41 @@ CharmmResidueOrderResult choose_charmm_residue_atom_order(
   }
   result.topology_residue_name = topology_residue_name;
   result.atom_order = *atom_order;
+  return result;
+}
+
+CharmmResidueReorderPlan plan_charmm_residue_reorder_indices(
+    const std::vector<std::string>& observed_atom_names,
+    const std::vector<std::string>& topology_atom_order,
+    const std::string& residue_name,
+    int residue_id) {
+  CharmmResidueReorderPlan result;
+  result.observed_indices.reserve(topology_atom_order.size());
+  for (const auto& atom_name : topology_atom_order) {
+    const auto found =
+        std::find(observed_atom_names.begin(), observed_atom_names.end(),
+                  atom_name);
+    if (found == observed_atom_names.end()) {
+      result.errors.push_back("Atom " + atom_name +
+                              " not found while planning CHARMM order for "
+                              "resname: " +
+                              residue_name + "\nand resid: " +
+                              std::to_string(residue_id) + "!");
+      result.observed_indices.clear();
+      return result;
+    }
+    result.observed_indices.push_back(static_cast<std::size_t>(
+        std::distance(observed_atom_names.begin(), found)));
+  }
+
+  if (observed_atom_names.size() != result.observed_indices.size()) {
+    result.errors.push_back(
+        "Number of atoms doesnt match that in charmm topology file for "
+        "\nresname: " +
+        residue_name + "\nand resid: " + std::to_string(residue_id) + "!");
+    result.observed_indices.clear();
+    return result;
+  }
   return result;
 }
 

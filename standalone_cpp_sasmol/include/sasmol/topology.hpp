@@ -3,6 +3,7 @@
 #include "sasmol/molecule.hpp"
 #include "sasmol/subset.hpp"
 
+#include <cstddef>
 #include <filesystem>
 #include <map>
 #include <string>
@@ -144,6 +145,13 @@ struct CharmmResidueOrderResult {
   [[nodiscard]] bool ok() const noexcept { return errors.empty(); }
 };
 
+struct CharmmResidueReorderPlan {
+  std::vector<std::size_t> observed_indices;
+  std::vector<std::string> errors;
+
+  [[nodiscard]] bool ok() const noexcept { return errors.empty(); }
+};
+
 [[nodiscard]] SubsetResult assign_charmm_types(
     Molecule& molecule, const std::vector<std::string>& types);
 
@@ -184,6 +192,12 @@ struct CharmmResidueOrderResult {
     int segment_n_terminal_residue_id,
     int segment_c_terminal_residue_id,
     const std::vector<std::string>& observed_atom_names);
+
+[[nodiscard]] CharmmResidueReorderPlan plan_charmm_residue_reorder_indices(
+    const std::vector<std::string>& observed_atom_names,
+    const std::vector<std::string>& topology_atom_order,
+    const std::string& residue_name,
+    int residue_id);
 
 [[nodiscard]] CharmmTopologyParseResult parse_charmm_topology(
     const std::filesystem::path& filename);
