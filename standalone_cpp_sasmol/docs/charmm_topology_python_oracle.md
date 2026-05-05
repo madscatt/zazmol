@@ -28,11 +28,12 @@ The tool deliberately preserves Python's parsed shape:
 - `minimal_resi_atoms_bonds.rtf`
 - `minimal_resi_angles.rtf`
 - `minimal_resi_four_terms.rtf`
+- `minimal_resi_donor_acceptor.rtf`
 - `minimal_pres_atoms_dele.rtf`
 - `minimal_comments_blank_lines.rtf`
 - `minimal_multiple_residues.rtf`
 
-All eight fixtures currently parse through Python with `errors == []`.
+All nine fixtures currently parse through Python with `errors == []`.
 
 ## Observed Python Shapes
 
@@ -51,7 +52,7 @@ C++ parity checkpoint:
   preserved.
 - `parse_charmm_topology(...)` parses those same global records plus `RESI`,
   `PRES`, `ATOM`, `BOND`, `DOUBLE`, `ANGL`, `THET`, `DIHE`, `IMPR`, and
-  `CMAP` records.
+  `CMAP`, `DONO`, and `ACCE` records.
 - The C++ tests for `minimal_resi_atoms.rtf` and `minimal_pres_atoms_dele.rtf`
   match Python's string-preserving residue, patch, total-charge, and atom-record
   shape.
@@ -61,6 +62,8 @@ C++ parity checkpoint:
   and `THET` triple shapes.
 - The C++ test for `minimal_resi_four_terms.rtf` matches Python's ordered
   `DIHE`, `IMPR`, and `CMAP` four-token shapes.
+- The C++ test for `minimal_resi_donor_acceptor.rtf` matches Python's ordered
+  `DONO` and `ACCE` string-list shapes.
 - The C++ parser deliberately ignores `DELE` and other remaining section records
   for this slice.
 
@@ -79,6 +82,8 @@ Residue and patch records:
 - `IMPR` records are stored as ordered four-token lists.
 - `CMAP` records are stored as ordered four-token lists by the current Python
   parser.
+- `DONO` records are stored as ordered strings.
+- `ACCE` records are stored as ordered strings.
 - `DELE ATOM HN` is stored under `DELE.ATOM` as the string `HN`.
 - `DELE ANGL HT1 N CA` is stored under `DELE.ANGL` as a token list.
 
@@ -91,6 +96,8 @@ Comment behavior:
 - inline comments in triple-token records such as `ANGL` stop triple parsing
   when the parser reaches the `!` token.
 - inline comments in four-token records such as `DIHE` stop four-token parsing
+  when the parser reaches the `!` token.
+- inline comments in one-token records such as `DONO` stop single-token parsing
   when the parser reaches the `!` token.
 - inline comments after `ATOM` records do not affect the stored atom record
   because Python keeps only `words[1:4]`.

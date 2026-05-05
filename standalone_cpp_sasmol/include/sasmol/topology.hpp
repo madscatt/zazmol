@@ -90,6 +90,8 @@ struct CharmmTopologyEntry {
   std::vector<CharmmTopologyQuadRecord> dihedrals;
   std::vector<CharmmTopologyQuadRecord> impropers;
   std::vector<CharmmTopologyQuadRecord> cmaps;
+  std::vector<std::string> donors;
+  std::vector<std::string> acceptors;
 };
 
 struct CharmmTopologyData {

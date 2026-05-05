@@ -55,6 +55,23 @@ void parse_pair_record(const std::vector<std::string>& tokens,
   }
 }
 
+void parse_single_record(const std::vector<std::string>& tokens,
+                         const std::string& record_name,
+                         std::size_t line_number,
+                         std::vector<std::string>& records,
+                         std::vector<std::string>& errors) {
+  std::size_t token = 1;
+  while (token < tokens.size() && !tokens[token].starts_with("!")) {
+    if (!is_charmm_atom_reference_token(tokens[token])) {
+      errors.push_back(line_context(line_number,
+                                    record_name + " record has invalid token"));
+      return;
+    }
+    records.push_back(tokens[token]);
+    ++token;
+  }
+}
+
 void parse_triple_record(const std::vector<std::string>& tokens,
                          const std::string& record_name,
                          std::size_t line_number,
@@ -200,7 +217,9 @@ CharmmTopologyParseResult parse_charmm_topology_impl(
            .thetas = {},
            .dihedrals = {},
            .impropers = {},
-           .cmaps = {}});
+           .cmaps = {},
+           .donors = {},
+           .acceptors = {}});
       current_entry = &result.topology.entries.back();
     } else if (include_entries && record == "ATOM") {
       if (current_entry == nullptr) {
@@ -256,6 +275,17 @@ CharmmTopologyParseResult parse_charmm_topology_impl(
       }
       parse_quad_record(tokens, record_name, line_number, *records,
                         result.errors);
+    } else if (include_entries && (record.starts_with("DONO") ||
+                                   record.starts_with("ACCE"))) {
+      if (current_entry == nullptr) {
+        result.errors.push_back(line_context(
+            line_number, record + " record appeared before RESI or PRES"));
+        continue;
+      }
+      auto& records = record.starts_with("DONO") ? current_entry->donors
+                                                 : current_entry->acceptors;
+      parse_single_record(tokens, record.starts_with("DONO") ? "DONO" : "ACCE",
+                          line_number, records, result.errors);
     }
   }
 

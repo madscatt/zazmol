@@ -391,6 +391,19 @@ void test_parse_charmm_topology_quad_terms_match_python_oracle_fixture() {
   assert(ala.cmaps[0].fourth == "C");
 }
 
+void test_parse_charmm_topology_donor_acceptor_match_python_oracle_fixture() {
+  const auto result = sasmol::parse_charmm_topology(
+      topology_fixture("minimal_resi_donor_acceptor.rtf"));
+
+  assert(result.ok());
+  assert(result.topology.entries.size() == 1);
+
+  const auto& ser = result.topology.entries[0];
+  assert(ser.name == "SER");
+  assert((ser.donors == std::vector<std::string>{"HN", "N", "HG1", "OG"}));
+  assert((ser.acceptors == std::vector<std::string>{"O", "OG"}));
+}
+
 void test_parse_charmm_topology_bond_pairs_stop_at_inline_comment() {
   const auto path =
       std::filesystem::temp_directory_path() / "sasmol_bond_comment_topology.rtf";
@@ -449,6 +462,24 @@ void test_parse_charmm_topology_quad_terms_stop_at_inline_comment() {
   assert(result.topology.entries[0].dihedrals[0].second == "CA");
   assert(result.topology.entries[0].dihedrals[0].third == "C");
   assert(result.topology.entries[0].dihedrals[0].fourth == "O");
+}
+
+void test_parse_charmm_topology_donor_acceptor_stop_at_inline_comment() {
+  const auto path = std::filesystem::temp_directory_path() /
+                    "sasmol_donor_comment_topology.rtf";
+  {
+    std::ofstream output(path);
+    output << "RESI SER 0.00\n";
+    output << "DONO HN N ! HG1 OG ignored\n";
+  }
+
+  const auto result = sasmol::parse_charmm_topology(path);
+  std::filesystem::remove(path);
+
+  assert(result.ok());
+  assert(result.topology.entries.size() == 1);
+  assert((result.topology.entries[0].donors ==
+          std::vector<std::string>{"HN", "N"}));
 }
 
 void test_parse_charmm_topology_reports_malformed_bond_pair() {
@@ -568,6 +599,25 @@ void test_parse_charmm_topology_reports_incomplete_quad_term() {
   assert(result.topology.entries[0].cmaps[0].fourth == "O");
 }
 
+void test_parse_charmm_topology_reports_malformed_donor_acceptor_token() {
+  const auto path = std::filesystem::temp_directory_path() /
+                    "sasmol_bad_donor_acceptor_topology.rtf";
+  {
+    std::ofstream output(path);
+    output << "RESI SER 0.00\n";
+    output << "ACCE O @\n";
+  }
+
+  const auto result = sasmol::parse_charmm_topology(path);
+  std::filesystem::remove(path);
+
+  assert(!result.ok());
+  assert(result.errors.size() == 1);
+  assert(result.topology.entries.size() == 1);
+  assert((result.topology.entries[0].acceptors ==
+          std::vector<std::string>{"O"}));
+}
+
 void test_parse_charmm_topology_reports_atom_before_residue_or_patch() {
   const auto path =
       std::filesystem::temp_directory_path() / "sasmol_bad_atom_topology.rtf";
@@ -610,15 +660,18 @@ int main() {
   test_parse_charmm_topology_bond_pairs_match_python_oracle_fixture();
   test_parse_charmm_topology_angle_triples_match_python_oracle_fixture();
   test_parse_charmm_topology_quad_terms_match_python_oracle_fixture();
+  test_parse_charmm_topology_donor_acceptor_match_python_oracle_fixture();
   test_parse_charmm_topology_bond_pairs_stop_at_inline_comment();
   test_parse_charmm_topology_angle_triples_stop_at_inline_comment();
   test_parse_charmm_topology_quad_terms_stop_at_inline_comment();
+  test_parse_charmm_topology_donor_acceptor_stop_at_inline_comment();
   test_parse_charmm_topology_reports_malformed_bond_pair();
   test_parse_charmm_topology_reports_incomplete_bond_pair();
   test_parse_charmm_topology_reports_malformed_angle_triple();
   test_parse_charmm_topology_reports_incomplete_angle_triple();
   test_parse_charmm_topology_reports_malformed_quad_term();
   test_parse_charmm_topology_reports_incomplete_quad_term();
+  test_parse_charmm_topology_reports_malformed_donor_acceptor_token();
   test_parse_charmm_topology_reports_atom_before_residue_or_patch();
   return 0;
 }
