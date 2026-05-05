@@ -56,6 +56,9 @@ Implemented:
   `check_charmm_atomic_order_reorganize`
 - `plan_charmm_residue_reorder_indices(...)` as a validation-only helper that
   maps chosen topology atom order to observed residue atom indices
+- `plan_charmm_molecule_reorder(...)` as a whole-molecule validation-only helper
+  that composes segment/residue grouping, topology order choice, and residue
+  index planning into one no-mutation reorder plan
 - `parse_charmm_topology_globals(...)` for Python-matched `MASS`, `DECL`,
   `DEFA`, and `AUTO` records, preserving values as strings
 - `parse_charmm_topology(...)` for those global records plus Python-matched
@@ -235,10 +238,21 @@ than guessed.
    - preserves Python's first-match behavior for duplicate atom names
    - still does not mutate molecule descriptors or coordinates
 
+   Fourteenth slice implemented:
+
+   - adds pure `plan_charmm_molecule_reorder(...)`
+   - validates required atom-aligned descriptors before planning
+   - groups atoms by first-seen segment and residue, matching Python's child
+     traversal intent
+   - composes residue atom-order choice and reorder-index planning into a full
+     molecule source-index order
+   - reports mixed residue names, descriptor length mismatches, and residue
+     planning failures without partial output
+   - still does not mutate molecule descriptors or coordinates
+
    Future slices should port Python `CharmmTopology` behavior as its own module:
 
-   - integrate this order choice into a no-partial-mutation molecule reorder
-     workflow
+   - use the full reorder plan to build a reordered molecule copy
    - validate missing, extra, duplicate, and ambiguous atoms
    - optionally reorder molecules only through an explicit API
 

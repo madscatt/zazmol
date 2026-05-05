@@ -152,6 +152,26 @@ struct CharmmResidueReorderPlan {
   [[nodiscard]] bool ok() const noexcept { return errors.empty(); }
 };
 
+struct CharmmResidueReorderSelection {
+  std::string segname;
+  int resid{};
+  std::string resname;
+  std::string topology_residue_name;
+  std::vector<std::size_t> atom_indices;
+  std::vector<std::string> observed_atom_names;
+  std::vector<std::string> topology_atom_order;
+  std::vector<std::size_t> observed_indices;
+  std::vector<std::size_t> source_atom_indices;
+};
+
+struct CharmmMoleculeReorderPlan {
+  std::vector<CharmmResidueReorderSelection> residues;
+  std::vector<std::size_t> source_atom_indices;
+  std::vector<std::string> errors;
+
+  [[nodiscard]] bool ok() const noexcept { return errors.empty(); }
+};
+
 [[nodiscard]] SubsetResult assign_charmm_types(
     Molecule& molecule, const std::vector<std::string>& types);
 
@@ -198,6 +218,11 @@ struct CharmmResidueReorderPlan {
     const std::vector<std::string>& topology_atom_order,
     const std::string& residue_name,
     int residue_id);
+
+[[nodiscard]] CharmmMoleculeReorderPlan plan_charmm_molecule_reorder(
+    const Molecule& molecule,
+    const CharmmTopologyData& topology,
+    const std::map<std::string, std::vector<std::string>>& residue_atoms);
 
 [[nodiscard]] CharmmTopologyParseResult parse_charmm_topology(
     const std::filesystem::path& filename);

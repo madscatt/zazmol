@@ -181,6 +181,16 @@ void append_duplicates(const std::map<std::string, int>& counts,
   }
 }
 
+template <typename T>
+void require_atom_aligned(const Molecule& molecule,
+                          const std::vector<T>& values,
+                          const std::string& field,
+                          std::vector<std::string>& errors) {
+  if (values.size() != molecule.natoms()) {
+    errors.push_back(field + " length does not match natoms");
+  }
+}
+
 const CharmmTopologyEntry* find_topology_entry(
     const CharmmTopologyData& topology, const std::string& name) {
   for (const auto& entry : topology.entries) {
@@ -613,6 +623,127 @@ CharmmResidueReorderPlan plan_charmm_residue_reorder_indices(
         residue_name + "\nand resid: " + std::to_string(residue_id) + "!");
     result.observed_indices.clear();
     return result;
+  }
+  return result;
+}
+
+CharmmMoleculeReorderPlan plan_charmm_molecule_reorder(
+    const Molecule& molecule,
+    const CharmmTopologyData& topology,
+    const std::map<std::string, std::vector<std::string>>& residue_atoms) {
+  CharmmMoleculeReorderPlan result;
+  require_atom_aligned(molecule, molecule.name(), "name", result.errors);
+  require_atom_aligned(molecule, molecule.resname(), "resname", result.errors);
+  require_atom_aligned(molecule, molecule.resid(), "resid", result.errors);
+  require_atom_aligned(molecule, molecule.segname(), "segname", result.errors);
+  if (!result.errors.empty()) {
+    return result;
+  }
+
+  struct ResidueGroup {
+    std::string segname;
+    int resid{};
+    std::string resname;
+    std::vector<std::size_t> atom_indices;
+    std::vector<std::string> atom_names;
+  };
+
+  struct SegmentGroup {
+    std::string segname;
+    std::vector<ResidueGroup> residues;
+  };
+
+  std::vector<SegmentGroup> segments;
+  for (std::size_t atom = 0; atom < molecule.natoms(); ++atom) {
+    const auto& segname = molecule.segname()[atom];
+    const auto resid = molecule.resid()[atom];
+    const auto& resname = molecule.resname()[atom];
+
+    auto segment = std::find_if(
+        segments.begin(), segments.end(), [&](const SegmentGroup& candidate) {
+          return candidate.segname == segname;
+        });
+    if (segment == segments.end()) {
+      segments.push_back({.segname = segname, .residues = {}});
+      segment = std::prev(segments.end());
+    }
+
+    auto residue = std::find_if(
+        segment->residues.begin(), segment->residues.end(),
+        [&](const ResidueGroup& candidate) { return candidate.resid == resid; });
+    if (residue == segment->residues.end()) {
+      segment->residues.push_back({.segname = segname,
+                                   .resid = resid,
+                                   .resname = resname,
+                                   .atom_indices = {},
+                                   .atom_names = {}});
+      residue = std::prev(segment->residues.end());
+    } else if (residue->resname != resname) {
+      result.errors.push_back("Residue " + std::to_string(resid) +
+                              " in segment " + segname +
+                              " has mixed residue names");
+      return result;
+    }
+
+    residue->atom_indices.push_back(atom);
+    residue->atom_names.push_back(molecule.name()[atom]);
+  }
+
+  result.source_atom_indices.reserve(molecule.natoms());
+  for (const auto& segment : segments) {
+    if (segment.residues.empty()) {
+      continue;
+    }
+    const auto n_terminal_resid = segment.residues.front().resid;
+    const auto c_terminal_resid = segment.residues.back().resid;
+
+    for (const auto& residue : segment.residues) {
+      auto order = choose_charmm_residue_atom_order(
+          topology, residue_atoms, residue.resname, residue.resid,
+          n_terminal_resid, c_terminal_resid, residue.atom_names);
+      if (!order.ok()) {
+        result.errors.insert(result.errors.end(), order.errors.begin(),
+                             order.errors.end());
+        result.source_atom_indices.clear();
+        result.residues.clear();
+        return result;
+      }
+
+      auto residue_plan = plan_charmm_residue_reorder_indices(
+          residue.atom_names, order.atom_order, order.topology_residue_name,
+          residue.resid);
+      if (!residue_plan.ok()) {
+        result.errors.insert(result.errors.end(), residue_plan.errors.begin(),
+                             residue_plan.errors.end());
+        result.source_atom_indices.clear();
+        result.residues.clear();
+        return result;
+      }
+
+      CharmmResidueReorderSelection selection;
+      selection.segname = residue.segname;
+      selection.resid = residue.resid;
+      selection.resname = residue.resname;
+      selection.topology_residue_name = order.topology_residue_name;
+      selection.atom_indices = residue.atom_indices;
+      selection.observed_atom_names = residue.atom_names;
+      selection.topology_atom_order = order.atom_order;
+      selection.observed_indices = residue_plan.observed_indices;
+      selection.source_atom_indices.reserve(residue_plan.observed_indices.size());
+      for (const auto observed_index : residue_plan.observed_indices) {
+        const auto source_atom = residue.atom_indices[observed_index];
+        selection.source_atom_indices.push_back(source_atom);
+        result.source_atom_indices.push_back(source_atom);
+      }
+      result.residues.push_back(std::move(selection));
+    }
+  }
+
+  if (result.source_atom_indices.size() != molecule.natoms()) {
+    result.errors.push_back("Planned CHARMM reorder atom count does not match "
+                            "natoms");
+    result.source_atom_indices.clear();
+    result.residues.clear();
   }
   return result;
 }
