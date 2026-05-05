@@ -43,6 +43,8 @@ Implemented:
 - hand-built `CharmmResidueDefinition` records plus
   `validate_charmm_residue_atoms(...)` for exact-match, missing atom, extra atom,
   and duplicate atom reports
+- `compare_list_ignore_order(...)` matching Python's helper behavior used by
+  `check_charmm_atomic_order_reorganize`
 - `parse_charmm_topology_globals(...)` for Python-matched `MASS`, `DECL`,
   `DEFA`, and `AUTO` records, preserving values as strings
 - `parse_charmm_topology(...)` for those global records plus Python-matched
@@ -173,6 +175,13 @@ than guessed.
    - parses `DELE ANGL` as ordered string vectors, preserving Python's
      `words[2:]` shape
    - ignores unknown `DELE` types, matching Python's current parser behavior
+
+   Ninth slice implemented:
+
+   - ports Python's `compare_list_ignore_order` helper as
+     `compare_list_ignore_order(...)`
+   - preserves the Python helper behavior exactly; this is less strict than
+     `validate_charmm_residue_atoms(...)` and exists for future reorder parity
 
    Future slices should port Python `CharmmTopology` behavior as its own module:
 

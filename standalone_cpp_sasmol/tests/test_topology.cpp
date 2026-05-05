@@ -218,6 +218,30 @@ void test_validate_charmm_residue_atoms_reports_duplicate_topology_atom() {
           std::vector<std::string>{"CA"}));
 }
 
+void test_compare_list_ignore_order_matches_any_order() {
+  assert(sasmol::compare_list_ignore_order({"N", "CA", "C"},
+                                           {"C", "N", "CA"}));
+}
+
+void test_compare_list_ignore_order_rejects_length_mismatch() {
+  assert(!sasmol::compare_list_ignore_order({"N", "CA", "C"}, {"N", "CA"}));
+}
+
+void test_compare_list_ignore_order_rejects_missing_item() {
+  assert(
+      !sasmol::compare_list_ignore_order({"N", "CA", "C"}, {"N", "CA", "O"}));
+}
+
+void test_compare_list_ignore_order_rejects_duplicate_in_second_list() {
+  assert(!sasmol::compare_list_ignore_order({"N", "CA", "C"},
+                                            {"N", "CA", "CA"}));
+}
+
+void test_compare_list_ignore_order_preserves_python_duplicate_first_list() {
+  assert(sasmol::compare_list_ignore_order({"N", "N", "CA"},
+                                           {"N", "CA", "C"}));
+}
+
 void test_parse_charmm_topology_globals_matches_python_oracle_fixture() {
   const auto result = sasmol::parse_charmm_topology_globals(
       topology_fixture("minimal_mass_only.rtf"));
@@ -750,6 +774,11 @@ int main() {
   test_validate_charmm_residue_atoms_reports_extra_atom();
   test_validate_charmm_residue_atoms_reports_duplicate_molecule_atom();
   test_validate_charmm_residue_atoms_reports_duplicate_topology_atom();
+  test_compare_list_ignore_order_matches_any_order();
+  test_compare_list_ignore_order_rejects_length_mismatch();
+  test_compare_list_ignore_order_rejects_missing_item();
+  test_compare_list_ignore_order_rejects_duplicate_in_second_list();
+  test_compare_list_ignore_order_preserves_python_duplicate_first_list();
   test_parse_charmm_topology_globals_matches_python_oracle_fixture();
   test_parse_charmm_topology_globals_reports_malformed_records();
   test_parse_charmm_topology_residue_atoms_match_python_oracle_fixture();

@@ -1,5 +1,6 @@
 #include "sasmol/topology.hpp"
 
+#include <algorithm>
 #include <cctype>
 #include <cstddef>
 #include <fstream>
@@ -353,6 +354,19 @@ CharmmTopologyParseResult parse_charmm_topology_globals(
 CharmmTopologyParseResult parse_charmm_topology(
     const std::filesystem::path& filename) {
   return parse_charmm_topology_impl(filename, true);
+}
+
+bool compare_list_ignore_order(const std::vector<std::string>& first,
+                               const std::vector<std::string>& second) {
+  if (first.size() != second.size()) {
+    return false;
+  }
+  for (const auto& item : first) {
+    if (std::count(second.begin(), second.end(), item) != 1) {
+      return false;
+    }
+  }
+  return true;
 }
 
 SubsetResult assign_charmm_types(Molecule& molecule,

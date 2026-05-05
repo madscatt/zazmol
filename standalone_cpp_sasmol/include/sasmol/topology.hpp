@@ -137,6 +137,10 @@ struct CharmmTopologyParseResult {
     const std::vector<std::string>& molecule_atom_names,
     const CharmmResidueDefinition& residue);
 
+[[nodiscard]] bool compare_list_ignore_order(
+    const std::vector<std::string>& first,
+    const std::vector<std::string>& second);
+
 [[nodiscard]] CharmmTopologyParseResult parse_charmm_topology(
     const std::filesystem::path& filename);
 
