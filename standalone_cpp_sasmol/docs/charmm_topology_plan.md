@@ -52,6 +52,9 @@ Recommended next step: pause topology feature expansion unless a caller needs a
 minimal parser for a reviewed subset of CHARMM topology records. Do not start
 parser work without a separate reviewed plan and fixtures.
 
+The Python oracle harness for future parser work is recorded in
+`docs/charmm_topology_python_oracle.md`.
+
 ## Safety Rule
 
 Never infer CHARMM atom types from PDB atom names alone.
