@@ -99,6 +99,9 @@ if(BUILD_TESTING)
 
   add_executable(test_topology tests/test_topology.cpp)
   target_link_libraries(test_topology PRIVATE sasmol_standalone)
+  target_compile_definitions(test_topology PRIVATE
+    SASMOL_TOPOLOGY_TEST_DATA_DIR="${CMAKE_CURRENT_SOURCE_DIR}/tests/data/topology"
+  )
   add_test(NAME topology COMMAND test_topology)
 
   add_executable(test_subset tests/test_subset.cpp)

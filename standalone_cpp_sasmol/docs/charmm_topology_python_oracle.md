@@ -41,6 +41,14 @@ Global records:
 - `DEFA` is stored as a list of strings.
 - `AUTO` is stored as a list of strings.
 
+C++ parity checkpoint:
+
+- `parse_charmm_topology_globals(...)` parses only these global records.
+- The C++ test for `minimal_mass_only.rtf` matches the Python oracle shape:
+  `MASS` values remain strings, and `DECL`, `DEFA`, and `AUTO` token order is
+  preserved.
+- The C++ parser deliberately ignores residue and patch records for this slice.
+
 Residue and patch records:
 
 - `RESI GLY 0.00` creates a top-level `GLY` dictionary.

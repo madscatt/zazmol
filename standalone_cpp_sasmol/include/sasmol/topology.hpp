@@ -3,6 +3,7 @@
 #include "sasmol/molecule.hpp"
 #include "sasmol/subset.hpp"
 
+#include <filesystem>
 #include <string>
 #include <vector>
 
@@ -42,6 +43,26 @@ struct CharmmResidueValidation {
   }
 };
 
+struct CharmmMassRecord {
+  std::string index;
+  std::string atom_type;
+  std::string mass;
+};
+
+struct CharmmTopologyData {
+  std::vector<CharmmMassRecord> masses;
+  std::vector<std::string> declarations;
+  std::vector<std::string> defaults;
+  std::vector<std::string> auto_terms;
+};
+
+struct CharmmTopologyParseResult {
+  CharmmTopologyData topology;
+  std::vector<std::string> errors;
+
+  [[nodiscard]] bool ok() const noexcept { return errors.empty(); }
+};
+
 [[nodiscard]] SubsetResult assign_charmm_types(
     Molecule& molecule, const std::vector<std::string>& types);
 
@@ -58,5 +79,8 @@ struct CharmmResidueValidation {
 [[nodiscard]] CharmmResidueValidation validate_charmm_residue_atoms(
     const std::vector<std::string>& molecule_atom_names,
     const CharmmResidueDefinition& residue);
+
+[[nodiscard]] CharmmTopologyParseResult parse_charmm_topology_globals(
+    const std::filesystem::path& filename);
 
 }  // namespace sasmol

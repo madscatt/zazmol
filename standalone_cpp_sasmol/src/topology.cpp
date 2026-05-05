@@ -1,10 +1,28 @@
 #include "sasmol/topology.hpp"
 
+#include <cstddef>
+#include <fstream>
 #include <map>
+#include <sstream>
+#include <utility>
 
 namespace sasmol {
 
 namespace {
+
+std::string line_context(std::size_t line_number, const std::string& message) {
+  return "line " + std::to_string(line_number) + ": " + message;
+}
+
+std::vector<std::string> split_tokens(const std::string& line) {
+  std::istringstream stream(line);
+  std::vector<std::string> tokens;
+  std::string token;
+  while (stream >> token) {
+    tokens.push_back(token);
+  }
+  return tokens;
+}
 
 std::map<std::string, int> count_atom_names(const std::vector<std::string>& names) {
   std::map<std::string, int> counts;
@@ -33,6 +51,63 @@ void append_duplicates(const std::map<std::string, int>& counts,
 }
 
 }  // namespace
+
+CharmmTopologyParseResult parse_charmm_topology_globals(
+    const std::filesystem::path& filename) {
+  CharmmTopologyParseResult result;
+  std::ifstream input(filename);
+  if (!input) {
+    result.errors.push_back("failed to open CHARMM topology file: " +
+                            filename.string());
+    return result;
+  }
+
+  std::string line;
+  std::size_t line_number = 0;
+  while (std::getline(input, line)) {
+    ++line_number;
+    const auto tokens = split_tokens(line);
+    if (tokens.empty() || tokens.front().starts_with("!")) {
+      continue;
+    }
+
+    const auto& record = tokens.front();
+    if (record == "MASS") {
+      if (tokens.size() < 4) {
+        result.errors.push_back(line_context(
+            line_number, "MASS record requires index, atom type, and mass"));
+        continue;
+      }
+      result.topology.masses.push_back({tokens[1], tokens[2], tokens[3]});
+    } else if (record == "DECL") {
+      if (tokens.size() < 2) {
+        result.errors.push_back(
+            line_context(line_number, "DECL record requires one token"));
+        continue;
+      }
+      result.topology.declarations.push_back(tokens[1]);
+    } else if (record == "DEFA") {
+      if (tokens.size() < 5) {
+        result.errors.push_back(
+            line_context(line_number, "DEFA record requires four tokens"));
+        continue;
+      }
+      result.topology.defaults.insert(result.topology.defaults.end(),
+                                      tokens.begin() + 1, tokens.begin() + 5);
+    } else if (record == "AUTO") {
+      if (tokens.size() < 3) {
+        result.errors.push_back(
+            line_context(line_number, "AUTO record requires two tokens"));
+        continue;
+      }
+      result.topology.auto_terms.insert(result.topology.auto_terms.end(),
+                                        tokens.begin() + 1,
+                                        tokens.begin() + 3);
+    }
+  }
+
+  return result;
+}
 
 SubsetResult assign_charmm_types(Molecule& molecule,
                                  const std::vector<std::string>& types) {

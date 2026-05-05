@@ -2,8 +2,14 @@
 
 #include <cassert>
 #include <cmath>
+#include <filesystem>
+#include <fstream>
 
 namespace {
+
+std::filesystem::path topology_fixture(const char* filename) {
+  return std::filesystem::path(SASMOL_TOPOLOGY_TEST_DATA_DIR) / filename;
+}
 
 void assert_close(sasmol::calc_type actual, sasmol::calc_type expected) {
   assert(std::fabs(actual - expected) < 1.0e-12);
@@ -212,6 +218,47 @@ void test_validate_charmm_residue_atoms_reports_duplicate_topology_atom() {
           std::vector<std::string>{"CA"}));
 }
 
+void test_parse_charmm_topology_globals_matches_python_oracle_fixture() {
+  const auto result = sasmol::parse_charmm_topology_globals(
+      topology_fixture("minimal_mass_only.rtf"));
+
+  assert(result.ok());
+  assert(result.topology.masses.size() == 2);
+  assert(result.topology.masses[0].index == "1");
+  assert(result.topology.masses[0].atom_type == "H");
+  assert(result.topology.masses[0].mass == "1.00800");
+  assert(result.topology.masses[1].index == "2");
+  assert(result.topology.masses[1].atom_type == "C");
+  assert(result.topology.masses[1].mass == "12.01100");
+  assert((result.topology.declarations == std::vector<std::string>{"-C"}));
+  assert((result.topology.defaults ==
+          std::vector<std::string>{"FIRS", "NTER", "LAST", "CTER"}));
+  assert((result.topology.auto_terms ==
+          std::vector<std::string>{"ANGLES", "DIHE"}));
+}
+
+void test_parse_charmm_topology_globals_reports_malformed_records() {
+  const auto path =
+      std::filesystem::temp_directory_path() / "sasmol_bad_global_topology.rtf";
+  {
+    std::ofstream output(path);
+    output << "MASS 1 H\n";
+    output << "DECL\n";
+    output << "DEFA FIRS NTER LAST\n";
+    output << "AUTO ANGLES\n";
+  }
+
+  const auto result = sasmol::parse_charmm_topology_globals(path);
+  std::filesystem::remove(path);
+
+  assert(!result.ok());
+  assert(result.errors.size() == 4);
+  assert(result.topology.masses.empty());
+  assert(result.topology.declarations.empty());
+  assert(result.topology.defaults.empty());
+  assert(result.topology.auto_terms.empty());
+}
+
 }  // namespace
 
 int main() {
@@ -231,5 +278,7 @@ int main() {
   test_validate_charmm_residue_atoms_reports_extra_atom();
   test_validate_charmm_residue_atoms_reports_duplicate_molecule_atom();
   test_validate_charmm_residue_atoms_reports_duplicate_topology_atom();
+  test_parse_charmm_topology_globals_matches_python_oracle_fixture();
+  test_parse_charmm_topology_globals_reports_malformed_records();
   return 0;
 }

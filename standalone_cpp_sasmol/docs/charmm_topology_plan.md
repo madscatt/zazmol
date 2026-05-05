@@ -21,9 +21,10 @@ for safe automatic assignment.
 ## Current Parity Checkpoint
 
 Topology support is intentionally narrow and safe at this stage. The C++ core
-can store CHARMM-related descriptors and can accept explicit caller-provided
-CHARMM type assignments, but it does not infer types and does not parse CHARMM
-topology files yet.
+can store CHARMM-related descriptors, can accept explicit caller-provided
+CHARMM type assignments, and can parse the first reviewed global-record subset
+from CHARMM topology files. It does not infer types, parse residues, apply
+patches, or mutate molecules from topology files yet.
 
 Implemented:
 
@@ -40,17 +41,19 @@ Implemented:
 - hand-built `CharmmResidueDefinition` records plus
   `validate_charmm_residue_atoms(...)` for exact-match, missing atom, extra atom,
   and duplicate atom reports
+- `parse_charmm_topology_globals(...)` for Python-matched `MASS`, `DECL`,
+  `DEFA`, and `AUTO` records, preserving values as strings
 - no-partial-mutation failure behavior for length mismatches, atom-name
   mismatches, and molecule name-vector mismatches
 
 This is enough for workflows that already have trustworthy CHARMM type data.
-It is not a topology engine. A full CHARMM topology parser would be a separate
-design step because Python `CharmmTopology` includes residue parsing, patches,
-completeness checks, and possible atom reordering.
+It is not a topology engine. The global parser slice is data-only and does not
+assign descriptors to a molecule. Residue parsing, patches, completeness checks,
+and possible atom reordering remain separate reviewed steps.
 
-Recommended next step: pause topology feature expansion unless a caller needs a
-minimal parser for a reviewed subset of CHARMM topology records. Do not start
-parser work without a separate reviewed plan and fixtures.
+Recommended next step: validate the next parser slice against tiny Python-oracle
+fixtures before any production topology summary work. Do not parse residues,
+patches, or bonds without a separate fixture-backed slice.
 
 The Python oracle harness for future parser work is recorded in
 `docs/charmm_topology_python_oracle.md`.
@@ -106,10 +109,17 @@ than guessed.
 
 4. **Topology Parser Subsystem**
 
-   Port Python `CharmmTopology` behavior as its own module:
+   First slice implemented:
 
-   - parse `MASS`, `DECL`, `DEFA`, `AUTO`, `RESI`, `PRES`, `ATOM`, `BOND`,
-     `DOUBLE`, `IMPR`, `CMAP`, `DONO`, `ACCE`, `IC`, and `DELE`
+   - `parse_charmm_topology_globals(...)`
+   - parses only `MASS`, `DECL`, `DEFA`, and `AUTO`
+   - stores Python-equivalent string tokens instead of numeric-coercing masses
+   - reports malformed global records through `errors`
+
+   Future slices should port Python `CharmmTopology` behavior as its own module:
+
+   - parse `RESI`, `PRES`, `ATOM`, `BOND`, `DOUBLE`, `IMPR`, `CMAP`, `DONO`,
+     `ACCE`, `IC`, and `DELE`
    - build residue atom lists
    - support reviewed residue patches such as `NTER`, `CTER`, `GLYP`, `PROP`,
      and disulfide/HIS variants
