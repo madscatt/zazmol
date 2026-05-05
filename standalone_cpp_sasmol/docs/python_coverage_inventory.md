@@ -35,24 +35,19 @@ Status labels:
 | `topology.Topology.create_fasta` | utilities/system FASTA tests | `sasmol/topology.hpp`, `sasmol/molecule.hpp` | `implemented` | low | Keep C++ result typed: sequence vector plus formatted FASTA string. |
 | `topology.Topology.renumber` | `test_topology/test_intg_topology_Topology.py`, `test_system/*index*`, `*resid*` | `sasmol/topology.hpp` | `implemented` | low-medium | Preserve explicit options for index/resid starts. |
 | `topology.Topology.make_constraint_pdb` | `test_topology/test_intg_topology_Topology.py` | `sasmol/topology.hpp`, `sasmol/file_io.hpp` | `implemented` | medium | C++ splits descriptor application from the PDB-writing wrapper. |
-| `topology.Topology.make_backbone_pdb_from_fasta` | dedicated oracle fixture needed | future topology builder | `missing` | medium-high | Pause before coding; behavior is structural synthesis. |
+| `topology.Topology.make_backbone_pdb_from_fasta` | `test_topology/test_intg_topology_Topology.py` | `sasmol/topology.hpp`, `sasmol/file_io.hpp` | `implemented` | medium-high | C++ exposes both molecule builder and PDB-writing wrapper. |
 | `multiprocessing_sasmol.Multiprocessing_SasMol` | no core C++ parity tests | optional adapter layer | `missing` | high | Defer unless standalone C++ needs orchestration parity. |
 | Python property tables: AMU, VDW, scattering lengths, CHARMM names, amino-acid SLD | `test_properties/*` | `sasmol/properties.hpp` | `partial` | medium | Expand table-by-table only when a caller or helper needs it. |
 | VMD/view helpers | `test_system/*send_coordinates_to_vmd*` | optional adapter | `deferred` | medium | Keep outside portable core. |
 
 ## Recommended Port Order
 
-1. `topology.Topology.make_backbone_pdb_from_fasta`
-
-   Medium to high risk. This builds molecular structure from FASTA and should
-   not be ported without dedicated fixtures for supported molecule types.
-
-2. Legacy `operate.Move.align(..., mode=...)` details
+1. Legacy `operate.Move.align(..., mode=...)` details
 
    High risk. Review mode-specific Python behavior before adding compatibility
    APIs.
 
-3. Python-style selected BIOMT `apply_biomt` / `copy_apply_biomt`
+2. Python-style selected BIOMT `apply_biomt` / `copy_apply_biomt`
 
    High risk. Keep separate from existing BIOMT metadata preservation and C++
    assembly helpers.

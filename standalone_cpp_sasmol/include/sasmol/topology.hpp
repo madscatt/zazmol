@@ -199,6 +199,11 @@ enum class ConstraintField {
   occupancy,
 };
 
+enum class BackboneMoltype {
+  protein,
+  nucleic,
+};
+
 struct FastaOptions {
   bool fasta_format{false};
   bool exclude_hetatm{false};
@@ -225,6 +230,13 @@ struct ConstraintPdbOptions {
   bool reset{true};
 };
 
+struct BackboneMoleculeResult {
+  Molecule molecule;
+  std::vector<std::string> errors;
+
+  [[nodiscard]] bool ok() const noexcept { return errors.empty(); }
+};
+
 [[nodiscard]] FastaResult create_fasta(const Molecule& molecule,
                                        const FastaOptions& options = {});
 
@@ -245,6 +257,24 @@ struct ConstraintPdbOptions {
     const std::filesystem::path& filename,
     ConstraintBasis basis,
     const ConstraintPdbOptions& options = {});
+
+[[nodiscard]] BackboneMoleculeResult make_backbone_molecule_from_fasta(
+    const std::vector<std::string>& fasta_sequence,
+    BackboneMoltype moltype);
+
+[[nodiscard]] BackboneMoleculeResult make_backbone_molecule_from_fasta(
+    const Molecule& molecule,
+    BackboneMoltype moltype);
+
+[[nodiscard]] SubsetResult make_backbone_pdb_from_fasta(
+    const std::vector<std::string>& fasta_sequence,
+    const std::filesystem::path& filename,
+    BackboneMoltype moltype);
+
+[[nodiscard]] SubsetResult make_backbone_pdb_from_fasta(
+    const Molecule& molecule,
+    const std::filesystem::path& filename,
+    BackboneMoltype moltype);
 
 [[nodiscard]] SubsetResult assign_charmm_types(
     Molecule& molecule, const std::vector<std::string>& types);

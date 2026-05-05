@@ -279,6 +279,86 @@ void test_make_constraint_pdb_writes_frame_zero_and_updates_descriptor() {
           std::vector<std::string>{"1.00", "1.00", "1.00", "0.00"}));
 }
 
+void test_make_backbone_molecule_from_fasta_protein() {
+  const auto result = sasmol::make_backbone_molecule_from_fasta(
+      std::vector<std::string>{"T", "C", "P"}, sasmol::BackboneMoltype::protein);
+
+  assert(result.ok());
+  assert(result.molecule.natoms() == 3);
+  assert((result.molecule.name() ==
+          std::vector<std::string>{"CA", "CA", "CA"}));
+  assert((result.molecule.resname() ==
+          std::vector<std::string>{"THR", "CYS", "PRO"}));
+  assert((result.molecule.index() == std::vector<int>{1, 2, 3}));
+  assert((result.molecule.resid() == std::vector<int>{1, 2, 3}));
+  assert(result.molecule.coordinate(0, 0).x == 0.0F);
+}
+
+void test_make_backbone_molecule_from_fasta_nucleic() {
+  const auto result = sasmol::make_backbone_molecule_from_fasta(
+      std::vector<std::string>{"G", "A", "U"}, sasmol::BackboneMoltype::nucleic);
+
+  assert(result.ok());
+  assert(result.molecule.natoms() == 3);
+  assert((result.molecule.name() ==
+          std::vector<std::string>{"O5'", "O5'", "O5'"}));
+  assert((result.molecule.resname() ==
+          std::vector<std::string>{"GUA", "ADE", "URA"}));
+}
+
+void test_make_backbone_molecule_from_fasta_uses_terminal_patches() {
+  auto result = sasmol::make_backbone_molecule_from_fasta(
+      std::vector<std::string>{"G", "A"}, sasmol::BackboneMoltype::protein);
+
+  assert(result.ok());
+  assert((result.molecule.resname() == std::vector<std::string>{"GLYP", "ALA"}));
+
+  result = sasmol::make_backbone_molecule_from_fasta(
+      std::vector<std::string>{"P", "A"}, sasmol::BackboneMoltype::protein);
+
+  assert(result.ok());
+  assert((result.molecule.resname() == std::vector<std::string>{"PROP", "ALA"}));
+}
+
+void test_make_backbone_molecule_from_formatted_fasta() {
+  sasmol::Molecule source;
+  source.fasta() = ">demo\nTC\nPA\n";
+
+  const auto result = sasmol::make_backbone_molecule_from_fasta(
+      source, sasmol::BackboneMoltype::protein);
+
+  assert(result.ok());
+  assert((result.molecule.resname() ==
+          std::vector<std::string>{"THR", "CYS", "PRO", "ALA"}));
+}
+
+void test_make_backbone_molecule_rejects_unknown_residue() {
+  const auto result = sasmol::make_backbone_molecule_from_fasta(
+      std::vector<std::string>{"A", "X"}, sasmol::BackboneMoltype::protein);
+
+  assert(!result.ok());
+  assert(result.molecule.natoms() == 0);
+}
+
+void test_make_backbone_pdb_from_fasta_writes_pdb() {
+  const auto path =
+      std::filesystem::temp_directory_path() / "sasmol_backbone_fasta_test.pdb";
+
+  const auto result = sasmol::make_backbone_pdb_from_fasta(
+      std::vector<std::string>{"G", "A"}, path, sasmol::BackboneMoltype::protein);
+
+  assert(result.ok());
+
+  sasmol::Molecule written;
+  const auto status = sasmol::PdbReader{}.read_pdb(path, written);
+  std::filesystem::remove(path);
+
+  assert(status.ok());
+  assert(written.natoms() == 2);
+  assert((written.name() == std::vector<std::string>{"CA", "CA"}));
+  assert((written.resname() == std::vector<std::string>{"GLYP", "ALA"}));
+}
+
 void test_assign_charmm_types_sets_atom_aligned_values() {
   sasmol::Molecule mol(3, 1);
 
@@ -1548,6 +1628,12 @@ int main() {
   test_apply_constraint_descriptor_occupancy_and_reset_false();
   test_apply_constraint_descriptor_rejects_mismatch_without_mutation();
   test_make_constraint_pdb_writes_frame_zero_and_updates_descriptor();
+  test_make_backbone_molecule_from_fasta_protein();
+  test_make_backbone_molecule_from_fasta_nucleic();
+  test_make_backbone_molecule_from_fasta_uses_terminal_patches();
+  test_make_backbone_molecule_from_formatted_fasta();
+  test_make_backbone_molecule_rejects_unknown_residue();
+  test_make_backbone_pdb_from_fasta_writes_pdb();
   test_assign_charmm_types_sets_atom_aligned_values();
   test_assign_charmm_types_rejects_length_mismatch_without_mutation();
   test_assign_charmm_types_allows_empty_molecule_empty_types();

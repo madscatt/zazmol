@@ -42,6 +42,41 @@ const std::map<std::string, std::string>& fasta_residue_dictionary() {
   return residues;
 }
 
+const std::map<std::string, std::string>& one_to_three_protein_dictionary() {
+  static const std::map<std::string, std::string> residues{
+      {"A", "ALA"}, {"R", "ARG"}, {"D", "ASP"}, {"N", "ASN"},
+      {"C", "CYS"}, {"E", "GLU"}, {"Q", "GLN"}, {"G", "GLY"},
+      {"H", "HSE"}, {"I", "ILE"}, {"L", "LEU"}, {"K", "LYS"},
+      {"M", "MET"}, {"F", "PHE"}, {"P", "PRO"}, {"S", "SER"},
+      {"T", "THR"}, {"W", "TRP"}, {"Y", "TYR"}, {"V", "VAL"}};
+  return residues;
+}
+
+const std::map<std::string, std::string>& one_to_three_nucleic_dictionary() {
+  static const std::map<std::string, std::string> residues{
+      {"G", "GUA"}, {"C", "CYT"}, {"A", "ADE"}, {"T", "THY"},
+      {"U", "URA"}};
+  return residues;
+}
+
+std::vector<std::string> fasta_string_to_sequence(const std::string& fasta) {
+  std::vector<std::string> sequence;
+  std::istringstream lines(fasta);
+  std::string line;
+  while (std::getline(lines, line)) {
+    if (!line.empty() && line.front() == '>') {
+      continue;
+    }
+    for (const auto residue : line) {
+      if (std::isspace(static_cast<unsigned char>(residue))) {
+        continue;
+      }
+      sequence.emplace_back(1, residue);
+    }
+  }
+  return sequence;
+}
+
 void require_atom_aligned_fasta_descriptor(const Molecule& molecule,
                                            std::size_t actual,
                                            const std::string& name,
@@ -767,6 +802,93 @@ SubsetResult make_constraint_pdb(Molecule& molecule,
   constraint_descriptor(molecule, options.field) =
       constraint_descriptor_const(candidate, options.field);
   return result;
+}
+
+BackboneMoleculeResult make_backbone_molecule_from_fasta(
+    const std::vector<std::string>& fasta_sequence,
+    BackboneMoltype moltype) {
+  BackboneMoleculeResult result;
+  const auto& residue_dictionary =
+      moltype == BackboneMoltype::protein ? one_to_three_protein_dictionary()
+                                          : one_to_three_nucleic_dictionary();
+  const std::string atom_name =
+      moltype == BackboneMoltype::protein ? "CA" : "O5'";
+
+  std::vector<std::string> residue_names;
+  residue_names.reserve(fasta_sequence.size());
+  bool first = true;
+  for (const auto& residue : fasta_sequence) {
+    if (moltype == BackboneMoltype::protein && first && residue == "G") {
+      residue_names.push_back("GLYP");
+    } else if (moltype == BackboneMoltype::protein && first && residue == "P") {
+      residue_names.push_back("PROP");
+    } else {
+      const auto found = residue_dictionary.find(residue);
+      if (found == residue_dictionary.end()) {
+        result.errors.push_back("unsupported FASTA residue '" + residue + "'");
+        return result;
+      }
+      residue_names.push_back(found->second);
+    }
+    first = false;
+  }
+
+  result.molecule.resize(fasta_sequence.size(), 1);
+  for (std::size_t atom = 0; atom < result.molecule.natoms(); ++atom) {
+    const int one_based = static_cast<int>(atom + 1);
+    result.molecule.record()[atom] = "ATOM";
+    result.molecule.index()[atom] = one_based;
+    result.molecule.original_index()[atom] = one_based;
+    result.molecule.name()[atom] = atom_name;
+    result.molecule.loc()[atom] = " ";
+    result.molecule.resname()[atom] = residue_names[atom];
+    result.molecule.chain()[atom] = "A";
+    result.molecule.resid()[atom] = one_based;
+    result.molecule.original_resid()[atom] = one_based;
+    result.molecule.rescode()[atom] = " ";
+    result.molecule.occupancy()[atom] = "0.00";
+    result.molecule.beta()[atom] = "0.00";
+    result.molecule.segname()[atom] = "DUM";
+    result.molecule.element()[atom] = "C";
+    result.molecule.charge()[atom] = " ";
+    result.molecule.moltype()[atom] = "protein";
+    result.molecule.set_coordinate(0, atom, {});
+  }
+  return result;
+}
+
+BackboneMoleculeResult make_backbone_molecule_from_fasta(
+    const Molecule& molecule,
+    BackboneMoltype moltype) {
+  return make_backbone_molecule_from_fasta(
+      fasta_string_to_sequence(molecule.fasta()), moltype);
+}
+
+SubsetResult make_backbone_pdb_from_fasta(
+    const std::vector<std::string>& fasta_sequence,
+    const std::filesystem::path& filename,
+    BackboneMoltype moltype) {
+  SubsetResult result;
+  const auto backbone =
+      make_backbone_molecule_from_fasta(fasta_sequence, moltype);
+  if (!backbone.ok()) {
+    result.errors.insert(result.errors.end(), backbone.errors.begin(),
+                         backbone.errors.end());
+    return result;
+  }
+  PdbWriter writer;
+  const auto status = writer.write_pdb(filename, backbone.molecule);
+  if (!status.ok()) {
+    result.errors.push_back(status.message);
+  }
+  return result;
+}
+
+SubsetResult make_backbone_pdb_from_fasta(const Molecule& molecule,
+                                          const std::filesystem::path& filename,
+                                          BackboneMoltype moltype) {
+  return make_backbone_pdb_from_fasta(fasta_string_to_sequence(molecule.fasta()),
+                                      filename, moltype);
 }
 
 bool compare_list_ignore_order(const std::vector<std::string>& first,
