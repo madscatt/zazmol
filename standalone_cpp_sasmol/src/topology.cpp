@@ -1,6 +1,38 @@
 #include "sasmol/topology.hpp"
 
+#include <map>
+
 namespace sasmol {
+
+namespace {
+
+std::map<std::string, int> count_atom_names(const std::vector<std::string>& names) {
+  std::map<std::string, int> counts;
+  for (const auto& name : names) {
+    ++counts[name];
+  }
+  return counts;
+}
+
+std::map<std::string, int> count_topology_atom_names(
+    const std::vector<CharmmAtomDefinition>& atoms) {
+  std::map<std::string, int> counts;
+  for (const auto& atom : atoms) {
+    ++counts[atom.name];
+  }
+  return counts;
+}
+
+void append_duplicates(const std::map<std::string, int>& counts,
+                       std::vector<std::string>& duplicates) {
+  for (const auto& [name, count] : counts) {
+    if (count > 1) {
+      duplicates.push_back(name);
+    }
+  }
+}
+
+}  // namespace
 
 SubsetResult assign_charmm_types(Molecule& molecule,
                                  const std::vector<std::string>& types) {
@@ -81,6 +113,32 @@ SubsetResult assign_charmm_types_and_atom_charges_from_atom_table(
   molecule.charmm_type() = std::move(types);
   molecule.atom_charge() = std::move(charges);
   return result;
+}
+
+CharmmResidueValidation validate_charmm_residue_atoms(
+    const std::vector<std::string>& molecule_atom_names,
+    const CharmmResidueDefinition& residue) {
+  CharmmResidueValidation validation;
+  const auto molecule_counts = count_atom_names(molecule_atom_names);
+  const auto topology_counts = count_topology_atom_names(residue.atoms);
+
+  append_duplicates(molecule_counts, validation.duplicate_molecule_atoms);
+  append_duplicates(topology_counts, validation.duplicate_topology_atoms);
+
+  for (const auto& [name, count] : topology_counts) {
+    (void)count;
+    if (molecule_counts.find(name) == molecule_counts.end()) {
+      validation.missing_atoms.push_back(name);
+    }
+  }
+  for (const auto& [name, count] : molecule_counts) {
+    (void)count;
+    if (topology_counts.find(name) == topology_counts.end()) {
+      validation.extra_atoms.push_back(name);
+    }
+  }
+
+  return validation;
 }
 
 }  // namespace sasmol

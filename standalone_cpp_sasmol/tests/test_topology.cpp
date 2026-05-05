@@ -150,6 +150,68 @@ void test_assign_charmm_types_and_atom_charges_rejects_length_mismatch() {
   assert_close(mol.atom_charge()[2], 0.3);
 }
 
+sasmol::CharmmResidueDefinition glycine_definition() {
+  return {.resname = "GLY",
+          .atoms = {{"N", "NH1", -0.47},
+                    {"CA", "CT2", -0.02},
+                    {"C", "C", 0.51},
+                    {"O", "O", -0.51}}};
+}
+
+void test_validate_charmm_residue_atoms_accepts_exact_match_any_order() {
+  const auto validation =
+      sasmol::validate_charmm_residue_atoms({"CA", "O", "N", "C"},
+                                            glycine_definition());
+
+  assert(validation.ok());
+  assert(validation.missing_atoms.empty());
+  assert(validation.extra_atoms.empty());
+  assert(validation.duplicate_molecule_atoms.empty());
+  assert(validation.duplicate_topology_atoms.empty());
+}
+
+void test_validate_charmm_residue_atoms_reports_missing_atom() {
+  const auto validation =
+      sasmol::validate_charmm_residue_atoms({"N", "CA", "C"},
+                                            glycine_definition());
+
+  assert(!validation.ok());
+  assert((validation.missing_atoms == std::vector<std::string>{"O"}));
+  assert(validation.extra_atoms.empty());
+}
+
+void test_validate_charmm_residue_atoms_reports_extra_atom() {
+  const auto validation =
+      sasmol::validate_charmm_residue_atoms({"N", "CA", "C", "O", "CB"},
+                                            glycine_definition());
+
+  assert(!validation.ok());
+  assert(validation.missing_atoms.empty());
+  assert((validation.extra_atoms == std::vector<std::string>{"CB"}));
+}
+
+void test_validate_charmm_residue_atoms_reports_duplicate_molecule_atom() {
+  const auto validation =
+      sasmol::validate_charmm_residue_atoms({"N", "CA", "C", "O", "CA"},
+                                            glycine_definition());
+
+  assert(!validation.ok());
+  assert((validation.duplicate_molecule_atoms ==
+          std::vector<std::string>{"CA"}));
+}
+
+void test_validate_charmm_residue_atoms_reports_duplicate_topology_atom() {
+  sasmol::CharmmResidueDefinition residue = glycine_definition();
+  residue.atoms.push_back({"CA", "CT2", -0.02});
+
+  const auto validation =
+      sasmol::validate_charmm_residue_atoms({"N", "CA", "C", "O"}, residue);
+
+  assert(!validation.ok());
+  assert((validation.duplicate_topology_atoms ==
+          std::vector<std::string>{"CA"}));
+}
+
 }  // namespace
 
 int main() {
@@ -164,5 +226,10 @@ int main() {
   test_assign_charmm_types_and_atom_charges_from_atom_table();
   test_assign_charmm_types_and_atom_charges_rejects_name_mismatch();
   test_assign_charmm_types_and_atom_charges_rejects_length_mismatch();
+  test_validate_charmm_residue_atoms_accepts_exact_match_any_order();
+  test_validate_charmm_residue_atoms_reports_missing_atom();
+  test_validate_charmm_residue_atoms_reports_extra_atom();
+  test_validate_charmm_residue_atoms_reports_duplicate_molecule_atom();
+  test_validate_charmm_residue_atoms_reports_duplicate_topology_atom();
   return 0;
 }

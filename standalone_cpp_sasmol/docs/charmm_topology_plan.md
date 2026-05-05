@@ -37,6 +37,9 @@ Implemented:
   or caller table
 - `assign_charmm_types_and_atom_charges_from_atom_table(molecule, assignments)`
   for explicit atom-ordered `(atom name, CHARMM type, atom charge)` rows
+- hand-built `CharmmResidueDefinition` records plus
+  `validate_charmm_residue_atoms(...)` for exact-match, missing atom, extra atom,
+  and duplicate atom reports
 - no-partial-mutation failure behavior for length mismatches, atom-name
   mismatches, and molecule name-vector mismatches
 
@@ -45,9 +48,9 @@ It is not a topology engine. A full CHARMM topology parser would be a separate
 design step because Python `CharmmTopology` includes residue parsing, patches,
 completeness checks, and possible atom reordering.
 
-Recommended next step: pause topology feature expansion unless a caller needs
-one more explicit table-driven helper. Do not start parser work without a
-separate reviewed plan and fixtures.
+Recommended next step: pause topology feature expansion unless a caller needs a
+minimal parser for a reviewed subset of CHARMM topology records. Do not start
+parser work without a separate reviewed plan and fixtures.
 
 ## Safety Rule
 
@@ -86,7 +89,19 @@ than guessed.
    This is stricter than the historical Python caller: no partial mutation
    after a mismatch.
 
-3. **Topology Parser Subsystem**
+3. **Residue Definition Model** implemented
+
+   Added plain C++ data structures for hand-built residue definitions:
+
+   - `CharmmAtomDefinition`
+   - `CharmmResidueDefinition`
+   - `CharmmResidueValidation`
+   - `validate_charmm_residue_atoms(molecule_atom_names, residue)`
+
+   This validates residue atom-name sets without parsing topology files, applying
+   patches, mutating molecules, or reordering atoms.
+
+4. **Topology Parser Subsystem**
 
    Port Python `CharmmTopology` behavior as its own module:
 
