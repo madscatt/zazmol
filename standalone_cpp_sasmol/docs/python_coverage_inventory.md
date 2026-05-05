@@ -22,6 +22,7 @@ Status labels:
 | DCD fixed/free atoms, unit-cell writing, true random seek | DCD fixture notes | `sasmol/file_io.hpp` | `deferred` | high | Require policy and fixtures before coding. |
 | BIOMT metadata preservation | `test_file_io/*biomt_metadata*` | `sasmol/file_io.hpp`, `sasmol/molecule.hpp` | `implemented` | low | Keep `read_pdb` passive. |
 | `calculate.Calculate` mass/formula/charge/COM/Rg/RMSD/minmax/PMI | `test_calculate/*` | `sasmol/calculate.hpp` | `implemented` | low | Add only fixture-backed edge hardening. |
+| `linear_algebra` helper functions | `test_linear_algebra/*` | `sasmol/linear_algebra.hpp` | `implemented` | medium | Includes legacy `find_u` and `cmp` helpers for alignment parity. |
 | `operate.Move` translate/center/rotate/PMI alignment | `test_operate/*` | `sasmol/operate.hpp` | `implemented` | low | Existing coverage is strong. |
 | `operate.Move.align(...)` legacy mode surface | `test_operate/*align*` | `sasmol/operate.hpp` | `implemented` | high | C++ exposes Python initialization/production semantics as explicit plan helpers rather than string mode dispatch. |
 | `operate.set_average_vdw` | `test_operate/test_unit_operate_set_average_vdw.py` | `sasmol/operate.hpp` | `implemented` | low-medium | C++ stores the usable legacy radius column as scalar `atom_vdw()`. |

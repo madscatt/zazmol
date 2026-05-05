@@ -22,8 +22,9 @@ behavior oracle.
 - Calculation coverage for mass, molecular formula, residue charge, center of
   mass, radius of gyration, RMSD, min/max, DCD streaming min/max, and principal
   moments of inertia.
-- Linear algebra coverage for cross products, matrix multiplication, vector
-  helpers, signed angles, dihedral angles, and ordinary three-point angles.
+- Linear algebra coverage for cross products, matrix multiplication, legacy
+  alignment matrix construction, vector helpers, Python-style comparison,
+  signed angles, dihedral angles, and ordinary three-point angles.
 - Operate coverage for translate, center, axis/general/Euler rotations, PMI
   alignment, explicit-index and basis-expression alignment initialization and
   production helpers, pure copy-returning variants, row and column convention
