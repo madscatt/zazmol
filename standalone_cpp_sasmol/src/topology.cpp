@@ -50,10 +50,8 @@ void append_duplicates(const std::map<std::string, int>& counts,
   }
 }
 
-}  // namespace
-
-CharmmTopologyParseResult parse_charmm_topology_globals(
-    const std::filesystem::path& filename) {
+CharmmTopologyParseResult parse_charmm_topology_impl(
+    const std::filesystem::path& filename, bool include_entries) {
   CharmmTopologyParseResult result;
   std::ifstream input(filename);
   if (!input) {
@@ -64,6 +62,7 @@ CharmmTopologyParseResult parse_charmm_topology_globals(
 
   std::string line;
   std::size_t line_number = 0;
+  CharmmTopologyEntry* current_entry = nullptr;
   while (std::getline(input, line)) {
     ++line_number;
     const auto tokens = split_tokens(line);
@@ -103,10 +102,49 @@ CharmmTopologyParseResult parse_charmm_topology_globals(
       result.topology.auto_terms.insert(result.topology.auto_terms.end(),
                                         tokens.begin() + 1,
                                         tokens.begin() + 3);
+    } else if (include_entries && (record == "RESI" || record == "PRES")) {
+      if (tokens.size() < 3) {
+        result.errors.push_back(line_context(
+            line_number, record + " record requires name and total charge"));
+        current_entry = nullptr;
+        continue;
+      }
+      result.topology.entries.push_back(
+          {.kind = record == "RESI" ? CharmmTopologyEntryKind::Residue
+                                    : CharmmTopologyEntryKind::Patch,
+           .name = tokens[1],
+           .total_charge = tokens[2],
+           .atoms = {}});
+      current_entry = &result.topology.entries.back();
+    } else if (include_entries && record == "ATOM") {
+      if (current_entry == nullptr) {
+        result.errors.push_back(line_context(
+            line_number, "ATOM record appeared before RESI or PRES"));
+        continue;
+      }
+      if (tokens.size() < 4) {
+        result.errors.push_back(line_context(
+            line_number,
+            "ATOM record requires atom name, CHARMM type, and charge"));
+        continue;
+      }
+      current_entry->atoms.push_back({tokens[1], tokens[2], tokens[3]});
     }
   }
 
   return result;
+}
+
+}  // namespace
+
+CharmmTopologyParseResult parse_charmm_topology_globals(
+    const std::filesystem::path& filename) {
+  return parse_charmm_topology_impl(filename, false);
+}
+
+CharmmTopologyParseResult parse_charmm_topology(
+    const std::filesystem::path& filename) {
+  return parse_charmm_topology_impl(filename, true);
 }
 
 SubsetResult assign_charmm_types(Molecule& molecule,

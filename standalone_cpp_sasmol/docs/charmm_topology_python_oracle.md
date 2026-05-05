@@ -47,7 +47,13 @@ C++ parity checkpoint:
 - The C++ test for `minimal_mass_only.rtf` matches the Python oracle shape:
   `MASS` values remain strings, and `DECL`, `DEFA`, and `AUTO` token order is
   preserved.
-- The C++ parser deliberately ignores residue and patch records for this slice.
+- `parse_charmm_topology(...)` parses those same global records plus `RESI`,
+  `PRES`, and `ATOM` records.
+- The C++ tests for `minimal_resi_atoms.rtf` and `minimal_pres_atoms_dele.rtf`
+  match Python's string-preserving residue, patch, total-charge, and atom-record
+  shape.
+- The C++ parser deliberately ignores `BOND`, `DELE`, and other section records
+  for this slice.
 
 Residue and patch records:
 

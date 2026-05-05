@@ -259,6 +259,81 @@ void test_parse_charmm_topology_globals_reports_malformed_records() {
   assert(result.topology.auto_terms.empty());
 }
 
+void test_parse_charmm_topology_residue_atoms_match_python_oracle_fixture() {
+  const auto result = sasmol::parse_charmm_topology(
+      topology_fixture("minimal_resi_atoms.rtf"));
+
+  assert(result.ok());
+  assert(result.topology.masses.size() == 4);
+  assert(result.topology.entries.size() == 1);
+
+  const auto& gly = result.topology.entries[0];
+  assert(gly.kind == sasmol::CharmmTopologyEntryKind::Residue);
+  assert(gly.name == "GLY");
+  assert(gly.total_charge == "0.00");
+  assert(gly.atoms.size() == 4);
+  assert(gly.atoms[0].name == "N");
+  assert(gly.atoms[0].charmm_type == "NH1");
+  assert(gly.atoms[0].atom_charge == "-0.47");
+  assert(gly.atoms[1].name == "CA");
+  assert(gly.atoms[1].charmm_type == "CT2");
+  assert(gly.atoms[1].atom_charge == "-0.02");
+  assert(gly.atoms[2].name == "C");
+  assert(gly.atoms[2].charmm_type == "C");
+  assert(gly.atoms[2].atom_charge == "0.51");
+  assert(gly.atoms[3].name == "O");
+  assert(gly.atoms[3].charmm_type == "O");
+  assert(gly.atoms[3].atom_charge == "-0.51");
+}
+
+void test_parse_charmm_topology_patch_atoms_match_python_oracle_fixture() {
+  const auto result = sasmol::parse_charmm_topology(
+      topology_fixture("minimal_pres_atoms_dele.rtf"));
+
+  assert(result.ok());
+  assert(result.topology.entries.size() == 2);
+
+  const auto& gly = result.topology.entries[0];
+  assert(gly.kind == sasmol::CharmmTopologyEntryKind::Residue);
+  assert(gly.name == "GLY");
+  assert(gly.total_charge == "0.00");
+  assert(gly.atoms.size() == 4);
+
+  const auto& nter = result.topology.entries[1];
+  assert(nter.kind == sasmol::CharmmTopologyEntryKind::Patch);
+  assert(nter.name == "NTER");
+  assert(nter.total_charge == "1.00");
+  assert(nter.atoms.size() == 4);
+  assert(nter.atoms[0].name == "N");
+  assert(nter.atoms[0].charmm_type == "NH3");
+  assert(nter.atoms[0].atom_charge == "-0.30");
+  assert(nter.atoms[1].name == "HT1");
+  assert(nter.atoms[1].charmm_type == "HC");
+  assert(nter.atoms[1].atom_charge == "0.33");
+  assert(nter.atoms[2].name == "HT2");
+  assert(nter.atoms[2].charmm_type == "HC");
+  assert(nter.atoms[2].atom_charge == "0.33");
+  assert(nter.atoms[3].name == "HT3");
+  assert(nter.atoms[3].charmm_type == "HC");
+  assert(nter.atoms[3].atom_charge == "0.33");
+}
+
+void test_parse_charmm_topology_reports_atom_before_residue_or_patch() {
+  const auto path =
+      std::filesystem::temp_directory_path() / "sasmol_bad_atom_topology.rtf";
+  {
+    std::ofstream output(path);
+    output << "ATOM N NH1 -0.47\n";
+  }
+
+  const auto result = sasmol::parse_charmm_topology(path);
+  std::filesystem::remove(path);
+
+  assert(!result.ok());
+  assert(result.errors.size() == 1);
+  assert(result.topology.entries.empty());
+}
+
 }  // namespace
 
 int main() {
@@ -280,5 +355,8 @@ int main() {
   test_validate_charmm_residue_atoms_reports_duplicate_topology_atom();
   test_parse_charmm_topology_globals_matches_python_oracle_fixture();
   test_parse_charmm_topology_globals_reports_malformed_records();
+  test_parse_charmm_topology_residue_atoms_match_python_oracle_fixture();
+  test_parse_charmm_topology_patch_atoms_match_python_oracle_fixture();
+  test_parse_charmm_topology_reports_atom_before_residue_or_patch();
   return 0;
 }

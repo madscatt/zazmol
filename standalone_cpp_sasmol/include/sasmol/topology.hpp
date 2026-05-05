@@ -49,11 +49,30 @@ struct CharmmMassRecord {
   std::string mass;
 };
 
+enum class CharmmTopologyEntryKind {
+  Residue,
+  Patch,
+};
+
+struct CharmmTopologyAtomRecord {
+  std::string name;
+  std::string charmm_type;
+  std::string atom_charge;
+};
+
+struct CharmmTopologyEntry {
+  CharmmTopologyEntryKind kind{};
+  std::string name;
+  std::string total_charge;
+  std::vector<CharmmTopologyAtomRecord> atoms;
+};
+
 struct CharmmTopologyData {
   std::vector<CharmmMassRecord> masses;
   std::vector<std::string> declarations;
   std::vector<std::string> defaults;
   std::vector<std::string> auto_terms;
+  std::vector<CharmmTopologyEntry> entries;
 };
 
 struct CharmmTopologyParseResult {
@@ -79,6 +98,9 @@ struct CharmmTopologyParseResult {
 [[nodiscard]] CharmmResidueValidation validate_charmm_residue_atoms(
     const std::vector<std::string>& molecule_atom_names,
     const CharmmResidueDefinition& residue);
+
+[[nodiscard]] CharmmTopologyParseResult parse_charmm_topology(
+    const std::filesystem::path& filename);
 
 [[nodiscard]] CharmmTopologyParseResult parse_charmm_topology_globals(
     const std::filesystem::path& filename);
