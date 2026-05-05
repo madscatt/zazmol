@@ -13,7 +13,7 @@ the public C++ contract.
 | `matrix_math` | `sasmol/linear_algebra.hpp` | Promoted as small vector, angle, dihedral, and matrix helper APIs. |
 | `mask` dihedral helpers | `sasmol/subset.hpp`, `get_dihedral_subset_mask` | Promoted as a subset helper because it returns atom masks. |
 | `overlap` | `sasmol/overlap.hpp`, `has_overlap` | Promoted as a named geometry helper over raw coordinates or molecule frames. |
-| VMD/view helpers | Deferred optional adapter | Not core molecule behavior; should stay outside the portable core unless a reviewed viewer adapter is added. |
+| VMD/view helpers | `sasmol/view.hpp` | Optional adapter. The C++ surface mirrors Python's coordinate extraction and can compile the promoted legacy IMD/VMD C sender when `SASMOL_ENABLE_VMD_ADAPTER=ON`. |
 
 ## Rules for Future Ports
 

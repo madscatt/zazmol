@@ -66,8 +66,9 @@ behavior oracle.
 - BIOMT support is deliberately split into passive metadata preservation,
   Python-style selected one-transform helpers, and optional coordinate-only
   assembly helpers. PDB reading still does not apply transforms automatically.
-- VMD/view extension behavior is an intentional adapter boundary rather than
-  portable core behavior.
+- VMD/view support is an optional adapter: the portable C++ API mirrors
+  Python's frame-to-X/Y/Z coordinate extraction, and the promoted legacy IMD/VMD
+  C sender is compiled only when requested.
 - Fixed/free atom DCD variants and DCD unit-cell writing are deliberate
   unsupported-status paths with tests. True random-access DCD seeking is not
   exposed; single-frame access remains explicit reopen-and-scan behavior.
@@ -84,5 +85,6 @@ behavior oracle.
 
 No broad in-scope core module remains as an obvious next port target. The next
 slice should be chosen from a concrete caller need or fixture-backed parity gap:
-selection grammar expansion from surveyed real expressions, optional VMD adapter
-work outside portable core, or unusual PDB/DCD/topology fixture hardening.
+selection grammar expansion from surveyed real expressions, real-VMD runtime
+smoke testing if that workflow matters, or unusual PDB/DCD/topology fixture
+hardening.

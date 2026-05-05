@@ -4,10 +4,11 @@ project(
   standalone_cpp_sasmol
   VERSION 0.1.0
   DESCRIPTION "Standalone C++20 SasMol parity library"
-  LANGUAGES CXX
+  LANGUAGES C CXX
 )
 
 option(SASMOL_ENABLE_SANITIZERS "Build with AddressSanitizer and UndefinedBehaviorSanitizer" OFF)
+option(SASMOL_ENABLE_VMD_ADAPTER "Build optional VMD IMD socket adapter" OFF)
 
 add_library(sasmol_standalone
   src/calculate.cpp
@@ -20,6 +21,7 @@ add_library(sasmol_standalone
   src/selection.cpp
   src/subset.cpp
   src/topology.cpp
+  src/view.cpp
 )
 
 target_include_directories(sasmol_standalone
@@ -29,10 +31,24 @@ target_include_directories(sasmol_standalone
 
 target_compile_features(sasmol_standalone PUBLIC cxx_std_20)
 set_target_properties(sasmol_standalone PROPERTIES
+  C_STANDARD 99
+  C_STANDARD_REQUIRED YES
   CXX_STANDARD 20
   CXX_STANDARD_REQUIRED YES
   CXX_EXTENSIONS NO
 )
+
+if(SASMOL_ENABLE_VMD_ADAPTER)
+  target_sources(sasmol_standalone PRIVATE
+    src/vmd_legacy/imd.c
+    src/vmd_legacy/view_vmd.c
+    src/vmd_legacy/vmdsock.c
+  )
+  target_include_directories(sasmol_standalone PRIVATE
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/vmd_legacy
+  )
+  target_compile_definitions(sasmol_standalone PUBLIC SASMOL_ENABLE_VMD_ADAPTER=1)
+endif()
 
 if(MSVC)
   target_compile_options(sasmol_standalone PRIVATE /W4)
@@ -96,6 +112,10 @@ if(BUILD_TESTING)
     SASMOL_TEST_DATA_DIR="${CMAKE_CURRENT_SOURCE_DIR}/../src/python/test_sasmol/data"
   )
   add_test(NAME properties COMMAND test_properties)
+
+  add_executable(test_view tests/test_view.cpp)
+  target_link_libraries(test_view PRIVATE sasmol_standalone)
+  add_test(NAME view COMMAND test_view)
 
   add_executable(test_selection tests/test_selection.cpp)
   target_link_libraries(test_selection PRIVATE sasmol_standalone)

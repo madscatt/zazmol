@@ -40,7 +40,7 @@ Status labels:
 | `multiprocessing_sasmol.Multiprocessing_SasMol` | no core C++ parity tests | none | `intentional difference` | low | Experimental Python orchestration helper; no C++ port planned. |
 | Python property tables: AMU, VDW, scattering lengths, amino-acid SLD | `test_properties/*` | `sasmol/properties.hpp` | `implemented` | medium | C++ table accessors are fixture-checked against Python oracle data. |
 | `charmm_topology.CharmmTopology.charmm_names` | `test_properties/test_unit_properties_Atomic_charmm_names.py` | `sasmol/topology.hpp` | `implemented` | medium | Pure CHARMM atom-name classification table fixture-checked against Python data. |
-| VMD/view helpers | `test_system/*send_coordinates_to_vmd*` | optional adapter | `intentional difference` | medium | External socket/viewer integration stays outside portable core unless a separate adapter is requested. |
+| VMD/view helpers | `test_system/*send_coordinates_to_vmd*` | `sasmol/view.hpp` | `implemented` | medium | Python-style coordinate extraction is portable; legacy IMD/VMD C sender is optional behind `SASMOL_ENABLE_VMD_ADAPTER`. |
 
 ## Recommended Port Order
 
@@ -54,10 +54,10 @@ Useful optional follow-ups:
   Add only named grammar features with Python/C++ parity tests. Do not recreate
   Python `eval`.
 
-- VMD/view adapter
+- VMD/view runtime smoke test
 
-  Keep portable core independent of VMD. If added, expose a small adapter API
-  around coordinate buffers and clear validation errors.
+  Optional only: test with a real VMD IMD listener when a local workflow needs
+  it. Normal tests intentionally use a mock sender.
 
 - unusual fixture hardening
 
