@@ -42,6 +42,14 @@ std::string selection_error(const std::string& message) {
   return "selection parse failed: " + message;
 }
 
+std::string lower_ascii(std::string value) {
+  for (auto& character : value) {
+    character = static_cast<char>(
+        std::tolower(static_cast<unsigned char>(character)));
+  }
+  return value;
+}
+
 bool is_identifier_start(char value) {
   return std::isalpha(static_cast<unsigned char>(value)) || value == '_';
 }
@@ -435,10 +443,11 @@ SelectionResult indices_by_resid_range(const Molecule& molecule, int first_resid
 }
 
 std::optional<std::string> basis_expression(const std::string& basis_name) {
-  if (basis_name == "all") {
+  const auto normalized = lower_ascii(basis_name);
+  if (normalized == "all") {
     return "not name[i] == None";
   }
-  if (basis_name == "heavy") {
+  if (normalized == "heavy") {
     return "not name[i][0] == \"H\"";
   }
   return std::nullopt;

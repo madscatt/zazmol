@@ -64,6 +64,16 @@ void test_named_basis_expression_all_and_heavy() {
   assert(*heavy == "not name[i][0] == \"H\"");
 }
 
+void test_named_basis_expression_matches_python_case_normalization() {
+  const auto all = sasmol::basis_expression("ALL");
+  assert(all);
+  assert(*all == "not name[i] == None");
+
+  const auto heavy = sasmol::basis_expression("Heavy");
+  assert(heavy);
+  assert(*heavy == "not name[i][0] == \"H\"");
+}
+
 void test_select_named_basis_all() {
   const auto mol = read_fixture("2AAD.pdb");
 
@@ -239,6 +249,7 @@ int main() {
   test_explicit_helpers();
   test_select_all_keyword();
   test_named_basis_expression_all_and_heavy();
+  test_named_basis_expression_matches_python_case_normalization();
   test_select_named_basis_all();
   test_select_named_basis_heavy();
   test_mask_from_indices();

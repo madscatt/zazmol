@@ -37,6 +37,7 @@ Implemented named basis helpers:
 
 - `basis_expression("all")` -> `not name[i] == None`
 - `basis_expression("heavy")` -> `not name[i][0] == "H"`
+- named basis lookup matches Python's case normalization
 - `select_named_basis(molecule, basis_name)`
 
 Implemented selection-to-mask bridge helpers:
