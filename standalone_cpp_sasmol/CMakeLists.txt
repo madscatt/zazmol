@@ -112,6 +112,12 @@ if(BUILD_TESTING)
   target_link_libraries(test_biomt_fixture_semantics PRIVATE sasmol_standalone)
   add_test(NAME biomt_fixture_semantics COMMAND test_biomt_fixture_semantics)
 
+  add_executable(test_biomt_metadata_fixture_semantics
+    tests/test_biomt_metadata_fixture_semantics.cpp)
+  target_link_libraries(test_biomt_metadata_fixture_semantics PRIVATE sasmol_standalone)
+  add_test(NAME biomt_metadata_fixture_semantics
+    COMMAND test_biomt_metadata_fixture_semantics)
+
   add_executable(test_dcd_reader tests/test_dcd_reader.cpp)
   target_link_libraries(test_dcd_reader PRIVATE sasmol_standalone)
   target_compile_definitions(test_dcd_reader PRIVATE
