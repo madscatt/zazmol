@@ -93,10 +93,10 @@ Write fixtures:
 | `pdb_common/1CRN.pdb` | protein write |
 | optional-field synthetic tests | default blank behavior and fill behavior |
 
-## Proposed First C++ Slice
+## Completed C++ Coverage
 
-Do not implement the whole PDB parser at once. Start with a strict contract
-surface and helper tests:
+The first PDB parity surface is implemented and covered by fixture/generated
+tests:
 
 1. Add C++ helper functions for fixed-column slicing and numeric parsing that
    return `IoStatus`/small result types instead of throwing or exiting.
@@ -139,3 +139,32 @@ Completed Python cross-reader validation for generated C++ PDB outputs:
 3. Recorded the result in `pdb_python_validation.md`.
 4. Kept this separate from normal CTest so Python is not an unconditional C++
    build dependency.
+
+## Current Hardening Inventory (May 5, 2026)
+
+The PDB surface is in a useful state. It already covers the core fixed-column
+reader/writer behavior, multi-frame frame-boundary handling, selected/all-frame
+writes, generated malformed input cases, element resolution fixtures,
+`pdbscan`-mode `CONECT` parsing, passive BIOMT metadata capture, and Python
+cross-reader validation for generated C++ outputs.
+
+The next PDB work should be hardening, not broadening. Do not add a new parser
+mode, topology inference, BIOMT transform behavior, or stricter PDB schema.
+
+Recommended next implementation slice:
+
+1. Make `PdbReader::read_pdb` failure-atomic.
+   Parse into a temporary `Molecule`, including coordinates, descriptors,
+   `CONECT`, all-zero guard, and BIOMT metadata. Assign to the caller's molecule
+   only after the whole read succeeds.
+2. Add a generated malformed PDB test proving an existing destination molecule is
+   unchanged after a mid-parse format error.
+3. Add a generated missing-optional-field read test to lock ordinary mode
+   defaults versus `pdbscan` literal preservation.
+4. Run normal and ASAN C++ tests.
+
+Suggested stop point:
+
+- Stop after read-failure atomicity and the two generated read-side hardening
+  tests. Leave new PDB syntax support, CHARMM/topology behavior, and Python
+  cross-reader expansion for separate decisions.
