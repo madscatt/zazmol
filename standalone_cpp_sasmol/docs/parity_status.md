@@ -32,9 +32,12 @@ behavior oracle.
   copy/duplicate/merge, dihedral subset masks, descriptor get/set, extension
   descriptors, and structured failure returns.
 - Overlap coverage for coordinate-vector and molecule-frame overlap checks.
-- Topology support for explicit CHARMM type assignment from already-trusted
-  atom-aligned type vectors or atom-name/type tables, with no PDB-name
-  inference and no partial mutation on validation failure.
+- Topology support for explicit CHARMM type/charge assignment from
+  already-trusted atom-aligned vectors or atom-name tables; Python-parity
+  CHARMM topology parsing for reviewed record types; pure residue atom-list,
+  patch, atom-order choice, residue reorder, whole-molecule reorder planning,
+  reordered-copy, and explicit in-place reorder helpers; no PDB-name inference
+  and no partial mutation on validation failure.
 - Normal and sanitizer C++ test runs are part of the checkpoint rhythm.
 
 ## Intentional Boundaries
@@ -47,8 +50,9 @@ behavior oracle.
 - `rotate_general_axis` preserves legacy Python behavior for non-unit axes; only
   unit-axis use is treated as a true rigid rotation.
 - PDB reading does not infer CHARMM atom types.
-- CHARMM topology parsing, patching, atom completeness checks, and atom
-  reordering remain separate design work.
+- CHARMM topology support is still a minimal parity port, not a full topology
+  engine. It preserves Python's current behavior and known limits, including
+  atom-only patching and no automatic PDB-read typing or reordering.
 - Python-style selected BIOMT `apply_biomt` / `copy_apply_biomt` parity remains
   deferred. Passive BIOMT metadata preservation and optional coordinate-only
   assembly helpers are already present.
@@ -63,8 +67,16 @@ behavior oracle.
 
 ## Recommended Next Slice
 
-Selection/subset documentation cleanup is complete. The remaining work in this
-area is feature work, not cleanup:
+The minimal CHARMM topology parity path is now present, but it should stay
+guarded:
+
+- update user-facing parity notes after each topology slice
+- validate any new parser behavior against Python oracle fixtures first
+- keep topology mutation behind explicit APIs
+- do not expand to CHARMM36 by guessing; open a tracked design issue for the
+  Python and C++ trees together
+
+Other feature work remains intentionally deferred:
 
 - Do not expand BIOMT further unless a real caller needs Python-style selected
   `apply_biomt` parity.
@@ -72,6 +84,3 @@ area is feature work, not cleanup:
   a documented grammar extension.
 - Contextual named selections such as `backbone` or `calpha` should remain
   deferred unless Python and C++ SasMol add the same reviewed behavior.
-
-The next implementation-heavy step should not be a CHARMM parser or arbitrary
-selection evaluator without a separate plan.

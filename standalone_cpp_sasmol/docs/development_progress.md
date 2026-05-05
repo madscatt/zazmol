@@ -17,7 +17,7 @@ That future expansion must keep the current failure contract:
 - the parser must stop rather than guessing
 - arbitrary Python-style `eval` behavior must not become the default C++ path
 
-## CHARMM Type Assignment
+## CHARMM Topology And Type Assignment
 
 `Molecule::charmm_type()` is a first-class descriptor, but it must not be
 auto-guessed from ordinary PDB input. Many user-supplied PDB files do not follow
@@ -25,19 +25,35 @@ CHARMM atom naming closely enough for automatic assignment to be safe. A wrong
 force-field type can be worse than a missing one because downstream calculations
 may treat it as authoritative.
 
-Future CHARMM typing should therefore be explicit:
+CHARMM typing should therefore stay explicit:
 
 - PDB read leaves `charmm_type()` empty
-- topology/CHARMM workflows may populate it after they have a real topology
-  source
+- topology/CHARMM workflows may populate it only after they have a real topology
+  source or caller-provided atom table
 - SASSIE currently assigns CHARMM types from a PSF atom table, then uses those
   atom-aligned values for torsion parameter matching
-- a future C++ helper can mirror that PSF/caller-table workflow by validating
-  atom names and refusing partial mutation on mismatch
+- the C++ helper mirrors that PSF/caller-table workflow by validating atom names
+  and refusing partial mutation on mismatch
 - helper APIs should report unmatched or ambiguous atoms instead of guessing
-- a full topology parser is a separate subsystem, not a hidden PDB-read feature
+
+The standalone C++ topology port now includes the minimal Python-parity path:
+
+- reviewed CHARMM topology record parsing with Python oracle fixtures
+- residue atom-list construction
+- atom-only residue patch application
+- residue atom order choice, including Python's terminal patch, CYS/DISU, and
+  HIS variant behavior
+- pure residue and whole-molecule reorder planning
+- pure reordered molecule copy
+- explicit in-place reorder wrapper that swaps only after planning and copying
+  succeed
+
+This is still not a general topology engine. Python currently has important
+limits, and the C++ port should not silently improve them in ways that split the
+two trees. CHARMM36 support needs a joint Python/C++ design pass.
 
 The staged topology direction is captured in `docs/charmm_topology_plan.md`.
+The follow-up issue draft is captured in `docs/charmm36_issue_draft.md`.
 
 ## Moltype Assignment Reporting
 
