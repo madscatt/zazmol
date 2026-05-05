@@ -15,6 +15,96 @@ void assert_close(sasmol::calc_type actual, sasmol::calc_type expected) {
   assert(std::fabs(actual - expected) < 1.0e-12);
 }
 
+sasmol::Molecule fasta_test_molecule() {
+  sasmol::Molecule molecule(7, 1);
+  molecule.record() = {"ATOM", "ATOM", "ATOM", "ATOM", "ATOM", "ATOM",
+                       "HETATM"};
+  molecule.resname() = {"THR", "THR", "CYS", "CYS", "PRO", "ADE", "HOH"};
+  molecule.resid() = {1, 1, 2, 2, 3, 4, 5};
+  molecule.chain() = {"A", "A", "A", "A", "B", "B", "W"};
+  molecule.segname() = {"SEG1", "SEG1", "SEG1", "SEG1", "SEG2", "SEG2",
+                        "WAT"};
+  return molecule;
+}
+
+void test_create_fasta_default_sequence_and_in_place_string() {
+  auto molecule = fasta_test_molecule();
+
+  const auto result = sasmol::create_fasta(molecule);
+
+  assert(result.ok());
+  assert((result.sequence == std::vector<std::string>{"T", "C", "P", "A",
+                                                      "X"}));
+  assert(result.formatted.empty());
+
+  const auto set_result = sasmol::create_fasta_in_place(molecule);
+  assert(set_result.ok());
+  assert(molecule.fasta() == "TCPAX");
+}
+
+void test_create_fasta_formatted_width_and_name() {
+  auto molecule = fasta_test_molecule();
+  sasmol::FastaOptions options;
+  options.fasta_format = true;
+  options.name = "demo";
+  options.width = 3;
+
+  const auto result = sasmol::create_fasta(molecule, options);
+
+  assert(result.ok());
+  assert(result.formatted == ">demo\nTCP\nAX\n");
+}
+
+void test_create_fasta_formatted_by_chain_and_segname() {
+  auto molecule = fasta_test_molecule();
+  sasmol::FastaOptions options;
+  options.fasta_format = true;
+  options.name = "demo";
+  options.split_mode = sasmol::FastaSplitMode::by_chain;
+
+  auto result = sasmol::create_fasta(molecule, options);
+
+  assert(result.ok());
+  assert(result.formatted.find(">demo chain:A\nTC\n") != std::string::npos);
+  assert(result.formatted.find(">demo chain:B\nPA\n") != std::string::npos);
+  assert(result.formatted.find(">demo chain:W\nX\n") != std::string::npos);
+
+  options.split_mode = sasmol::FastaSplitMode::by_segname;
+  result = sasmol::create_fasta(molecule, options);
+
+  assert(result.ok());
+  assert(result.formatted.find(">demo segname:SEG1\nTC\n") !=
+         std::string::npos);
+  assert(result.formatted.find(">demo segname:SEG2\nPA\n") !=
+         std::string::npos);
+  assert(result.formatted.find(">demo segname:WAT\nX\n") !=
+         std::string::npos);
+}
+
+void test_create_fasta_excludes_hetatm_when_requested() {
+  auto molecule = fasta_test_molecule();
+  sasmol::FastaOptions options;
+  options.fasta_format = true;
+  options.exclude_hetatm = true;
+
+  const auto result = sasmol::create_fasta(molecule, options);
+
+  assert(result.ok());
+  assert(result.sequence.back() == "X");
+  assert(result.formatted == ">\nTCPA\n");
+}
+
+void test_create_fasta_rejects_unknown_residue_without_mutation() {
+  auto molecule = fasta_test_molecule();
+  molecule.resname()[0] = "BOG";
+  molecule.fasta() = "old";
+
+  const auto result = sasmol::create_fasta_in_place(molecule);
+
+  assert(!result.ok());
+  assert(molecule.fasta() == "old");
+}
+
 void test_assign_charmm_types_sets_atom_aligned_values() {
   sasmol::Molecule mol(3, 1);
 
@@ -1269,6 +1359,11 @@ void test_parse_charmm_topology_reports_atom_before_residue_or_patch() {
 }  // namespace
 
 int main() {
+  test_create_fasta_default_sequence_and_in_place_string();
+  test_create_fasta_formatted_width_and_name();
+  test_create_fasta_formatted_by_chain_and_segname();
+  test_create_fasta_excludes_hetatm_when_requested();
+  test_create_fasta_rejects_unknown_residue_without_mutation();
   test_assign_charmm_types_sets_atom_aligned_values();
   test_assign_charmm_types_rejects_length_mismatch_without_mutation();
   test_assign_charmm_types_allows_empty_molecule_empty_types();

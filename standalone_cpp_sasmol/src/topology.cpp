@@ -7,6 +7,7 @@
 #include <iterator>
 #include <map>
 #include <sstream>
+#include <stdexcept>
 #include <utility>
 
 namespace sasmol {
@@ -25,6 +26,53 @@ std::vector<std::string> split_tokens(const std::string& line) {
     tokens.push_back(token);
   }
   return tokens;
+}
+
+const std::map<std::string, std::string>& fasta_residue_dictionary() {
+  static const std::map<std::string, std::string> residues{
+      {"ALA", "A"}, {"ARG", "R"}, {"ASP", "D"}, {"ASN", "N"},
+      {"CYS", "C"}, {"GLU", "E"}, {"GLN", "Q"}, {"GLY", "G"},
+      {"HSD", "H"}, {"HIS", "H"}, {"HSE", "H"}, {"HSP", "H"},
+      {"ILE", "I"}, {"LEU", "L"}, {"LYS", "K"}, {"MET", "M"},
+      {"PHE", "F"}, {"PRO", "P"}, {"SER", "S"}, {"THR", "T"},
+      {"TRP", "W"}, {"TYR", "Y"}, {"VAL", "V"}, {"GUA", "G"},
+      {"CYT", "C"}, {"ADE", "A"}, {"THY", "T"}, {"URA", "U"}};
+  return residues;
+}
+
+void require_atom_aligned_fasta_descriptor(const Molecule& molecule,
+                                           std::size_t actual,
+                                           const std::string& name,
+                                           std::vector<std::string>& errors) {
+  if (actual != molecule.natoms()) {
+    errors.push_back("create_fasta requires descriptor '" + name +
+                     "' length to match natoms");
+  }
+}
+
+std::string join_sequence(const std::vector<std::string>& sequence) {
+  std::string joined;
+  for (const auto& residue : sequence) {
+    joined += residue;
+  }
+  return joined;
+}
+
+std::string wrap_sequence(const std::string& sequence, std::size_t width) {
+  if (sequence.empty()) {
+    return "";
+  }
+  if (width == 0) {
+    throw std::invalid_argument("create_fasta width must be greater than zero");
+  }
+  std::string wrapped;
+  for (std::size_t offset = 0; offset < sequence.size(); offset += width) {
+    if (!wrapped.empty()) {
+      wrapped += '\n';
+    }
+    wrapped += sequence.substr(offset, width);
+  }
+  return wrapped;
 }
 
 bool is_charmm_atom_reference_token(const std::string& token) {
@@ -420,6 +468,140 @@ CharmmTopologyParseResult parse_charmm_topology_globals(
 CharmmTopologyParseResult parse_charmm_topology(
     const std::filesystem::path& filename) {
   return parse_charmm_topology_impl(filename, true);
+}
+
+FastaResult create_fasta(const Molecule& molecule, const FastaOptions& options) {
+  FastaResult result;
+  require_atom_aligned_fasta_descriptor(molecule, molecule.resname().size(),
+                                        "resname", result.errors);
+  require_atom_aligned_fasta_descriptor(molecule, molecule.record().size(),
+                                        "record", result.errors);
+  require_atom_aligned_fasta_descriptor(molecule, molecule.resid().size(),
+                                        "resid", result.errors);
+  require_atom_aligned_fasta_descriptor(molecule, molecule.chain().size(),
+                                        "chain", result.errors);
+  require_atom_aligned_fasta_descriptor(molecule, molecule.segname().size(),
+                                        "segname", result.errors);
+  if (options.width == 0) {
+    result.errors.push_back("create_fasta width must be greater than zero");
+  }
+  if (!result.ok()) {
+    return result;
+  }
+
+  const auto& residue_dictionary = fasta_residue_dictionary();
+  std::vector<std::string> one_letter_resname;
+  one_letter_resname.reserve(molecule.natoms());
+  for (std::size_t atom = 0; atom < molecule.natoms(); ++atom) {
+    const auto found = residue_dictionary.find(molecule.resname()[atom]);
+    if (found != residue_dictionary.end()) {
+      one_letter_resname.push_back(found->second);
+    } else if (molecule.record()[atom] == "HETATM") {
+      one_letter_resname.push_back("X");
+    } else {
+      result.errors.push_back("non standard resname: " +
+                              molecule.resname()[atom]);
+      return result;
+    }
+  }
+
+  std::vector<std::vector<std::string>> grouped_fasta;
+  std::vector<std::string> local_fasta;
+  std::vector<std::string> chain_names;
+  std::vector<std::string> segname_names;
+  bool first = true;
+  int last_resid = 0;
+  bool have_last_resid = false;
+  std::string last_chain;
+  std::string last_segname;
+
+  for (std::size_t atom = 0; atom < molecule.natoms(); ++atom) {
+    if (options.split_mode == FastaSplitMode::by_chain) {
+      const auto& chain = molecule.chain()[atom];
+      if (first || chain != last_chain) {
+        chain_names.push_back(chain);
+        if (first) {
+          first = false;
+        } else {
+          grouped_fasta.push_back(local_fasta);
+        }
+        last_chain = chain;
+        local_fasta.clear();
+      }
+    } else if (options.split_mode == FastaSplitMode::by_segname) {
+      const auto& segname = molecule.segname()[atom];
+      if (first || segname != last_segname) {
+        segname_names.push_back(segname);
+        if (first) {
+          first = false;
+        } else {
+          grouped_fasta.push_back(local_fasta);
+        }
+        last_segname = segname;
+        local_fasta.clear();
+      }
+    }
+
+    const auto resid = molecule.resid()[atom];
+    if (!have_last_resid || resid != last_resid) {
+      local_fasta.push_back(one_letter_resname[atom]);
+      result.sequence.push_back(one_letter_resname[atom]);
+      last_resid = resid;
+      have_last_resid = true;
+    }
+  }
+
+  grouped_fasta.push_back(local_fasta);
+  if (!options.fasta_format) {
+    return result;
+  }
+
+  const std::string header = options.name.empty() ? ">" : ">" + options.name;
+  std::string final_fasta;
+  for (std::size_t group = 0; group < grouped_fasta.size(); ++group) {
+    auto sequence = grouped_fasta[group];
+    if (options.exclude_hetatm) {
+      sequence.erase(std::remove(sequence.begin(), sequence.end(), "X"),
+                     sequence.end());
+    }
+
+    const auto joined_fasta = join_sequence(sequence);
+    const auto wrapped = wrap_sequence(joined_fasta, options.width);
+    const bool saveme = !wrapped.empty();
+
+    std::string formatted = header;
+    if (options.split_mode == FastaSplitMode::by_chain) {
+      formatted += options.name.empty() ? "chain:" : " chain:";
+      formatted += chain_names[group];
+    } else if (options.split_mode == FastaSplitMode::by_segname) {
+      formatted += options.name.empty() ? "segname:" : " segname:";
+      formatted += segname_names[group];
+    }
+    formatted += '\n';
+    formatted += wrapped;
+
+    if (saveme) {
+      final_fasta += formatted + '\n';
+    } else {
+      final_fasta += '\n';
+    }
+  }
+  result.formatted = final_fasta;
+  return result;
+}
+
+SubsetResult create_fasta_in_place(Molecule& molecule,
+                                   const FastaOptions& options) {
+  SubsetResult result;
+  const auto fasta = create_fasta(molecule, options);
+  if (!fasta.ok()) {
+    result.errors.insert(result.errors.end(), fasta.errors.begin(),
+                         fasta.errors.end());
+    return result;
+  }
+  molecule.fasta() =
+      options.fasta_format ? fasta.formatted : join_sequence(fasta.sequence);
+  return result;
 }
 
 bool compare_list_ignore_order(const std::vector<std::string>& first,

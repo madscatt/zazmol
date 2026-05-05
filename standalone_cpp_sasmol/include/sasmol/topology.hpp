@@ -179,6 +179,35 @@ struct CharmmReorderedMoleculeResult {
   [[nodiscard]] bool ok() const noexcept { return errors.empty(); }
 };
 
+enum class FastaSplitMode {
+  none,
+  by_chain,
+  by_segname,
+};
+
+struct FastaOptions {
+  bool fasta_format{false};
+  bool exclude_hetatm{false};
+  FastaSplitMode split_mode{FastaSplitMode::none};
+  std::string name;
+  std::size_t width{80};
+};
+
+struct FastaResult {
+  std::vector<std::string> sequence;
+  std::string formatted;
+  std::vector<std::string> errors;
+
+  [[nodiscard]] bool ok() const noexcept { return errors.empty(); }
+};
+
+[[nodiscard]] FastaResult create_fasta(const Molecule& molecule,
+                                       const FastaOptions& options = {});
+
+[[nodiscard]] SubsetResult create_fasta_in_place(
+    Molecule& molecule,
+    const FastaOptions& options = {});
+
 [[nodiscard]] SubsetResult assign_charmm_types(
     Molecule& molecule, const std::vector<std::string>& types);
 
