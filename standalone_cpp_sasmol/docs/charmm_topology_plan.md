@@ -49,6 +49,8 @@ Implemented:
   residue/patch names to ordered atom-name lists from parsed topology entries
 - `setup_cys_patch_atoms_simple(...)` as a pure helper for the Python `DISU`
   convention, removing `HG1` from the CYS atom list
+- `patch_charmm_residue_atoms(...)` as a pure helper for Python's atom-only
+  residue patch behavior, returning a patched topology entry and atom-name list
 - `parse_charmm_topology_globals(...)` for Python-matched `MASS`, `DECL`,
   `DEFA`, and `AUTO` records, preserving values as strings
 - `parse_charmm_topology(...)` for those global records plus Python-matched
@@ -197,10 +199,21 @@ than guessed.
    - avoids Python's hard failure on tiny topology fixtures without CYS by
      omitting `DISU` when no CYS atom list exists
 
+   Eleventh slice implemented:
+
+   - ports Python's `patch_charmm_residue_atoms` atom behavior as pure
+     `patch_charmm_residue_atoms(...)`
+   - applies `DELE ATOM` records from the patch to the residue atom list
+   - replaces same-named residue atoms before adding patch atoms
+   - preserves Python's patch placement policy: `NTER`, `GLYP`, and `PROP`
+     insert patch atoms at the front; `CTER` appends patch atoms
+   - still does not patch bonds, angles, or any other topology records, matching
+     Python's documented limitation
+
    Future slices should port Python `CharmmTopology` behavior as its own module:
 
-   - support reviewed residue patches such as `NTER`, `CTER`, `GLYP`, `PROP`,
-     and disulfide/HIS variants
+   - integrate reviewed residue patch selection such as `NTER`, `CTER`, `GLYP`,
+     `PROP`, and disulfide/HIS variants into an order-check workflow
    - validate missing, extra, duplicate, and ambiguous atoms
    - optionally reorder molecules only through an explicit API
 

@@ -128,6 +128,14 @@ struct CharmmResidueAtomListResult {
   [[nodiscard]] bool ok() const noexcept { return errors.empty(); }
 };
 
+struct CharmmPatchResult {
+  CharmmTopologyEntry patched_entry;
+  std::vector<std::string> atom_names;
+  std::vector<std::string> errors;
+
+  [[nodiscard]] bool ok() const noexcept { return errors.empty(); }
+};
+
 [[nodiscard]] SubsetResult assign_charmm_types(
     Molecule& molecule, const std::vector<std::string>& types);
 
@@ -154,6 +162,11 @@ struct CharmmResidueAtomListResult {
 
 [[nodiscard]] CharmmResidueAtomListResult setup_charmm_residue_atoms(
     const CharmmTopologyData& topology);
+
+[[nodiscard]] CharmmPatchResult patch_charmm_residue_atoms(
+    const CharmmTopologyData& topology,
+    const std::string& residue,
+    const std::string& patch);
 
 [[nodiscard]] CharmmTopologyParseResult parse_charmm_topology(
     const std::filesystem::path& filename);

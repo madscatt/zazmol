@@ -180,6 +180,16 @@ void append_duplicates(const std::map<std::string, int>& counts,
   }
 }
 
+const CharmmTopologyEntry* find_topology_entry(
+    const CharmmTopologyData& topology, const std::string& name) {
+  for (const auto& entry : topology.entries) {
+    if (entry.name == name) {
+      return &entry;
+    }
+  }
+  return nullptr;
+}
+
 CharmmTopologyParseResult parse_charmm_topology_impl(
     const std::filesystem::path& filename, bool include_entries) {
   CharmmTopologyParseResult result;
@@ -398,6 +408,69 @@ CharmmResidueAtomListResult setup_charmm_residue_atoms(
   const auto cys = result.residue_atoms.find("CYS");
   if (cys != result.residue_atoms.end()) {
     result.residue_atoms["DISU"] = setup_cys_patch_atoms_simple(cys->second);
+  }
+  return result;
+}
+
+CharmmPatchResult patch_charmm_residue_atoms(const CharmmTopologyData& topology,
+                                             const std::string& residue,
+                                             const std::string& patch) {
+  CharmmPatchResult result;
+  const auto* residue_entry = find_topology_entry(topology, residue);
+  if (residue_entry == nullptr) {
+    result.errors.push_back("Residue " + residue +
+                            " not found in the topology information list "
+                            "during patching!");
+    return result;
+  }
+  const auto* patch_entry = find_topology_entry(topology, patch);
+  if (patch_entry == nullptr) {
+    result.errors.push_back("Patch " + patch +
+                            " not found in the topology information list "
+                            "during patching!");
+    return result;
+  }
+
+  result.patched_entry = *residue_entry;
+  result.patched_entry.name = residue + "_" + patch;
+
+  for (const auto& atom_delete : patch_entry->deletes.atoms) {
+    for (auto atom = result.patched_entry.atoms.begin();
+         atom != result.patched_entry.atoms.end();) {
+      if (atom->name == atom_delete) {
+        atom = result.patched_entry.atoms.erase(atom);
+      } else {
+        ++atom;
+      }
+    }
+  }
+
+  std::size_t num_added = 0;
+  for (const auto& patch_atom : patch_entry->atoms) {
+    for (auto atom = result.patched_entry.atoms.begin();
+         atom != result.patched_entry.atoms.end();) {
+      if (atom->name == patch_atom.name) {
+        atom = result.patched_entry.atoms.erase(atom);
+      } else {
+        ++atom;
+      }
+    }
+
+    if (patch == "NTER" || patch == "GLYP" || patch == "PROP") {
+      const auto insert_at =
+          std::min(num_added, result.patched_entry.atoms.size());
+      result.patched_entry.atoms.insert(result.patched_entry.atoms.begin() +
+                                            static_cast<std::ptrdiff_t>(insert_at),
+                                        patch_atom);
+    } else if (patch == "CTER") {
+      result.patched_entry.atoms.push_back(patch_atom);
+    }
+    ++num_added;
+  }
+
+  result.atom_names.reserve(result.patched_entry.atoms.size());
+  for (const auto& atom : result.patched_entry.atoms) {
+    result.atom_names.push_back(atom.name);
   }
   return result;
 }
