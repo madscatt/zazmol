@@ -71,6 +71,13 @@ struct CharmmTopologyTripleRecord {
   std::string third;
 };
 
+struct CharmmTopologyQuadRecord {
+  std::string first;
+  std::string second;
+  std::string third;
+  std::string fourth;
+};
+
 struct CharmmTopologyEntry {
   CharmmTopologyEntryKind kind{};
   std::string name;
@@ -80,6 +87,9 @@ struct CharmmTopologyEntry {
   std::vector<CharmmTopologyPairRecord> doubles;
   std::vector<CharmmTopologyTripleRecord> angles;
   std::vector<CharmmTopologyTripleRecord> thetas;
+  std::vector<CharmmTopologyQuadRecord> dihedrals;
+  std::vector<CharmmTopologyQuadRecord> impropers;
+  std::vector<CharmmTopologyQuadRecord> cmaps;
 };
 
 struct CharmmTopologyData {

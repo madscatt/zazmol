@@ -78,6 +78,31 @@ void parse_triple_record(const std::vector<std::string>& tokens,
   }
 }
 
+void parse_quad_record(const std::vector<std::string>& tokens,
+                       const std::string& record_name,
+                       std::size_t line_number,
+                       std::vector<CharmmTopologyQuadRecord>& records,
+                       std::vector<std::string>& errors) {
+  std::size_t token = 1;
+  while (token + 3 < tokens.size() && !tokens[token].starts_with("!")) {
+    if (!is_charmm_atom_reference_token(tokens[token]) ||
+        !is_charmm_atom_reference_token(tokens[token + 1]) ||
+        !is_charmm_atom_reference_token(tokens[token + 2]) ||
+        !is_charmm_atom_reference_token(tokens[token + 3])) {
+      errors.push_back(line_context(line_number,
+                                    record_name + " record has invalid quad"));
+      return;
+    }
+    records.push_back({tokens[token], tokens[token + 1], tokens[token + 2],
+                       tokens[token + 3]});
+    token += 4;
+  }
+  if (token < tokens.size() && !tokens[token].starts_with("!")) {
+    errors.push_back(
+        line_context(line_number, record_name + " record has incomplete quad"));
+  }
+}
+
 std::map<std::string, int> count_atom_names(const std::vector<std::string>& names) {
   std::map<std::string, int> counts;
   for (const auto& name : names) {
@@ -172,7 +197,10 @@ CharmmTopologyParseResult parse_charmm_topology_impl(
            .bonds = {},
            .doubles = {},
            .angles = {},
-           .thetas = {}});
+           .thetas = {},
+           .dihedrals = {},
+           .impropers = {},
+           .cmaps = {}});
       current_entry = &result.topology.entries.back();
     } else if (include_entries && record == "ATOM") {
       if (current_entry == nullptr) {
@@ -209,6 +237,25 @@ CharmmTopologyParseResult parse_charmm_topology_impl(
                                                  : current_entry->thetas;
       parse_triple_record(tokens, record.starts_with("ANGL") ? "ANGL" : "THET",
                           line_number, records, result.errors);
+    } else if (include_entries && (record.starts_with("DIHE") ||
+                                   record.starts_with("IMPR") ||
+                                   record.starts_with("CMAP"))) {
+      if (current_entry == nullptr) {
+        result.errors.push_back(line_context(
+            line_number, record + " record appeared before RESI or PRES"));
+        continue;
+      }
+      auto* records = &current_entry->cmaps;
+      std::string record_name = "CMAP";
+      if (record.starts_with("DIHE")) {
+        records = &current_entry->dihedrals;
+        record_name = "DIHE";
+      } else if (record.starts_with("IMPR")) {
+        records = &current_entry->impropers;
+        record_name = "IMPR";
+      }
+      parse_quad_record(tokens, record_name, line_number, *records,
+                        result.errors);
     }
   }
 

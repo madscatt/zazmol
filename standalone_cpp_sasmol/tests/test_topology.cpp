@@ -361,6 +361,36 @@ void test_parse_charmm_topology_angle_triples_match_python_oracle_fixture() {
   assert(gly.thetas[0].third == "CA");
 }
 
+void test_parse_charmm_topology_quad_terms_match_python_oracle_fixture() {
+  const auto result = sasmol::parse_charmm_topology(
+      topology_fixture("minimal_resi_four_terms.rtf"));
+
+  assert(result.ok());
+  assert(result.topology.entries.size() == 1);
+
+  const auto& ala = result.topology.entries[0];
+  assert(ala.name == "ALA");
+  assert(ala.dihedrals.size() == 2);
+  assert(ala.dihedrals[0].first == "N");
+  assert(ala.dihedrals[0].second == "CA");
+  assert(ala.dihedrals[0].third == "C");
+  assert(ala.dihedrals[0].fourth == "O");
+  assert(ala.dihedrals[1].first == "N");
+  assert(ala.dihedrals[1].second == "CA");
+  assert(ala.dihedrals[1].third == "CB");
+  assert(ala.dihedrals[1].fourth == "C");
+  assert(ala.impropers.size() == 1);
+  assert(ala.impropers[0].first == "N");
+  assert(ala.impropers[0].second == "-C");
+  assert(ala.impropers[0].third == "CA");
+  assert(ala.impropers[0].fourth == "HN");
+  assert(ala.cmaps.size() == 1);
+  assert(ala.cmaps[0].first == "-C");
+  assert(ala.cmaps[0].second == "N");
+  assert(ala.cmaps[0].third == "CA");
+  assert(ala.cmaps[0].fourth == "C");
+}
+
 void test_parse_charmm_topology_bond_pairs_stop_at_inline_comment() {
   const auto path =
       std::filesystem::temp_directory_path() / "sasmol_bond_comment_topology.rtf";
@@ -398,6 +428,27 @@ void test_parse_charmm_topology_angle_triples_stop_at_inline_comment() {
   assert(result.topology.entries[0].angles[0].first == "N");
   assert(result.topology.entries[0].angles[0].second == "CA");
   assert(result.topology.entries[0].angles[0].third == "C");
+}
+
+void test_parse_charmm_topology_quad_terms_stop_at_inline_comment() {
+  const auto path =
+      std::filesystem::temp_directory_path() / "sasmol_quad_comment_topology.rtf";
+  {
+    std::ofstream output(path);
+    output << "RESI GLY 0.00\n";
+    output << "DIHE N CA C O ! N CA CB C ignored\n";
+  }
+
+  const auto result = sasmol::parse_charmm_topology(path);
+  std::filesystem::remove(path);
+
+  assert(result.ok());
+  assert(result.topology.entries.size() == 1);
+  assert(result.topology.entries[0].dihedrals.size() == 1);
+  assert(result.topology.entries[0].dihedrals[0].first == "N");
+  assert(result.topology.entries[0].dihedrals[0].second == "CA");
+  assert(result.topology.entries[0].dihedrals[0].third == "C");
+  assert(result.topology.entries[0].dihedrals[0].fourth == "O");
 }
 
 void test_parse_charmm_topology_reports_malformed_bond_pair() {
@@ -477,6 +528,46 @@ void test_parse_charmm_topology_reports_incomplete_angle_triple() {
   assert(result.topology.entries[0].thetas[0].third == "C");
 }
 
+void test_parse_charmm_topology_reports_malformed_quad_term() {
+  const auto path =
+      std::filesystem::temp_directory_path() / "sasmol_bad_quad_topology.rtf";
+  {
+    std::ofstream output(path);
+    output << "RESI GLY 0.00\n";
+    output << "IMPR N CA @ O\n";
+  }
+
+  const auto result = sasmol::parse_charmm_topology(path);
+  std::filesystem::remove(path);
+
+  assert(!result.ok());
+  assert(result.errors.size() == 1);
+  assert(result.topology.entries.size() == 1);
+  assert(result.topology.entries[0].impropers.empty());
+}
+
+void test_parse_charmm_topology_reports_incomplete_quad_term() {
+  const auto path =
+      std::filesystem::temp_directory_path() / "sasmol_incomplete_quad_topology.rtf";
+  {
+    std::ofstream output(path);
+    output << "RESI GLY 0.00\n";
+    output << "CMAP N CA C O CA\n";
+  }
+
+  const auto result = sasmol::parse_charmm_topology(path);
+  std::filesystem::remove(path);
+
+  assert(!result.ok());
+  assert(result.errors.size() == 1);
+  assert(result.topology.entries.size() == 1);
+  assert(result.topology.entries[0].cmaps.size() == 1);
+  assert(result.topology.entries[0].cmaps[0].first == "N");
+  assert(result.topology.entries[0].cmaps[0].second == "CA");
+  assert(result.topology.entries[0].cmaps[0].third == "C");
+  assert(result.topology.entries[0].cmaps[0].fourth == "O");
+}
+
 void test_parse_charmm_topology_reports_atom_before_residue_or_patch() {
   const auto path =
       std::filesystem::temp_directory_path() / "sasmol_bad_atom_topology.rtf";
@@ -518,12 +609,16 @@ int main() {
   test_parse_charmm_topology_patch_atoms_match_python_oracle_fixture();
   test_parse_charmm_topology_bond_pairs_match_python_oracle_fixture();
   test_parse_charmm_topology_angle_triples_match_python_oracle_fixture();
+  test_parse_charmm_topology_quad_terms_match_python_oracle_fixture();
   test_parse_charmm_topology_bond_pairs_stop_at_inline_comment();
   test_parse_charmm_topology_angle_triples_stop_at_inline_comment();
+  test_parse_charmm_topology_quad_terms_stop_at_inline_comment();
   test_parse_charmm_topology_reports_malformed_bond_pair();
   test_parse_charmm_topology_reports_incomplete_bond_pair();
   test_parse_charmm_topology_reports_malformed_angle_triple();
   test_parse_charmm_topology_reports_incomplete_angle_triple();
+  test_parse_charmm_topology_reports_malformed_quad_term();
+  test_parse_charmm_topology_reports_incomplete_quad_term();
   test_parse_charmm_topology_reports_atom_before_residue_or_patch();
   return 0;
 }
