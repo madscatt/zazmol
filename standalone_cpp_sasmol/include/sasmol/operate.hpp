@@ -2,6 +2,7 @@
 
 #include "sasmol/calculate.hpp"
 #include "sasmol/molecule.hpp"
+#include "sasmol/subset.hpp"
 
 #include <cstddef>
 #include <vector>
@@ -42,6 +43,8 @@ struct AlignmentPlan {
 
 void apply_translation(CoordinateView coordinates, CalcVec3 delta);
 void apply_rotation(CoordinateView coordinates, const Rotation& rotation);
+
+[[nodiscard]] SubsetResult set_average_vdw(Molecule& molecule);
 
 void translate(Molecule& molecule, std::size_t frame, CalcVec3 value,
                TranslationOptions options = {});

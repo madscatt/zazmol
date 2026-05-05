@@ -4,7 +4,9 @@
 #include <array>
 #include <cmath>
 #include <limits>
+#include <map>
 #include <stdexcept>
+#include <string>
 #include <utility>
 
 namespace sasmol {
@@ -44,6 +46,20 @@ CalcVec3 axis_vector(Axis axis) {
       return {0.0, 0.0, 1.0};
   }
   return {};
+}
+
+const std::map<std::string, calc_type>& legacy_average_vdw_radii() {
+  static const std::map<std::string, calc_type> radii{
+      {"H", 0.928619230769}, {"C", 2.00249333333},
+      {"N", 1.85},           {"O", 1.7392625},
+      {"F", 1.7},            {"Ne", 1.5300},
+      {"Na", 1.36375},       {"Mg", 1.18500},
+      {"P", 2.15},           {"S", 2.000000},
+      {"Cl", 2.27},          {"K", 1.76375},
+      {"Ca", 1.367},         {"Fe", 0.650000},
+      {"Zn", 1.09000},       {"Cs", 2.100},
+      {"D", 0.928619230769}, {"1H", 0.928619230769}};
+  return radii;
 }
 
 CalcVec3 matrix_column(const CalcMatrix3& matrix, std::size_t column) {
@@ -372,6 +388,25 @@ void apply_rotation(CoordinateView coordinates, const Rotation& rotation) {
       coordinates.set(atom, transform_row_vector(xyz, rotation.matrix));
     }
   }
+}
+
+SubsetResult set_average_vdw(Molecule& molecule) {
+  SubsetResult result;
+  if (molecule.element().size() != molecule.natoms()) {
+    result.errors.push_back(
+        "set_average_vdw requires descriptor 'element' length to match natoms");
+    return result;
+  }
+
+  const auto& radii = legacy_average_vdw_radii();
+  std::vector<calc_type> atom_vdw;
+  atom_vdw.reserve(molecule.natoms());
+  for (const auto& element : molecule.element()) {
+    const auto found = radii.find(element);
+    atom_vdw.push_back(found == radii.end() ? calc_type{} : found->second);
+  }
+  molecule.atom_vdw() = std::move(atom_vdw);
+  return result;
 }
 
 void translate(Molecule& molecule, std::size_t frame, CalcVec3 value,

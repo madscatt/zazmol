@@ -24,7 +24,7 @@ Status labels:
 | `calculate.Calculate` mass/formula/charge/COM/Rg/RMSD/minmax/PMI | `test_calculate/*` | `sasmol/calculate.hpp` | `implemented` | low | Add only fixture-backed edge hardening. |
 | `operate.Move` translate/center/rotate/PMI alignment | `test_operate/*` | `sasmol/operate.hpp` | `implemented` | low | Existing coverage is strong. |
 | `operate.Move.align(...)` legacy mode surface | `test_operate/*align*` | `sasmol/operate.hpp` | `partial` | high | Port only after mode-specific oracle review. |
-| `operate.set_average_vdw` | `test_operate/test_unit_operate_set_average_vdw.py` | descriptor/property helpers | `missing` | low-medium | Port as isolated helper after FASTA/renumber slices. |
+| `operate.set_average_vdw` | `test_operate/test_unit_operate_set_average_vdw.py` | `sasmol/operate.hpp` | `implemented` | low-medium | C++ stores the usable legacy radius column as scalar `atom_vdw()`. |
 | `subset.Mask` named basis, masks, indices, copy, duplicate, merge, descriptors | `test_subset/*` | `sasmol/selection.hpp`, `sasmol/subset.hpp` | `implemented` | medium | Keep expanding only through explicit grammar decisions. |
 | `subset.Mask.get_subset_mask` open Python eval behavior | `test_subset/*get_subset_mask*` | `sasmol/selection.hpp` | `intentional difference` | high | Survey real expressions before any grammar expansion. |
 | `subset.Mask.apply_biomt`, `copy_apply_biomt` | future dedicated fixtures | `sasmol/subset.hpp` | `deferred` | high | Keep separate from metadata and assembly helpers. |
@@ -42,27 +42,22 @@ Status labels:
 
 ## Recommended Port Order
 
-1. `operate.set_average_vdw`
-
-   Low to medium risk. This is isolated, but may require a focused property-table
-   expansion for VDW values.
-
-2. `topology.Topology.make_constraint_pdb`
+1. `topology.Topology.make_constraint_pdb`
 
    Medium risk. It combines selection, descriptor changes, and PDB writing, so a
    tiny Python oracle output should come first.
 
-3. `topology.Topology.make_backbone_pdb_from_fasta`
+2. `topology.Topology.make_backbone_pdb_from_fasta`
 
    Medium to high risk. This builds molecular structure from FASTA and should
    not be ported without dedicated fixtures for supported molecule types.
 
-4. Legacy `operate.Move.align(..., mode=...)` details
+3. Legacy `operate.Move.align(..., mode=...)` details
 
    High risk. Review mode-specific Python behavior before adding compatibility
    APIs.
 
-5. Python-style selected BIOMT `apply_biomt` / `copy_apply_biomt`
+4. Python-style selected BIOMT `apply_biomt` / `copy_apply_biomt`
 
    High risk. Keep separate from existing BIOMT metadata preservation and C++
    assembly helpers.

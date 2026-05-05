@@ -116,6 +116,43 @@ void assert_coordinates_unchanged(const sasmol::Molecule& molecule,
   }
 }
 
+void test_set_average_vdw_sets_legacy_radii() {
+  sasmol::Molecule mol(3, 1);
+  mol.element() = {"C", "N", "O"};
+
+  const auto result = sasmol::set_average_vdw(mol);
+
+  assert(result.ok());
+  assert(mol.atom_vdw().size() == 3);
+  assert_close_double(mol.atom_vdw()[0], 2.00249333333);
+  assert_close_double(mol.atom_vdw()[1], 1.85);
+  assert_close_double(mol.atom_vdw()[2], 1.7392625);
+}
+
+void test_set_average_vdw_preserves_length_for_unknown_elements() {
+  sasmol::Molecule mol(3, 1);
+  mol.element() = {"X", "C", "N"};
+
+  const auto result = sasmol::set_average_vdw(mol);
+
+  assert(result.ok());
+  assert(mol.atom_vdw().size() == 3);
+  assert_close_double(mol.atom_vdw()[0], 0.0);
+  assert_close_double(mol.atom_vdw()[1], 2.00249333333);
+  assert_close_double(mol.atom_vdw()[2], 1.85);
+}
+
+void test_set_average_vdw_rejects_element_mismatch_without_mutation() {
+  sasmol::Molecule mol(3, 1);
+  mol.element() = {"C", "N"};
+  mol.atom_vdw() = {1.0, 2.0, 3.0};
+
+  const auto result = sasmol::set_average_vdw(mol);
+
+  assert(!result.ok());
+  assert((mol.atom_vdw() == std::vector<sasmol::calc_type>{1.0, 2.0, 3.0}));
+}
+
 void test_translate_mutates_only_selected_frame() {
   sasmol::Molecule mol(1, 2);
   mol.set_coordinate(0, 0, {1.0F, 2.0F, 3.0F});
@@ -580,6 +617,9 @@ void test_align_rejects_bad_plan_index_without_mutation() {
 }  // namespace
 
 int main() {
+  test_set_average_vdw_sets_legacy_radii();
+  test_set_average_vdw_preserves_length_for_unknown_elements();
+  test_set_average_vdw_rejects_element_mismatch_without_mutation();
   test_translate_mutates_only_selected_frame();
   test_translated_returns_copy_without_mutating_source();
   test_center_moves_com_to_origin();
