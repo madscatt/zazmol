@@ -40,12 +40,13 @@ behavior oracle.
   including Python `None` entries represented as empty optionals.
 - Topology support for explicit CHARMM type/charge assignment from
   already-trusted atom-aligned vectors or atom-name tables; Python-parity
-  CHARMM topology parsing for reviewed record types; pure residue atom-list,
-  patch, atom-order choice, residue reorder, whole-molecule reorder planning,
-  reordered-copy, explicit in-place reorder helpers, and FASTA creation from
-  residue descriptors; Python-style index/resid renumbering; constraint
-  descriptor/PDB generation; FASTA backbone molecule/PDB generation; no
-  PDB-name inference and no partial mutation on validation failure.
+  CHARMM atom-name classification lists; Python-parity CHARMM topology parsing
+  for reviewed record types; pure residue atom-list, patch, atom-order choice,
+  residue reorder, whole-molecule reorder planning, reordered-copy, explicit
+  in-place reorder helpers, and FASTA creation from residue descriptors;
+  Python-style index/resid renumbering; constraint descriptor/PDB generation;
+  FASTA backbone molecule/PDB generation; no PDB-name inference and no partial
+  mutation on validation failure.
 - Normal and sanitizer C++ test runs are part of the checkpoint rhythm.
 
 ## Intentional Boundaries

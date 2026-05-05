@@ -23,6 +23,8 @@ struct CharmmTypeChargeAssignment {
   calc_type atom_charge{};
 };
 
+using CharmmNameTable = std::map<std::string, std::vector<std::string>>;
+
 struct CharmmAtomDefinition {
   std::string name;
   std::string charmm_type;
@@ -288,6 +290,8 @@ struct BackboneMoleculeResult {
 [[nodiscard]] SubsetResult assign_charmm_types_and_atom_charges_from_atom_table(
     Molecule& molecule,
     const std::vector<CharmmTypeChargeAssignment>& assignments);
+
+[[nodiscard]] const CharmmNameTable& charmm_names();
 
 [[nodiscard]] CharmmResidueValidation validate_charmm_residue_atoms(
     const std::vector<std::string>& molecule_atom_names,

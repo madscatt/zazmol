@@ -108,6 +108,7 @@ if(BUILD_TESTING)
   target_link_libraries(test_topology PRIVATE sasmol_standalone)
   target_compile_definitions(test_topology PRIVATE
     SASMOL_TOPOLOGY_TEST_DATA_DIR="${CMAKE_CURRENT_SOURCE_DIR}/tests/data/topology"
+    SASMOL_TEST_DATA_DIR="${CMAKE_CURRENT_SOURCE_DIR}/../src/python/test_sasmol/data"
   )
   add_test(NAME topology COMMAND test_topology)
 

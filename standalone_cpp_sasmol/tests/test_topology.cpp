@@ -2,10 +2,12 @@
 
 #include "sasmol/file_io.hpp"
 
+#include <algorithm>
 #include <cassert>
 #include <cmath>
 #include <filesystem>
 #include <fstream>
+#include <set>
 
 namespace {
 
@@ -13,8 +15,35 @@ std::filesystem::path topology_fixture(const char* filename) {
   return std::filesystem::path(SASMOL_TOPOLOGY_TEST_DATA_DIR) / filename;
 }
 
+std::filesystem::path property_fixture(const char* filename) {
+  return std::filesystem::path(SASMOL_TEST_DATA_DIR) / "sasmol" /
+         "properties" / filename;
+}
+
 void assert_close(sasmol::calc_type actual, sasmol::calc_type expected) {
   assert(std::fabs(actual - expected) < 1.0e-12);
+}
+
+std::vector<std::string> read_atom_name_lines(const char* filename) {
+  std::ifstream input(property_fixture(filename));
+  assert(input);
+
+  std::vector<std::string> names;
+  std::string line;
+  while (std::getline(input, line)) {
+    if (!line.empty()) {
+      names.push_back(line);
+    }
+  }
+  return names;
+}
+
+void assert_same_names_ignore_order(const std::vector<std::string>& first,
+                                    const std::vector<std::string>& second) {
+  assert(first.size() == second.size());
+  for (const auto& name : first) {
+    assert(std::find(second.begin(), second.end(), name) != second.end());
+  }
 }
 
 sasmol::Molecule fasta_test_molecule() {
@@ -506,6 +535,40 @@ sasmol::CharmmResidueDefinition glycine_definition() {
                     {"CA", "CT2", -0.02},
                     {"C", "C", 0.51},
                     {"O", "O", -0.51}}};
+}
+
+void test_charmm_names_match_python_fixture_lists() {
+  const auto& names = sasmol::charmm_names();
+  assert(names.size() == 7);
+  assert_same_names_ignore_order(names.at("hydrogen"),
+                                 read_atom_name_lines("Hatoms.txt"));
+  assert_same_names_ignore_order(names.at("carbon"),
+                                 read_atom_name_lines("Catoms.txt"));
+  assert_same_names_ignore_order(names.at("nitrogen"),
+                                 read_atom_name_lines("Natoms.txt"));
+  assert_same_names_ignore_order(names.at("oxygen"),
+                                 read_atom_name_lines("Oatoms.txt"));
+  assert_same_names_ignore_order(names.at("sulfur"),
+                                 read_atom_name_lines("Satoms.txt"));
+  assert_same_names_ignore_order(names.at("phosphorus"),
+                                 read_atom_name_lines("Patoms.txt"));
+  assert_same_names_ignore_order(names.at("other"),
+                                 read_atom_name_lines("Otheratoms.txt"));
+}
+
+void test_charmm_names_are_unique_across_categories() {
+  const auto& names = sasmol::charmm_names();
+  std::set<std::string> seen;
+  std::size_t total{};
+  for (const auto& [category, atom_names] : names) {
+    (void)category;
+    for (const auto& atom_name : atom_names) {
+      ++total;
+      const auto inserted = seen.insert(atom_name);
+      assert(inserted.second);
+    }
+  }
+  assert(seen.size() == total);
 }
 
 void test_validate_charmm_residue_atoms_accepts_exact_match_any_order() {
@@ -1645,6 +1708,8 @@ int main() {
   test_assign_charmm_types_and_atom_charges_from_atom_table();
   test_assign_charmm_types_and_atom_charges_rejects_name_mismatch();
   test_assign_charmm_types_and_atom_charges_rejects_length_mismatch();
+  test_charmm_names_match_python_fixture_lists();
+  test_charmm_names_are_unique_across_categories();
   test_validate_charmm_residue_atoms_accepts_exact_match_any_order();
   test_validate_charmm_residue_atoms_reports_missing_atom();
   test_validate_charmm_residue_atoms_reports_extra_atom();
