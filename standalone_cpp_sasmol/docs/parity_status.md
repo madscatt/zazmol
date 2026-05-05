@@ -68,8 +68,9 @@ behavior oracle.
   assembly helpers. PDB reading still does not apply transforms automatically.
 - VMD/view extension behavior remains deferred as an optional adapter rather
   than portable core behavior.
-- Fixed/free atom DCD variants, DCD unit-cell writing, and true random-access
-  DCD seeking remain unsupported unless fixtures and policy are added.
+- Fixed/free atom DCD variants and DCD unit-cell writing are deliberate
+  unsupported-status paths with tests. True random-access DCD seeking is not
+  exposed; single-frame access remains explicit reopen-and-scan behavior.
 - Python multiprocessing support is experimental orchestration code and is not
   planned for the standalone C++ core.
 - CHARMM36 support is tracked as separate joint Python/C++ design work, not as
@@ -81,13 +82,9 @@ behavior oracle.
 
 ## Recommended Next Slice
 
-Start with DCD variant policy and fixtures:
+Start with bounded selection grammar expansion from a real usage survey. Add
+only named grammar features with Python/C++ parity tests; do not recreate Python
+`eval`.
 
-- define exact status behavior for unsupported fixed/free atom files, unit-cell
-  records, and true random seek requests
-- add tiny generated fixtures before any broader reader/writer changes
-- keep sequential streaming as the default production path
-
-Then consider bounded selection grammar expansion from a real usage survey. VMD
-viewing should remain last and optional because it is an adapter boundary, not
-portable molecule behavior.
+After that, VMD viewing should remain last and optional because it is an adapter
+boundary, not portable molecule behavior.

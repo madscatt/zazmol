@@ -80,6 +80,23 @@ The standalone C++ API preserves that policy:
   unless a future implementation adds true indexed random access with separate
   tests and documentation.
 
+## Variant Policy Checkpoint
+
+The current standalone C++ DCD surface is intentionally narrower than the full
+legacy extension machinery:
+
+- fixed/free atom DCD files signaled by nonzero `NAMNF` return
+  `IoCode::unsupported` during header parsing before any coordinate corruption
+  is possible
+- CHARMm unit-cell blocks are recognized and skipped during reads for the
+  fixture-backed normal-coordinate path
+- DCD unit-cell writing returns `IoCode::unsupported`
+- true random seeking is not exposed; `read_single_dcd_step(...)` is explicit
+  reopen-and-scan behavior using one-based frame numbering
+
+These are not accidental gaps. They are the current policy until fixture-backed
+caller need justifies broader support.
+
 ## Minimum Fixture Parity
 
 Small required fixtures:

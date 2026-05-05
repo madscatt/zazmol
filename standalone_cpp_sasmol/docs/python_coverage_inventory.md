@@ -19,7 +19,7 @@ Status labels:
 | --- | --- | --- | --- | --- | --- |
 | `file_io.Files` PDB read/write | `test_file_io/*read_pdb*`, `*write_pdb*` | `sasmol/file_io.hpp` | `implemented` | low | Continue hardening only with fixtures. |
 | `file_io.Files` DCD open/read/step/close/write | `test_file_io/*dcd*` | `sasmol/file_io.hpp` | `implemented` | medium | Keep streaming APIs explicit for large trajectories. |
-| DCD fixed/free atoms, unit-cell writing, true random seek | DCD fixture notes | `sasmol/file_io.hpp` | `deferred` | high | Require policy and fixtures before coding. |
+| DCD fixed/free atoms, unit-cell writing, true random seek | DCD fixture notes, C++ guard tests | `sasmol/file_io.hpp` | `intentional difference` | high | Fixed/free variants and unit-cell writes fail with explicit `unsupported` status; true random seek is not exposed. Add fixtures only if policy changes. |
 | BIOMT metadata preservation | `test_file_io/*biomt_metadata*` | `sasmol/file_io.hpp`, `sasmol/molecule.hpp` | `implemented` | low | Keep `read_pdb` passive. |
 | `calculate.Calculate` mass/formula/charge/COM/Rg/RMSD/minmax/PMI | `test_calculate/*` | `sasmol/calculate.hpp` | `implemented` | low | Add only fixture-backed edge hardening. |
 | `linear_algebra` helper functions | `test_linear_algebra/*` | `sasmol/linear_algebra.hpp` | `implemented` | medium | Includes legacy `find_u` and `cmp` helpers for alignment parity. |
@@ -46,18 +46,12 @@ Status labels:
 
 The remaining in-scope work needs explicit guardrails. Recommended order:
 
-1. DCD variant policy and fixtures
-
-   Decide exact behavior for fixed/free atom variants, unit-cell records, and
-   true random seeking before implementation. Generated fixtures only; unsupported
-   variants must fail with precise status.
-
-2. Bounded selection grammar expansion
+1. Bounded selection grammar expansion
 
    Survey real selection expressions first, then add only named grammar features
    with Python/C++ parity tests. Do not recreate Python `eval`.
 
-3. VMD/view optional adapter boundary
+2. VMD/view optional adapter boundary
 
    Keep portable core independent of VMD. If added, expose a small adapter API
    around coordinate buffers and clear validation errors.
