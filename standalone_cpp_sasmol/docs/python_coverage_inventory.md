@@ -40,21 +40,29 @@ Status labels:
 | `multiprocessing_sasmol.Multiprocessing_SasMol` | no core C++ parity tests | none | `intentional difference` | low | Experimental Python orchestration helper; no C++ port planned. |
 | Python property tables: AMU, VDW, scattering lengths, amino-acid SLD | `test_properties/*` | `sasmol/properties.hpp` | `implemented` | medium | C++ table accessors are fixture-checked against Python oracle data. |
 | `charmm_topology.CharmmTopology.charmm_names` | `test_properties/test_unit_properties_Atomic_charmm_names.py` | `sasmol/topology.hpp` | `implemented` | medium | Pure CHARMM atom-name classification table fixture-checked against Python data. |
-| VMD/view helpers | `test_system/*send_coordinates_to_vmd*` | optional adapter | `deferred` | medium | Keep outside portable core. |
+| VMD/view helpers | `test_system/*send_coordinates_to_vmd*` | optional adapter | `intentional difference` | medium | External socket/viewer integration stays outside portable core unless a separate adapter is requested. |
 
 ## Recommended Port Order
 
-The remaining in-scope work needs explicit guardrails. Recommended order:
+No broad in-scope core module remains as an obvious next port target. Future
+work should be driven by a named caller need or fixture-backed parity gap.
 
-1. Bounded selection grammar expansion
+Useful optional follow-ups:
 
-   Survey real selection expressions first, then add only named grammar features
-   with Python/C++ parity tests. Do not recreate Python `eval`.
+- selection grammar expansion from a real usage survey
 
-2. VMD/view optional adapter boundary
+  Add only named grammar features with Python/C++ parity tests. Do not recreate
+  Python `eval`.
 
-   Keep portable core independent of VMD. If added, expose a small adapter API
-   around coordinate buffers and clear validation errors.
+- VMD/view adapter
+
+  Keep portable core independent of VMD. If added, expose a small adapter API
+  around coordinate buffers and clear validation errors.
+
+- unusual fixture hardening
+
+  Add only when a concrete PDB, DCD, topology, or selection fixture shows a
+  behavior gap.
 
 ## Policy-Gated Work
 
