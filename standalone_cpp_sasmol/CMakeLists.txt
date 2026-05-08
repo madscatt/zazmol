@@ -73,90 +73,90 @@ target_link_libraries(pdb_roundtrip_writer PRIVATE sasmol_standalone)
 include(CTest)
 
 if(BUILD_TESTING)
-  add_executable(test_molecule_core tests/test_molecule_core.cpp)
+  add_executable(test_molecule_core test_sasmol_cpp/test_molecule_core.cpp)
   target_link_libraries(test_molecule_core PRIVATE sasmol_standalone)
   add_test(NAME molecule_core COMMAND test_molecule_core)
 
-  add_executable(test_file_io_contract tests/test_file_io_contract.cpp)
+  add_executable(test_file_io_contract test_sasmol_cpp/test_file_io_contract.cpp)
   target_link_libraries(test_file_io_contract PRIVATE sasmol_standalone)
   target_compile_definitions(test_file_io_contract PRIVATE
     SASMOL_TEST_DATA_DIR="${CMAKE_CURRENT_SOURCE_DIR}/../src/python/test_sasmol/data"
   )
   add_test(NAME file_io_contract COMMAND test_file_io_contract)
 
-  add_executable(test_calculate tests/test_calculate.cpp)
+  add_executable(test_calculate test_sasmol_cpp/test_calculate.cpp)
   target_link_libraries(test_calculate PRIVATE sasmol_standalone)
   target_compile_definitions(test_calculate PRIVATE
     SASMOL_TEST_DATA_DIR="${CMAKE_CURRENT_SOURCE_DIR}/../src/python/test_sasmol/data"
   )
   add_test(NAME calculate COMMAND test_calculate)
 
-  add_executable(test_operate tests/test_operate.cpp)
+  add_executable(test_operate test_sasmol_cpp/test_operate.cpp)
   target_link_libraries(test_operate PRIVATE sasmol_standalone)
   target_compile_definitions(test_operate PRIVATE
     SASMOL_TEST_DATA_DIR="${CMAKE_CURRENT_SOURCE_DIR}/../src/python/test_sasmol/data"
   )
   add_test(NAME operate COMMAND test_operate)
 
-  add_executable(test_linear_algebra tests/test_linear_algebra.cpp)
+  add_executable(test_linear_algebra test_sasmol_cpp/test_linear_algebra.cpp)
   target_link_libraries(test_linear_algebra PRIVATE sasmol_standalone)
   add_test(NAME linear_algebra COMMAND test_linear_algebra)
 
-  add_executable(test_overlap tests/test_overlap.cpp)
+  add_executable(test_overlap test_sasmol_cpp/test_overlap.cpp)
   target_link_libraries(test_overlap PRIVATE sasmol_standalone)
   add_test(NAME overlap COMMAND test_overlap)
 
-  add_executable(test_properties tests/test_properties.cpp)
+  add_executable(test_properties test_sasmol_cpp/test_properties.cpp)
   target_link_libraries(test_properties PRIVATE sasmol_standalone)
   target_compile_definitions(test_properties PRIVATE
     SASMOL_TEST_DATA_DIR="${CMAKE_CURRENT_SOURCE_DIR}/../src/python/test_sasmol/data"
   )
   add_test(NAME properties COMMAND test_properties)
 
-  add_executable(test_view tests/test_view.cpp)
+  add_executable(test_view test_sasmol_cpp/test_view.cpp)
   target_link_libraries(test_view PRIVATE sasmol_standalone)
   add_test(NAME view COMMAND test_view)
 
-  add_executable(test_selection tests/test_selection.cpp)
+  add_executable(test_selection test_sasmol_cpp/test_selection.cpp)
   target_link_libraries(test_selection PRIVATE sasmol_standalone)
   target_compile_definitions(test_selection PRIVATE
     SASMOL_TEST_DATA_DIR="${CMAKE_CURRENT_SOURCE_DIR}/../src/python/test_sasmol/data"
   )
   add_test(NAME selection COMMAND test_selection)
 
-  add_executable(test_workflow_validation tests/test_workflow_validation.cpp)
+  add_executable(test_workflow_validation test_sasmol_cpp/test_workflow_validation.cpp)
   target_link_libraries(test_workflow_validation PRIVATE sasmol_standalone)
   target_compile_definitions(test_workflow_validation PRIVATE
     SASMOL_TEST_DATA_DIR="${CMAKE_CURRENT_SOURCE_DIR}/../src/python/test_sasmol/data"
   )
   add_test(NAME workflow_validation COMMAND test_workflow_validation)
 
-  add_executable(test_topology tests/test_topology.cpp)
+  add_executable(test_topology test_sasmol_cpp/test_topology.cpp)
   target_link_libraries(test_topology PRIVATE sasmol_standalone)
   target_compile_definitions(test_topology PRIVATE
-    SASMOL_TOPOLOGY_TEST_DATA_DIR="${CMAKE_CURRENT_SOURCE_DIR}/tests/data/topology"
+    SASMOL_TOPOLOGY_TEST_DATA_DIR="${CMAKE_CURRENT_SOURCE_DIR}/test_sasmol_cpp/data/topology"
     SASMOL_TEST_DATA_DIR="${CMAKE_CURRENT_SOURCE_DIR}/../src/python/test_sasmol/data"
   )
   add_test(NAME topology COMMAND test_topology)
 
-  add_executable(test_subset tests/test_subset.cpp)
+  add_executable(test_subset test_sasmol_cpp/test_subset.cpp)
   target_link_libraries(test_subset PRIVATE sasmol_standalone)
   target_compile_definitions(test_subset PRIVATE
     SASMOL_TEST_DATA_DIR="${CMAKE_CURRENT_SOURCE_DIR}/../src/python/test_sasmol/data"
   )
   add_test(NAME subset COMMAND test_subset)
 
-  add_executable(test_biomt_fixture_semantics tests/test_biomt_fixture_semantics.cpp)
+  add_executable(test_biomt_fixture_semantics test_sasmol_cpp/test_biomt_fixture_semantics.cpp)
   target_link_libraries(test_biomt_fixture_semantics PRIVATE sasmol_standalone)
   add_test(NAME biomt_fixture_semantics COMMAND test_biomt_fixture_semantics)
 
   add_executable(test_biomt_metadata_fixture_semantics
-    tests/test_biomt_metadata_fixture_semantics.cpp)
+    test_sasmol_cpp/test_biomt_metadata_fixture_semantics.cpp)
   target_link_libraries(test_biomt_metadata_fixture_semantics PRIVATE sasmol_standalone)
   add_test(NAME biomt_metadata_fixture_semantics
     COMMAND test_biomt_metadata_fixture_semantics)
 
-  add_executable(test_dcd_reader tests/test_dcd_reader.cpp)
+  add_executable(test_dcd_reader test_sasmol_cpp/test_dcd_reader.cpp)
   target_link_libraries(test_dcd_reader PRIVATE sasmol_standalone)
   target_compile_definitions(test_dcd_reader PRIVATE
     SASMOL_TEST_DATA_DIR="${CMAKE_CURRENT_SOURCE_DIR}/../src/python/test_sasmol/data"
@@ -164,7 +164,7 @@ if(BUILD_TESTING)
   )
   add_test(NAME dcd_reader COMMAND test_dcd_reader)
 
-  add_executable(test_pdb_helpers tests/test_pdb_helpers.cpp)
+  add_executable(test_pdb_helpers test_sasmol_cpp/test_pdb_helpers.cpp)
   target_link_libraries(test_pdb_helpers PRIVATE sasmol_standalone)
   target_compile_definitions(test_pdb_helpers PRIVATE
     SASMOL_TEST_DATA_DIR="${CMAKE_CURRENT_SOURCE_DIR}/../src/python/test_sasmol/data"

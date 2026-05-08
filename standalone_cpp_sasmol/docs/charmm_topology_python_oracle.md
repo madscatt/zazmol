@@ -10,7 +10,7 @@ to JSON with:
 ```bash
 /Users/curtisj/anaconda3/bin/python \
   standalone_cpp_sasmol/tools/validate_charmm_topology_with_python.py \
-  standalone_cpp_sasmol/tests/data/topology/minimal_resi_atoms.rtf
+  standalone_cpp_sasmol/test_sasmol_cpp/data/topology/minimal_resi_atoms.rtf
 ```
 
 The tool deliberately preserves Python's parsed shape:

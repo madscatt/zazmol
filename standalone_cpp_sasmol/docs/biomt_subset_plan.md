@@ -180,7 +180,7 @@ Notes:
 
 ## Test Scaffolding In This Step
 
-`tests/test_biomt_fixture_semantics.cpp` added generated fixture-style checks for:
+`test_sasmol_cpp/test_biomt_fixture_semantics.cpp` added generated fixture-style checks for:
 
 - deterministic transform-order behavior
 - explicit frame targeting
@@ -189,7 +189,7 @@ Notes:
 These tests lock fixture semantics and expected transformed coordinates for
 optional assembly helper behavior.
 
-`tests/test_biomt_metadata_fixture_semantics.cpp` added generated fixture-style
+`test_sasmol_cpp/test_biomt_metadata_fixture_semantics.cpp` added generated fixture-style
 checks for:
 
 - empty metadata when no BIOMT header lines are present
