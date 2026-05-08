@@ -324,7 +324,8 @@ class Topology(charmm_topology.CharmmTopology):
         Protein PDB files are written with one "CA" atom per residue
         Nucleic acid PDF files are written with on "O5'" atom per residue
 
-        N-terminal patches for proteins (GLYP, PROP) are accommodated
+        Protein PDB residue names are written as standard residue names; terminal
+        patch names such as GLYP and PROP belong in topology/psfgen contexts.
 
         All coordinate values are set to 0.000 
 
@@ -339,22 +340,14 @@ class Topology(charmm_topology.CharmmTopology):
             sequence_name = "O5'"
 
         sequence = []
-        first_flag = True
 
         for residue in self._fasta:
 
             if moltype == "protein":
-                if residue == 'G' and first_flag:
-                    sequence.append('GLYP')
-                elif residue == 'P' and first_flag:
-                    sequence.append('PROP')
-                else:
-                    sequence.append(residue_dictionary[residue])
+                sequence.append(residue_dictionary[residue])
 
             elif moltype == "nucleic":
                 sequence.append(residue_dictionary[residue])
-
-            first_flag = False
 
         import sasmol.system as system
 

@@ -816,21 +816,13 @@ BackboneMoleculeResult make_backbone_molecule_from_fasta(
 
   std::vector<std::string> residue_names;
   residue_names.reserve(fasta_sequence.size());
-  bool first = true;
   for (const auto& residue : fasta_sequence) {
-    if (moltype == BackboneMoltype::protein && first && residue == "G") {
-      residue_names.push_back("GLYP");
-    } else if (moltype == BackboneMoltype::protein && first && residue == "P") {
-      residue_names.push_back("PROP");
-    } else {
-      const auto found = residue_dictionary.find(residue);
-      if (found == residue_dictionary.end()) {
-        result.errors.push_back("unsupported FASTA residue '" + residue + "'");
-        return result;
-      }
-      residue_names.push_back(found->second);
+    const auto found = residue_dictionary.find(residue);
+    if (found == residue_dictionary.end()) {
+      result.errors.push_back("unsupported FASTA residue '" + residue + "'");
+      return result;
     }
-    first = false;
+    residue_names.push_back(found->second);
   }
 
   result.molecule.resize(fasta_sequence.size(), 1);

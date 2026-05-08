@@ -223,7 +223,7 @@ class Test_intg_topology_Topology(unittest.TestCase):
         self.assertEqual(backbone.natoms(), len(molecule.fasta()))
         self.assertEqual(backbone.name()[0], "O5'")
 
-    def test_make_backbone_pdb_from_fasta_uses_n_terminal_glycine_patch(self):
+    def test_make_backbone_pdb_from_fasta_uses_standard_n_terminal_glycine(self):
         molecule = system.Molecule(0)
         molecule.setFasta(['G', 'A'])
         outfile = self.make_temp_pdb()
@@ -233,10 +233,10 @@ class Test_intg_topology_Topology(unittest.TestCase):
         backbone = system.Molecule(0)
         backbone.read_pdb(outfile)
 
-        self.assertEqual(backbone.resname()[0], 'GLYP')
+        self.assertEqual(backbone.resname()[0], 'GLY')
         self.assertEqual(backbone.resname()[1], 'ALA')
 
-    def test_make_backbone_pdb_from_fasta_uses_n_terminal_proline_patch(self):
+    def test_make_backbone_pdb_from_fasta_uses_standard_n_terminal_proline(self):
         molecule = system.Molecule(0)
         molecule.setFasta(['P', 'A'])
         outfile = self.make_temp_pdb()
@@ -246,7 +246,7 @@ class Test_intg_topology_Topology(unittest.TestCase):
         backbone = system.Molecule(0)
         backbone.read_pdb(outfile)
 
-        self.assertEqual(backbone.resname()[0], 'PROP')
+        self.assertEqual(backbone.resname()[0], 'PRO')
         self.assertEqual(backbone.resname()[1], 'ALA')
 
     def test_create_fasta_default(self):
