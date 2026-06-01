@@ -323,8 +323,6 @@ class PDB(object):
         '''
 
         pdb_id_mode = kwargs.get('pdb_id_mode', 'standard')
-        if kwargs.get('allow_vmd_hex_ids', False):
-            pdb_id_mode = kwargs.get('pdb_id_mode', 'vmd_hex')
         ambiguous_vmd_hex = kwargs.get('ambiguous_vmd_hex', 'error')
 
         return pdb_id_mode, ambiguous_vmd_hex
