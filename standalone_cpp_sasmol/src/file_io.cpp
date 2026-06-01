@@ -229,6 +229,88 @@ bool parse_int_field(const std::string& text, int& value) {
   }
 }
 
+struct PdbIdParseResult {
+  IoStatus status;
+  int value{};
+};
+
+bool is_hex_field(const std::string& text) {
+  return !text.empty() &&
+         std::all_of(text.begin(), text.end(), [](const char character) {
+           return std::isxdigit(static_cast<unsigned char>(character)) != 0;
+         });
+}
+
+bool has_hex_letter(const std::string& text) {
+  return std::any_of(text.begin(), text.end(), [](const char character) {
+    return (character >= 'a' && character <= 'f') ||
+           (character >= 'A' && character <= 'F');
+  });
+}
+
+PdbIdParseResult parse_pdb_id_field(
+    const std::string& text, const PdbReadOptions& options,
+    int overflow_threshold, const std::string& label,
+    const std::optional<int>& ordinal = std::nullopt,
+    const std::optional<int>& previous_value = std::nullopt) {
+  int decimal_value{};
+  if (options.pdb_id_mode == PdbIdMode::standard) {
+    if (parse_int_field(text, decimal_value)) {
+      return {IoStatus::success(), decimal_value};
+    }
+    return {{IoCode::format_error, "Failed to parse PDB " + label + "."}, 0};
+  }
+
+  const auto trimmed = trim_copy(text);
+  if (!is_hex_field(trimmed)) {
+    return {{IoCode::format_error, "Failed to parse VMD hex PDB " + label + "."},
+            0};
+  }
+
+  int hex_value{};
+  try {
+    std::size_t parsed{};
+    hex_value = std::stoi(trimmed, &parsed, 16);
+    if (parsed != trimmed.size()) {
+      return {{IoCode::format_error,
+               "Failed to parse VMD hex PDB " + label + "."},
+              0};
+    }
+  } catch (...) {
+    return {{IoCode::format_error, "Failed to parse VMD hex PDB " + label + "."},
+            0};
+  }
+
+  if (has_hex_letter(trimmed)) {
+    return {IoStatus::success(), hex_value};
+  }
+  if (!parse_int_field(text, decimal_value)) {
+    return {{IoCode::format_error, "Failed to parse PDB " + label + "."}, 0};
+  }
+  if (hex_value <= overflow_threshold ||
+      decimal_value == overflow_threshold) {
+    return {IoStatus::success(), decimal_value};
+  }
+  if (previous_value.has_value()) {
+    if (*previous_value >= overflow_threshold) {
+      return {IoStatus::success(), hex_value};
+    }
+    if (decimal_value >= *previous_value) {
+      return {IoStatus::success(), decimal_value};
+    }
+  }
+  if (ordinal.has_value() && *ordinal > overflow_threshold) {
+    return {IoStatus::success(), hex_value};
+  }
+  if (options.ambiguous_vmd_hex == VmdHexAmbiguity::hex) {
+    return {IoStatus::success(), hex_value};
+  }
+
+  return {{IoCode::format_error,
+           "Ambiguous numeric VMD hex PDB " + label + "."},
+          0};
+}
+
 bool parse_coord_field(const std::string& text, coord_type& value) {
   const auto trimmed = trim_copy(text);
   if (trimmed.empty()) {
@@ -326,15 +408,27 @@ bool all_equal(const std::vector<std::size_t>& values) {
   return true;
 }
 
-std::vector<int> parse_conect_line(const std::string& line) {
+struct ConectParseResult {
+  IoStatus status;
+  std::vector<int> indices;
+};
+
+ConectParseResult parse_conect_line(const std::string& line,
+                                    const PdbReadOptions& options) {
   std::vector<int> indices;
   for (std::size_t start = 6; start < line.size(); start += 5) {
-    int value{};
-    if (parse_int_field(fixed_slice(line, start, 5), value)) {
-      indices.push_back(value);
+    const auto field = fixed_slice(line, start, 5);
+    if (trim_copy(field).empty()) {
+      continue;
     }
+    auto parsed =
+        parse_pdb_id_field(field, options, 99999, "CONECT atom serial");
+    if (!parsed.status) {
+      return {parsed.status, {}};
+    }
+    indices.push_back(parsed.value);
   }
-  return indices;
+  return {IoStatus::success(), indices};
 }
 
 std::vector<std::string> split_csv_tokens(const std::string& text) {
@@ -562,7 +656,11 @@ IoStatus PdbReader::read_pdb(const std::filesystem::path& filename,
     if (!is_pdb_coordinate_record(record)) {
       header_lines.push_back(line);
       if (record == "CONECT" && options.pdbscan) {
-        const auto indices = parse_conect_line(line);
+        const auto conect = parse_conect_line(line, options);
+        if (!conect.status) {
+          return conect.status;
+        }
+        const auto& indices = conect.indices;
         if (indices.size() > 1) {
           const int base = indices.front();
           for (std::size_t atom = 0; atom < parsed_molecule.natoms(); ++atom) {
@@ -581,7 +679,13 @@ IoStatus PdbReader::read_pdb(const std::filesystem::path& filename,
     }
 
     PdbAtomRecord atom;
-    status = parse_pdb_atom_record(line, atom, options);
+    auto record_options = options;
+    record_options.atom_ordinal_context = static_cast<int>(atom_index + 1);
+    if (frame_index == 0 && atom_index > 0) {
+      record_options.previous_resid_context =
+          parsed_molecule.resid()[atom_index - 1];
+    }
+    status = parse_pdb_atom_record(line, atom, record_options);
     if (!status) {
       return status;
     }
@@ -739,17 +843,25 @@ IoStatus PdbReader::parse_pdb_atom_record(
 
   PdbAtomRecord parsed;
   parsed.record = record_name;
-  if (!parse_int_field(fixed_slice(line, 6, 5), parsed.original_index)) {
-    return {IoCode::format_error, "Failed to parse PDB atom serial."};
+  auto parsed_id = parse_pdb_id_field(fixed_slice(line, 6, 5), options, 99999,
+                                      "atom serial",
+                                      options.atom_ordinal_context);
+  if (!parsed_id.status) {
+    return parsed_id.status;
   }
+  parsed.original_index = parsed_id.value;
   parsed.name = trim_copy(fixed_slice(line, 12, 4));
   parsed.loc = options.pdbscan ? std::string(1, fixed_char(line, 16)) : " ";
   parsed.resname = trim_copy(fixed_slice(line, 17, 4));
   parsed.chain = std::string(1, fixed_char(line, 21));
   parsed.original_resid = fixed_slice(line, 22, 4);
-  if (!parse_int_field(parsed.original_resid, parsed.resid)) {
-    return {IoCode::format_error, "Failed to parse PDB residue id."};
+  parsed_id = parse_pdb_id_field(parsed.original_resid, options, 9999,
+                                 "residue id", std::nullopt,
+                                 options.previous_resid_context);
+  if (!parsed_id.status) {
+    return parsed_id.status;
   }
+  parsed.resid = parsed_id.value;
   parsed.rescode = std::string(1, fixed_char(line, 26));
 
   if (!parse_coord_field(fixed_slice(line, 30, 8), parsed.coordinate.x) ||

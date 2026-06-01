@@ -21,7 +21,7 @@ from unittest import main, skipIf
 import unittest
 import sasmol.system as system
 
-import numpy, os, copy
+import numpy, os, copy, tempfile
 
 floattype=os.environ['SASMOL_FLOATTYPE']
 
@@ -60,6 +60,19 @@ class Test_intg_file_io_Files_read_dcd(unittest.TestCase):
             else:
                self.assert_list_almost_equal(a[i],b[i],places)
 
+   def make_atom_line(self, serial, name, resname, chain, resid, x):
+      return "%-6s%5s %-4s%1s%-4s%1s%4s%1s   %8.3f%8.3f%8.3f%6s%6s      %-4s%2s%2s\n" % (
+         'ATOM', serial, name, ' ', resname, chain, resid, ' ',
+         x, x + 1.0, x + 2.0, '1.00', '0.00', chain, name[0], '  ')
+
+   def write_temp_pdb(self, lines):
+      handle = tempfile.NamedTemporaryFile(mode='w', suffix='.pdb', delete=False)
+      try:
+         handle.writelines(lines)
+      finally:
+         handle.close()
+      return handle.name
+
    def test_1ATM_one_frame(self):
       '''
 	   test a pdb file with 1 atom and 1 frame
@@ -73,6 +86,100 @@ class Test_intg_file_io_Files_read_dcd(unittest.TestCase):
       #print('\nexpected_coor \n',expected_coor)
       #
       self.assert_list_almost_equal(expected_coor, result_coor,3)
+
+   def test_vmd_hex_ids_require_explicit_read_mode(self):
+      '''
+      Hex-like VMD overflow IDs are not accepted by default.
+      '''
+      pdb_file = self.write_temp_pdb([
+         self.make_atom_line('186A0', 'CA', 'GLY', 'A', '271A', 1.0),
+         'END\n'])
+
+      try:
+         with self.assertRaises(Exception):
+            self.o.read_pdb(pdb_file)
+      finally:
+         os.unlink(pdb_file)
+
+   def test_vmd_hex_read_mode_decodes_unambiguous_atom_and_resid(self):
+      '''
+      Explicit VMD mode decodes A-F atom serial and resid overflow fields.
+      '''
+      pdb_file = self.write_temp_pdb([
+         self.make_atom_line('186A0', 'CA', 'GLY', 'A', '271A', 1.0),
+         self.make_atom_line('186A1', 'CB', 'GLY', 'A', '271A', 2.0),
+         'END\n'])
+
+      try:
+         self.o.read_pdb(pdb_file, pdb_id_mode='vmd_hex')
+         self.assert_list_almost_equal(self.o.index(), [1, 2])
+         self.assert_list_almost_equal(self.o.original_index(), [100000, 100001])
+         self.assert_list_almost_equal(self.o.resid(), [10010, 10010])
+         self.assert_list_almost_equal(self.o.original_resid(), [10010, 10010])
+      finally:
+         os.unlink(pdb_file)
+
+   def test_vmd_hex_read_mode_decodes_numeric_resid_overflow_with_context(self):
+      '''
+      VMD resid 10000 is raw 2710, so context is needed to avoid misreading it.
+      '''
+      pdb_file = self.write_temp_pdb([
+         self.make_atom_line('99999', 'CA', 'GLY', 'A', '9999', 1.0),
+         self.make_atom_line('186A0', 'CB', 'GLY', 'A', '2710', 2.0),
+         'END\n'])
+
+      try:
+         self.o.read_pdb(pdb_file, pdb_id_mode='vmd_hex')
+         self.assert_list_almost_equal(self.o.original_index(), [99999, 100000])
+         self.assert_list_almost_equal(self.o.resid(), [9999, 10000])
+      finally:
+         os.unlink(pdb_file)
+
+   def test_vmd_hex_read_mode_rejects_ambiguous_numeric_starting_resid(self):
+      '''
+      A file that starts at raw resid 2710 may mean decimal 2710 or hex 10000.
+      '''
+      pdb_file = self.write_temp_pdb([
+         self.make_atom_line('186A0', 'CA', 'GLY', 'A', '2710', 1.0),
+         'END\n'])
+
+      try:
+         with self.assertRaises(Exception):
+            self.o.read_pdb(pdb_file, pdb_id_mode='vmd_hex')
+      finally:
+         os.unlink(pdb_file)
+
+   def test_vmd_hex_read_mode_can_force_ambiguous_numeric_fields_to_hex(self):
+      '''
+      Callers that know a file is VMD-hex encoded can opt into hex ambiguity.
+      '''
+      pdb_file = self.write_temp_pdb([
+         self.make_atom_line('20000', 'CA', 'GLY', 'A', '2710', 1.0),
+         'END\n'])
+
+      try:
+         self.o.read_pdb(
+            pdb_file, pdb_id_mode='vmd_hex', ambiguous_vmd_hex='hex')
+         self.assert_list_almost_equal(self.o.original_index(), [131072])
+         self.assert_list_almost_equal(self.o.resid(), [10000])
+      finally:
+         os.unlink(pdb_file)
+
+   def test_vmd_hex_read_mode_decodes_pdbscan_conect(self):
+      '''
+      pdbscan CONECT parsing follows the same explicit VMD ID mode.
+      '''
+      pdb_file = self.write_temp_pdb([
+         self.make_atom_line('186A0', 'CA', 'GLY', 'A', '271A', 1.0),
+         self.make_atom_line('186A1', 'CB', 'GLY', 'A', '271A', 2.0),
+         'CONECT186A0186A1\n',
+         'END\n'])
+
+      try:
+         self.o.read_pdb(pdb_file, pdbscan=True, pdb_id_mode='vmd_hex')
+         self.assertEqual(self.o.conect(), {100000: [100001]})
+      finally:
+         os.unlink(pdb_file)
 
 
    def test_1ATM_two_frames(self):

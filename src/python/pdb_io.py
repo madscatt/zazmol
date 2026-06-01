@@ -263,6 +263,72 @@ class PDB(object):
 
         return
 
+    def _parse_pdb_id_field(self, field, pdb_id_mode='standard',
+                            ambiguous_vmd_hex='error',
+                            overflow_threshold=None,
+                            previous_value=None,
+                            ordinal=None,
+                            label='PDB id'):
+        '''
+        Parse decimal PDB identifiers, with opt-in support for VMD hex overflow.
+        '''
+
+        if pdb_id_mode == 'standard':
+            return locale.atoi(field)
+
+        if pdb_id_mode != 'vmd_hex':
+            raise ValueError('unsupported pdb_id_mode: ' + str(pdb_id_mode))
+
+        if ambiguous_vmd_hex not in ('error', 'hex'):
+            raise ValueError(
+                'unsupported ambiguous_vmd_hex: ' + str(ambiguous_vmd_hex))
+
+        raw = field.strip()
+        if raw == '':
+            raise ValueError('empty ' + label)
+
+        hexdigits = '0123456789abcdefABCDEF'
+        if any(character not in hexdigits for character in raw):
+            raise ValueError('invalid VMD hex ' + label + ': ' + field)
+
+        hex_value = int(raw, 16)
+        has_hex_letter = any(character in 'abcdefABCDEF' for character in raw)
+        if has_hex_letter:
+            return hex_value
+
+        decimal_value = locale.atoi(field)
+        if overflow_threshold is None or hex_value <= overflow_threshold:
+            return decimal_value
+        if decimal_value == overflow_threshold:
+            return decimal_value
+
+        if previous_value is not None:
+            if previous_value >= overflow_threshold:
+                return hex_value
+            if decimal_value >= previous_value:
+                return decimal_value
+
+        if ordinal is not None and ordinal > overflow_threshold:
+            return hex_value
+
+        if ambiguous_vmd_hex == 'hex':
+            return hex_value
+
+        raise ValueError(
+            'ambiguous numeric VMD hex ' + label + ': ' + field)
+
+    def _read_pdb_id_options(self, kwargs):
+        '''
+        Normalize read_pdb identifier parsing options.
+        '''
+
+        pdb_id_mode = kwargs.get('pdb_id_mode', 'standard')
+        if kwargs.get('allow_vmd_hex_ids', False):
+            pdb_id_mode = kwargs.get('pdb_id_mode', 'vmd_hex')
+        ambiguous_vmd_hex = kwargs.get('ambiguous_vmd_hex', 'error')
+
+        return pdb_id_mode, ambiguous_vmd_hex
+
     def element_filter(self):
         '''	
         This function filters the PDB file to sraighten
@@ -791,6 +857,8 @@ class PDB(object):
 
         if 'pdbscan' in kwargs:
             pdbscan = kwargs['pdbscan']
+
+        pdb_id_mode, ambiguous_vmd_hex = self._read_pdb_id_options(kwargs)
 	
         with io.open(filename, 'r') as temp_infile:
             infile = temp_infile.readlines()
@@ -893,6 +961,7 @@ class PDB(object):
 
         unique_names = [] ; unique_resnames = [] ; unique_resids = [] ; unique_chains = [] 
         unique_occupancies = [] ; unique_betas = [] ; unique_segnames = [] ; unique_moltypes = []
+        previous_resid = None
 
         for i in range(len(infile)):
             lin=infile[i]
@@ -906,7 +975,11 @@ class PDB(object):
                 true_index += 1
                 #atom.append(string.strip(lin[0:6]))		#	1-6		record name	
                 atom.append(lin[0:6].strip())		#	1-6		record name	
-                original_index.append(lin[6:11])				#	7-11		atom serial number
+                original_index.append(
+                    self._parse_pdb_id_field(
+                        lin[6:11], pdb_id_mode, ambiguous_vmd_hex,
+                        overflow_threshold=99999, ordinal=true_index,
+                        label='atom serial'))				#	7-11		atom serial number
                 index.append(str(true_index))   	        #   set index so that > 99,999 atoms can be read and counted
                 #this_name = string.strip(lin[12:16])		#	13-16		atom name
                 this_name = lin[12:16].strip()
@@ -921,9 +994,13 @@ class PDB(object):
                 resname.append(lin[17:21].strip())	#	18-20		residue name
                 this_chain = lin[21]				#	22		chain identifier
                 chain.append(lin[21])				#	22		chain identifier
-                this_resid = locale.atoi(lin[22:26])			#	23-26		residue sequence number
-                original_resid.append(lin[22:26])			#	23-26		residue sequence number
-                resid.append(lin[22:26])			#	23-26		residue sequence number
+                this_resid = self._parse_pdb_id_field(
+                    lin[22:26], pdb_id_mode, ambiguous_vmd_hex,
+                    overflow_threshold=9999, previous_value=previous_resid,
+                    label='residue id')			#	23-26		residue sequence number
+                previous_resid = this_resid
+                original_resid.append(this_resid)			#	23-26		residue sequence number
+                resid.append(this_resid)			#	23-26		residue sequence number
                 rescode.append(lin[26])				#	27		code for insertion of residues
                 x.append(lin[30:38])				#	31-38		Real(8.3) X: angstroms	
                 y.append(lin[38:46])				#	39-46		Real(8.3) Y: angstroms	
@@ -1083,7 +1160,11 @@ class PDB(object):
                 # character columns. First is the base atom, following atoms 
                 # are those connected to it. 
                 # Input line is filtered to ignore blank columns.
-                ndxs = [int(lin[i:i+5]) for i in range(6, len(lin), 5) if lin[i:i+5].strip()]
+                ndxs = [
+                    self._parse_pdb_id_field(
+                        lin[i:i+5], pdb_id_mode, ambiguous_vmd_hex,
+                        overflow_threshold=99999, label='CONECT atom serial')
+                    for i in range(6, len(lin), 5) if lin[i:i+5].strip()]
                 conect[ndxs[0]] = ndxs[1:]
 
         if(((this_frame - 1) != num_frames) and not fastread):

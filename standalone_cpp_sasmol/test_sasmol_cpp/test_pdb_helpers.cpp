@@ -153,6 +153,36 @@ std::string first_coordinate_line(const std::filesystem::path& path) {
   return {};
 }
 
+std::string atom_line_with_ids(const std::string& serial,
+                               const std::string& resid,
+                               const std::string& name = "CA",
+                               float x = 11.1F) {
+  std::string line(80, ' ');
+  line.replace(0, 6, "ATOM  ");
+  line.replace(6, std::min<std::size_t>(5, serial.size()),
+               serial.substr(0, 5));
+  line.replace(12, 4, " " + name + std::string(3 - name.size(), ' '));
+  line.replace(17, 4, "GLY ");
+  line[21] = 'A';
+  line.replace(22, std::min<std::size_t>(4, resid.size()),
+               resid.substr(0, 4));
+  std::ostringstream xstream;
+  xstream << std::fixed << std::setprecision(3) << std::setw(8) << x;
+  line.replace(30, 8, xstream.str());
+  xstream.str(std::string());
+  xstream.clear();
+  xstream << std::fixed << std::setprecision(3) << std::setw(8) << (x + 1.0F);
+  line.replace(38, 8, xstream.str());
+  xstream.str(std::string());
+  xstream.clear();
+  xstream << std::fixed << std::setprecision(3) << std::setw(8) << (x + 2.0F);
+  line.replace(46, 8, xstream.str());
+  line.replace(54, 6, "  1.00");
+  line.replace(60, 6, "  0.00");
+  line.replace(76, 2, " C");
+  return line;
+}
+
 void test_parse_pdb_atom_record_uses_sasmol_field_names() {
   sasmol::PdbReader reader;
   sasmol::PdbAtomRecord atom;
@@ -220,6 +250,74 @@ void test_parse_pdb_atom_record_rejects_bad_required_numbers() {
   const auto status = reader.parse_pdb_atom_record(line, atom);
 
   assert(status.code == sasmol::IoCode::format_error);
+}
+
+void test_parse_pdb_atom_record_vmd_hex_requires_explicit_mode() {
+  sasmol::PdbReader reader;
+  sasmol::PdbAtomRecord atom;
+  const auto status =
+      reader.parse_pdb_atom_record(atom_line_with_ids("186A0", "271A"), atom);
+
+  assert(status.code == sasmol::IoCode::format_error);
+}
+
+void test_parse_pdb_atom_record_vmd_hex_unambiguous_fields() {
+  sasmol::PdbReader reader;
+  sasmol::PdbAtomRecord atom;
+  sasmol::PdbReadOptions options;
+  options.pdb_id_mode = sasmol::PdbIdMode::vmd_hex;
+
+  const auto status =
+      reader.parse_pdb_atom_record(atom_line_with_ids("186A0", "271A"), atom,
+                                   options);
+
+  assert(status.ok());
+  assert(atom.original_index == 100000);
+  assert(atom.resid == 10010);
+}
+
+void test_parse_pdb_atom_record_vmd_hex_numeric_resid_uses_context() {
+  sasmol::PdbReader reader;
+  sasmol::PdbAtomRecord atom;
+  sasmol::PdbReadOptions options;
+  options.pdb_id_mode = sasmol::PdbIdMode::vmd_hex;
+  options.previous_resid_context = 9999;
+
+  const auto status =
+      reader.parse_pdb_atom_record(atom_line_with_ids("186A0", "2710"), atom,
+                                   options);
+
+  assert(status.ok());
+  assert(atom.resid == 10000);
+}
+
+void test_parse_pdb_atom_record_vmd_hex_rejects_ambiguous_numeric_start() {
+  sasmol::PdbReader reader;
+  sasmol::PdbAtomRecord atom;
+  sasmol::PdbReadOptions options;
+  options.pdb_id_mode = sasmol::PdbIdMode::vmd_hex;
+
+  const auto status =
+      reader.parse_pdb_atom_record(atom_line_with_ids("186A0", "2710"), atom,
+                                   options);
+
+  assert(status.code == sasmol::IoCode::format_error);
+}
+
+void test_parse_pdb_atom_record_vmd_hex_can_force_ambiguous_numeric_fields() {
+  sasmol::PdbReader reader;
+  sasmol::PdbAtomRecord atom;
+  sasmol::PdbReadOptions options;
+  options.pdb_id_mode = sasmol::PdbIdMode::vmd_hex;
+  options.ambiguous_vmd_hex = sasmol::VmdHexAmbiguity::hex;
+
+  const auto status =
+      reader.parse_pdb_atom_record(atom_line_with_ids("20000", "2710"), atom,
+                                   options);
+
+  assert(status.ok());
+  assert(atom.original_index == 131072);
+  assert(atom.resid == 10000);
 }
 
 void test_parse_pdb_atom_record_missing_optional_defaults() {
@@ -571,6 +669,33 @@ void test_read_pdb_pdbscan_conect_parsing() {
   assert(status.ok());
   assert((mol.conect()[0] == std::vector<int>{20, 30}));
   assert(mol.conect()[1].empty());
+
+  std::filesystem::remove(path);
+}
+
+void test_read_pdb_pdbscan_conect_parsing_vmd_hex_ids() {
+  const auto path =
+      std::filesystem::temp_directory_path() / "sasmol_conect_scan_vmd_hex.pdb";
+  {
+    std::ofstream out(path);
+    out << atom_line_with_ids("186A0", "271A", "CA", 1.0F) << '\n';
+    out << atom_line_with_ids("186A1", "271A", "CB", 2.0F) << '\n';
+    out << "CONECT186A0186A1\n";
+    out << "END\n";
+  }
+
+  sasmol::PdbReader reader;
+  sasmol::PdbReadOptions options;
+  options.pdbscan = true;
+  options.pdb_id_mode = sasmol::PdbIdMode::vmd_hex;
+  sasmol::Molecule mol;
+
+  const auto status = reader.read_pdb(path, mol, options);
+
+  assert(status.ok());
+  assert(mol.original_index()[0] == 100000);
+  assert(mol.original_index()[1] == 100001);
+  assert((mol.conect()[0] == std::vector<int>{100001}));
 
   std::filesystem::remove(path);
 }
@@ -972,6 +1097,11 @@ int main() {
   test_parse_pdb_atom_record_uses_sasmol_field_names();
   test_parse_pdb_atom_record_preserves_altloc_in_pdbscan_mode();
   test_parse_pdb_atom_record_rejects_bad_required_numbers();
+  test_parse_pdb_atom_record_vmd_hex_requires_explicit_mode();
+  test_parse_pdb_atom_record_vmd_hex_unambiguous_fields();
+  test_parse_pdb_atom_record_vmd_hex_numeric_resid_uses_context();
+  test_parse_pdb_atom_record_vmd_hex_rejects_ambiguous_numeric_start();
+  test_parse_pdb_atom_record_vmd_hex_can_force_ambiguous_numeric_fields();
   test_parse_pdb_atom_record_missing_optional_defaults();
   test_resolve_pdb_element_matches_python_core_cases();
   test_resolve_pdb_element_table_fixtures();
@@ -986,6 +1116,7 @@ int main() {
   test_read_pdb_check_zero_coor_guard();
   test_read_pdb_failure_does_not_mutate_existing_molecule();
   test_read_pdb_pdbscan_conect_parsing();
+  test_read_pdb_pdbscan_conect_parsing_vmd_hex_ids();
   test_read_pdb_records_biomt_metadata_without_coordinate_changes();
   test_write_pdb_single_frame_1atm_round_trip();
   test_write_pdb_single_frame_2aad_round_trip();

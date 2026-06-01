@@ -5,6 +5,7 @@
 #include <cstddef>
 #include <filesystem>
 #include <fstream>
+#include <optional>
 #include <string>
 #include <vector>
 
@@ -31,12 +32,26 @@ struct IoStatus {
   [[nodiscard]] static IoStatus not_implemented(std::string message);
 };
 
+enum class PdbIdMode {
+  standard,
+  vmd_hex,
+};
+
+enum class VmdHexAmbiguity {
+  error,
+  hex,
+};
+
 struct PdbReadOptions {
   bool tolerant{true};
   bool resolve_elements{true};
   bool preserve_conect{true};
   bool apply_all_zero_coordinate_guard{true};
   bool pdbscan{false};
+  PdbIdMode pdb_id_mode{PdbIdMode::standard};
+  VmdHexAmbiguity ambiguous_vmd_hex{VmdHexAmbiguity::error};
+  std::optional<int> atom_ordinal_context;
+  std::optional<int> previous_resid_context;
 };
 
 enum class PdbFrameMode {
