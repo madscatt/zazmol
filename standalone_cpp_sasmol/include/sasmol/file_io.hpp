@@ -120,6 +120,19 @@ class PdbReader {
   }
 };
 
+struct MmcifReadOptions {
+  bool resolve_elements{true};
+  bool apply_all_zero_coordinate_guard{true};
+  bool pdbscan{false};
+};
+
+class MmcifReader {
+ public:
+  [[nodiscard]] IoStatus read_mmcif(
+      const std::filesystem::path& filename, Molecule& molecule,
+      const MmcifReadOptions& options = {}) const;
+};
+
 class PdbWriter {
  public:
   [[nodiscard]] IoStatus write_pdb(const std::filesystem::path& filename,

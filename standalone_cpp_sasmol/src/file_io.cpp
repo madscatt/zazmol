@@ -7,6 +7,7 @@
 #include <cstdint>
 #include <cstring>
 #include <ios>
+#include <iterator>
 #include <limits>
 #include <map>
 #include <sstream>
@@ -442,6 +443,252 @@ std::vector<std::string> split_csv_tokens(const std::string& text) {
     }
   }
   return tokens;
+}
+
+bool starts_with(const std::string& text, const std::string& prefix) {
+  return text.size() >= prefix.size() &&
+         std::equal(prefix.begin(), prefix.end(), text.begin());
+}
+
+bool is_mmcif_missing_value(const std::string& value) {
+  return value.empty() || value == "." || value == "?";
+}
+
+std::string clean_mmcif_value(const std::string& value,
+                              const std::string& default_value = "") {
+  if (is_mmcif_missing_value(value)) {
+    return default_value;
+  }
+  return value;
+}
+
+bool is_line_start(const std::string& text, std::size_t index) {
+  return index == 0 || text[index - 1] == '\n';
+}
+
+std::vector<std::string> tokenize_mmcif(const std::string& text) {
+  std::vector<std::string> tokens;
+  std::size_t index = 0;
+  while (index < text.size()) {
+    while (index < text.size() &&
+           std::isspace(static_cast<unsigned char>(text[index])) != 0) {
+      ++index;
+    }
+    if (index >= text.size()) {
+      break;
+    }
+
+    if (text[index] == '#') {
+      while (index < text.size() && text[index] != '\n') {
+        ++index;
+      }
+      continue;
+    }
+
+    if (text[index] == ';' && is_line_start(text, index)) {
+      const auto start = index + 1;
+      auto end = text.find("\n;", start);
+      if (end == std::string::npos) {
+        tokens.push_back(text.substr(start));
+        break;
+      }
+      tokens.push_back(text.substr(start, end - start));
+      index = end + 2;
+      while (index < text.size() && text[index] != '\n') {
+        ++index;
+      }
+      continue;
+    }
+
+    if (text[index] == '\'' || text[index] == '"') {
+      const char quote = text[index];
+      ++index;
+      const auto start = index;
+      while (index < text.size() && text[index] != quote) {
+        ++index;
+      }
+      tokens.push_back(text.substr(start, index - start));
+      if (index < text.size()) {
+        ++index;
+      }
+      continue;
+    }
+
+    const auto start = index;
+    while (index < text.size() &&
+           std::isspace(static_cast<unsigned char>(text[index])) == 0 &&
+           text[index] != '#') {
+      ++index;
+    }
+    tokens.push_back(text.substr(start, index - start));
+    if (index < text.size() && text[index] == '#') {
+      while (index < text.size() && text[index] != '\n') {
+        ++index;
+      }
+    }
+  }
+  return tokens;
+}
+
+struct MmcifAtomSiteTable {
+  std::vector<std::string> attributes;
+  std::vector<std::vector<std::string>> rows;
+  std::map<std::string, std::size_t> column_by_attribute;
+};
+
+bool is_mmcif_loop_terminator(const std::string& token) {
+  return token == "loop_" || token == "stop_" || starts_with(token, "_") ||
+         starts_with(token, "data_") || starts_with(token, "save_");
+}
+
+std::string mmcif_attribute_name(const std::string& tag) {
+  const auto dot = tag.find('.');
+  if (dot == std::string::npos || dot + 1 >= tag.size()) {
+    return tag;
+  }
+  return tag.substr(dot + 1);
+}
+
+IoStatus extract_mmcif_atom_site_table(const std::string& text,
+                                       MmcifAtomSiteTable& table) {
+  const auto tokens = tokenize_mmcif(text);
+  for (std::size_t index = 0; index < tokens.size();) {
+    if (tokens[index] != "loop_") {
+      ++index;
+      continue;
+    }
+
+    ++index;
+    std::vector<std::string> tags;
+    while (index < tokens.size() && starts_with(tokens[index], "_")) {
+      tags.push_back(tokens[index]);
+      ++index;
+    }
+    if (tags.empty()) {
+      continue;
+    }
+
+    const bool atom_site_loop =
+        std::all_of(tags.begin(), tags.end(), [](const std::string& tag) {
+          return starts_with(tag, "_atom_site.");
+        });
+
+    const auto data_start = index;
+    while (index < tokens.size() && !is_mmcif_loop_terminator(tokens[index])) {
+      ++index;
+    }
+    const auto data_end = index;
+    if (!atom_site_loop) {
+      continue;
+    }
+
+    const auto value_count = data_end - data_start;
+    if (value_count == 0) {
+      return {IoCode::format_error,
+              "mmCIF _atom_site loop does not contain rows."};
+    }
+    if (value_count % tags.size() != 0) {
+      return {IoCode::format_error,
+              "mmCIF _atom_site loop has an incomplete row."};
+    }
+
+    table.attributes.clear();
+    table.rows.clear();
+    table.column_by_attribute.clear();
+    table.attributes.reserve(tags.size());
+    for (std::size_t column = 0; column < tags.size(); ++column) {
+      const auto name = mmcif_attribute_name(tags[column]);
+      table.attributes.push_back(name);
+      table.column_by_attribute[name] = column;
+    }
+
+    for (std::size_t row_start = data_start; row_start < data_end;
+         row_start += tags.size()) {
+      table.rows.emplace_back(
+          tokens.begin() + static_cast<std::ptrdiff_t>(row_start),
+          tokens.begin() +
+              static_cast<std::ptrdiff_t>(row_start + tags.size()));
+    }
+    return IoStatus::success();
+  }
+
+  return {IoCode::format_error,
+          "mmCIF file does not contain an _atom_site loop."};
+}
+
+std::string mmcif_value(const MmcifAtomSiteTable& table,
+                        const std::vector<std::string>& row,
+                        const std::string& attribute,
+                        const std::string& default_value = "") {
+  const auto column = table.column_by_attribute.find(attribute);
+  if (column == table.column_by_attribute.end() ||
+      column->second >= row.size()) {
+    return default_value;
+  }
+  return clean_mmcif_value(row[column->second], default_value);
+}
+
+std::string mmcif_first_value(const MmcifAtomSiteTable& table,
+                              const std::vector<std::string>& row,
+                              const std::vector<std::string>& attributes,
+                              const std::string& default_value = "") {
+  for (const auto& attribute : attributes) {
+    const auto value = mmcif_value(table, row, attribute, "");
+    if (!is_mmcif_missing_value(value)) {
+      return value;
+    }
+  }
+  return default_value;
+}
+
+IoStatus parse_mmcif_int_value(const MmcifAtomSiteTable& table,
+                               const std::vector<std::string>& row,
+                               const std::vector<std::string>& attributes,
+                               const std::string& label, int& value) {
+  const auto text = mmcif_first_value(table, row, attributes, "");
+  if (is_mmcif_missing_value(text)) {
+    return {IoCode::format_error, "Missing mmCIF " + label + "."};
+  }
+  if (!parse_int_field(text, value)) {
+    return {IoCode::format_error,
+            "mmCIF " + label +
+                " is not compatible with SASMOL integer descriptors: " + text};
+  }
+  return IoStatus::success();
+}
+
+IoStatus parse_mmcif_coordinate_value(const MmcifAtomSiteTable& table,
+                                      const std::vector<std::string>& row,
+                                      const std::string& attribute,
+                                      coord_type& value) {
+  const auto text = mmcif_value(table, row, attribute, "");
+  if (!parse_coord_field(text, value)) {
+    return {IoCode::format_error,
+            "Failed to parse mmCIF coordinate " + attribute + "."};
+  }
+  return IoStatus::success();
+}
+
+std::vector<std::vector<std::size_t>> mmcif_model_groups(
+    const MmcifAtomSiteTable& table) {
+  std::vector<std::string> model_order;
+  std::map<std::string, std::vector<std::size_t>> rows_by_model;
+  for (std::size_t row_index = 0; row_index < table.rows.size(); ++row_index) {
+    const auto model =
+        mmcif_value(table, table.rows[row_index], "pdbx_PDB_model_num", "1");
+    if (rows_by_model.find(model) == rows_by_model.end()) {
+      model_order.push_back(model);
+      rows_by_model[model] = {};
+    }
+    rows_by_model[model].push_back(row_index);
+  }
+
+  std::vector<std::vector<std::size_t>> groups;
+  groups.reserve(model_order.size());
+  for (const auto& model : model_order) {
+    groups.push_back(rows_by_model[model]);
+  }
+  return groups;
 }
 
 }  // namespace
@@ -967,6 +1214,198 @@ PdbElementResult PdbReader::resolve_pdb_element(
   return {{IoCode::format_error,
            "PDB atom name does not start with an element character."},
           ""};
+}
+
+IoStatus MmcifReader::read_mmcif(const std::filesystem::path& filename,
+                                 Molecule& molecule,
+                                 const MmcifReadOptions& options) const {
+  std::ifstream input(filename);
+  if (!input) {
+    return {IoCode::file_error,
+            "Failed to open mmCIF file: " + filename.string()};
+  }
+  const std::string contents((std::istreambuf_iterator<char>(input)),
+                             std::istreambuf_iterator<char>());
+
+  MmcifAtomSiteTable atom_site;
+  auto status = extract_mmcif_atom_site_table(contents, atom_site);
+  if (!status) {
+    return status;
+  }
+  if (atom_site.rows.empty()) {
+    return {IoCode::format_error,
+            "mmCIF file does not contain _atom_site records."};
+  }
+
+  const auto groups = mmcif_model_groups(atom_site);
+  if (groups.empty() || groups.front().empty()) {
+    return {IoCode::format_error,
+            "mmCIF file does not contain coordinate models."};
+  }
+  const std::size_t natoms = groups.front().size();
+  for (const auto& group : groups) {
+    if (group.size() != natoms) {
+      return {IoCode::format_error,
+              "number of atoms per mmCIF model is not equal"};
+    }
+  }
+
+  Molecule parsed_molecule(natoms, groups.size());
+  PdbReader pdb_reader;
+  const auto first_model = groups.front();
+
+  for (std::size_t atom_index = 0; atom_index < natoms; ++atom_index) {
+    const auto& row = atom_site.rows[first_model[atom_index]];
+
+    parsed_molecule.record()[atom_index] =
+        trim_copy(mmcif_value(atom_site, row, "group_PDB", "ATOM"));
+
+    int original_index{};
+    status = parse_mmcif_int_value(atom_site, row, {"id"}, "atom id",
+                                   original_index);
+    if (!status) {
+      return status;
+    }
+    parsed_molecule.original_index()[atom_index] = original_index;
+    parsed_molecule.index()[atom_index] = static_cast<int>(atom_index + 1);
+
+    const auto atom_name = trim_copy(mmcif_first_value(
+        atom_site, row, {"auth_atom_id", "label_atom_id"}, ""));
+    parsed_molecule.name()[atom_index] = atom_name;
+
+    const auto altloc = mmcif_value(atom_site, row, "label_alt_id", " ");
+    parsed_molecule.loc()[atom_index] = options.pdbscan ? altloc : " ";
+
+    const auto residue_name = trim_copy(mmcif_first_value(
+        atom_site, row, {"auth_comp_id", "label_comp_id"}, ""));
+    parsed_molecule.resname()[atom_index] = residue_name;
+
+    const auto chain = trim_copy(mmcif_first_value(
+        atom_site, row, {"auth_asym_id", "label_asym_id"}, ""));
+    parsed_molecule.chain()[atom_index] = chain;
+
+    int resid{};
+    status = parse_mmcif_int_value(atom_site, row,
+                                   {"auth_seq_id", "label_seq_id"},
+                                   "residue id", resid);
+    if (!status) {
+      return status;
+    }
+    parsed_molecule.resid()[atom_index] = resid;
+    parsed_molecule.original_resid()[atom_index] = resid;
+
+    parsed_molecule.rescode()[atom_index] =
+        mmcif_value(atom_site, row, "pdbx_PDB_ins_code", " ");
+
+    auto occupancy = mmcif_value(atom_site, row, "occupancy", "");
+    if (is_mmcif_missing_value(occupancy)) {
+      occupancy = options.pdbscan ? "" : "  1.00";
+    }
+    parsed_molecule.occupancy()[atom_index] = occupancy;
+
+    auto beta = mmcif_value(atom_site, row, "B_iso_or_equiv", "");
+    if (is_mmcif_missing_value(beta)) {
+      beta = options.pdbscan ? "" : "  0.00";
+    }
+    parsed_molecule.beta()[atom_index] = beta;
+
+    parsed_molecule.segname()[atom_index] = chain;
+
+    auto element = uppercase(
+        trim_copy(mmcif_value(atom_site, row, "type_symbol", "  ")));
+    if (element.empty()) {
+      element = "  ";
+    }
+    if (options.resolve_elements &&
+        (element.empty() || element == " " || element == "  ")) {
+      const auto resolved = pdb_reader.resolve_pdb_element(atom_name,
+                                                           residue_name);
+      if (!resolved.status) {
+        return resolved.status;
+      }
+      element = resolved.element;
+    }
+    parsed_molecule.element()[atom_index] = element;
+
+    auto charge = mmcif_value(atom_site, row, "pdbx_formal_charge", "  ");
+    if (is_mmcif_missing_value(charge)) {
+      charge = "  ";
+    }
+    parsed_molecule.charge()[atom_index] = charge;
+
+    parsed_molecule.residue_flag()[atom_index] = 0;
+    parsed_molecule.moltype()[atom_index] = moltype_for_resname(residue_name);
+  }
+
+  for (std::size_t frame_index = 0; frame_index < groups.size();
+       ++frame_index) {
+    for (std::size_t atom_index = 0; atom_index < natoms; ++atom_index) {
+      const auto& row = atom_site.rows[groups[frame_index][atom_index]];
+      const auto& first_row = atom_site.rows[first_model[atom_index]];
+      if (frame_index != 0) {
+        const auto name = trim_copy(mmcif_first_value(
+            atom_site, row, {"auth_atom_id", "label_atom_id"}, ""));
+        const auto first_name = trim_copy(mmcif_first_value(
+            atom_site, first_row, {"auth_atom_id", "label_atom_id"}, ""));
+        const auto resname = trim_copy(mmcif_first_value(
+            atom_site, row, {"auth_comp_id", "label_comp_id"}, ""));
+        const auto first_resname = trim_copy(mmcif_first_value(
+            atom_site, first_row, {"auth_comp_id", "label_comp_id"}, ""));
+        const auto chain = trim_copy(mmcif_first_value(
+            atom_site, row, {"auth_asym_id", "label_asym_id"}, ""));
+        const auto first_chain = trim_copy(mmcif_first_value(
+            atom_site, first_row, {"auth_asym_id", "label_asym_id"}, ""));
+        int resid{};
+        int first_resid{};
+        status = parse_mmcif_int_value(atom_site, row,
+                                       {"auth_seq_id", "label_seq_id"},
+                                       "residue id", resid);
+        if (!status) {
+          return status;
+        }
+        status = parse_mmcif_int_value(atom_site, first_row,
+                                       {"auth_seq_id", "label_seq_id"},
+                                       "residue id", first_resid);
+        if (!status) {
+          return status;
+        }
+        if (name != first_name || resname != first_resname ||
+            chain != first_chain || resid != first_resid) {
+          return {IoCode::format_error,
+                  "mmCIF model atom ordering differs between frames."};
+        }
+      }
+
+      Vec3 coordinate{};
+      status = parse_mmcif_coordinate_value(atom_site, row, "Cartn_x",
+                                            coordinate.x);
+      if (!status) {
+        return status;
+      }
+      status = parse_mmcif_coordinate_value(atom_site, row, "Cartn_y",
+                                            coordinate.y);
+      if (!status) {
+        return status;
+      }
+      status = parse_mmcif_coordinate_value(atom_site, row, "Cartn_z",
+                                            coordinate.z);
+      if (!status) {
+        return status;
+      }
+      parsed_molecule.set_coordinate(frame_index, atom_index, coordinate);
+    }
+  }
+
+  if (options.apply_all_zero_coordinate_guard) {
+    PdbWriter writer;
+    status = writer.check_for_all_zero_columns(parsed_molecule);
+    if (!status) {
+      return status;
+    }
+  }
+
+  molecule = std::move(parsed_molecule);
+  return IoStatus::success();
 }
 
 IoStatus PdbWriter::write_pdb(const std::filesystem::path& filename,

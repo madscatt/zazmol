@@ -170,4 +170,11 @@ if(BUILD_TESTING)
     SASMOL_TEST_DATA_DIR="${CMAKE_CURRENT_SOURCE_DIR}/../src/python/test_sasmol/data"
   )
   add_test(NAME pdb_helpers COMMAND test_pdb_helpers)
+
+  add_executable(test_mmcif_reader test_sasmol_cpp/test_mmcif_reader.cpp)
+  target_link_libraries(test_mmcif_reader PRIVATE sasmol_standalone)
+  target_compile_definitions(test_mmcif_reader PRIVATE
+    SASMOL_TEST_DATA_DIR="${CMAKE_CURRENT_SOURCE_DIR}/../src/python/test_sasmol/data"
+  )
+  add_test(NAME mmcif_reader COMMAND test_mmcif_reader)
 endif()

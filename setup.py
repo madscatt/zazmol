@@ -54,9 +54,12 @@ setup(name='sasmol',
                    "Programming Language :: Python :: C :: Fortran",
                    "Topic :: Scientific/Engineering :: Chemistry :: Physics"],
 
-      package_dir={'sasmol': os.path.join('src', 'python')},
+      package_dir={
+          'sasmol': os.path.join('src', 'python'),
+          'mmcif': os.path.join(
+              'third_party', 'rcsb', 'mmcif-1.1.1', 'mmcif')},
 
-      packages=['sasmol', 'sasmol.test_sasmol', 'sasmol.test_sasmol.utilities', 'sasmol.test_sasmol.data', 'sasmol.test_sasmol.data.pdb_common', 'sasmol.test_sasmol.data.dcd_common', 'sasmol.test_sasmol.data.sasmol', 'sasmol.test_sasmol.data.sasmol.calculate', 'sasmol.test_sasmol.data.sasmol.file_io', 'sasmol.test_sasmol.data.sasmol.file_io.test-results', 'sasmol.test_sasmol.data.sasmol.linear_algebra', 'sasmol.test_sasmol.test_utilities', 'sasmol.test_sasmol.data.sasmol.system',
+      packages=['sasmol', 'mmcif', 'mmcif.api', 'mmcif.core', 'mmcif.io', 'sasmol.test_sasmol', 'sasmol.test_sasmol.utilities', 'sasmol.test_sasmol.data', 'sasmol.test_sasmol.data.pdb_common', 'sasmol.test_sasmol.data.dcd_common', 'sasmol.test_sasmol.data.sasmol', 'sasmol.test_sasmol.data.sasmol.calculate', 'sasmol.test_sasmol.data.sasmol.file_io', 'sasmol.test_sasmol.data.sasmol.file_io.test-results', 'sasmol.test_sasmol.data.sasmol.linear_algebra', 'sasmol.test_sasmol.test_utilities', 'sasmol.test_sasmol.data.sasmol.system',
                 'sasmol.test_sasmol.data.sasmol.operate', 'sasmol.test_sasmol.data.sasmol.properties', 'sasmol.test_sasmol.test_calculate', 'sasmol.test_sasmol.test_file_io', 'sasmol.test_sasmol.test_linear_algebra', 'sasmol.test_sasmol.test_operate', 'sasmol.test_sasmol.test_properties', 'sasmol.test_sasmol.test_subset', 'sasmol.test_sasmol.test_topology', 'sasmol.extensions', 'sasmol.extensions.dcdio', 'sasmol.extensions.view', 'sasmol.extensions.mask', 'sasmol.extensions.matrix_math'],
 
       ext_modules=[
@@ -113,6 +116,20 @@ setup(name='sasmol',
               'src', 'python', 'test_sasmol', 'data', 'pdb_common', '3AAD.pdb')]),
           (os.path.join('sasmol', 'test_sasmol', 'data', 'pdb_common'), [os.path.join(
               'src', 'python', 'test_sasmol', 'data', 'pdb_common', 'rna-1to10.pdb')]),
+          (os.path.join('sasmol', 'test_sasmol', 'data', 'mmcif_common'), [os.path.join(
+              'src', 'python', 'test_sasmol', 'data', 'mmcif_common', '1BNA.cif')]),
+          (os.path.join('sasmol', 'test_sasmol', 'data', 'mmcif_common'), [os.path.join(
+              'src', 'python', 'test_sasmol', 'data', 'mmcif_common', '1CRN.cif')]),
+          (os.path.join('sasmol', 'test_sasmol', 'data', 'mmcif_common'), [os.path.join(
+              'src', 'python', 'test_sasmol', 'data', 'mmcif_common', '1EHZ.cif')]),
+          (os.path.join('sasmol', 'test_sasmol', 'data', 'mmcif_common'), [os.path.join(
+              'src', 'python', 'test_sasmol', 'data', 'mmcif_common', '1KP8.cif')]),
+          (os.path.join('sasmol', 'test_sasmol', 'data', 'mmcif_common'), [os.path.join(
+              'src', 'python', 'test_sasmol', 'data', 'mmcif_common', '2K39.cif')]),
+          (os.path.join('sasmol', 'test_sasmol', 'data', 'mmcif_common'), [os.path.join(
+              'src', 'python', 'test_sasmol', 'data', 'mmcif_common', '4HHB.cif')]),
+          (os.path.join('sasmol', 'test_sasmol', 'data', 'mmcif_common'), [os.path.join(
+              'src', 'python', 'test_sasmol', 'data', 'mmcif_common', 'README.md')]),
 
           (os.path.join('sasmol', 'test_sasmol', 'data', 'sasmol', 'calculate'), [os.path.join(
               'src', 'python', 'test_sasmol', 'data', 'sasmol', 'calculate', '1ATN.pdb')]),

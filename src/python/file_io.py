@@ -22,6 +22,7 @@ import string
 import locale
 import time
 import sasmol.pdb_io as pdb_io
+import sasmol.mmcif_io as mmcif_io
 import sasmol.dcd_io as dcd_io
 
 #	FILE_IO
@@ -44,7 +45,7 @@ import sasmol.dcd_io as dcd_io
 
 '''
 
-class Files(pdb_io.PDB, dcd_io.DCD):
+class Files(pdb_io.PDB, mmcif_io.MMCIF, dcd_io.DCD):
     '''
     Composite I/O mixin that combines PDB and DCD behavior.
 
@@ -72,6 +73,51 @@ class Files(pdb_io.PDB, dcd_io.DCD):
             string : mode hint provided by caller
         '''
         pass
+
+    def _detect_structure_format(self, filename):
+        '''
+        Detect legacy PDB versus PDBx/mmCIF for structure input dispatch.
+        '''
+
+        lower_filename = str(filename).lower()
+        if lower_filename.endswith(('.cif', '.mmcif', '.cif.gz', '.mmcif.gz')):
+            return 'mmcif'
+        if lower_filename.endswith(('.pdb', '.ent', '.pdb.gz')):
+            return 'pdb'
+
+        with open(filename, 'r') as infile:
+            for line in infile:
+                stripped = line.strip()
+                if stripped == '':
+                    continue
+                if stripped.startswith('data_') or stripped.startswith('_atom_site.'):
+                    return 'mmcif'
+                record_name = line[0:6].strip()
+                if record_name in ('ATOM', 'HETATM', 'HEADER', 'MODEL', 'REMARK'):
+                    return 'pdb'
+                break
+
+        raise ValueError('unable to detect structure file format: ' + str(filename))
+
+    def read_structure(self, filename, format='auto', **kwargs):
+        '''
+        Read a molecular structure file using format dispatch.
+
+        ``format='auto'`` preserves legacy PDB behavior for `.pdb`/`.ent`
+        inputs while routing PDBx/mmCIF files to ``read_mmcif``.
+        '''
+
+        selected_format = format
+        if selected_format == 'auto':
+            selected_format = self._detect_structure_format(filename)
+
+        selected_format = selected_format.lower()
+        if selected_format in ('pdb', 'legacy_pdb'):
+            return self.read_pdb(filename, **kwargs)
+        if selected_format in ('mmcif', 'cif', 'pdbx'):
+            return self.read_mmcif(filename, **kwargs)
+
+        raise ValueError('unsupported structure file format: ' + str(format))
 
     def open_file(filename):
         '''

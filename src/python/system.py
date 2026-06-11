@@ -130,7 +130,7 @@ class Atom(
         try:
             if self._filename is not None:
                 if (os.path.isfile(self._filename)):
-                    self.read_pdb(self._filename)
+                    self.read_structure(self._filename)
                     self._defined_with_input_file = True
             else:
 
@@ -138,7 +138,7 @@ class Atom(
                     self._argument_flag = True
                     if (os.path.isfile(str(argument))):
                         try:
-                            self.read_pdb(argument)
+                            self.read_structure(argument)
                             self._defined_with_input_file = True
                             self._filename = argument
                             break
