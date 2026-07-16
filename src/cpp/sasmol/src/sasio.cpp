@@ -4,6 +4,20 @@
 #include <sascalc.h>
 #include <util.h>
 #include <stdexcept> 
+#include <vector>
+
+sasio::DcdReadHandle::DcdReadHandle()
+    : fp(0),
+      natoms(0),
+      nframes(0),
+      reverseEndian(0),
+      charmm(0),
+      istart(0),
+      nsavc(0),
+      delta(0.0),
+      namnf(0)
+{
+}
 
 ///
 /// @par Detailed description 
@@ -670,24 +684,103 @@ FILE *
 sasio::
 open_dcd_read(std::string &filename, int &natoms, int &nset, int &reverseEndian) {
 
-    FILE *dcd_infile = 0 ;
+    DcdReadHandle dcd_handle = sasio::open_dcd_read_handle(filename);
+    natoms = dcd_handle.natoms;
+    nset = dcd_handle.nframes;
+    reverseEndian = dcd_handle.reverseEndian;
 
-    char *c_filename = new char[filename.size()+1] ;
-    c_filename[filename.size()] = 0 ;
-    memcpy(c_filename,filename.c_str(),filename.size()) ;
+    return dcd_handle.fp ;
+}
 
-    dcd_infile = ::open_dcd_read(c_filename) ; /// @note I have to cite the global declaration
+///
+/// @par Detailed description
+/// Open a DCD file for C++ streaming reads and keep the header-derived state
+/// required by read_dcdstep() with the file pointer.
+/// @param [in] filename DCD path
+/// @return DCD read descriptor
+sasio::DcdReadHandle
+sasio::
+open_dcd_read_handle(std::string &filename) {
 
-    int num_fixed = 0 ; 
-    int charmm = 0 ;
-    int result = 1 ;
+    DcdReadHandle dcd_handle ;
+    std::vector<char> c_filename(filename.begin(), filename.end()) ;
+    c_filename.push_back('\0') ;
 
-    int read_header_result, istart, nsavc, namnf ;
-    double delta ; 
+    dcd_handle.fp = ::open_dcd_read(&c_filename[0]) ; /// @note I have to cite the global declaration
 
-    read_header_result = read_dcdheader(dcd_infile,&natoms,&nset,&istart,&nsavc,&delta,&namnf,&reverseEndian,&charmm) ;
+    if(dcd_handle.fp == 0)
+    {
+        return dcd_handle ;
+    }
 
-    return dcd_infile ;
+    int read_header_result = read_dcdheader(
+        dcd_handle.fp,
+        &dcd_handle.natoms,
+        &dcd_handle.nframes,
+        &dcd_handle.istart,
+        &dcd_handle.nsavc,
+        &dcd_handle.delta,
+        &dcd_handle.namnf,
+        &dcd_handle.reverseEndian,
+        &dcd_handle.charmm) ;
+
+    if(read_header_result != 0)
+    {
+        sasio::close_dcd_read(dcd_handle) ;
+    }
+
+    return dcd_handle ;
+}
+
+///
+/// @par Detailed description
+/// Close a DCD descriptor and clear its stored file pointer.
+/// @param [in, out] dcd_handle DCD read descriptor
+/// @return fclose result, or 0 if already closed
+int
+sasio::
+close_dcd_read(DcdReadHandle &dcd_handle) {
+
+    if(dcd_handle.fp == 0)
+    {
+        return 0 ;
+    }
+
+    int result = ::close_dcd_read(dcd_handle.fp) ;
+    dcd_handle.fp = 0 ;
+
+    return result ;
+}
+
+///
+/// @par Detailed description
+/// Read the next DCD frame using all header state stored in the descriptor.
+/// @param [in, out] dcd_handle DCD read descriptor
+/// @param [in] frame Destination frame index
+/// @param [out] x X coordinates
+/// @param [out] y Y coordinates
+/// @param [out] z Z coordinates
+/// @return read_dcdstep() result
+int
+sasio::
+read_dcd_step(DcdReadHandle &dcd_handle, int &frame, float *x, float *y, float *z) {
+
+    int first = frame ;
+    if(dcd_handle.namnf != 0)
+    {
+        first = (frame == 0) ? 1 : 0 ;
+    }
+
+    return read_dcdstep(
+        dcd_handle.fp,
+        dcd_handle.natoms,
+        x,
+        y,
+        z,
+        dcd_handle.namnf,
+        first,
+        dcd_handle.reverseEndian,
+        dcd_handle.charmm) ;
 }
 
 ///
@@ -722,6 +815,53 @@ read_dcd_step(FILE *dcd_infile, int &frame, int &natoms, int &reverseEndian)
           _x()(i,frame) = vector_x[i] ;
           _y()(i,frame) = vector_y[i] ;
           _z()(i,frame) = vector_z[i] ;
+    }
+
+    _number_of_frames()++ ;
+
+    return ;
+}
+
+///
+/// @par Detailed description
+/// Read the next DCD frame using the persistent descriptor populated by
+/// open_dcd_read_handle().
+/// @param [in, out] dcd_handle DCD read descriptor
+/// @param [in] frame Destination frame index
+/// @return ...
+/// @note ...
+void
+sasio::Files::
+read_dcd_step(sasio::DcdReadHandle &dcd_handle, int &frame)
+{
+
+    std::vector<float> vector_x(dcd_handle.natoms) ;
+    std::vector<float> vector_y(dcd_handle.natoms) ;
+    std::vector<float> vector_z(dcd_handle.natoms) ;
+
+    int result = sasio::read_dcd_step(
+        dcd_handle,
+        frame,
+        &vector_x[0],
+        &vector_y[0],
+        &vector_z[0]) ;
+
+    if(result != 0)
+    {
+        throw std::runtime_error("read_dcdstep failed") ;
+    }
+
+    if(_x().cols() < frame)
+    {
+        std::cout << "resizing array: cols() =  " << _x().cols() << " frame = " << frame  << std::endl ;
+        resize_array() ;
+    }
+
+    for(int i = 0 ; i < _natoms() ; ++i)
+    {
+          _x()(i,frame) = vector_x[i] ;
+          _y()(i,frame) = vector_y[i] ;
+          _z()(i,frame) = vector_z[i] ;
     } 
 
     _number_of_frames()++ ;
@@ -741,29 +881,26 @@ sasio::Files::
 read_dcd(std::string &dcd_input_file_name)
 {
 
-    int input_natoms, input_nset, input_reverseEndian ;
-    FILE *dcd_file_pointer ;
-
-    dcd_file_pointer = sasio::open_dcd_read(dcd_input_file_name, input_natoms, input_nset, input_reverseEndian) ;
+    DcdReadHandle dcd_handle = sasio::open_dcd_read_handle(dcd_input_file_name) ;
 
     int input_frame = 0 ;
 
     _number_of_frames() = 0 ;
 
-    _x().setZero(_natoms(), input_nset);
-    _y().setZero(_natoms(), input_nset);
-    _z().setZero(_natoms(), input_nset);
+    _x().setZero(_natoms(), dcd_handle.nframes);
+    _y().setZero(_natoms(), dcd_handle.nframes);
+    _z().setZero(_natoms(), dcd_handle.nframes);
 
     std::cout << "_x().cols() = " << _x().cols() << std::endl ;
-    std::cout << "input_nset = " << input_nset << std::endl ;
+    std::cout << "input_nset = " << dcd_handle.nframes << std::endl ;
 
-    for(int i = 0 ; i < input_nset ; ++i)
+    for(int i = 0 ; i < dcd_handle.nframes ; ++i)
     {
         std::cout << "." ;
-        read_dcd_step(dcd_file_pointer, i, input_natoms, input_reverseEndian) ;
+        read_dcd_step(dcd_handle, i) ;
     }
 
-    int result = close_dcd_read(dcd_file_pointer) ;
+    int result = sasio::close_dcd_read(dcd_handle) ;
 
     std::cout << std::endl ;
 
@@ -780,4 +917,3 @@ to do:
     def write_dcd_frames(self, filename, start, end) --> not used
 
 */
-

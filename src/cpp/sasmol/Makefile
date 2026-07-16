@@ -37,12 +37,15 @@ PTEROS_HEADERS=$(addprefix $(PTEROS_DIRINC),$(PTEROS_SRC:.cpp=.h))
 PTEROS_SOURCES=$(addprefix $(PTEROS_DIRSRC),$(PTEROS_SRC))
 PTEROS_OBJECTS=$(addprefix $(PTEROS_DIRLIB),$(PTEROS_SRC:.cpp=.o))
 
-all: $(DIRTESTS)test.out $(DIRTESTS)test_pteros.out
+all: $(DIRTESTS)test.out $(DIRTESTS)test_pteros.out $(DIRTESTS)test_dcd_read_handle.out
 
 $(DIRTESTS)test.out: $(DIRTESTS)test.cpp $(LIBRARY)
 	$(CC) $< $(LDFLAGS) -L$(DIRLIB_BOOST) -L$(DIRLIB) -l$(LIB) -lboost_regex -o $@
 
 $(DIRTESTS)test_pteros.out: $(DIRTESTS)test_pteros.cpp $(LIBRARY)
+	$(CC) $< $(LDFLAGS) -L$(DIRLIB_BOOST) -L$(DIRLIB) -l$(LIB) -lboost_regex -o $@
+
+$(DIRTESTS)test_dcd_read_handle.out: $(DIRTESTS)test_dcd_read_handle.cpp $(LIBRARY)
 	$(CC) $< $(LDFLAGS) -L$(DIRLIB_BOOST) -L$(DIRLIB) -l$(LIB) -lboost_regex -o $@
 
 $(LIBRARY): $(OBJECTS) $(PTEROS_OBJECTS)
@@ -65,4 +68,4 @@ clean:
 	rm -f $(OBJECTS)
 	rm -f $(PTEROS_OBJECTS)
 	rm -f $(LIBRARY)
-	rm -f $(DIRTESTS)test.out $(DIRTESTS)test_pteros.out
+	rm -f $(DIRTESTS)test.out $(DIRTESTS)test_pteros.out $(DIRTESTS)test_dcd_read_handle.out
