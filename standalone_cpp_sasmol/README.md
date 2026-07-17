@@ -1,9 +1,8 @@
-# Standalone C++ SasMol
+# Modern C++ SasMol
 
-This directory starts a new standalone C++20 SasMol library. It is intentionally
-separate from the existing Python `zazmol` package and from the legacy
-`src/cpp/sasmol` tree. Python `zazmol` remains the read-only behavioral
-standard, fixture source, and naming reference.
+This directory contains the modern C++20 SasMol library that is packaged with
+the Python `sasmol` install. Python `zazmol` remains the behavioral standard,
+fixture source, and naming reference for one-to-one parity work.
 
 ## Design Goals
 
@@ -58,6 +57,28 @@ Open design follow-ups are tracked in
 cmake -S standalone_cpp_sasmol -B standalone_cpp_sasmol/build
 cmake --build standalone_cpp_sasmol/build
 ctest --test-dir standalone_cpp_sasmol/build --output-on-failure
+```
+
+To install the native library and CMake package metadata from this tree:
+
+```bash
+cmake -S standalone_cpp_sasmol -B standalone_cpp_sasmol/build \
+  -DCMAKE_INSTALL_PREFIX=/path/to/prefix
+cmake --build standalone_cpp_sasmol/build --target install
+```
+
+The install exports the `sasmol::sasmol` CMake target, headers under
+`include/sasmol`, and the static archive as `lib/libsasmol.a`.
+
+The normal Python package build also builds this library and stages it under the
+installed `sasmol/native` package directory. Downstream builds should discover
+the packaged paths through:
+
+```python
+import sasmol.native_config as native_config
+
+include_dirs = native_config.include_dirs()
+extra_objects = native_config.extra_objects()
 ```
 
 ## Memory-Safety Checks

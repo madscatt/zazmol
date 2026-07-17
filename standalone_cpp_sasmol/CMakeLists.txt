@@ -1,16 +1,19 @@
 cmake_minimum_required(VERSION 3.20)
 
 project(
-  standalone_cpp_sasmol
+  sasmol
   VERSION 0.1.0
-  DESCRIPTION "Standalone C++20 SasMol parity library"
+  DESCRIPTION "Modern C++20 SasMol parity library"
   LANGUAGES C CXX
 )
+
+include(CMakePackageConfigHelpers)
+include(GNUInstallDirs)
 
 option(SASMOL_ENABLE_SANITIZERS "Build with AddressSanitizer and UndefinedBehaviorSanitizer" OFF)
 option(SASMOL_ENABLE_VMD_ADAPTER "Build optional VMD IMD socket adapter" OFF)
 
-add_library(sasmol_standalone
+add_library(sasmol
   src/calculate.cpp
   src/file_io.cpp
   src/linear_algebra.cpp
@@ -23,14 +26,16 @@ add_library(sasmol_standalone
   src/topology.cpp
   src/view.cpp
 )
+add_library(sasmol_standalone ALIAS sasmol)
 
-target_include_directories(sasmol_standalone
+target_include_directories(sasmol
   PUBLIC
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+    $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
 )
 
-target_compile_features(sasmol_standalone PUBLIC cxx_std_20)
-set_target_properties(sasmol_standalone PROPERTIES
+target_compile_features(sasmol PUBLIC cxx_std_20)
+set_target_properties(sasmol PROPERTIES
   C_STANDARD 99
   C_STANDARD_REQUIRED YES
   CXX_STANDARD 20
@@ -39,30 +44,66 @@ set_target_properties(sasmol_standalone PROPERTIES
 )
 
 if(SASMOL_ENABLE_VMD_ADAPTER)
-  target_sources(sasmol_standalone PRIVATE
+  target_sources(sasmol PRIVATE
     src/vmd_legacy/imd.c
     src/vmd_legacy/view_vmd.c
     src/vmd_legacy/vmdsock.c
   )
-  target_include_directories(sasmol_standalone PRIVATE
+  target_include_directories(sasmol PRIVATE
     ${CMAKE_CURRENT_SOURCE_DIR}/src/vmd_legacy
   )
-  target_compile_definitions(sasmol_standalone PUBLIC SASMOL_ENABLE_VMD_ADAPTER=1)
+  target_compile_definitions(sasmol PUBLIC SASMOL_ENABLE_VMD_ADAPTER=1)
 endif()
 
 if(MSVC)
-  target_compile_options(sasmol_standalone PRIVATE /W4)
+  target_compile_options(sasmol PRIVATE /W4)
 else()
-  target_compile_options(sasmol_standalone PRIVATE -Wall -Wextra -Wpedantic)
+  target_compile_options(sasmol PRIVATE -Wall -Wextra -Wpedantic)
 endif()
 
 if(SASMOL_ENABLE_SANITIZERS)
   if(MSVC)
     message(FATAL_ERROR "SASMOL_ENABLE_SANITIZERS is currently configured for Clang/GCC-style sanitizers.")
   endif()
-  target_compile_options(sasmol_standalone PUBLIC -fsanitize=address,undefined -fno-omit-frame-pointer)
-  target_link_options(sasmol_standalone PUBLIC -fsanitize=address,undefined)
+  target_compile_options(sasmol PUBLIC -fsanitize=address,undefined -fno-omit-frame-pointer)
+  target_link_options(sasmol PUBLIC -fsanitize=address,undefined)
 endif()
+
+install(TARGETS sasmol
+  EXPORT sasmolTargets
+  ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+  LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+  RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+  INCLUDES DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
+)
+
+install(DIRECTORY include/sasmol
+  DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
+  FILES_MATCHING PATTERN "*.hpp"
+)
+
+write_basic_package_version_file(
+  "${CMAKE_CURRENT_BINARY_DIR}/sasmolConfigVersion.cmake"
+  VERSION ${PROJECT_VERSION}
+  COMPATIBILITY SameMajorVersion
+)
+
+configure_package_config_file(
+  "${CMAKE_CURRENT_SOURCE_DIR}/cmake/sasmolConfig.cmake.in"
+  "${CMAKE_CURRENT_BINARY_DIR}/sasmolConfig.cmake"
+  INSTALL_DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/sasmol
+)
+
+install(FILES
+  "${CMAKE_CURRENT_BINARY_DIR}/sasmolConfig.cmake"
+  "${CMAKE_CURRENT_BINARY_DIR}/sasmolConfigVersion.cmake"
+  DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/sasmol
+)
+
+install(EXPORT sasmolTargets
+  NAMESPACE sasmol::
+  DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/sasmol
+)
 
 add_executable(dcd_roundtrip_writer tools/dcd_roundtrip_writer.cpp)
 target_link_libraries(dcd_roundtrip_writer PRIVATE sasmol_standalone)

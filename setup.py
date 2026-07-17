@@ -6,9 +6,11 @@
 '''
 import numpy
 import os
+import subprocess
 # import setuptools
 # from numpy.distutils.core import Extension, setup
 from setuptools import Extension, setup
+from setuptools.command.build_py import build_py as _build_py
 #       SETUP
 #
 #       12/01/2009      --      initial coding              :       jc
@@ -29,6 +31,49 @@ from setuptools import Extension, setup
 os.environ['NPY_DISABLE_CPU_FEATURES'] = 'AVX512FP16'
 
 NUMPY_INCLUDE = numpy.get_include()
+
+
+class build_py(_build_py):
+    """Build and stage the modern native C++ SasMol library."""
+
+    def run(self):
+        _build_py.run(self)
+        self._build_native_sasmol()
+
+    def _build_native_sasmol(self):
+        source_dir = os.path.abspath(
+            os.path.join(os.path.dirname(__file__), 'standalone_cpp_sasmol'))
+        if not os.path.isdir(source_dir):
+            raise RuntimeError(
+                "missing modern C++ SasMol source directory: %s" % source_dir)
+
+        build_cmd = self.get_finalized_command('build')
+        build_dir = os.path.abspath(
+            os.path.join(build_cmd.build_temp, 'sasmol_native'))
+        stage_dir = os.path.abspath(
+            os.path.join(self.build_lib, 'sasmol', 'native'))
+        cmake_args = [
+            'cmake',
+            '-S', source_dir,
+            '-B', build_dir,
+            '-DCMAKE_BUILD_TYPE=Release',
+            '-DBUILD_TESTING=OFF',
+            '-DCMAKE_POSITION_INDEPENDENT_CODE=ON',
+            '-DCMAKE_INSTALL_PREFIX=%s' % stage_dir,
+        ]
+        build_args = [
+            'cmake',
+            '--build', build_dir,
+            '--target', 'install',
+            '--config', 'Release',
+        ]
+
+        try:
+            subprocess.check_call(cmake_args)
+            subprocess.check_call(build_args)
+        except OSError as exc:
+            raise RuntimeError(
+                "CMake is required to build the native SasMol library: %s" % exc)
 
 
 def read(fname):
@@ -59,8 +104,18 @@ setup(name='sasmol',
           'mmcif': os.path.join(
               'third_party', 'rcsb', 'mmcif-1.1.1', 'mmcif')},
 
-      packages=['sasmol', 'mmcif', 'mmcif.api', 'mmcif.core', 'mmcif.io', 'sasmol.test_sasmol', 'sasmol.test_sasmol.utilities', 'sasmol.test_sasmol.data', 'sasmol.test_sasmol.data.pdb_common', 'sasmol.test_sasmol.data.dcd_common', 'sasmol.test_sasmol.data.sasmol', 'sasmol.test_sasmol.data.sasmol.calculate', 'sasmol.test_sasmol.data.sasmol.file_io', 'sasmol.test_sasmol.data.sasmol.file_io.test-results', 'sasmol.test_sasmol.data.sasmol.linear_algebra', 'sasmol.test_sasmol.test_utilities', 'sasmol.test_sasmol.data.sasmol.system',
+      packages=['sasmol', 'mmcif', 'mmcif.api', 'mmcif.core', 'mmcif.io', 'sasmol.test_sasmol', 'sasmol.test_sasmol.utilities', 'sasmol.test_sasmol.data', 'sasmol.test_sasmol.data.pdb_common', 'sasmol.test_sasmol.data.dcd_common', 'sasmol.test_sasmol.data.sasmol', 'sasmol.test_sasmol.data.sasmol.calculate', 'sasmol.test_sasmol.data.sasmol.file_io', 'sasmol.test_sasmol.data.sasmol.file_io.test-results', 'sasmol.test_sasmol.data.sasmol.linear_algebra', 'sasmol.test_sasmol.test_utilities', 'sasmol.test_sasmol.test_system', 'sasmol.test_sasmol.data.sasmol.system',
                 'sasmol.test_sasmol.data.sasmol.operate', 'sasmol.test_sasmol.data.sasmol.properties', 'sasmol.test_sasmol.test_calculate', 'sasmol.test_sasmol.test_file_io', 'sasmol.test_sasmol.test_linear_algebra', 'sasmol.test_sasmol.test_operate', 'sasmol.test_sasmol.test_properties', 'sasmol.test_sasmol.test_subset', 'sasmol.test_sasmol.test_topology', 'sasmol.extensions', 'sasmol.extensions.dcdio', 'sasmol.extensions.view', 'sasmol.extensions.mask', 'sasmol.extensions.matrix_math'],
+
+      package_data={
+          'sasmol': [
+              'native/include/sasmol/*.hpp',
+              'native/lib/*.a',
+              'native/lib/cmake/sasmol/*.cmake',
+          ],
+      },
+
+      cmdclass={'build_py': build_py},
 
       ext_modules=[
           Extension('sasmol._dcdio',

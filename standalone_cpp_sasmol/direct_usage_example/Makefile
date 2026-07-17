@@ -5,7 +5,7 @@ CFLAGS ?= -std=c99 -Wall -Wextra -Wpedantic -O2
 
 SASMOL_DIR := ..
 BUILD_DIR := $(SASMOL_DIR)/build
-LIB := $(BUILD_DIR)/libsasmol_standalone.a
+LIB := $(BUILD_DIR)/libsasmol.a
 INCLUDES := -I$(SASMOL_DIR)/include
 CPP_TARGET := simple_pdb_in_dcd_out_cpp
 C_TARGET := simple_pdb_in_dcd_out_c
@@ -26,7 +26,7 @@ all: $(CPP_TARGET) $(C_TARGET)
 
 sasmol:
 	cmake -S $(SASMOL_DIR) -B $(BUILD_DIR)
-	cmake --build $(BUILD_DIR) --target sasmol_standalone
+	cmake --build $(BUILD_DIR) --target sasmol
 
 $(CPP_OBJECT): $(CPP_SOURCE)
 	$(CXX) $(CXXFLAGS) $(INCLUDES) -c $(CPP_SOURCE) -o $(CPP_OBJECT)

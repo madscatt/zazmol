@@ -1,0 +1,2 @@
+recursive-include standalone_cpp_sasmol *.cmake *.cpp *.c *.hpp *.h *.md
+recursive-include standalone_cpp_sasmol/cmake *.in
