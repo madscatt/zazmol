@@ -4,6 +4,7 @@
 #include <cmath>
 #include <filesystem>
 #include <fstream>
+#include <iomanip>
 #include <sstream>
 #include <string>
 #include <vector>
@@ -67,6 +68,22 @@ void test_conect_lines_remap_original_to_current_indices() {
 
 std::filesystem::path fixture_path(const char* area, const char* name) {
   return std::filesystem::path(SASMOL_TEST_DATA_DIR) / area / name;
+}
+
+std::string atom_line(int serial, const std::string& name,
+                      const std::string& resname, const std::string& chain,
+                      int resid) {
+  std::ostringstream line;
+  line << std::left << std::setw(6) << "ATOM" << std::right << std::setw(5)
+       << serial << " " << std::left << std::setw(4) << name << " "
+       << std::left << std::setw(4) << resname << std::setw(1) << chain
+       << std::right << std::setw(4) << resid << "    " << std::fixed
+       << std::setprecision(3) << std::setw(8) << static_cast<double>(serial)
+       << std::setw(8) << static_cast<double>(serial + 1)
+       << std::setw(8) << static_cast<double>(serial + 2)
+       << "  1.00  0.00      " << std::left << std::setw(4) << chain
+       << std::right << std::setw(2) << name[0] << "  \n";
+  return line.str();
 }
 
 std::vector<std::vector<std::string>> read_token_rows(
@@ -502,7 +519,36 @@ void test_read_pdb_classifies_rna_moltype() {
 
   assert(status.ok());
   assert(mol.natoms() == 10632);
-  assert(mol.moltype()[0] == "rna");
+  assert(mol.moltype()[0] == "nucleic");
+}
+
+void test_read_pdb_classifies_overlap_resnames_as_nucleic() {
+  const auto path =
+      std::filesystem::temp_directory_path() / "sasmol_moltype_overlap.pdb";
+  {
+    std::ofstream output(path);
+    output << atom_line(1, "P", "ALA", "P", 1)
+           << atom_line(2, "P", "ADE", "D", 2)
+           << atom_line(3, "P", "GUA", "D", 3)
+           << atom_line(4, "P", "CYT", "D", 4)
+           << atom_line(5, "P", "THY", "D", 5)
+           << atom_line(6, "P", "URA", "R", 6)
+           << atom_line(7, "P", "A", "R", 7)
+           << atom_line(8, "P", "DA", "D", 8)
+           << atom_line(9, "O", "TIP3", "W", 9)
+           << atom_line(10, "C1", "LIG", "L", 10) << "END\n";
+  }
+
+  sasmol::PdbReader reader;
+  sasmol::Molecule mol;
+  const auto status = reader.read_pdb(path, mol);
+
+  assert(status.ok());
+  assert((mol.moltype() == std::vector<std::string>{
+                              "protein", "nucleic", "nucleic", "nucleic",
+                              "dna", "rna", "rna", "dna", "water",
+                              "other"}));
+  std::filesystem::remove(path);
 }
 
 void test_read_pdb_rna_multiframe_fixture() {
@@ -517,7 +563,7 @@ void test_read_pdb_rna_multiframe_fixture() {
   assert(mol.number_of_frames() == 10);
   assert(mol.name()[0] == "C5'");
   assert(mol.resname()[0] == "GUA");
-  assert(mol.moltype()[0] == "rna");
+  assert(mol.moltype()[0] == "nucleic");
   auto xyz = mol.coordinate(0, 0);
   assert_close(xyz.x, -5.094F);
   assert_close(xyz.y, 1.608F);
@@ -848,7 +894,7 @@ void test_write_pdb_selected_rna_frame_round_trip() {
   assert(status.ok());
   assert(round_trip.natoms() == 10632);
   assert(round_trip.number_of_frames() == 1);
-  assert(round_trip.moltype()[0] == "rna");
+  assert(round_trip.moltype()[0] == "nucleic");
   const auto xyz = round_trip.coordinate(0, 10631);
   assert_close(xyz.x, -6.392F);
   assert_close(xyz.y, 14.348F);
@@ -1109,6 +1155,7 @@ int main() {
   test_read_pdb_single_frame_1atm();
   test_read_pdb_single_frame_2aad_descriptors();
   test_read_pdb_classifies_rna_moltype();
+  test_read_pdb_classifies_overlap_resnames_as_nucleic();
   test_read_pdb_rna_multiframe_fixture();
   test_read_pdb_1crn_protein_fixture();
   test_read_pdb_accepts_single_frame_without_end();

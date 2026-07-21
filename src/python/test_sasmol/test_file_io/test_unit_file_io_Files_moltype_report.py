@@ -29,15 +29,15 @@ class Test_unit_file_io_Files_moltype_report(unittest.TestCase):
             resname=['ADE', 'CYT', 'GUA'],
             resid=[1, 2, 3],
             segname='DNA1',
-            moltype=['rna', 'rna', 'rna'])
+            moltype=['nucleic', 'nucleic', 'nucleic'])
 
         report = molecule.moltype_by_segname_report()
 
         self.assertEqual(report['overall_status'], 'ambiguous_nucleic')
-        self.assertEqual(molecule.moltype(), ['rna', 'rna', 'rna'])
+        self.assertEqual(molecule.moltype(), ['nucleic', 'nucleic', 'nucleic'])
         segment = report['segments']['DNA1']
         self.assertEqual(segment['status'], 'ambiguous_nucleic')
-        self.assertEqual(segment['assigned_moltypes'], ['rna'])
+        self.assertEqual(segment['assigned_moltypes'], ['nucleic'])
         self.assertEqual(segment['ambiguous_resnames'], ['ADE', 'CYT', 'GUA'])
         self.assertEqual(segment['residue_count'], 3)
         self.assertIn('DNA/RNA-overlap residue names',

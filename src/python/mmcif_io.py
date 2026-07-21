@@ -134,17 +134,7 @@ class MMCIF(object):
         return atom_site
 
     def _mmcif_moltype_for_resname(self, resname):
-        protein_resnames, dna_resnames, rna_resnames, nucleic_resnames, water_resnames = self.get_resnames()
-
-        if resname in protein_resnames:
-            return 'protein'
-        if resname in rna_resnames:
-            return 'rna'
-        if resname in dna_resnames:
-            return 'dna'
-        if resname in water_resnames:
-            return 'water'
-        return 'other'
+        return self.moltype_for_resname(resname)
 
     def _mmcif_unique_counts(self, values):
         unique_values = []

@@ -551,6 +551,28 @@ class PDB(object):
 			
         return protein_resnames,dna_resnames,rna_resnames,nucleic_resnames,water_resnames
 
+    def moltype_for_resname(self, resname):
+        '''
+        Return the residue-name moltype without resolving DNA/RNA overlap by
+        table order.
+        '''
+
+        protein_resnames,dna_resnames,rna_resnames,nucleic_resnames,water_resnames = self.get_resnames()
+        is_dna = resname in dna_resnames
+        is_rna = resname in rna_resnames
+
+        if resname in protein_resnames:
+            return 'protein'
+        if is_dna and is_rna:
+            return 'nucleic'
+        if is_rna:
+            return 'rna'
+        if is_dna:
+            return 'dna'
+        if resname in water_resnames:
+            return 'water'
+        return 'other'
+
     def moltype_by_segname_report(self):
         '''
         Build a non-mutating report of moltype assignments by segment.
@@ -1083,21 +1105,8 @@ class PDB(object):
 	
                 #this_resname=(string.strip(lin[17:21]))
                 this_resname=(lin[17:21].strip())
-                if this_resname in protein_resnames:
-                    moltype.append('protein')
-                    this_moltype = 'protein'
-                elif this_resname in rna_resnames:	
-                    moltype.append('rna')
-                    this_moltype = 'rna'
-                elif this_resname in dna_resnames:	
-                    moltype.append('dna')
-                    this_moltype = 'dna'
-                elif this_resname in water_resnames:	
-                    moltype.append('water')
-                    this_moltype = 'water'
-                else:
-                    moltype.append('other')
-                    this_moltype = 'other'
+                this_moltype = self.moltype_for_resname(this_resname)
+                moltype.append(this_moltype)
 				
                 if(this_moltype not in unique_moltypes): unique_moltypes.append(this_moltype)
 					

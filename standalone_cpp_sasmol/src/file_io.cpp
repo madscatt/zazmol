@@ -371,9 +371,13 @@ std::string moltype_for_resname(const std::string& resname) {
   static const std::set<std::string> water = {
       "TIP3", "SPCE", "TIP", "SPC", "TIP4", "TP3M"};
 
+  const bool is_dna = dna.contains(resname);
+  const bool is_rna = rna.contains(resname);
+
   if (protein.contains(resname)) return "protein";
-  if (rna.contains(resname)) return "rna";
-  if (dna.contains(resname)) return "dna";
+  if (is_dna && is_rna) return "nucleic";
+  if (is_rna) return "rna";
+  if (is_dna) return "dna";
   if (water.contains(resname)) return "water";
   return "other";
 }

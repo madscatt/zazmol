@@ -21,6 +21,7 @@ from unittest import main
 import unittest
 import os
 import numpy
+import tempfile
 
 import sasmol.system as system
 
@@ -50,6 +51,65 @@ class Test_intg_file_io_Files_read_mmcif(unittest.TestCase):
                 self.assertAlmostEqual(a[i], b[i], places)
             else:
                 self.assertEqual(a[i], b[i])
+
+    def write_temp_mmcif(self, residues):
+        handle = tempfile.NamedTemporaryFile(mode='w', suffix='.cif', delete=False)
+        try:
+            handle.write('data_moltype_regression\n')
+            handle.write('loop_\n')
+            handle.write('_atom_site.group_PDB\n')
+            handle.write('_atom_site.id\n')
+            handle.write('_atom_site.type_symbol\n')
+            handle.write('_atom_site.label_atom_id\n')
+            handle.write('_atom_site.label_alt_id\n')
+            handle.write('_atom_site.label_comp_id\n')
+            handle.write('_atom_site.label_asym_id\n')
+            handle.write('_atom_site.label_entity_id\n')
+            handle.write('_atom_site.label_seq_id\n')
+            handle.write('_atom_site.pdbx_PDB_ins_code\n')
+            handle.write('_atom_site.Cartn_x\n')
+            handle.write('_atom_site.Cartn_y\n')
+            handle.write('_atom_site.Cartn_z\n')
+            handle.write('_atom_site.occupancy\n')
+            handle.write('_atom_site.B_iso_or_equiv\n')
+            handle.write('_atom_site.pdbx_formal_charge\n')
+            handle.write('_atom_site.auth_seq_id\n')
+            handle.write('_atom_site.auth_comp_id\n')
+            handle.write('_atom_site.auth_asym_id\n')
+            handle.write('_atom_site.auth_atom_id\n')
+            handle.write('_atom_site.pdbx_PDB_model_num\n')
+            for atom_id, resname, chain in residues:
+                handle.write(
+                    'ATOM %d P P . %s %s 1 %d ? %.1f %.1f %.1f 1.00 0.00 ? %d %s %s P 1\n' %
+                    (atom_id, resname, chain, atom_id, atom_id, atom_id + 1.0,
+                     atom_id + 2.0, atom_id, resname, chain))
+        finally:
+            handle.close()
+        return handle.name
+
+    def test_resname_moltype_classification_matches_pdb_overlap_policy(self):
+        residues = [
+            (1, 'ALA', 'P'),
+            (2, 'ADE', 'D'),
+            (3, 'GUA', 'D'),
+            (4, 'CYT', 'D'),
+            (5, 'THY', 'D'),
+            (6, 'URA', 'R'),
+            (7, 'A', 'R'),
+            (8, 'DA', 'D'),
+            (9, 'TIP3', 'W'),
+            (10, 'LIG', 'L')]
+        cif_file = self.write_temp_mmcif(residues)
+        try:
+            mol = system.Molecule()
+            mol.read_mmcif(cif_file)
+        finally:
+            os.unlink(cif_file)
+
+        self.assertEqual(
+            list(mol.moltype()),
+            ['protein', 'nucleic', 'nucleic', 'nucleic', 'dna',
+             'rna', 'rna', 'dna', 'water', 'other'])
 
     def test_1crn_mmcif_matches_existing_pdb_core_fields(self):
         pdb_mol = system.Molecule()

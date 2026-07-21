@@ -71,6 +71,29 @@ class Test_subset_Mask_get_subset_mask(unittest.TestCase):
     def setUp(self):
         self.o = system.Molecule(0)
 
+    def test_moltype_masks_include_nucleic_fallback(self):
+        '''
+        test moltype masks for all supported residue classifications
+        '''
+        #
+        self.o = system.Molecule_Maker(
+            6,
+            name=['CA', 'P', 'P', 'O', 'C1', 'P'],
+            moltype=['protein', 'dna', 'rna', 'water', 'other', 'nucleic'])
+        #
+        expected = {
+            'protein': [1, 0, 0, 0, 0, 0],
+            'dna': [0, 1, 0, 0, 0, 0],
+            'rna': [0, 0, 1, 0, 0, 0],
+            'water': [0, 0, 0, 1, 0, 0],
+            'other': [0, 0, 0, 0, 1, 0],
+            'nucleic': [0, 0, 0, 0, 0, 1]}
+        #
+        for moltype, expected_mask in expected.items():
+            error, mask = self.o.get_subset_mask('moltype[i]=="%s"' % moltype)
+            self.assertEqual(error, [])
+            self.assertEqual(list(mask), expected_mask)
+
     def test_null(self):
         '''
         test for a null atom list

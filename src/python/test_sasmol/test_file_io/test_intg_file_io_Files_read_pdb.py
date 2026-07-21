@@ -17,6 +17,7 @@
 
 from sasmol.test_sasmol.utilities import env
 
+from collections import Counter
 from unittest import main, skipIf
 import unittest
 import sasmol.system as system
@@ -72,6 +73,33 @@ class Test_intg_file_io_Files_read_dcd(unittest.TestCase):
       finally:
          handle.close()
       return handle.name
+
+   def test_resname_moltype_classification_does_not_resolve_overlap_as_rna(self):
+      lines = [
+         self.make_atom_line(1, 'P', 'ALA', 'P', 1, 1.0),
+         self.make_atom_line(2, 'P', 'ADE', 'D', 2, 2.0),
+         self.make_atom_line(3, 'P', 'GUA', 'D', 3, 3.0),
+         self.make_atom_line(4, 'P', 'CYT', 'D', 4, 4.0),
+         self.make_atom_line(5, 'P', 'THY', 'D', 5, 5.0),
+         self.make_atom_line(6, 'P', 'URA', 'R', 6, 6.0),
+         self.make_atom_line(7, 'P', 'A', 'R', 7, 7.0),
+         self.make_atom_line(8, 'P', 'DA', 'D', 8, 8.0),
+         self.make_atom_line(9, 'O', 'TIP3', 'W', 9, 9.0),
+         self.make_atom_line(10, 'C1', 'LIG', 'L', 10, 10.0),
+         'END\n']
+      pdb_file = self.write_temp_pdb(lines)
+      try:
+         self.o.read_pdb(pdb_file)
+      finally:
+         os.unlink(pdb_file)
+
+      self.assertEqual(
+         list(self.o.moltype()),
+         ['protein', 'nucleic', 'nucleic', 'nucleic', 'dna',
+          'rna', 'rna', 'dna', 'water', 'other'])
+      self.assertEqual(Counter(self.o.moltype()),
+                       Counter({'nucleic': 3, 'dna': 2, 'rna': 2,
+                                'protein': 1, 'water': 1, 'other': 1}))
 
    def test_1ATM_one_frame(self):
       '''

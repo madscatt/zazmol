@@ -6,6 +6,7 @@
 #include <fstream>
 #include <set>
 #include <string>
+#include <tuple>
 #include <vector>
 
 namespace {
@@ -21,6 +22,46 @@ void assert_close(sasmol::coord_type actual, sasmol::coord_type expected,
 
 std::set<std::string> unique_values(const std::vector<std::string>& values) {
   return std::set<std::string>(values.begin(), values.end());
+}
+
+void write_moltype_mmcif(const std::filesystem::path& path) {
+  const std::vector<std::tuple<int, std::string, std::string>> residues = {
+      {1, "ALA", "P"},  {2, "ADE", "D"},  {3, "GUA", "D"},
+      {4, "CYT", "D"},  {5, "THY", "D"},  {6, "URA", "R"},
+      {7, "A", "R"},    {8, "DA", "D"},   {9, "TIP3", "W"},
+      {10, "LIG", "L"}};
+
+  std::ofstream output(path);
+  output << "data_moltype_regression\n"
+         << "loop_\n"
+         << "_atom_site.group_PDB\n"
+         << "_atom_site.id\n"
+         << "_atom_site.type_symbol\n"
+         << "_atom_site.label_atom_id\n"
+         << "_atom_site.label_alt_id\n"
+         << "_atom_site.label_comp_id\n"
+         << "_atom_site.label_asym_id\n"
+         << "_atom_site.label_entity_id\n"
+         << "_atom_site.label_seq_id\n"
+         << "_atom_site.pdbx_PDB_ins_code\n"
+         << "_atom_site.Cartn_x\n"
+         << "_atom_site.Cartn_y\n"
+         << "_atom_site.Cartn_z\n"
+         << "_atom_site.occupancy\n"
+         << "_atom_site.B_iso_or_equiv\n"
+         << "_atom_site.pdbx_formal_charge\n"
+         << "_atom_site.auth_seq_id\n"
+         << "_atom_site.auth_comp_id\n"
+         << "_atom_site.auth_asym_id\n"
+         << "_atom_site.auth_atom_id\n"
+         << "_atom_site.pdbx_PDB_model_num\n";
+  for (const auto& [atom_id, resname, chain] : residues) {
+    output << "ATOM " << atom_id << " P P . " << resname << " " << chain
+           << " 1 " << atom_id << " ? " << atom_id << ".0 "
+           << atom_id + 1 << ".0 " << atom_id + 2
+           << ".0 1.00 0.00 ? " << atom_id << " " << resname << " "
+           << chain << " P 1\n";
+  }
 }
 
 void test_1crn_mmcif_matches_existing_pdb_core_fields() {
@@ -79,6 +120,23 @@ void test_nucleic_acid_and_heterogen_fixtures_read() {
   assert(hemoglobin.natoms() == 4779);
   assert(unique_values(hemoglobin.moltype()).contains("protein"));
   assert(unique_values(hemoglobin.resname()).contains("HEM"));
+}
+
+void test_read_mmcif_classifies_overlap_resnames_as_nucleic() {
+  const auto path =
+      std::filesystem::temp_directory_path() / "sasmol_moltype_overlap.cif";
+  write_moltype_mmcif(path);
+
+  sasmol::MmcifReader reader;
+  sasmol::Molecule molecule;
+  const auto status = reader.read_mmcif(path, molecule);
+
+  assert(status.ok());
+  assert((molecule.moltype() == std::vector<std::string>{
+                                  "protein", "nucleic", "nucleic", "nucleic",
+                                  "dna", "rna", "rna", "dna", "water",
+                                  "other"}));
+  std::filesystem::remove(path);
 }
 
 void test_multimodel_nmr_fixture_groups_frames() {
@@ -166,6 +224,7 @@ void test_bad_identifier_does_not_mutate_existing_molecule() {
 int main() {
   test_1crn_mmcif_matches_existing_pdb_core_fields();
   test_nucleic_acid_and_heterogen_fixtures_read();
+  test_read_mmcif_classifies_overlap_resnames_as_nucleic();
   test_multimodel_nmr_fixture_groups_frames();
   test_large_multichain_fixture_reads_full_chain_ids();
   test_bad_identifier_does_not_mutate_existing_molecule();
