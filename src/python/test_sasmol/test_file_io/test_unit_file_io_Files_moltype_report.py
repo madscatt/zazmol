@@ -93,6 +93,42 @@ class Test_unit_file_io_Files_moltype_report(unittest.TestCase):
         self.assertEqual(segment['assigned_moltypes'], ['protein', 'dna'])
         self.assertIn('multiple assigned moltypes', segment['evidence'][0])
 
+    def test_conflicting_dna_and_rna_evidence_is_reported(self):
+        molecule = system.Molecule_Maker(
+            2,
+            name=["O2'", 'P'],
+            resname=['ADE', 'THY'],
+            resid=[1, 2],
+            segname='HYBR',
+            moltype=['nucleic', 'nucleic'])
+
+        report = molecule.moltype_by_segname_report()
+
+        self.assertEqual(report['overall_status'], 'nucleic_conflict')
+        segment = report['segments']['HYBR']
+        self.assertEqual(segment['status'], 'nucleic_conflict')
+        self.assertEqual(segment['decision'], 'kept recognized nucleic atoms as nucleic')
+        self.assertEqual(segment['rna_atom_evidence'], ["O2'"])
+        self.assertEqual(segment['dna_resname_evidence'], ['THY'])
+
+    def test_blank_segname_report_falls_back_to_chain_groups(self):
+        molecule = system.Molecule_Maker(
+            3,
+            name=["O2'", 'P', 'P'],
+            resname=['ADE', 'GUA', 'THY'],
+            resid=[1, 2, 3],
+            chain=['R', 'R', 'D'],
+            segname=['', '', ''],
+            moltype=['rna', 'rna', 'dna'])
+
+        report = molecule.moltype_by_segname_report()
+
+        self.assertEqual(report['overall_status'], 'clean')
+        self.assertEqual(sorted(report['segments'].keys()), ['chain:D', 'chain:R'])
+        self.assertEqual(report['segments']['chain:R']['grouping_source'], 'chain')
+        self.assertEqual(report['segments']['chain:R']['chain'], 'R')
+        self.assertEqual(report['segments']['chain:D']['dna_resname_evidence'], ['THY'])
+
 
 if __name__ == '__main__':
     unittest.main()

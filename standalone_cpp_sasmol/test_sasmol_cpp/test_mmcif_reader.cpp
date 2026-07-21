@@ -24,13 +24,10 @@ std::set<std::string> unique_values(const std::vector<std::string>& values) {
   return std::set<std::string>(values.begin(), values.end());
 }
 
-void write_moltype_mmcif(const std::filesystem::path& path) {
-  const std::vector<std::tuple<int, std::string, std::string>> residues = {
-      {1, "ALA", "P"},  {2, "ADE", "D"},  {3, "GUA", "D"},
-      {4, "CYT", "D"},  {5, "THY", "D"},  {6, "URA", "R"},
-      {7, "A", "R"},    {8, "DA", "D"},   {9, "TIP3", "W"},
-      {10, "LIG", "L"}};
-
+void write_moltype_mmcif_atoms(
+    const std::filesystem::path& path,
+    const std::vector<std::tuple<int, std::string, std::string, std::string>>&
+        atoms) {
   std::ofstream output(path);
   output << "data_moltype_regression\n"
          << "loop_\n"
@@ -55,13 +52,23 @@ void write_moltype_mmcif(const std::filesystem::path& path) {
          << "_atom_site.auth_asym_id\n"
          << "_atom_site.auth_atom_id\n"
          << "_atom_site.pdbx_PDB_model_num\n";
-  for (const auto& [atom_id, resname, chain] : residues) {
-    output << "ATOM " << atom_id << " P P . " << resname << " " << chain
+  for (const auto& [atom_id, atom_name, resname, chain] : atoms) {
+    output << "ATOM " << atom_id << " O " << atom_name << " . " << resname
+           << " " << chain
            << " 1 " << atom_id << " ? " << atom_id << ".0 "
            << atom_id + 1 << ".0 " << atom_id + 2
            << ".0 1.00 0.00 ? " << atom_id << " " << resname << " "
-           << chain << " P 1\n";
+           << chain << " " << atom_name << " 1\n";
   }
+}
+
+void write_moltype_mmcif(const std::filesystem::path& path) {
+  write_moltype_mmcif_atoms(
+      path, {{1, "P", "ALA", "P"},  {2, "P", "ADE", "D"},
+             {3, "P", "GUA", "D"},  {4, "P", "CYT", "D"},
+             {5, "P", "THY", "D"},  {6, "P", "URA", "R"},
+             {7, "P", "A", "R"},    {8, "P", "DA", "D"},
+             {9, "O", "TIP3", "W"}, {10, "C1", "LIG", "L"}});
 }
 
 void test_1crn_mmcif_matches_existing_pdb_core_fields() {
@@ -136,6 +143,58 @@ void test_read_mmcif_classifies_overlap_resnames_as_nucleic() {
                                   "protein", "nucleic", "nucleic", "nucleic",
                                   "dna", "rna", "rna", "dna", "water",
                                   "other"}));
+  std::filesystem::remove(path);
+}
+
+void test_read_mmcif_o2prime_evidence_promotes_overlap_segment_to_rna() {
+  const auto path =
+      std::filesystem::temp_directory_path() / "sasmol_moltype_o2prime.cif";
+  write_moltype_mmcif_atoms(
+      path, {{1, "O2'", "ADE", "R"}, {2, "P", "GUA", "R"},
+             {3, "P", "CYT", "R"}});
+
+  sasmol::MmcifReader reader;
+  sasmol::Molecule molecule;
+  const auto status = reader.read_mmcif(path, molecule);
+
+  assert(status.ok());
+  assert((molecule.moltype() ==
+          std::vector<std::string>{"rna", "rna", "rna"}));
+  std::filesystem::remove(path);
+}
+
+void test_read_mmcif_o2star_alias_promotes_overlap_segment_to_rna() {
+  const auto path =
+      std::filesystem::temp_directory_path() / "sasmol_moltype_o2star.cif";
+  write_moltype_mmcif_atoms(
+      path, {{1, "O2*", "ADE", "R"}, {2, "P", "GUA", "R"}});
+
+  sasmol::MmcifReader reader;
+  sasmol::Molecule molecule;
+  const auto status = reader.read_mmcif(path, molecule);
+
+  assert(status.ok());
+  assert((molecule.moltype() == std::vector<std::string>{"rna", "rna"}));
+  std::filesystem::remove(path);
+}
+
+void test_read_mmcif_conflicting_dna_and_o2prime_evidence_stays_nucleic() {
+  const auto path =
+      std::filesystem::temp_directory_path() / "sasmol_moltype_conflict.cif";
+  write_moltype_mmcif_atoms(
+      path, {{1, "O2'", "ADE", "X"}, {2, "P", "THY", "X"},
+             {3, "P", "GUA", "X"}});
+
+  sasmol::MmcifReader reader;
+  sasmol::Molecule molecule;
+  const auto status = reader.read_mmcif(path, molecule);
+
+  assert(status.ok());
+  assert((molecule.moltype() ==
+          std::vector<std::string>{"nucleic", "nucleic", "nucleic"}));
+  const auto report = molecule.moltype_by_segname_report();
+  assert(report.overall_status == "nucleic_conflict");
+  assert(report.segments.at("X").status == "nucleic_conflict");
   std::filesystem::remove(path);
 }
 
@@ -225,6 +284,9 @@ int main() {
   test_1crn_mmcif_matches_existing_pdb_core_fields();
   test_nucleic_acid_and_heterogen_fixtures_read();
   test_read_mmcif_classifies_overlap_resnames_as_nucleic();
+  test_read_mmcif_o2prime_evidence_promotes_overlap_segment_to_rna();
+  test_read_mmcif_o2star_alias_promotes_overlap_segment_to_rna();
+  test_read_mmcif_conflicting_dna_and_o2prime_evidence_stays_nucleic();
   test_multimodel_nmr_fixture_groups_frames();
   test_large_multichain_fixture_reads_full_chain_ids();
   test_bad_identifier_does_not_mutate_existing_molecule();

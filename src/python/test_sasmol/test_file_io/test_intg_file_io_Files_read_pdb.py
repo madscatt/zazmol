@@ -61,10 +61,12 @@ class Test_intg_file_io_Files_read_dcd(unittest.TestCase):
             else:
                self.assert_list_almost_equal(a[i],b[i],places)
 
-   def make_atom_line(self, serial, name, resname, chain, resid, x):
+   def make_atom_line(self, serial, name, resname, chain, resid, x, segname=None):
+      if segname is None:
+         segname = chain
       return "%-6s%5s %-4s%1s%-4s%1s%4s%1s   %8.3f%8.3f%8.3f%6s%6s      %-4s%2s%2s\n" % (
          'ATOM', serial, name, ' ', resname, chain, resid, ' ',
-         x, x + 1.0, x + 2.0, '1.00', '0.00', chain, name[0], '  ')
+         x, x + 1.0, x + 2.0, '1.00', '0.00', segname, name[0], '  ')
 
    def write_temp_pdb(self, lines):
       handle = tempfile.NamedTemporaryFile(mode='w', suffix='.pdb', delete=False)
@@ -100,6 +102,103 @@ class Test_intg_file_io_Files_read_dcd(unittest.TestCase):
       self.assertEqual(Counter(self.o.moltype()),
                        Counter({'nucleic': 3, 'dna': 2, 'rna': 2,
                                 'protein': 1, 'water': 1, 'other': 1}))
+
+   def test_o2prime_evidence_promotes_overlap_segment_to_rna(self):
+      lines = [
+         self.make_atom_line(1, "O2'", 'ADE', 'R', 1, 1.0),
+         self.make_atom_line(2, 'P', 'GUA', 'R', 2, 2.0),
+         self.make_atom_line(3, 'P', 'CYT', 'R', 3, 3.0),
+         'END\n']
+      pdb_file = self.write_temp_pdb(lines)
+      try:
+         self.o.read_pdb(pdb_file)
+      finally:
+         os.unlink(pdb_file)
+
+      self.assertEqual(list(self.o.moltype()), ['rna', 'rna', 'rna'])
+
+   def test_o2star_alias_promotes_overlap_segment_to_rna(self):
+      lines = [
+         self.make_atom_line(1, 'O2*', 'ADE', 'R', 1, 1.0),
+         self.make_atom_line(2, 'P', 'GUA', 'R', 2, 2.0),
+         'END\n']
+      pdb_file = self.write_temp_pdb(lines)
+      try:
+         self.o.read_pdb(pdb_file)
+      finally:
+         os.unlink(pdb_file)
+
+      self.assertEqual(list(self.o.moltype()), ['rna', 'rna'])
+
+   def test_conflicting_dna_and_o2prime_evidence_stays_nucleic(self):
+      lines = [
+         self.make_atom_line(1, "O2'", 'ADE', 'X', 1, 1.0),
+         self.make_atom_line(2, 'P', 'THY', 'X', 2, 2.0),
+         self.make_atom_line(3, 'P', 'GUA', 'X', 3, 3.0),
+         'END\n']
+      pdb_file = self.write_temp_pdb(lines)
+      try:
+         self.o.read_pdb(pdb_file)
+      finally:
+         os.unlink(pdb_file)
+
+      self.assertEqual(list(self.o.moltype()), ['nucleic', 'nucleic', 'nucleic'])
+      report = self.o.moltype_by_segname_report()
+      self.assertEqual(report['overall_status'], 'nucleic_conflict')
+      self.assertEqual(report['segments']['X']['status'], 'nucleic_conflict')
+
+   def test_pdbscan_blank_segnames_use_chain_for_o2prime_inference(self):
+      lines = [
+         self.make_atom_line(1, "O2'", 'ADE', 'R', 1, 1.0, segname=''),
+         self.make_atom_line(2, 'P', 'GUA', 'R', 2, 2.0, segname=''),
+         self.make_atom_line(3, 'P', 'ADE', 'D', 3, 3.0, segname=''),
+         self.make_atom_line(4, 'P', 'GUA', 'D', 4, 4.0, segname=''),
+         'END\n']
+      pdb_file = self.write_temp_pdb(lines)
+      try:
+         self.o.read_pdb(pdb_file, pdbscan=True)
+      finally:
+         os.unlink(pdb_file)
+
+      self.assertEqual(list(self.o.segname()), ['', '', '', ''])
+      self.assertEqual(list(self.o.moltype()), ['rna', 'rna', 'nucleic', 'nucleic'])
+      report = self.o.moltype_by_segname_report()
+      self.assertEqual(report['segments']['chain:R']['grouping_source'], 'chain')
+      self.assertEqual(report['segments']['chain:R']['chain'], 'R')
+      self.assertEqual(report['segments']['chain:D']['status'], 'ambiguous_nucleic')
+
+   def test_pdbscan_chain_fallback_isolates_cross_chain_o2prime_conflict(self):
+      lines = [
+         self.make_atom_line(1, "O2'", 'ADE', 'R', 1, 1.0, segname=''),
+         self.make_atom_line(2, 'P', 'GUA', 'R', 2, 2.0, segname=''),
+         self.make_atom_line(3, 'P', 'THY', 'D', 3, 3.0, segname=''),
+         'END\n']
+      pdb_file = self.write_temp_pdb(lines)
+      try:
+         self.o.read_pdb(pdb_file, pdbscan=True)
+      finally:
+         os.unlink(pdb_file)
+
+      self.assertEqual(list(self.o.moltype()), ['rna', 'rna', 'dna'])
+      report = self.o.moltype_by_segname_report()
+      self.assertEqual(report['overall_status'], 'clean')
+      self.assertEqual(report['segments']['chain:R']['status'], 'clean')
+      self.assertEqual(report['segments']['chain:D']['status'], 'clean')
+
+   def test_pdbscan_blank_segname_and_blank_chain_does_not_propagate_o2prime(self):
+      lines = [
+         self.make_atom_line(1, "O2'", 'ADE', '', 1, 1.0, segname=''),
+         self.make_atom_line(2, 'P', 'GUA', '', 2, 2.0, segname=''),
+         'END\n']
+      pdb_file = self.write_temp_pdb(lines)
+      try:
+         self.o.read_pdb(pdb_file, pdbscan=True)
+      finally:
+         os.unlink(pdb_file)
+
+      self.assertEqual(list(self.o.moltype()), ['nucleic', 'nucleic'])
+      report = self.o.moltype_by_segname_report()
+      self.assertEqual(report['segments']['']['grouping_source'], 'none')
 
    def test_1ATM_one_frame(self):
       '''

@@ -270,6 +270,8 @@ class MMCIF(object):
         self._segname = segname
         self._element = element
         self._charge = charge
+        moltype = self._finalize_nucleic_moltypes_by_segment(
+            name, resname, segname, chain, moltype)
         self._moltype = moltype
         self._residue_flag = residue_flag
         self._coor = numpy.array(coor)

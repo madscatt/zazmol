@@ -53,6 +53,11 @@ class Test_intg_file_io_Files_read_mmcif(unittest.TestCase):
                 self.assertEqual(a[i], b[i])
 
     def write_temp_mmcif(self, residues):
+        return self.write_temp_mmcif_with_atom_names(
+            [(atom_id, 'P', resname, chain)
+             for atom_id, resname, chain in residues])
+
+    def write_temp_mmcif_with_atom_names(self, atoms):
         handle = tempfile.NamedTemporaryFile(mode='w', suffix='.cif', delete=False)
         try:
             handle.write('data_moltype_regression\n')
@@ -78,11 +83,12 @@ class Test_intg_file_io_Files_read_mmcif(unittest.TestCase):
             handle.write('_atom_site.auth_asym_id\n')
             handle.write('_atom_site.auth_atom_id\n')
             handle.write('_atom_site.pdbx_PDB_model_num\n')
-            for atom_id, resname, chain in residues:
+            for atom_id, atom_name, resname, chain in atoms:
                 handle.write(
-                    'ATOM %d P P . %s %s 1 %d ? %.1f %.1f %.1f 1.00 0.00 ? %d %s %s P 1\n' %
-                    (atom_id, resname, chain, atom_id, atom_id, atom_id + 1.0,
-                     atom_id + 2.0, atom_id, resname, chain))
+                    'ATOM %d O %s . %s %s 1 %d ? %.1f %.1f %.1f 1.00 0.00 ? %d %s %s %s 1\n' %
+                    (atom_id, atom_name, resname, chain, atom_id, atom_id,
+                     atom_id + 1.0, atom_id + 2.0, atom_id, resname, chain,
+                     atom_name))
         finally:
             handle.close()
         return handle.name
@@ -110,6 +116,55 @@ class Test_intg_file_io_Files_read_mmcif(unittest.TestCase):
             list(mol.moltype()),
             ['protein', 'nucleic', 'nucleic', 'nucleic', 'dna',
              'rna', 'rna', 'dna', 'water', 'other'])
+
+    def test_o2prime_evidence_promotes_overlap_segment_to_rna(self):
+        residues = [
+            (1, 'ADE', 'R'),
+            (2, 'GUA', 'R'),
+            (3, 'CYT', 'R')]
+        cif_file = self.write_temp_mmcif(residues)
+        try:
+            mol = system.Molecule()
+            mol.read_mmcif(cif_file)
+        finally:
+            os.unlink(cif_file)
+
+        self.assertEqual(list(mol.moltype()), ['nucleic', 'nucleic', 'nucleic'])
+
+        cif_file = self.write_temp_mmcif_with_atom_names(
+            [(1, "O2'", 'ADE', 'R'), (2, 'P', 'GUA', 'R'), (3, 'P', 'CYT', 'R')])
+        try:
+            mol = system.Molecule()
+            mol.read_mmcif(cif_file)
+        finally:
+            os.unlink(cif_file)
+
+        self.assertEqual(list(mol.moltype()), ['rna', 'rna', 'rna'])
+
+    def test_o2star_alias_promotes_overlap_segment_to_rna(self):
+        cif_file = self.write_temp_mmcif_with_atom_names(
+            [(1, 'O2*', 'ADE', 'R'), (2, 'P', 'GUA', 'R')])
+        try:
+            mol = system.Molecule()
+            mol.read_mmcif(cif_file)
+        finally:
+            os.unlink(cif_file)
+
+        self.assertEqual(list(mol.moltype()), ['rna', 'rna'])
+
+    def test_conflicting_dna_and_o2prime_evidence_stays_nucleic(self):
+        cif_file = self.write_temp_mmcif_with_atom_names(
+            [(1, "O2'", 'ADE', 'X'), (2, 'P', 'THY', 'X'), (3, 'P', 'GUA', 'X')])
+        try:
+            mol = system.Molecule()
+            mol.read_mmcif(cif_file)
+        finally:
+            os.unlink(cif_file)
+
+        self.assertEqual(list(mol.moltype()), ['nucleic', 'nucleic', 'nucleic'])
+        report = mol.moltype_by_segname_report()
+        self.assertEqual(report['overall_status'], 'nucleic_conflict')
+        self.assertEqual(report['segments']['X']['status'], 'nucleic_conflict')
 
     def test_1crn_mmcif_matches_existing_pdb_core_fields(self):
         pdb_mol = system.Molecule()

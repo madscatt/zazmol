@@ -573,6 +573,88 @@ class PDB(object):
             return 'water'
         return 'other'
 
+    def nucleic_rna_atom_aliases(self):
+        '''
+        Atom names accepted as ribose 2'-oxygen evidence for RNA.
+        '''
+
+        return ["O2'", "O2*"]
+
+    def _unique_values(self, values):
+        unique_values = []
+        for value in values:
+            if value not in unique_values:
+                unique_values.append(value)
+        return unique_values
+
+    def _effective_moltype_group(self, segname, chain):
+        '''
+        Return the segment-like grouping used for nucleic moltype inference.
+
+        PDBScan mode intentionally preserves blank PDB segnames so downstream
+        scanners can segment later.  For read-time nucleic inference, a blank
+        segname falls back to chain; if both are blank there is no defensible
+        segment-wide group.
+        '''
+
+        this_segname = '' if segname is None else str(segname).strip()
+        this_chain = '' if chain is None else str(chain).strip()
+
+        if this_segname:
+            return ('segname', this_segname, this_segname)
+        if this_chain:
+            return ('chain', this_chain, 'chain:%s' % this_chain)
+        return ('none', '', '')
+
+    def _finalize_nucleic_moltypes_by_segment(self, names, resnames, segnames, chains, moltypes):
+        '''
+        Use segment-level O2' evidence to resolve ambiguous nucleic moltypes.
+
+        Accepted O2' aliases are positive RNA evidence. Absence of an alias
+        leaves ambiguous atoms as ``nucleic``. Conflicting DNA- and RNA-specific
+        evidence in one segment leaves recognized nucleic atoms as ``nucleic``.
+        '''
+
+        protein_resnames,dna_resnames,rna_resnames,nucleic_resnames,water_resnames = self.get_resnames()
+        dna_set = set(dna_resnames)
+        rna_set = set(rna_resnames)
+        rna_atom_names = set(self.nucleic_rna_atom_aliases())
+        segments = {}
+
+        for i, moltype in enumerate(moltypes):
+            if moltype not in ('dna', 'rna', 'nucleic'):
+                continue
+            segname = segnames[i] if i < len(segnames) else ''
+            chain = chains[i] if i < len(chains) else ''
+            grouping_source, grouping_value, grouping_key = self._effective_moltype_group(
+                segname, chain)
+            if grouping_source == 'none':
+                continue
+            resname = resnames[i] if i < len(resnames) else ''
+            atom_name = names[i] if i < len(names) else ''
+            segment = segments.setdefault(
+                grouping_key,
+                {'indices': [], 'has_dna': False, 'has_rna': False, 'has_o2prime': False})
+            segment['indices'].append(i)
+            if resname in dna_set and resname not in rna_set:
+                segment['has_dna'] = True
+            if resname in rna_set and resname not in dna_set:
+                segment['has_rna'] = True
+            if atom_name in rna_atom_names:
+                segment['has_o2prime'] = True
+
+        for segment in segments.values():
+            has_conflict = segment['has_dna'] and (segment['has_rna'] or segment['has_o2prime'])
+            if has_conflict:
+                for i in segment['indices']:
+                    moltypes[i] = 'nucleic'
+            elif segment['has_o2prime']:
+                for i in segment['indices']:
+                    if moltypes[i] == 'nucleic':
+                        moltypes[i] = 'rna'
+
+        return moltypes
+
     def moltype_by_segname_report(self):
         '''
         Build a non-mutating report of moltype assignments by segment.
@@ -592,7 +674,7 @@ class PDB(object):
         dna_set = set(dna_resnames)
         rna_set = set(rna_resnames)
         ambiguous_nucleic = dna_set.intersection(rna_set)
-        rna_atom_names = set(["O2'", "O2*"])
+        rna_atom_names = set(self.nucleic_rna_atom_aliases())
 
         def descriptor(name):
             try:
@@ -617,6 +699,7 @@ class PDB(object):
         resnames = descriptor('resname')
         names = descriptor('name')
         segnames = descriptor('segname')
+        chains = descriptor('chain')
         moltypes = descriptor('moltype')
         resids = descriptor('resid')
         rescodes = descriptor('rescode')
@@ -624,7 +707,7 @@ class PDB(object):
         try:
             natoms = self.natoms()
         except Exception:
-            natoms = max(len(resnames), len(names), len(segnames), len(moltypes))
+            natoms = max(len(resnames), len(names), len(segnames), len(chains), len(moltypes))
 
         report = {
             'overall_status': 'clean',
@@ -635,14 +718,21 @@ class PDB(object):
 
         for i in range(natoms):
             segname = value_at(segnames, i, '')
+            chain = value_at(chains, i, '')
+            grouping_source, grouping_value, grouping_key = self._effective_moltype_group(
+                segname, chain)
             resname = value_at(resnames, i, '')
             atom_name = value_at(names, i, '')
             moltype = value_at(moltypes, i, '')
             resid = value_at(resids, i, '')
             rescode = value_at(rescodes, i, '')
 
-            if segname not in report['segments']:
-                report['segments'][segname] = {
+            if grouping_key not in report['segments']:
+                report['segments'][grouping_key] = {
+                    'segname': segname,
+                    'chain': chain,
+                    'grouping_source': grouping_source,
+                    'grouping_value': grouping_value,
                     'status': 'clean',
                     'assigned_moltypes': [],
                     'resnames': [],
@@ -652,15 +742,16 @@ class PDB(object):
                     'rna_atom_evidence': [],
                     'atom_count': 0,
                     'residue_count': 0,
+                    'decision': '',
                     'evidence': []
                 }
-                residues_by_segment[segname] = set()
+                residues_by_segment[grouping_key] = set()
 
-            segment = report['segments'][segname]
+            segment = report['segments'][grouping_key]
             segment['atom_count'] += 1
             append_unique(segment['assigned_moltypes'], moltype)
             append_unique(segment['resnames'], resname)
-            residues_by_segment[segname].add((resid, rescode, resname))
+            residues_by_segment[grouping_key].add((resid, rescode, resname))
 
             if resname in ambiguous_nucleic:
                 append_unique(segment['ambiguous_resnames'], resname)
@@ -680,9 +771,23 @@ class PDB(object):
                 len(segment['dna_resname_evidence']) > 0 or
                 len(segment['rna_resname_evidence']) > 0 or
                 len(segment['rna_atom_evidence']) > 0)
+            has_nucleic_conflict = (
+                len(segment['dna_resname_evidence']) > 0 and
+                (len(segment['rna_resname_evidence']) > 0 or
+                 len(segment['rna_atom_evidence']) > 0))
 
-            if len(assigned) > 1:
+            if has_nucleic_conflict:
+                segment['status'] = 'nucleic_conflict'
+                segment['decision'] = 'kept recognized nucleic atoms as nucleic'
+                segment['evidence'].append(
+                    'DNA-specific and RNA-specific/O2prime evidence in one segment')
+                append_message(
+                    report,
+                    "Segment %s contains conflicting DNA- and RNA-specific/O2prime evidence." %
+                    segname)
+            elif len(assigned) > 1:
                 segment['status'] = 'mixed'
+                segment['decision'] = 'kept assigned moltypes'
                 segment['evidence'].append(
                     'multiple assigned moltypes: ' + ', '.join(assigned))
                 append_message(
@@ -691,6 +796,7 @@ class PDB(object):
                     (segname, ', '.join(assigned)))
             elif len(assigned) == 1 and assigned[0] == 'other':
                 segment['status'] = 'all_other'
+                segment['decision'] = 'kept other'
                 segment['evidence'].append(
                     'all atoms are assigned moltype other')
                 append_message(
@@ -699,6 +805,7 @@ class PDB(object):
                     segname)
             elif has_ambiguous_nucleic and not has_specific_nucleic_evidence:
                 segment['status'] = 'ambiguous_nucleic'
+                segment['decision'] = 'kept ambiguous atoms as nucleic'
                 segment['evidence'].append(
                     'DNA/RNA-overlap residue names without DNA- or RNA-specific evidence: ' +
                     ', '.join(segment['ambiguous_resnames']))
@@ -708,6 +815,7 @@ class PDB(object):
                     (segname, ', '.join(segment['ambiguous_resnames'])))
             else:
                 segment['status'] = 'clean'
+                segment['decision'] = 'kept assigned moltypes'
                 if segment['dna_resname_evidence']:
                     segment['evidence'].append(
                         'DNA-specific residue names: ' +
@@ -723,7 +831,9 @@ class PDB(object):
 
         statuses = [segment['status']
                     for segment in report['segments'].values()]
-        if 'mixed' in statuses:
+        if 'nucleic_conflict' in statuses:
+            report['overall_status'] = 'nucleic_conflict'
+        elif 'mixed' in statuses:
             report['overall_status'] = 'mixed_by_segname'
         elif 'ambiguous_nucleic' in statuses:
             report['overall_status'] = 'ambiguous_nucleic'
@@ -1107,8 +1217,6 @@ class PDB(object):
                 this_resname=(lin[17:21].strip())
                 this_moltype = self.moltype_for_resname(this_resname)
                 moltype.append(this_moltype)
-				
-                if(this_moltype not in unique_moltypes): unique_moltypes.append(this_moltype)
 					
                 if(true_index == num_atoms):				
                     if(printme): print('finished reading frame = ',this_frame)
@@ -1124,6 +1232,9 @@ class PDB(object):
                     true_index = 0
                     x=[] ; y=[] ; z=[]
                     if(this_frame == 1):
+                        moltype = self._finalize_nucleic_moltypes_by_segment(
+                            name, resname, segname, chain, moltype)
+                        unique_moltypes = self._unique_values(moltype)
                         self._atom=atom ; self._index=index  ; self._original_index = original_index ; self._name=name ; self._loc=loc ; self._resname=resname ; self._residue_flag = residue_flag
                         self._chain=chain ; self._resid=resid ; self._rescode=rescode ; self._original_resid=original_resid
                         self._occupancy=occupancy ; self._beta=beta ; self._segname=segname ; self._element=element

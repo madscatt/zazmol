@@ -382,6 +382,99 @@ std::string moltype_for_resname(const std::string& resname) {
   return "other";
 }
 
+const std::set<std::string>& nucleic_rna_atom_aliases() {
+  static const std::set<std::string> names = {"O2'", "O2*"};
+  return names;
+}
+
+struct MoltypeGroupKey {
+  std::string source;
+  std::string value;
+
+  [[nodiscard]] std::string key() const {
+    if (source == "chain") {
+      return "chain:" + value;
+    }
+    return value;
+  }
+};
+
+MoltypeGroupKey effective_moltype_group(const std::string& segname,
+                                        const std::string& chain) {
+  const auto trimmed_segname = trim_copy(segname);
+  if (!trimmed_segname.empty()) {
+    return {"segname", trimmed_segname};
+  }
+
+  const auto trimmed_chain = trim_copy(chain);
+  if (!trimmed_chain.empty()) {
+    return {"chain", trimmed_chain};
+  }
+
+  return {"none", ""};
+}
+
+void finalize_nucleic_moltypes_by_segment(Molecule& molecule) {
+  static const std::set<std::string> dna = {
+      "NUSA", "NUSG", "NUSC", "NUSU", "DA", "DG", "DC", "DT",
+      "ADE",  "GUA",  "CYT",  "THY"};
+  static const std::set<std::string> rna = {
+      "RNUS", "RNUA", "RUUG", "RNUC", "A", "C", "G", "U",
+      "ADE",  "CYT",  "GUA",  "URA"};
+
+  struct SegmentEvidence {
+    std::vector<std::size_t> indices;
+    bool has_dna{};
+    bool has_rna{};
+    bool has_o2prime{};
+  };
+
+  std::map<std::string, SegmentEvidence> segments;
+  for (std::size_t atom = 0; atom < molecule.natoms(); ++atom) {
+    auto& moltype = molecule.moltype()[atom];
+    if (moltype != "dna" && moltype != "rna" && moltype != "nucleic") {
+      continue;
+    }
+
+    const auto& segname = molecule.segname()[atom];
+    const auto& chain = molecule.chain()[atom];
+    const auto group = effective_moltype_group(segname, chain);
+    if (group.source == "none") {
+      continue;
+    }
+    const auto& resname = molecule.resname()[atom];
+    const auto& atom_name = molecule.name()[atom];
+    auto& segment = segments[group.key()];
+    segment.indices.push_back(atom);
+    if (dna.contains(resname) && !rna.contains(resname)) {
+      segment.has_dna = true;
+    }
+    if (rna.contains(resname) && !dna.contains(resname)) {
+      segment.has_rna = true;
+    }
+    if (nucleic_rna_atom_aliases().contains(atom_name)) {
+      segment.has_o2prime = true;
+    }
+  }
+
+  for (const auto& [segname, segment] : segments) {
+    (void)segname;
+    const bool has_conflict =
+        segment.has_dna && (segment.has_rna || segment.has_o2prime);
+    if (has_conflict) {
+      for (const auto atom : segment.indices) {
+        molecule.moltype()[atom] = "nucleic";
+      }
+    } else if (segment.has_o2prime) {
+      for (const auto atom : segment.indices) {
+        if (molecule.moltype()[atom] == "nucleic") {
+          molecule.moltype()[atom] = "rna";
+        }
+      }
+    }
+  }
+}
+
 const std::set<std::string>& pdb_conflict_atom_names() {
   static const std::set<std::string> names = {"CD", "CE", "HE", "HG", "NE",
                                               "ND", "NB", "PB", "PA"};
@@ -985,6 +1078,7 @@ IoStatus PdbReader::read_pdb(const std::filesystem::path& filename,
   }
 
   parsed_molecule.set_biomt(parse_biomt_header_records(header_lines));
+  finalize_nucleic_moltypes_by_segment(parsed_molecule);
 
   molecule = std::move(parsed_molecule);
   return IoStatus::success();
@@ -1408,6 +1502,7 @@ IoStatus MmcifReader::read_mmcif(const std::filesystem::path& filename,
     }
   }
 
+  finalize_nucleic_moltypes_by_segment(parsed_molecule);
   molecule = std::move(parsed_molecule);
   return IoStatus::success();
 }

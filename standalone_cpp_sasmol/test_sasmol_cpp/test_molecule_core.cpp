@@ -168,6 +168,28 @@ void test_moltype_report_flags_mixed_segment() {
   assert(segment.assigned_moltypes[1] == "dna");
 }
 
+void test_moltype_report_falls_back_to_chain_for_blank_segnames() {
+  sasmol::Molecule mol(3, 1);
+  mol.segname() = {"", "", ""};
+  mol.chain() = {"R", "R", "D"};
+  mol.resname() = {"ADE", "GUA", "THY"};
+  mol.name() = {"O2'", "P", "P"};
+  mol.resid() = {1, 2, 3};
+  mol.moltype() = {"rna", "rna", "dna"};
+
+  const auto report = mol.moltype_by_segname_report();
+
+  assert(report.overall_status == "clean");
+  const auto& rna_segment = report.segments.at("chain:R");
+  assert(rna_segment.grouping_source == "chain");
+  assert(rna_segment.chain == "R");
+  assert(rna_segment.rna_atom_evidence.size() == 1);
+  const auto& dna_segment = report.segments.at("chain:D");
+  assert(dna_segment.grouping_source == "chain");
+  assert(dna_segment.dna_resname_evidence.size() == 1);
+  assert(dna_segment.dna_resname_evidence[0] == "THY");
+}
+
 void test_out_of_range_coordinates_throw() {
   sasmol::Molecule mol(1, 1);
   bool threw = false;
@@ -193,6 +215,7 @@ int main() {
   test_moltype_report_keeps_specific_nucleic_segment_clean();
   test_moltype_report_uses_rna_atom_name_evidence();
   test_moltype_report_flags_mixed_segment();
+  test_moltype_report_falls_back_to_chain_for_blank_segnames();
   test_out_of_range_coordinates_throw();
   return 0;
 }

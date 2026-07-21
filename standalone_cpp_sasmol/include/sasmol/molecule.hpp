@@ -26,6 +26,9 @@ struct IntegrityReport {
 
 struct MoltypeSegmentReport {
   std::string segname;
+  std::string chain;
+  std::string grouping_source{"segname"};
+  std::string grouping_value;
   std::string status{"clean"};
   std::vector<std::string> assigned_moltypes;
   std::vector<std::string> resnames;
@@ -35,6 +38,7 @@ struct MoltypeSegmentReport {
   std::vector<std::string> rna_atom_evidence;
   std::size_t atom_count{};
   std::size_t residue_count{};
+  std::string decision;
   std::vector<std::string> evidence;
 };
 
