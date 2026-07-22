@@ -114,8 +114,8 @@ class Test_intg_file_io_Files_read_mmcif(unittest.TestCase):
 
         self.assertEqual(
             list(mol.moltype()),
-            ['protein', 'nucleic', 'nucleic', 'nucleic', 'dna',
-             'rna', 'rna', 'dna', 'water', 'other'])
+            ['protein', 'dna', 'dna', 'dna', 'dna',
+             'nucleic', 'nucleic', 'dna', 'water', 'other'])
 
     def test_o2prime_evidence_promotes_overlap_segment_to_rna(self):
         residues = [
@@ -152,7 +152,7 @@ class Test_intg_file_io_Files_read_mmcif(unittest.TestCase):
 
         self.assertEqual(list(mol.moltype()), ['rna', 'rna'])
 
-    def test_conflicting_dna_and_o2prime_evidence_stays_nucleic(self):
+    def test_ambiguous_thymine_does_not_conflict_with_o2prime_rna(self):
         cif_file = self.write_temp_mmcif_with_atom_names(
             [(1, "O2'", 'ADE', 'X'), (2, 'P', 'THY', 'X'), (3, 'P', 'GUA', 'X')])
         try:
@@ -161,10 +161,10 @@ class Test_intg_file_io_Files_read_mmcif(unittest.TestCase):
         finally:
             os.unlink(cif_file)
 
-        self.assertEqual(list(mol.moltype()), ['nucleic', 'nucleic', 'nucleic'])
+        self.assertEqual(list(mol.moltype()), ['rna', 'rna', 'rna'])
         report = mol.moltype_by_segname_report()
-        self.assertEqual(report['overall_status'], 'nucleic_conflict')
-        self.assertEqual(report['segments']['X']['status'], 'nucleic_conflict')
+        self.assertEqual(report['overall_status'], 'clean')
+        self.assertEqual(report['segments']['X']['identity'], 'resolved_rna')
 
     def test_1crn_mmcif_matches_existing_pdb_core_fields(self):
         pdb_mol = system.Molecule()

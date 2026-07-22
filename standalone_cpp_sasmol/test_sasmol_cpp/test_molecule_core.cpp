@@ -103,12 +103,12 @@ void test_moltype_report_flags_ambiguous_nucleic_without_mutation() {
 
   const auto report = mol.moltype_by_segname_report();
 
-  assert(report.overall_status == "ambiguous_nucleic");
+  assert(report.overall_status == "ambiguous");
   assert(mol.moltype()[0] == "rna");
   const auto& segment = report.segments.at("DNA1");
-  assert(segment.status == "ambiguous_nucleic");
+  assert(segment.status == "ambiguous");
   assert(segment.assigned_moltypes.size() == 1);
-  assert(segment.assigned_moltypes[0] == "rna");
+  assert(segment.assigned_moltypes[0] == "nucleic");
   assert(segment.ambiguous_resnames.size() == 3);
   assert(segment.ambiguous_resnames[0] == "ADE");
   assert(segment.residue_count == 3);
@@ -127,7 +127,7 @@ void test_moltype_report_keeps_specific_nucleic_segment_clean() {
 
   assert(report.overall_status == "clean");
   const auto& segment = report.segments.at("DNA1");
-  assert(segment.status == "clean");
+  assert(segment.status == "resolved_dna");
   assert(segment.dna_resname_evidence.size() == 2);
   assert(segment.dna_resname_evidence[0] == "DA");
 }
@@ -144,8 +144,8 @@ void test_moltype_report_uses_rna_atom_name_evidence() {
 
   assert(report.overall_status == "clean");
   const auto& segment = report.segments.at("RNA1");
-  assert(segment.status == "clean");
-  assert(segment.ambiguous_resnames.size() == 2);
+  assert(segment.status == "resolved_rna");
+  assert(segment.ambiguous_resnames.size() == 1);
   assert(segment.rna_atom_evidence.size() == 1);
   assert(segment.rna_atom_evidence[0] == "O2'");
 }
@@ -160,12 +160,11 @@ void test_moltype_report_flags_mixed_segment() {
 
   const auto report = mol.moltype_by_segname_report();
 
-  assert(report.overall_status == "mixed_by_segname");
+  assert(report.overall_status == "clean");
   const auto& segment = report.segments.at("MIXD");
-  assert(segment.status == "mixed");
-  assert(segment.assigned_moltypes.size() == 2);
-  assert(segment.assigned_moltypes[0] == "protein");
-  assert(segment.assigned_moltypes[1] == "dna");
+  assert(segment.status == "resolved_dna");
+  assert(segment.assigned_moltypes.size() == 1);
+  assert(segment.assigned_moltypes[0] == "dna");
 }
 
 void test_moltype_report_falls_back_to_chain_for_blank_segnames() {
@@ -179,15 +178,43 @@ void test_moltype_report_falls_back_to_chain_for_blank_segnames() {
 
   const auto report = mol.moltype_by_segname_report();
 
-  assert(report.overall_status == "clean");
+  assert(report.overall_status == "ambiguous");
   const auto& rna_segment = report.segments.at("chain:R");
   assert(rna_segment.grouping_source == "chain");
   assert(rna_segment.chain == "R");
   assert(rna_segment.rna_atom_evidence.size() == 1);
   const auto& dna_segment = report.segments.at("chain:D");
   assert(dna_segment.grouping_source == "chain");
-  assert(dna_segment.dna_resname_evidence.size() == 1);
-  assert(dna_segment.dna_resname_evidence[0] == "THY");
+  assert(dna_segment.ambiguous_resnames.size() == 1);
+  assert(dna_segment.ambiguous_resnames[0] == "THY");
+}
+
+void test_coordinate_classifier_reports_residue_evidence_and_conflicts() {
+  sasmol::Molecule mol(7, 1);
+  mol.segname() = {"D", "D", "D", "D", "D", "D", "D"};
+  mol.chain() = {"A", "A", "A", "A", "A", "A", "A"};
+  mol.resname() = {"ADE", "ADE", "ADE", "ADE", "ADE", "DA", "DA"};
+  mol.name() = {"C1'", "C2'", "C3'", "C4'", "O4'", "P", "O2'"};
+  mol.resid() = {1, 1, 1, 1, 1, 2, 3};
+  mol.record() = {"ATOM", "ATOM", "ATOM", "ATOM", "ATOM", "HETATM", "ATOM"};
+  mol.moltype() = {"other", "other", "other", "other", "other", "other", "other"};
+
+  const auto report = mol.classify_nucleic_moltypes();
+
+  const auto& segment = report.segments.at("D");
+  assert(report.overall_status == "conflict");
+  assert(segment.identity == "conflict");
+  assert(segment.canonical_moltype == "nucleic");
+  assert(segment.complete_deoxy_sugar_evidence.size() == 1);
+  assert(segment.complete_deoxy_sugar_evidence[0] == "ADE");
+  assert(segment.rna_atom_evidence.size() == 1);
+  assert(segment.rna_atom_evidence[0] == "O2'");
+  assert(segment.record_classes.size() == 2);
+  assert(segment.residue_decisions.size() == 3);
+  assert(segment.conflicting_residues.size() == 1);
+  for (const auto& moltype : mol.moltype()) {
+    assert(moltype == "nucleic");
+  }
 }
 
 void test_out_of_range_coordinates_throw() {
@@ -216,6 +243,7 @@ int main() {
   test_moltype_report_uses_rna_atom_name_evidence();
   test_moltype_report_flags_mixed_segment();
   test_moltype_report_falls_back_to_chain_for_blank_segnames();
+  test_coordinate_classifier_reports_residue_evidence_and_conflicts();
   test_out_of_range_coordinates_throw();
   return 0;
 }

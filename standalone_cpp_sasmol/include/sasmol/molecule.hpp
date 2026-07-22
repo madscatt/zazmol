@@ -24,18 +24,37 @@ struct IntegrityReport {
   [[nodiscard]] bool ok() const noexcept { return issues.empty(); }
 };
 
+struct MoltypeResidueDecision {
+  std::string resname;
+  int resid{};
+  std::string rescode;
+  std::string chain;
+  std::string identity;
+  std::string evidence;
+  std::vector<std::string> o2prime_atoms;
+  bool complete_deoxy_sugar{};
+  std::vector<std::string> conflict_reasons;
+};
+
 struct MoltypeSegmentReport {
   std::string segname;
   std::string chain;
   std::string grouping_source{"segname"};
   std::string grouping_value;
   std::string status{"clean"};
+  std::string identity{"clean"};
+  std::string canonical_moltype;
+  std::vector<std::string> chains;
   std::vector<std::string> assigned_moltypes;
   std::vector<std::string> resnames;
   std::vector<std::string> ambiguous_resnames;
   std::vector<std::string> dna_resname_evidence;
   std::vector<std::string> rna_resname_evidence;
   std::vector<std::string> rna_atom_evidence;
+  std::vector<std::string> complete_deoxy_sugar_evidence;
+  std::vector<MoltypeResidueDecision> residue_decisions;
+  std::vector<MoltypeResidueDecision> conflicting_residues;
+  std::vector<std::string> record_classes;
   std::size_t atom_count{};
   std::size_t residue_count{};
   std::string decision;
@@ -247,6 +266,7 @@ class Molecule {
   [[nodiscard]] ConstCoordinateView coordinate_view(std::size_t frame) const;
 
   [[nodiscard]] IntegrityReport check_integrity(bool fast_check = false) const;
+  MoltypeReport classify_nucleic_moltypes();
   [[nodiscard]] MoltypeReport moltype_by_segname_report() const;
 
  private:

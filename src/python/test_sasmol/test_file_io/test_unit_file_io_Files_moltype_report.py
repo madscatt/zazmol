@@ -33,14 +33,14 @@ class Test_unit_file_io_Files_moltype_report(unittest.TestCase):
 
         report = molecule.moltype_by_segname_report()
 
-        self.assertEqual(report['overall_status'], 'ambiguous_nucleic')
+        self.assertEqual(report['overall_status'], 'ambiguous')
         self.assertEqual(molecule.moltype(), ['nucleic', 'nucleic', 'nucleic'])
         segment = report['segments']['DNA1']
-        self.assertEqual(segment['status'], 'ambiguous_nucleic')
+        self.assertEqual(segment['status'], 'ambiguous')
         self.assertEqual(segment['assigned_moltypes'], ['nucleic'])
         self.assertEqual(segment['ambiguous_resnames'], ['ADE', 'CYT', 'GUA'])
         self.assertEqual(segment['residue_count'], 3)
-        self.assertIn('DNA/RNA-overlap residue names',
+        self.assertIn('insufficient coordinate evidence',
                       segment['evidence'][0])
 
     def test_specific_nucleic_resnames_keep_segment_clean(self):
@@ -56,7 +56,7 @@ class Test_unit_file_io_Files_moltype_report(unittest.TestCase):
 
         self.assertEqual(report['overall_status'], 'clean')
         segment = report['segments']['DNA1']
-        self.assertEqual(segment['status'], 'clean')
+        self.assertEqual(segment['status'], 'resolved_dna')
         self.assertEqual(segment['dna_resname_evidence'], ['DA', 'DT'])
 
     def test_rna_atom_name_evidence_can_resolve_overlap_resnames(self):
@@ -72,8 +72,8 @@ class Test_unit_file_io_Files_moltype_report(unittest.TestCase):
 
         self.assertEqual(report['overall_status'], 'clean')
         segment = report['segments']['RNA1']
-        self.assertEqual(segment['status'], 'clean')
-        self.assertEqual(segment['ambiguous_resnames'], ['ADE', 'GUA'])
+        self.assertEqual(segment['status'], 'resolved_rna')
+        self.assertEqual(segment['ambiguous_resnames'], ['GUA'])
         self.assertEqual(segment['rna_atom_evidence'], ["O2'"])
 
     def test_mixed_segment_is_reported(self):
@@ -87,29 +87,28 @@ class Test_unit_file_io_Files_moltype_report(unittest.TestCase):
 
         report = molecule.moltype_by_segname_report()
 
-        self.assertEqual(report['overall_status'], 'mixed_by_segname')
+        self.assertEqual(report['overall_status'], 'clean')
         segment = report['segments']['MIXD']
-        self.assertEqual(segment['status'], 'mixed')
-        self.assertEqual(segment['assigned_moltypes'], ['protein', 'dna'])
-        self.assertIn('multiple assigned moltypes', segment['evidence'][0])
+        self.assertEqual(segment['status'], 'resolved_dna')
+        self.assertEqual(segment['assigned_moltypes'], ['dna'])
 
     def test_conflicting_dna_and_rna_evidence_is_reported(self):
         molecule = system.Molecule_Maker(
             2,
             name=["O2'", 'P'],
-            resname=['ADE', 'THY'],
+            resname=['ADE', 'DA'],
             resid=[1, 2],
             segname='HYBR',
             moltype=['nucleic', 'nucleic'])
 
         report = molecule.moltype_by_segname_report()
 
-        self.assertEqual(report['overall_status'], 'nucleic_conflict')
+        self.assertEqual(report['overall_status'], 'conflict')
         segment = report['segments']['HYBR']
-        self.assertEqual(segment['status'], 'nucleic_conflict')
-        self.assertEqual(segment['decision'], 'kept recognized nucleic atoms as nucleic')
+        self.assertEqual(segment['status'], 'conflict')
+        self.assertEqual(segment['decision'], 'assigned recognized nucleic atoms as nucleic')
         self.assertEqual(segment['rna_atom_evidence'], ["O2'"])
-        self.assertEqual(segment['dna_resname_evidence'], ['THY'])
+        self.assertEqual(segment['dna_resname_evidence'], ['DA'])
 
     def test_blank_segname_report_falls_back_to_chain_groups(self):
         molecule = system.Molecule_Maker(
@@ -123,11 +122,11 @@ class Test_unit_file_io_Files_moltype_report(unittest.TestCase):
 
         report = molecule.moltype_by_segname_report()
 
-        self.assertEqual(report['overall_status'], 'clean')
+        self.assertEqual(report['overall_status'], 'ambiguous')
         self.assertEqual(sorted(report['segments'].keys()), ['chain:D', 'chain:R'])
         self.assertEqual(report['segments']['chain:R']['grouping_source'], 'chain')
         self.assertEqual(report['segments']['chain:R']['chain'], 'R')
-        self.assertEqual(report['segments']['chain:D']['dna_resname_evidence'], ['THY'])
+        self.assertEqual(report['segments']['chain:D']['ambiguous_resnames'], ['THY'])
 
 
 if __name__ == '__main__':

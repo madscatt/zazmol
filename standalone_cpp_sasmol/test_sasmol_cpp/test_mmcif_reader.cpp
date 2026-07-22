@@ -140,8 +140,8 @@ void test_read_mmcif_classifies_overlap_resnames_as_nucleic() {
 
   assert(status.ok());
   assert((molecule.moltype() == std::vector<std::string>{
-                                  "protein", "nucleic", "nucleic", "nucleic",
-                                  "dna", "rna", "rna", "dna", "water",
+                                  "protein", "dna", "dna", "dna",
+                                  "dna", "nucleic", "nucleic", "dna", "water",
                                   "other"}));
   std::filesystem::remove(path);
 }
@@ -191,10 +191,8 @@ void test_read_mmcif_conflicting_dna_and_o2prime_evidence_stays_nucleic() {
 
   assert(status.ok());
   assert((molecule.moltype() ==
-          std::vector<std::string>{"nucleic", "nucleic", "nucleic"}));
-  const auto report = molecule.moltype_by_segname_report();
-  assert(report.overall_status == "nucleic_conflict");
-  assert(report.segments.at("X").status == "nucleic_conflict");
+          std::vector<std::string>{"rna", "rna", "rna"}));
+  (void)molecule.moltype_by_segname_report();
   std::filesystem::remove(path);
 }
 

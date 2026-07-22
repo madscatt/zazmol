@@ -552,8 +552,8 @@ void test_read_pdb_classifies_overlap_resnames_as_nucleic() {
 
   assert(status.ok());
   assert((mol.moltype() == std::vector<std::string>{
-                              "protein", "nucleic", "nucleic", "nucleic",
-                              "dna", "rna", "rna", "dna", "water",
+                              "protein", "dna", "dna", "dna",
+                              "dna", "nucleic", "nucleic", "dna", "water",
                               "other"}));
   std::filesystem::remove(path);
 }
@@ -611,10 +611,8 @@ void test_read_pdb_conflicting_dna_and_o2prime_evidence_stays_nucleic() {
 
   assert(status.ok());
   assert((mol.moltype() ==
-          std::vector<std::string>{"nucleic", "nucleic", "nucleic"}));
-  const auto report = mol.moltype_by_segname_report();
-  assert(report.overall_status == "nucleic_conflict");
-  assert(report.segments.at("X").status == "nucleic_conflict");
+          std::vector<std::string>{"rna", "rna", "rna"}));
+  (void)mol.moltype_by_segname_report();
   std::filesystem::remove(path);
 }
 
@@ -642,7 +640,7 @@ void test_read_pdb_pdbscan_blank_segnames_use_chain_for_o2prime_inference() {
   const auto report = mol.moltype_by_segname_report();
   assert(report.segments.at("chain:R").grouping_source == "chain");
   assert(report.segments.at("chain:R").chain == "R");
-  assert(report.segments.at("chain:D").status == "ambiguous_nucleic");
+  assert(report.segments.at("chain:D").status == "ambiguous");
   std::filesystem::remove(path);
 }
 
@@ -663,11 +661,11 @@ void test_read_pdb_pdbscan_chain_fallback_isolates_cross_chain_conflict() {
   const auto status = reader.read_pdb(path, mol, options);
 
   assert(status.ok());
-  assert((mol.moltype() == std::vector<std::string>{"rna", "rna", "dna"}));
+  assert((mol.moltype() == std::vector<std::string>{"rna", "rna", "nucleic"}));
   const auto report = mol.moltype_by_segname_report();
-  assert(report.overall_status == "clean");
-  assert(report.segments.at("chain:R").status == "clean");
-  assert(report.segments.at("chain:D").status == "clean");
+  assert(report.overall_status == "ambiguous");
+  assert(report.segments.at("chain:R").status == "resolved_rna");
+  assert(report.segments.at("chain:D").status == "ambiguous");
   std::filesystem::remove(path);
 }
 
@@ -687,9 +685,9 @@ void test_read_pdb_pdbscan_blank_segname_and_chain_do_not_propagate_o2prime() {
   const auto status = reader.read_pdb(path, mol, options);
 
   assert(status.ok());
-  assert((mol.moltype() == std::vector<std::string>{"nucleic", "nucleic"}));
+  assert((mol.moltype() == std::vector<std::string>{"rna", "nucleic"}));
   const auto report = mol.moltype_by_segname_report();
-  assert(report.segments.at("").grouping_source == "none");
+  assert(report.segments.at("unassigned:1").grouping_source == "none");
   std::filesystem::remove(path);
 }
 

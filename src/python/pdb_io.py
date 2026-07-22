@@ -541,11 +541,17 @@ class PDB(object):
 
         protein_resnames=['ALA','ARG','ASN','ASP','CYS','GLN','GLU','GLY','HIS','HSD','HSE','HSP','ILE','LEU','LYS','MET','PHE','PRO','SER','THR','TRP','TYR','VAL']
 	
-        dna_resnames=['NUSA','NUSG','NUSC','NUSU','DA','DG','DC','DT','ADE','GUA','CYT','THY']
+        # These historical return values are retained for callers.  Nucleic
+        # identity is defined by ``nucleic_evidence_registry`` below, rather
+        # than by the order of these lists.
+        dna_resnames=['NUSA','NUSG','NUSC','NUSU','DA','DG','DC','DT','DI','DU']
 
-        rna_resnames=['RNUS','RNUA','RUUG','RNUC','A', 'C', 'G', 'U','ADE','CYT','GUA','URA']
+        rna_resnames=['RNUS','RNUA','RUUG','RNUC']
 
-        nucleic_resnames = ['GUA','ADE','CYT','THY','URA','G', 'A', 'C', 'T', 'U','DA','DG','DC','DT']
+        nucleic_resnames = ['GUA','ADE','CYT','THY','URA','G', 'A', 'C', 'T', 'U',
+                            'DA','DG','DC','DT','DI','DU',
+                            'NUSA','NUSG','NUSC','NUSU',
+                            'RNUS','RNUA','RUUG','RNUC']
 
         water_resnames=['TIP3','SPCE','TIP','SPC','TIP4','TP3M'] 
 			
@@ -553,22 +559,25 @@ class PDB(object):
 
     def moltype_for_resname(self, resname):
         '''
-        Return the residue-name moltype without resolving DNA/RNA overlap by
-        table order.
+        Return an initial descriptor-only moltype.
+
+        The authoritative DNA/RNA decision is made later by
+        :meth:`classify_nucleic_moltypes`, from residue atom evidence and
+        effective-group aggregation.  A recognized but sugar-unspecified
+        nucleic residue is deliberately initialized as ``nucleic``.
         '''
 
         protein_resnames,dna_resnames,rna_resnames,nucleic_resnames,water_resnames = self.get_resnames()
-        is_dna = resname in dna_resnames
-        is_rna = resname in rna_resnames
+        registry = self.nucleic_evidence_registry()
 
         if resname in protein_resnames:
             return 'protein'
-        if is_dna and is_rna:
-            return 'nucleic'
-        if is_rna:
+        if resname in registry['explicit_ribonucleotide']:
             return 'rna'
-        if is_dna:
+        if resname in registry['explicit_deoxy']:
             return 'dna'
+        if resname in registry['recognized_nucleic']:
+            return 'nucleic'
         if resname in water_resnames:
             return 'water'
         return 'other'
@@ -579,6 +588,48 @@ class PDB(object):
         '''
 
         return ["O2'", "O2*"]
+
+    def nucleic_evidence_registry(self):
+        '''Return mutually exclusive, coordinate-only nucleic name evidence.
+
+        Bare base and legacy base names intentionally carry no sugar identity.
+        Names are listed explicitly: this method must never infer a class from
+        a prefix such as ``D`` or ``R``.
+        '''
+
+        explicit_deoxy = ('DA', 'DC', 'DG', 'DT', 'DI', 'DU',
+                           'NUSA', 'NUSG', 'NUSC', 'NUSU')
+        explicit_ribonucleotide = ('RNUS', 'RNUA', 'RUUG', 'RNUC')
+        sugar_dependent_ambiguous = ('A', 'C', 'G', 'T', 'U',
+                                     'ADE', 'CYT', 'GUA', 'THY', 'URA')
+        recognized_unspecified = ()
+        recognized_nucleic = set(explicit_deoxy)
+        recognized_nucleic.update(explicit_ribonucleotide)
+        recognized_nucleic.update(sugar_dependent_ambiguous)
+        recognized_nucleic.update(recognized_unspecified)
+        return {
+            'explicit_deoxy': set(explicit_deoxy),
+            'explicit_ribonucleotide': set(explicit_ribonucleotide),
+            'sugar_dependent_ambiguous': set(sugar_dependent_ambiguous),
+            'recognized_unspecified': set(recognized_unspecified),
+            'recognized_nucleic': recognized_nucleic,
+        }
+
+    def nucleic_sugar_atom_aliases(self):
+        '''Return exact accepted aliases for the ribose/deoxyribose ring.'''
+
+        return {
+            'C1': ("C1'", 'C1*'),
+            'C2': ("C2'", 'C2*'),
+            'C3': ("C3'", 'C3*'),
+            'C4': ("C4'", 'C4*'),
+            'O4': ("O4'", 'O4*'),
+        }
+
+    def _normalize_nucleic_atom_name(self, atom_name):
+        '''Normalize fixed-field padding without changing chemical punctuation.'''
+
+        return '' if atom_name is None else str(atom_name).strip()
 
     def _unique_values(self, values):
         unique_values = []
@@ -606,54 +657,211 @@ class PDB(object):
             return ('chain', this_chain, 'chain:%s' % this_chain)
         return ('none', '', '')
 
-    def _finalize_nucleic_moltypes_by_segment(self, names, resnames, segnames, chains, moltypes):
-        '''
-        Use segment-level O2' evidence to resolve ambiguous nucleic moltypes.
+    def _nucleic_descriptor_values(self, name):
+        try:
+            return list(getattr(self, name)())
+        except Exception:
+            return []
 
-        Accepted O2' aliases are positive RNA evidence. Absence of an alias
-        leaves ambiguous atoms as ``nucleic``. Conflicting DNA- and RNA-specific
-        evidence in one segment leaves recognized nucleic atoms as ``nucleic``.
-        '''
+    def _analyze_nucleic_moltypes(self):
+        '''Analyze coordinate-only nucleic evidence without mutating the molecule.'''
 
-        protein_resnames,dna_resnames,rna_resnames,nucleic_resnames,water_resnames = self.get_resnames()
-        dna_set = set(dna_resnames)
-        rna_set = set(rna_resnames)
-        rna_atom_names = set(self.nucleic_rna_atom_aliases())
-        segments = {}
+        names = self._nucleic_descriptor_values('name')
+        resnames = self._nucleic_descriptor_values('resname')
+        segnames = self._nucleic_descriptor_values('segname')
+        chains = self._nucleic_descriptor_values('chain')
+        resids = self._nucleic_descriptor_values('resid')
+        rescodes = self._nucleic_descriptor_values('rescode')
+        records = self._nucleic_descriptor_values('atom')
+        moltypes = self._nucleic_descriptor_values('moltype')
+        natoms = max(len(names), len(resnames), len(segnames), len(chains),
+                     len(resids), len(rescodes), len(records), len(moltypes))
+        registry = self.nucleic_evidence_registry()
+        rna_aliases = set(self.nucleic_rna_atom_aliases())
+        sugar_aliases = {key: set(value) for key, value in
+                         self.nucleic_sugar_atom_aliases().items()}
 
-        for i, moltype in enumerate(moltypes):
-            if moltype not in ('dna', 'rna', 'nucleic'):
+        def value(values, index, default=''):
+            return values[index] if index < len(values) else default
+
+        # Preserve all non-nucleic assignments.  Proposed nucleic assignments
+        # below are derived only from descriptors, never from this value.
+        proposed = list(moltypes)
+        if len(proposed) < natoms:
+            proposed.extend([''] * (natoms - len(proposed)))
+
+        residues = []
+        current = None
+        occurrence = 0
+        for index in range(natoms):
+            resname = str(value(resnames, index, '')).strip()
+            if resname not in registry['recognized_nucleic']:
+                current = None
                 continue
-            segname = segnames[i] if i < len(segnames) else ''
-            chain = chains[i] if i < len(chains) else ''
-            grouping_source, grouping_value, grouping_key = self._effective_moltype_group(
-                segname, chain)
-            if grouping_source == 'none':
-                continue
-            resname = resnames[i] if i < len(resnames) else ''
-            atom_name = names[i] if i < len(names) else ''
-            segment = segments.setdefault(
-                grouping_key,
-                {'indices': [], 'has_dna': False, 'has_rna': False, 'has_o2prime': False})
-            segment['indices'].append(i)
-            if resname in dna_set and resname not in rna_set:
-                segment['has_dna'] = True
-            if resname in rna_set and resname not in dna_set:
-                segment['has_rna'] = True
-            if atom_name in rna_atom_names:
-                segment['has_o2prime'] = True
+            signature = (str(value(segnames, index, '')).strip(),
+                         str(value(chains, index, '')).strip(),
+                         value(resids, index, ''),
+                         str(value(rescodes, index, '')).strip(), resname)
+            if current is None or current['signature'] != signature:
+                occurrence += 1
+                current = {'signature': signature, 'occurrence': occurrence,
+                           'indices': [], 'atom_names': set(), 'records': set()}
+                residues.append(current)
+            current['indices'].append(index)
+            current['atom_names'].add(self._normalize_nucleic_atom_name(value(names, index, '')))
+            record = str(value(records, index, '')).strip()
+            if record:
+                current['records'].add(record)
 
-        for segment in segments.values():
-            has_conflict = segment['has_dna'] and (segment['has_rna'] or segment['has_o2prime'])
-            if has_conflict:
-                for i in segment['indices']:
-                    moltypes[i] = 'nucleic'
-            elif segment['has_o2prime']:
-                for i in segment['indices']:
-                    if moltypes[i] == 'nucleic':
-                        moltypes[i] = 'rna'
+        for residue in residues:
+            segname, chain, resid, rescode, resname = residue['signature']
+            atoms = residue['atom_names']
+            has_o2prime = sorted(atoms.intersection(rna_aliases))
+            complete_deoxy = (not has_o2prime and
+                               all(atoms.intersection(sugar_aliases[position])
+                                   for position in ('C1', 'C2', 'C3', 'C4', 'O4')))
+            explicit_dna = resname in registry['explicit_deoxy']
+            explicit_rna = resname in registry['explicit_ribonucleotide']
+            conflict_reasons = []
+            if explicit_dna and has_o2prime:
+                conflict_reasons.append('explicit deoxy name with O2prime evidence')
+            if explicit_rna and complete_deoxy:
+                conflict_reasons.append('explicit ribonucleotide name with complete deoxy sugar')
+            if conflict_reasons:
+                identity = 'conflict'
+                evidence = 'conflict'
+            elif has_o2prime:
+                identity = 'rna'
+                evidence = 'o2prime'
+            elif explicit_dna:
+                identity = 'dna'
+                evidence = 'explicit_deoxy_name'
+            elif complete_deoxy:
+                identity = 'dna'
+                evidence = 'complete_deoxy_sugar'
+            elif explicit_rna:
+                identity = 'rna'
+                evidence = 'explicit_ribonucleotide_name'
+            else:
+                identity = 'ambiguous'
+                evidence = 'insufficient_coordinate_evidence'
+            residue.update({'segname': segname, 'chain': chain, 'resid': resid,
+                            'rescode': rescode, 'resname': resname,
+                            'identity': identity, 'evidence': evidence,
+                            'o2prime_atoms': has_o2prime,
+                            'complete_deoxy_sugar': complete_deoxy,
+                            'conflict_reasons': conflict_reasons})
 
-        return moltypes
+        groups = {}
+        for residue in residues:
+            source, group_value, group_key = self._effective_moltype_group(
+                residue['segname'], residue['chain'])
+            if source == 'none':
+                group_key = 'unassigned:%d' % residue['occurrence']
+            group = groups.setdefault(group_key, {
+                'grouping_source': source, 'grouping_value': group_value,
+                'segname': residue['segname'], 'chains': [], 'residues': []})
+            if residue['chain'] not in group['chains']:
+                group['chains'].append(residue['chain'])
+            group['residues'].append(residue)
+
+        report = {'overall_status': 'clean', 'segments': {}, 'messages': []}
+        status_priority = {'clean': 0, 'ambiguous': 1, 'conflict': 2}
+        overall = 'clean'
+        for group_key, group in groups.items():
+            identities = [residue['identity'] for residue in group['residues']]
+            has_dna = 'dna' in identities
+            has_rna = 'rna' in identities
+            has_conflict = 'conflict' in identities
+            if has_conflict or (has_dna and has_rna):
+                identity, canonical = 'conflict', 'nucleic'
+            elif has_dna:
+                identity, canonical = 'resolved_dna', 'dna'
+            elif has_rna:
+                identity, canonical = 'resolved_rna', 'rna'
+            else:
+                identity, canonical = 'ambiguous', 'nucleic'
+            if group['grouping_source'] == 'none':
+                # Both identifiers are blank: this group represents exactly one
+                # residue and must not propagate evidence to another residue.
+                local = group['residues'][0]['identity']
+                identity = {'dna': 'resolved_dna', 'rna': 'resolved_rna',
+                            'ambiguous': 'ambiguous', 'conflict': 'conflict'}[local]
+                canonical = {'dna': 'dna', 'rna': 'rna',
+                             'ambiguous': 'nucleic', 'conflict': 'nucleic'}[local]
+            for residue in group['residues']:
+                for index in residue['indices']:
+                    proposed[index] = canonical
+            o2_evidence = []
+            deoxy_names = []
+            ribo_names = []
+            ambiguous_names = []
+            conflict_residues = []
+            record_classes = []
+            residue_decisions = []
+            for residue in group['residues']:
+                if residue['resname'] in registry['explicit_deoxy'] and residue['resname'] not in deoxy_names:
+                    deoxy_names.append(residue['resname'])
+                if residue['resname'] in registry['explicit_ribonucleotide'] and residue['resname'] not in ribo_names:
+                    ribo_names.append(residue['resname'])
+                if residue['identity'] == 'ambiguous' and residue['resname'] not in ambiguous_names:
+                    ambiguous_names.append(residue['resname'])
+                for atom_name in residue['o2prime_atoms']:
+                    if atom_name not in o2_evidence:
+                        o2_evidence.append(atom_name)
+                for record in sorted(residue['records']):
+                    if record not in record_classes:
+                        record_classes.append(record)
+                decision = {'resname': residue['resname'], 'resid': residue['resid'],
+                            'rescode': residue['rescode'], 'chain': residue['chain'],
+                            'identity': residue['identity'], 'evidence': residue['evidence'],
+                            'o2prime_atoms': list(residue['o2prime_atoms']),
+                            'complete_deoxy_sugar': residue['complete_deoxy_sugar'],
+                            'conflict_reasons': list(residue['conflict_reasons'])}
+                residue_decisions.append(decision)
+                if residue['identity'] == 'conflict':
+                    conflict_residues.append(decision)
+            message = ''
+            if identity == 'conflict':
+                message = 'conflicting DNA and RNA coordinate evidence'
+            elif identity == 'ambiguous':
+                message = 'insufficient coordinate evidence to resolve DNA or RNA'
+            segment = {
+                'grouping_source': group['grouping_source'],
+                'grouping_value': group['grouping_value'],
+                'segname': group['segname'], 'chain': group['chains'][0] if group['chains'] else '',
+                'chains': list(group['chains']), 'identity': identity,
+                'canonical_moltype': canonical, 'status': identity,
+                'assigned_moltypes': [canonical],
+                'atom_count': sum(len(residue['indices']) for residue in group['residues']),
+                'residue_count': len(group['residues']),
+                'residue_decisions': residue_decisions,
+                'dna_resname_evidence': deoxy_names,
+                'rna_resname_evidence': ribo_names,
+                'ambiguous_resnames': ambiguous_names,
+                'rna_atom_evidence': o2_evidence,
+                'complete_deoxy_sugar_evidence': [decision['resname'] for decision in residue_decisions if decision['complete_deoxy_sugar']],
+                'conflicting_residues': conflict_residues,
+                'record_classes': record_classes,
+                'decision': 'assigned recognized nucleic atoms as %s' % canonical,
+                'evidence': [message] if message else []}
+            report['segments'][group_key] = segment
+            if message:
+                report['messages'].append('Segment %s: %s.' % (group_key, message))
+            group_status = 'conflict' if identity == 'conflict' else ('ambiguous' if identity == 'ambiguous' else 'clean')
+            if status_priority[group_status] > status_priority[overall]:
+                overall = group_status
+        report['overall_status'] = overall
+        return proposed, report
+
+    def classify_nucleic_moltypes(self):
+        '''Apply the authoritative coordinate-only nucleic classification.'''
+
+        proposed, report = self._analyze_nucleic_moltypes()
+        self._moltype = proposed
+        self._moltypes = self._unique_values(proposed)
+        self._number_of_moltypes = len(self._moltypes)
+        return report
 
     def moltype_by_segname_report(self):
         '''
@@ -670,177 +878,9 @@ class PDB(object):
             report with ``overall_status``, ``segments``, and ``messages``.
         '''
 
-        protein_resnames,dna_resnames,rna_resnames,nucleic_resnames,water_resnames = self.get_resnames()
-        dna_set = set(dna_resnames)
-        rna_set = set(rna_resnames)
-        ambiguous_nucleic = dna_set.intersection(rna_set)
-        rna_atom_names = set(self.nucleic_rna_atom_aliases())
-
-        def descriptor(name):
-            try:
-                return getattr(self, name)()
-            except Exception:
-                return []
-
-        def value_at(values, index, default):
-            try:
-                return values[index]
-            except Exception:
-                return default
-
-        def append_unique(values, value):
-            if value not in values:
-                values.append(value)
-
-        def append_message(report, message):
-            if message not in report['messages']:
-                report['messages'].append(message)
-
-        resnames = descriptor('resname')
-        names = descriptor('name')
-        segnames = descriptor('segname')
-        chains = descriptor('chain')
-        moltypes = descriptor('moltype')
-        resids = descriptor('resid')
-        rescodes = descriptor('rescode')
-
-        try:
-            natoms = self.natoms()
-        except Exception:
-            natoms = max(len(resnames), len(names), len(segnames), len(chains), len(moltypes))
-
-        report = {
-            'overall_status': 'clean',
-            'segments': {},
-            'messages': []
-        }
-        residues_by_segment = {}
-
-        for i in range(natoms):
-            segname = value_at(segnames, i, '')
-            chain = value_at(chains, i, '')
-            grouping_source, grouping_value, grouping_key = self._effective_moltype_group(
-                segname, chain)
-            resname = value_at(resnames, i, '')
-            atom_name = value_at(names, i, '')
-            moltype = value_at(moltypes, i, '')
-            resid = value_at(resids, i, '')
-            rescode = value_at(rescodes, i, '')
-
-            if grouping_key not in report['segments']:
-                report['segments'][grouping_key] = {
-                    'segname': segname,
-                    'chain': chain,
-                    'grouping_source': grouping_source,
-                    'grouping_value': grouping_value,
-                    'status': 'clean',
-                    'assigned_moltypes': [],
-                    'resnames': [],
-                    'ambiguous_resnames': [],
-                    'dna_resname_evidence': [],
-                    'rna_resname_evidence': [],
-                    'rna_atom_evidence': [],
-                    'atom_count': 0,
-                    'residue_count': 0,
-                    'decision': '',
-                    'evidence': []
-                }
-                residues_by_segment[grouping_key] = set()
-
-            segment = report['segments'][grouping_key]
-            segment['atom_count'] += 1
-            append_unique(segment['assigned_moltypes'], moltype)
-            append_unique(segment['resnames'], resname)
-            residues_by_segment[grouping_key].add((resid, rescode, resname))
-
-            if resname in ambiguous_nucleic:
-                append_unique(segment['ambiguous_resnames'], resname)
-            if resname in dna_set and resname not in rna_set:
-                append_unique(segment['dna_resname_evidence'], resname)
-            if resname in rna_set and resname not in dna_set:
-                append_unique(segment['rna_resname_evidence'], resname)
-            if atom_name in rna_atom_names:
-                append_unique(segment['rna_atom_evidence'], atom_name)
-
-        for segname, segment in report['segments'].items():
-            segment['residue_count'] = len(residues_by_segment[segname])
-
-            assigned = [x for x in segment['assigned_moltypes'] if x != '']
-            has_ambiguous_nucleic = len(segment['ambiguous_resnames']) > 0
-            has_specific_nucleic_evidence = (
-                len(segment['dna_resname_evidence']) > 0 or
-                len(segment['rna_resname_evidence']) > 0 or
-                len(segment['rna_atom_evidence']) > 0)
-            has_nucleic_conflict = (
-                len(segment['dna_resname_evidence']) > 0 and
-                (len(segment['rna_resname_evidence']) > 0 or
-                 len(segment['rna_atom_evidence']) > 0))
-
-            if has_nucleic_conflict:
-                segment['status'] = 'nucleic_conflict'
-                segment['decision'] = 'kept recognized nucleic atoms as nucleic'
-                segment['evidence'].append(
-                    'DNA-specific and RNA-specific/O2prime evidence in one segment')
-                append_message(
-                    report,
-                    "Segment %s contains conflicting DNA- and RNA-specific/O2prime evidence." %
-                    segname)
-            elif len(assigned) > 1:
-                segment['status'] = 'mixed'
-                segment['decision'] = 'kept assigned moltypes'
-                segment['evidence'].append(
-                    'multiple assigned moltypes: ' + ', '.join(assigned))
-                append_message(
-                    report,
-                    "Segment %s contains multiple assigned moltypes: %s." %
-                    (segname, ', '.join(assigned)))
-            elif len(assigned) == 1 and assigned[0] == 'other':
-                segment['status'] = 'all_other'
-                segment['decision'] = 'kept other'
-                segment['evidence'].append(
-                    'all atoms are assigned moltype other')
-                append_message(
-                    report,
-                    "Segment %s contains only moltype other assignments." %
-                    segname)
-            elif has_ambiguous_nucleic and not has_specific_nucleic_evidence:
-                segment['status'] = 'ambiguous_nucleic'
-                segment['decision'] = 'kept ambiguous atoms as nucleic'
-                segment['evidence'].append(
-                    'DNA/RNA-overlap residue names without DNA- or RNA-specific evidence: ' +
-                    ', '.join(segment['ambiguous_resnames']))
-                append_message(
-                    report,
-                    "Segment %s contains DNA/RNA-overlap residue names without DNA- or RNA-specific evidence: %s." %
-                    (segname, ', '.join(segment['ambiguous_resnames'])))
-            else:
-                segment['status'] = 'clean'
-                segment['decision'] = 'kept assigned moltypes'
-                if segment['dna_resname_evidence']:
-                    segment['evidence'].append(
-                        'DNA-specific residue names: ' +
-                        ', '.join(segment['dna_resname_evidence']))
-                if segment['rna_resname_evidence']:
-                    segment['evidence'].append(
-                        'RNA-specific residue names: ' +
-                        ', '.join(segment['rna_resname_evidence']))
-                if segment['rna_atom_evidence']:
-                    segment['evidence'].append(
-                        'RNA atom-name evidence: ' +
-                        ', '.join(segment['rna_atom_evidence']))
-
-        statuses = [segment['status']
-                    for segment in report['segments'].values()]
-        if 'nucleic_conflict' in statuses:
-            report['overall_status'] = 'nucleic_conflict'
-        elif 'mixed' in statuses:
-            report['overall_status'] = 'mixed_by_segname'
-        elif 'ambiguous_nucleic' in statuses:
-            report['overall_status'] = 'ambiguous_nucleic'
-        elif 'all_other' in statuses:
-            report['overall_status'] = 'unknown'
-
-        return report
+        # Keep report generation non-mutating while sharing every decision with
+        # ``classify_nucleic_moltypes``.
+        return self._analyze_nucleic_moltypes()[1]
 
     def initialize_children(self):
 
@@ -1232,13 +1272,13 @@ class PDB(object):
                     true_index = 0
                     x=[] ; y=[] ; z=[]
                     if(this_frame == 1):
-                        moltype = self._finalize_nucleic_moltypes_by_segment(
-                            name, resname, segname, chain, moltype)
                         unique_moltypes = self._unique_values(moltype)
                         self._atom=atom ; self._index=index  ; self._original_index = original_index ; self._name=name ; self._loc=loc ; self._resname=resname ; self._residue_flag = residue_flag
                         self._chain=chain ; self._resid=resid ; self._rescode=rescode ; self._original_resid=original_resid
                         self._occupancy=occupancy ; self._beta=beta ; self._segname=segname ; self._element=element
                         self._charge=charge ; self._moltype=moltype
+                        self.classify_nucleic_moltypes()
+                        unique_moltypes = self._moltypes
                         
                         self._number_of_names = len(unique_names) ; self._names = unique_names
                         self._number_of_resnames = len(unique_resnames) ; self._resnames = unique_resnames

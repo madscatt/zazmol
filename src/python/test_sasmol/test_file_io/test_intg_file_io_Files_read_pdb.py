@@ -97,10 +97,10 @@ class Test_intg_file_io_Files_read_dcd(unittest.TestCase):
 
       self.assertEqual(
          list(self.o.moltype()),
-         ['protein', 'nucleic', 'nucleic', 'nucleic', 'dna',
-          'rna', 'rna', 'dna', 'water', 'other'])
+         ['protein', 'dna', 'dna', 'dna', 'dna',
+          'nucleic', 'nucleic', 'dna', 'water', 'other'])
       self.assertEqual(Counter(self.o.moltype()),
-                       Counter({'nucleic': 3, 'dna': 2, 'rna': 2,
+                       Counter({'dna': 5, 'nucleic': 2,
                                 'protein': 1, 'water': 1, 'other': 1}))
 
    def test_o2prime_evidence_promotes_overlap_segment_to_rna(self):
@@ -130,7 +130,7 @@ class Test_intg_file_io_Files_read_dcd(unittest.TestCase):
 
       self.assertEqual(list(self.o.moltype()), ['rna', 'rna'])
 
-   def test_conflicting_dna_and_o2prime_evidence_stays_nucleic(self):
+   def test_ambiguous_thymine_does_not_conflict_with_o2prime_rna(self):
       lines = [
          self.make_atom_line(1, "O2'", 'ADE', 'X', 1, 1.0),
          self.make_atom_line(2, 'P', 'THY', 'X', 2, 2.0),
@@ -142,10 +142,10 @@ class Test_intg_file_io_Files_read_dcd(unittest.TestCase):
       finally:
          os.unlink(pdb_file)
 
-      self.assertEqual(list(self.o.moltype()), ['nucleic', 'nucleic', 'nucleic'])
+      self.assertEqual(list(self.o.moltype()), ['rna', 'rna', 'rna'])
       report = self.o.moltype_by_segname_report()
-      self.assertEqual(report['overall_status'], 'nucleic_conflict')
-      self.assertEqual(report['segments']['X']['status'], 'nucleic_conflict')
+      self.assertEqual(report['overall_status'], 'clean')
+      self.assertEqual(report['segments']['X']['identity'], 'resolved_rna')
 
    def test_pdbscan_blank_segnames_use_chain_for_o2prime_inference(self):
       lines = [
@@ -165,7 +165,7 @@ class Test_intg_file_io_Files_read_dcd(unittest.TestCase):
       report = self.o.moltype_by_segname_report()
       self.assertEqual(report['segments']['chain:R']['grouping_source'], 'chain')
       self.assertEqual(report['segments']['chain:R']['chain'], 'R')
-      self.assertEqual(report['segments']['chain:D']['status'], 'ambiguous_nucleic')
+      self.assertEqual(report['segments']['chain:D']['status'], 'ambiguous')
 
    def test_pdbscan_chain_fallback_isolates_cross_chain_o2prime_conflict(self):
       lines = [
@@ -179,11 +179,11 @@ class Test_intg_file_io_Files_read_dcd(unittest.TestCase):
       finally:
          os.unlink(pdb_file)
 
-      self.assertEqual(list(self.o.moltype()), ['rna', 'rna', 'dna'])
+      self.assertEqual(list(self.o.moltype()), ['rna', 'rna', 'nucleic'])
       report = self.o.moltype_by_segname_report()
-      self.assertEqual(report['overall_status'], 'clean')
-      self.assertEqual(report['segments']['chain:R']['status'], 'clean')
-      self.assertEqual(report['segments']['chain:D']['status'], 'clean')
+      self.assertEqual(report['overall_status'], 'ambiguous')
+      self.assertEqual(report['segments']['chain:R']['status'], 'resolved_rna')
+      self.assertEqual(report['segments']['chain:D']['status'], 'ambiguous')
 
    def test_pdbscan_blank_segname_and_blank_chain_does_not_propagate_o2prime(self):
       lines = [
@@ -196,9 +196,9 @@ class Test_intg_file_io_Files_read_dcd(unittest.TestCase):
       finally:
          os.unlink(pdb_file)
 
-      self.assertEqual(list(self.o.moltype()), ['nucleic', 'nucleic'])
+      self.assertEqual(list(self.o.moltype()), ['rna', 'nucleic'])
       report = self.o.moltype_by_segname_report()
-      self.assertEqual(report['segments']['']['grouping_source'], 'none')
+      self.assertEqual(report['segments']['unassigned:1']['grouping_source'], 'none')
 
    def test_1ATM_one_frame(self):
       '''

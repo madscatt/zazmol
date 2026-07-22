@@ -84,7 +84,7 @@ class Test_unit_file_io_Files_get_resnames(unittest.TestCase):
       make sure the right dna list was generated
       '''
       #
-      dna_resnames=['NUSA','NUSG','NUSC','NUSU','DA','DG','DC','DT','ADE','GUA','CYT','THY']
+      dna_resnames=['NUSA','NUSG','NUSC','NUSU','DA','DG','DC','DT','DI','DU']
       self.assertEqual(self.compare_namelists(dna_resnames, self.dna), 0)
 
 
@@ -93,7 +93,7 @@ class Test_unit_file_io_Files_get_resnames(unittest.TestCase):
       make sure the right rna list was generated
       '''
       #
-      rna_resnames=['RNUS','RNUA','RUUG','RNUC','A', 'C', 'G', 'U','ADE','CYT','GUA','URA']
+      rna_resnames=['RNUS','RNUA','RUUG','RNUC']
       self.assertEqual(self.compare_namelists(rna_resnames, self.rna), 0)
 
 
@@ -102,7 +102,10 @@ class Test_unit_file_io_Files_get_resnames(unittest.TestCase):
       make sure the right nucleic list was generated
       '''
       #
-      nucleic_resnames = ['GUA','ADE','CYT','THY','URA','G', 'A', 'C', 'T', 'U','DA','DG','DC','DT']
+      nucleic_resnames = ['GUA','ADE','CYT','THY','URA','G', 'A', 'C', 'T', 'U',
+                          'DA','DG','DC','DT','DI','DU',
+                          'NUSA','NUSG','NUSC','NUSU',
+                          'RNUS','RNUA','RUUG','RNUC']
       self.assertEqual(self.compare_namelists(nucleic_resnames, self.nucleic), 0)
 
 
@@ -123,4 +126,3 @@ class Test_unit_file_io_Files_get_resnames(unittest.TestCase):
    
 if __name__ == '__main__': 
    unittest.main() 
-
