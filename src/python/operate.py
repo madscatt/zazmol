@@ -574,12 +574,24 @@ class Move():
         ''' right handed coordinate frame '''
         ak = ak[:, pmi_eigenvector]
 
-        axes = {
-            'x': numpy.array([1.0, 0.0, 0.0]),
-            'y': numpy.array([0.0, 1.0, 0.0]),
-            'z': numpy.array([0.0, 0.0, 1.0]),
-        }
-        axis = axes[alignment_vector_axis]
+        if isinstance(alignment_vector_axis, str):
+            axes = {
+                'x': numpy.array([1.0, 0.0, 0.0]),
+                'y': numpy.array([0.0, 1.0, 0.0]),
+                'z': numpy.array([0.0, 0.0, 1.0]),
+            }
+            axis = axes[alignment_vector_axis]
+        else:
+            axis = numpy.asarray(
+                alignment_vector_axis, dtype=config.CALC_DTYPE)
+            if axis.shape != (3,):
+                raise ValueError('PMI alignment vector must contain 3 values')
+            if not numpy.all(numpy.isfinite(axis)):
+                raise ValueError('PMI alignment vector must be finite')
+            magnitude = numpy.linalg.norm(axis)
+            if magnitude == 0.0:
+                raise ValueError('PMI alignment vector cannot be zero')
+            axis = axis / magnitude
 
         ak = ak / numpy.linalg.norm(ak)
         rotvec = numpy.cross(axis, ak)

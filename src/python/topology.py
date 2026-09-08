@@ -251,10 +251,14 @@ class Topology(charmm_topology.CharmmTopology):
             basis_string = "moltype[i] == 'protein'"
 
         elif basis_type == 'nucleic':
-            basis_string = "moltype[i] == 'nucleic'"
+            basis_string = (
+                "moltype[i] == 'nucleic' or moltype[i] == 'dna' "
+                "or moltype[i] == 'rna'")
 
         elif basis_type == 'solute':
-            basis_string = "moltype[i] == 'protein' or moltype[i] == 'nucleic'"
+            basis_string = (
+                "moltype[i] == 'protein' or moltype[i] == 'nucleic' "
+                "or moltype[i] == 'dna' or moltype[i] == 'rna'")
 
         error, mask = self.get_subset_mask(basis_string)
 

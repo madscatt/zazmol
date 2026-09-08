@@ -168,6 +168,21 @@ class Test_intg_topology_Topology(unittest.TestCase):
         self.assertEqual(constrained.beta()[2], '1.00')
         self.assertEqual(constrained.beta()[3], '0.00')
 
+    def test_make_constraint_pdb_sets_current_dna_and_rna_atoms(self):
+        molecule = self.make_topology_test_molecule()
+        molecule.setMoltype(['protein', 'protein', 'dna', 'rna'])
+        outfile = self.make_temp_pdb()
+
+        molecule.make_constraint_pdb(outfile, 'nucleic')
+
+        constrained = system.Molecule(0)
+        constrained.read_pdb(outfile)
+
+        self.assertEqual(constrained.beta()[0], '0.00')
+        self.assertEqual(constrained.beta()[1], '0.00')
+        self.assertEqual(constrained.beta()[2], '1.00')
+        self.assertEqual(constrained.beta()[3], '1.00')
+
     def test_make_constraint_pdb_sets_solute_atoms(self):
         molecule = self.make_topology_test_molecule()
         outfile = self.make_temp_pdb()
@@ -181,6 +196,18 @@ class Test_intg_topology_Topology(unittest.TestCase):
         self.assertEqual(constrained.beta()[1], '1.00')
         self.assertEqual(constrained.beta()[2], '1.00')
         self.assertEqual(constrained.beta()[3], '0.00')
+
+    def test_make_constraint_pdb_solute_includes_current_nucleic_types(self):
+        molecule = self.make_topology_test_molecule()
+        molecule.setMoltype(['protein', 'protein', 'dna', 'rna'])
+        outfile = self.make_temp_pdb()
+
+        molecule.make_constraint_pdb(outfile, 'solute')
+
+        constrained = system.Molecule(0)
+        constrained.read_pdb(outfile)
+
+        self.assertTrue(all(value == '1.00' for value in constrained.beta()))
 
     def test_make_constraint_pdb_reset_false_preserves_unselected_values(self):
         molecule = self.make_topology_test_molecule()

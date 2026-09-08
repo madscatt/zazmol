@@ -91,6 +91,19 @@ class Test_Operate_Move_Align_PMI(unittest.TestCase):
         result_axis = ak[:, pmi_eigenvector]
         self.assert_axis_aligned(result_axis, expected_axis, places=2)
 
+    def test_align_pmi_on_user_vector(self):
+        frame = 0
+        pmi_eigenvector = 1
+        expected_axis = numpy.array([1.0, 1.0, 1.0])
+        self.o1.align_pmi_on_axis(frame, pmi_eigenvector, expected_axis)
+        uk, ak, I = self.o1.calculate_principal_moments_of_inertia(frame)
+        result_axis = ak[:, pmi_eigenvector]
+        self.assert_axis_aligned(result_axis, expected_axis, places=2)
+
+    def test_align_pmi_rejects_zero_user_vector(self):
+        with self.assertRaisesRegex(ValueError, 'cannot be zero'):
+            self.o1.align_pmi_on_axis(0, 0, numpy.zeros(3))
+
     def tearDown(self):
         pass
 
