@@ -5,6 +5,7 @@ import json
 from pathlib import Path
 import re
 import subprocess
+import sys
 from setuptools.command.bdist_egg import bdist_egg
 
 
@@ -78,3 +79,93 @@ def build_commands(root, component_id, version, package, build, build_py, sdist)
 
     return {"build": StampedBuild, "build_py": StampedBuildPy,
             "sdist": StampedSdist, "bdist_egg": StampedEgg}
+
+
+def complete_install(component_id, expected_stamp):
+    """Notify an explicitly bound instance only after owner verification."""
+    config_path = Path(sys.prefix) / "etc/sassie/version-stack.json"
+    try:
+        if not config_path.exists() and not config_path.is_symlink():
+            print("Installed build recorded; this Python environment has no bound website.")
+            return
+        config = json.loads(config_path.read_text())
+        if (not isinstance(config, dict) or config.get("schema_version") != 1 or
+                not isinstance(config.get("python_prefix"), str) or
+                not Path(config["python_prefix"]).is_absolute() or
+                Path(config["python_prefix"]).resolve() != Path(sys.prefix).resolve() or
+                not isinstance(config.get("publisher"), str) or
+                not Path(config["publisher"]).is_absolute() or
+                not Path(config["publisher"]).is_file()):
+            raise ValueError("invalid version-stack binding for this Python environment")
+        subprocess.run([sys.executable, "-I", config["publisher"], "complete-install",
+                        "--component", component_id, "--expected-stamp",
+                        str(Path(expected_stamp).resolve()), "--verified"], check=True)
+    except (OSError, ValueError, subprocess.CalledProcessError) as error:
+        raise RuntimeError("Installed successfully; version-stack update failed: " + str(error)) from error
+
+
+def verify_installed_zazmol(expected_stamp):
+    """Check the new installed package in a fresh, isolated interpreter."""
+    script = r'''
+import importlib
+from importlib import machinery, metadata, resources
+import json
+from pathlib import Path
+import sys
+import sasmol
+from sasmol import native_config
+
+def within(path, parent):
+    return path == parent or parent in path.parents
+
+prefix = Path(sys.prefix).resolve()
+package = Path(sasmol.__file__).resolve().parent
+if not within(package, prefix):
+    raise SystemExit("installed sasmol is outside this Python environment")
+stamp = json.loads(resources.read_text("sasmol", "_build_info.json"))
+if (stamp != json.loads(Path(sys.argv[1]).read_text()) or
+        stamp.get("component_id") != "zazmol" or
+        stamp.get("version") != metadata.version("sasmol")):
+    raise SystemExit("installed ZazMol build stamp does not match this build/distribution")
+for name in ("_dcdio", "_mask", "_view_vmd", "overlap", "matrix_math"):
+    module = importlib.import_module("sasmol." + name)
+    path = Path(module.__file__).resolve()
+    if not within(path, package) or not any(str(path).endswith(s) for s in machinery.EXTENSION_SUFFIXES):
+        raise SystemExit("ZazMol extension is not installed in this package: " + name)
+    print("Installed native extension:", path)
+if native_config.native_api_version() < 1 or not native_config.has_modern_dcd_reader_api():
+    raise SystemExit("installed ZazMol lacks the required modern native API")
+paths = ([Path(p) / "sasmol/molecule.hpp" for p in native_config.include_dirs()] +
+         [Path(p) for p in native_config.extra_objects()])
+for path in paths:
+    if not within(path.resolve(), package) or not path.is_file() or not path.stat().st_size:
+        raise SystemExit("installed ZazMol native file is missing or outside the package: " + str(path))
+    print("Installed native file:", path)
+for directory in native_config.library_dirs():
+    if not within(Path(directory).resolve(), package) or not Path(directory).is_dir():
+        raise SystemExit("installed ZazMol native library directory is invalid")
+print("Installed ZazMol verified:", stamp)
+'''
+    subprocess.run([sys.executable, "-I", "-c", script, str(expected_stamp)], check=True)
+
+
+def verified_install_command(install):
+    """Keep packaging/staging separate from a normal environment install."""
+    class VerifiedInstall(install):
+        def run(self):
+            import sysconfig
+            environment_install = (
+                not (self.root or self.home or self.user or self.dry_run) and
+                self.prefix is not None and
+                Path(self.prefix).resolve() == Path(sys.prefix).resolve() and
+                Path(self.install_lib).resolve() in {
+                    Path(sysconfig.get_path(key)).resolve() for key in ("purelib", "platlib")})
+            super().run()
+            if not environment_install:
+                print("Staged/alternate installation; instance version stack unchanged.")
+                return
+            build = self.get_finalized_command("build")
+            expected_stamp = Path(build.build_lib) / "sasmol/_build_info.json"
+            verify_installed_zazmol(expected_stamp)
+            complete_install("zazmol", expected_stamp)
+    return VerifiedInstall

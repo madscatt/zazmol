@@ -13,7 +13,8 @@ from setuptools import Extension, setup
 from setuptools.command.build_py import build_py as _build_py
 from distutils.command.build import build as base_build
 from setuptools.command.sdist import sdist as base_sdist
-from build_support import build_commands
+from setuptools.command.install import install as base_install
+from build_support import build_commands, verified_install_command
 #       SETUP
 #
 #       12/01/2009      --      initial coding              :       jc
@@ -118,9 +119,9 @@ setup(name='sasmol',
           ],
       },
 
-      cmdclass=build_commands(
+      cmdclass=dict(build_commands(
           os.path.dirname(os.path.abspath(__file__)), 'zazmol', '2.0', 'sasmol',
-          base_build, build_py, base_sdist),
+          base_build, build_py, base_sdist), install=verified_install_command(base_install)),
 
       ext_modules=[
           Extension('sasmol._dcdio',

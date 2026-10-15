@@ -119,9 +119,23 @@ the helper and `.build-info.json`, so a source archive can be built without Git.
 A failed build does not create a success stamp. Missing evidence stays unknown.
 
 Read installed evidence through `importlib.resources` in the interpreter that
-runs the jobs, rather than reading a nearby checkout. The application publishes
-the receipt after normal installation/verification; see
-`../genapp_zazzie/docs/source_revision_metadata.md`. Publication preserves
+runs the jobs, rather than reading a nearby checkout. Normal
+`~/anaconda3/bin/python setup.py install` now verifies the installed
+stamp/distribution, native extensions, modern API, headers and static library
+in an isolated child interpreter. After verification it automatically updates
+only ZazMol in an explicitly bound website's stack. No separate publish command
+is required. The optional one-time binding lives at
+`<selected Python prefix>/etc/sassie/version-stack.json`; its schema is owned by
+`../genapp_zazzie/docs/source_revision_metadata.md`. No application dependency
+is required for standalone installations without that binding.
+
+Plain builds, eggs/archives and staged or alternate-target installs (`--root`,
+`--home`, `--user`, alternate prefix/library directory) do not update a running
+instance. A failed install or native verification cannot publish. A binding or
+publication error fails the command with `Installed successfully; version-stack
+update failed`; the verified new package remains installed. This does not add
+rollback to the normal setuptools installer. Deployment and binding setup are
+separate approved operations. Publication preserves
 independent release dates/tags and reports modified or mixed builds explicitly.
 Git hooks do not publish installed versions. Live hook migration and deployment
 are separately authorized operations. These changes do not alter scientific
