@@ -107,3 +107,22 @@ molecule.calculate_principal_moments_of_inertia(frame)
 ```python
 molecule.write_pdb('rotated_hiv1_gag.pdb', frame, 'w')
 ```
+
+## Installed build identity
+
+Normal `setup.py build` / installation completes the existing native build and
+includes `sasmol/_build_info.json`. The owner helper is `build_support.py`;
+component ID is `zazmol`, canonical package version remains `2.0`. The schema-1
+stamp carries the source revision (or null), tracked-source modified flag and
+UTC build time. Eggs carry it as a package resource. Source distributions carry
+the helper and `.build-info.json`, so a source archive can be built without Git.
+A failed build does not create a success stamp. Missing evidence stays unknown.
+
+Read installed evidence through `importlib.resources` in the interpreter that
+runs the jobs, rather than reading a nearby checkout. The application publishes
+the receipt after normal installation/verification; see
+`../genapp_zazzie/docs/source_revision_metadata.md`. Publication preserves
+independent release dates/tags and reports modified or mixed builds explicitly.
+Git hooks do not publish installed versions. Live hook migration and deployment
+are separately authorized operations. These changes do not alter scientific
+calculations, native build options, or the existing release version.

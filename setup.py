@@ -11,6 +11,9 @@ import subprocess
 # from numpy.distutils.core import Extension, setup
 from setuptools import Extension, setup
 from setuptools.command.build_py import build_py as _build_py
+from distutils.command.build import build as base_build
+from setuptools.command.sdist import sdist as base_sdist
+from build_support import build_commands
 #       SETUP
 #
 #       12/01/2009      --      initial coding              :       jc
@@ -115,7 +118,9 @@ setup(name='sasmol',
           ],
       },
 
-      cmdclass={'build_py': build_py},
+      cmdclass=build_commands(
+          os.path.dirname(os.path.abspath(__file__)), 'zazmol', '2.0', 'sasmol',
+          base_build, build_py, base_sdist),
 
       ext_modules=[
           Extension('sasmol._dcdio',
