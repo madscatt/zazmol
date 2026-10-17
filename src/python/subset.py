@@ -357,6 +357,93 @@ class Mask(object):
 		return error, mask_array
 		'''
 
+    def get_subset_mask_prepared(self, basis_filter):
+        """Build an atom mask after preparing the selection once per call.
+
+        Parameters
+        ----------
+        basis_filter : str
+            Developer-supplied expression using the same molecular descriptors
+            and atom index ``i`` as :meth:`get_subset_mask`.
+
+        Returns
+        -------
+        error : list
+            Existing selection messages, or an empty list on success.
+        mask_array : numpy.ndarray or list
+            Atom-ordered integer mask on success; the existing no-match or
+            partial list on a selection failure.
+
+        Notes
+        -----
+        This opt-in method prepares Python expression text once, then evaluates
+        it for every atom. It requires no native compiler or new dependency.
+        Descriptors are read on every call; no expressions, masks or molecular
+        data are cached across calls. The original method is unchanged.
+
+        Callers own expression suitability and result handling. Preparation
+        occurs inside the first atom's existing evaluation boundary, so an
+        empty molecule does not evaluate the expression. This is not a sandbox.
+        The method's frame/locals and Python translation audit events differ
+        from the original; arbitrary Python introspection parity is not promised.
+        A subclass overriding the original method must review this separate
+        method before opting in; its override is not called automatically.
+
+        Examples
+        --------
+        >>> import sasmol.system as system
+        >>> molecule = system.Molecule_Maker(2, name=['N', 'CA'])
+        >>> error, mask = molecule.get_subset_mask_prepared('name[i] == "CA"')
+        >>> error, mask.tolist()
+        ([], [0, 1])
+        """
+        index = self.index()
+        name = self.name()
+        loc = self.loc()
+        resname = self.resname()
+        chain = self.chain()
+        resid = self.resid()
+        rescode = self.rescode()
+        occupancy = self.occupancy()
+        beta = self.beta()
+        segname = self.segname()
+        element = self.element()
+        charge = self.charge()
+        moltype = self.moltype()
+        residue_flag = self.residue_flag()
+
+        error = []
+
+        preliminary_mask_array = []
+
+        natoms = self.natoms()
+
+        for i in range(natoms):
+
+            try:
+                if i == 0:
+                    prepared_expression = compile(
+                        str.lstrip(basis_filter, ' \t'), '<string>', 'eval',
+                        dont_inherit=True)
+                if (eval(prepared_expression)):
+                    preliminary_mask_array.append(1)
+                else:
+                    preliminary_mask_array.append(0)
+            except Exception:
+                error.append('failed to evaluate filter selection ' +
+                             basis_filter + ' for atom ' + str(i))
+                return error, preliminary_mask_array
+
+        if (numpy.sum(preliminary_mask_array) == 0):
+            error.append(
+                'found no atoms using filter selection ' + basis_filter)
+            return error, preliminary_mask_array
+        else:
+            mask_array = numpy.array(preliminary_mask_array, int)
+
+        return error, mask_array
+
+
     def merge_two_molecules(self, mol1, mol2, **kwargs):
         '''
         Merge two input molecules into ``self``.

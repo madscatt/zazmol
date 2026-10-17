@@ -86,3 +86,35 @@ molecule.calculate_center_of_mass(0)
 ```python
 molecule.write_pdb("centered_hiv1_gag.pdb", 0, "w");
 ```
+
+
+### Prepared atom selections
+
+The separate `get_subset_mask_prepared()` method prepares a selection expression
+once per call before evaluating it for each atom. Use it explicitly when repeated
+expression translation is a measured cost:
+
+```python
+import sasmol.system as system
+
+molecule = system.Molecule_Maker(3, name=['N', 'CA', 'C'])
+error, mask = molecule.get_subset_mask_prepared('name[i] == "CA"')
+if not error:
+    indices = molecule.get_indices_from_mask(mask)  # array([1])
+```
+
+`get_subset_mask()` and existing callers are unchanged. Both methods read current
+molecular descriptors and retain atom order. The prepared method stores no masks,
+indices, molecular state or expressions between calls. It still traverses every
+atom on each selection; it does not make a repeated full-molecule search disappear.
+Preparation is a Python operation and needs no native compiler or new dependency.
+
+As with the existing method, developers supply suitable expression strings and
+handle returned results or exceptions. Successful masks are integer NumPy arrays;
+existing no-match and partial-failure results are lists with selection messages.
+No new error channel, input-validation layer or automatic fallback is introduced.
+The prepared method is intended for molecular descriptor expressions, not exact
+parity of arbitrary Python frame/local introspection or translation audit events.
+A subclass that customizes `get_subset_mask()` must review the separate method
+before using it: the prepared method does not call that custom override. Existing
+`get_named_subset_mask()` calls continue using the original evaluator.

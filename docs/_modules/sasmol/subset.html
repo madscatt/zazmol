@@ -14,27 +14,24 @@
     <script src="../../_static/doctools.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
-
+   
   <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
-
-
+  
+  
   <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
 
   </head><body>
-
+  
 
     <div class="document">
       <div class="documentwrapper">
         <div class="bodywrapper">
-
+          
 
           <div class="body" role="main">
-
+            
   <h1>Source code for sasmol.subset</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">absolute_import</span>
-<span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">division</span>
-<span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">print_function</span>
-<span class="c1"># from __future__ import unicode_literals</span>
+<span></span><span class="c1"># from __future__ import unicode_literals</span>
 <span class="c1">#</span>
 <span class="c1">#</span>
 <span class="c1">#    SASMOL: Copyright (C) 2011 Joseph E. Curtis, Ph.D.</span>
@@ -87,28 +84,59 @@
 
 <div class="viewcode-block" id="Mask"><a class="viewcode-back" href="../../index_subset.html#sasmol.subset.Mask">[docs]</a><span class="k">class</span> <span class="nc">Mask</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
 
-    <span class="sd">&quot;&quot;&quot; Base class containing methods to extract or combine system objects</span>
-<span class="sd">        using numpy masks</span>
+    <span class="sd">&quot;&quot;&quot;Methods to create and apply atom-selection masks.</span>
 
-<span class="sd">        Examples</span>
-<span class="sd">        ========</span>
+<span class="sd">    Masks in this module are atom-aligned integer arrays (typically 0/1) with</span>
+<span class="sd">    length ``natoms``. A common workflow is to create a mask with</span>
+<span class="sd">    ``get_subset_mask`` and apply it with methods such as</span>
+<span class="sd">    ``get_coor_using_mask`` or ``copy_molecule_using_mask``.</span>
 
-<span class="sd">        First example shows how to use class methods from system object:</span>
-
-<span class="sd">        &gt;&gt;&gt; import sasmol.system as system</span>
-<span class="sd">        &gt;&gt;&gt; molecule = system.Molecule(&#39;hiv1_gag.pdb&#39;)</span>
-<span class="sd">        &gt;&gt;&gt; basis_filter = &#39;name[i] == &quot;CA&quot; and resid[i] &lt; 10&#39;</span>
-<span class="sd">        &gt;&gt;&gt; error, mask = molecule.get_subset_mask(basis_filter)  </span>
-<span class="sd">        &gt;&gt;&gt; import numpy</span>
-<span class="sd">        &gt;&gt;&gt; numpy.nonzero(mask)</span>
-<span class="sd">        (array([  4,  11,  21,  45,  55,  66,  82, 101, 112]),) </span>
-
-<span class="sd">        Note</span>
-<span class="sd">        ----</span>
-
-<span class="sd">        `self` parameter is not shown in the ``Parameters`` section in the documentation</span>
-
+<span class="sd">    Examples</span>
+<span class="sd">    --------</span>
+<span class="sd">    &gt;&gt;&gt; import sasmol.system as system</span>
+<span class="sd">    &gt;&gt;&gt; molecule = system.Molecule(&#39;hiv1_gag.pdb&#39;)</span>
+<span class="sd">    &gt;&gt;&gt; error, mask = molecule.get_subset_mask(&#39;name[i] == &quot;CA&quot; and resid[i] &lt; 10&#39;)</span>
+<span class="sd">    &gt;&gt;&gt; error</span>
+<span class="sd">    []</span>
 <span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">_named_basis_filters</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s1">&#39;all&#39;</span><span class="p">:</span> <span class="s1">&#39;not name[i] == None&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;heavy&#39;</span><span class="p">:</span> <span class="s1">&#39;not name[i][0] == &quot;H&quot;&#39;</span><span class="p">,</span>
+    <span class="p">}</span>
+
+<div class="viewcode-block" id="Mask.named_basis_filter"><a class="viewcode-back" href="../../index_subset.html#sasmol.subset.Mask.named_basis_filter">[docs]</a>    <span class="k">def</span> <span class="nf">named_basis_filter</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">basis_name</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Return the explicit selection expression for a supported named basis.</span>
+
+<span class="sd">        Supported names are intentionally limited to unambiguous selections.</span>
+<span class="sd">        ``backbone`` is not included because protein, DNA, RNA, overlap, and</span>
+<span class="sd">        constraint workflows use different backbone definitions.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">normalized</span> <span class="o">=</span> <span class="n">basis_name</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+        <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+            <span class="k">return</span> <span class="p">[</span><span class="s1">&#39;basis name must be a string&#39;</span><span class="p">],</span> <span class="s1">&#39;&#39;</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">return</span> <span class="p">[],</span> <span class="bp">self</span><span class="o">.</span><span class="n">_named_basis_filters</span><span class="p">[</span><span class="n">normalized</span><span class="p">]</span>
+        <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+            <span class="k">return</span> <span class="p">[</span><span class="s1">&#39;unsupported named basis: &#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">basis_name</span><span class="p">)],</span> <span class="s1">&#39;&#39;</span></div>
+
+<div class="viewcode-block" id="Mask.get_named_subset_mask"><a class="viewcode-back" href="../../index_subset.html#sasmol.subset.Mask.get_named_subset_mask">[docs]</a>    <span class="k">def</span> <span class="nf">get_named_subset_mask</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">basis_name</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Build a subset mask from a supported named basis.</span>
+
+<span class="sd">        This is a thin convenience wrapper over ``get_subset_mask``. It does</span>
+<span class="sd">        not change the expression syntax accepted by ``get_subset_mask``.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+
+        <span class="n">error</span><span class="p">,</span> <span class="n">basis_filter</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">named_basis_filter</span><span class="p">(</span><span class="n">basis_name</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">error</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">error</span><span class="p">,</span> <span class="p">[]</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_subset_mask</span><span class="p">(</span><span class="n">basis_filter</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="Mask.get_dihedral_subset_mask"><a class="viewcode-back" href="../../index_subset.html#sasmol.subset.Mask.get_dihedral_subset_mask">[docs]</a>    <span class="k">def</span> <span class="nf">get_dihedral_subset_mask</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">flexible_residues</span><span class="p">,</span> <span class="n">mtype</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;</span>
@@ -236,39 +264,27 @@
 
 <div class="viewcode-block" id="Mask.get_subset_mask"><a class="viewcode-back" href="../../index_subset.html#sasmol.subset.Mask.get_subset_mask">[docs]</a>    <span class="k">def</span> <span class="nf">get_subset_mask</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">basis_filter</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;</span>
-<span class="sd">        This method creates an array of ones and/or zeros</span>
-<span class="sd">        of the length of the number of atoms in &quot;self&quot; and</span>
-<span class="sd">        uses the user-supplied filter string to filter the</span>
-<span class="sd">        parameter descriptors to obtain a subset array</span>
-<span class="sd">        that can be used to filter entities in other methods</span>
-<span class="sd">        either in this class or elsewhere.</span>
+<span class="sd">        Build a 0/1 atom mask from a selection expression.</span>
 
-<span class="sd">        usage:</span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        basis_filter</span>
+<span class="sd">            string : expression evaluated per atom index ``i``</span>
 
-<span class="sd">                Here is a way to create a mask to be used somewhere else:</span>
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        error</span>
+<span class="sd">            list : empty on success, otherwise a selection error message</span>
 
-<span class="sd">                m1=system.Molecule(0)	### create a molecule m1</span>
-<span class="sd">                m1.read_pdb(filename)	### read in variables, coor, etc.</span>
+<span class="sd">        mask_array</span>
+<span class="sd">            integer array : atom-aligned selection mask</span>
 
-<span class="sd">                . . . do stuff . . . </span>
-
-<span class="sd">                basis_filter = XXXX     ### your (see examples below)</span>
-
-<span class="sd">                error,mask = m1.get_subset_mask(basis_filter)  ### get a mask</span>
-
-<span class="sd">                . . . do something with the mask using other functions in this class . . . </span>
-
-<span class="sd">                Here are some example basis_filter strings:</span>
-
-<span class="sd">                basis_filter = &#39;name[i] == &quot;CA&quot; and resid[i] &lt; 10&#39;</span>
-<span class="sd">                basis_filter = &#39;name[i][0] == &quot;H&quot; and resid[i] &lt; 10&#39;</span>
-<span class="sd">                basis_filter = &#39;name[i] == &quot;CA&quot; and resid[i] &gt;= 1 and resid[i] &lt; 10&#39;</span>
-
-<span class="sd">                The syntax for basis selection can be quite eloborate.  For example,</span>
-
-<span class="sd">                basis_filter = &#39;name[i] == &quot;CA&quot; and resid[i] &gt;= 1 and resid[i] &lt; 10 and moltype==&quot;protein&quot; and chain==&quot;F&quot; and occupancy==1 and beta&gt;10.0 and element==&quot;C&quot; ...&#39;</span>
-
-<span class="sd">                could be used for advanced selection needs.  See API for full details.</span>
+<span class="sd">        Examples</span>
+<span class="sd">        --------</span>
+<span class="sd">        &gt;&gt;&gt; import sasmol.system as system</span>
+<span class="sd">        &gt;&gt;&gt; molecule = system.Molecule(&#39;hiv1_gag.pdb&#39;)</span>
+<span class="sd">        &gt;&gt;&gt; basis_filter = &#39;name[i] == &quot;CA&quot; and resid[i] &lt; 10&#39;</span>
+<span class="sd">        &gt;&gt;&gt; error, mask = molecule.get_subset_mask(basis_filter)</span>
 
 <span class="sd">        &#39;&#39;&#39;</span>
         <span class="n">index</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">index</span><span class="p">()</span>
@@ -339,7 +355,7 @@
                     <span class="n">preliminary_mask_array</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
                 <span class="k">else</span><span class="p">:</span>
                     <span class="n">preliminary_mask_array</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
-            <span class="k">except</span><span class="p">:</span>
+            <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
                 <span class="n">error</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;failed to evaluate filter selection &#39;</span> <span class="o">+</span>
                              <span class="n">basis_filter</span> <span class="o">+</span> <span class="s1">&#39; for atom &#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="p">))</span>
                 <span class="k">return</span> <span class="n">error</span><span class="p">,</span> <span class="n">preliminary_mask_array</span>
@@ -362,7 +378,7 @@
 <span class="sd">			try:</span>
 <span class="sd">				if(eval(basis_filter)):</span>
 <span class="sd">					mask_array[i]=1</span>
-<span class="sd">			except:</span>
+<span class="sd">			except Exception:</span>
 <span class="sd">				error.append(&#39;failed to evaluate filter selection &#39;+basis_filter+&#39; for atom &#39;+str(i))</span>
 <span class="sd">				return error, mask_array		</span>
 <span class="sd">		if(numpy.sum(mask_array) == 0):</span>
@@ -374,36 +390,120 @@
 <span class="sd">		return error, mask_array</span>
 <span class="sd">		&#39;&#39;&#39;</span></div>
 
+<div class="viewcode-block" id="Mask.get_subset_mask_prepared"><a class="viewcode-back" href="../../index_subset.html#sasmol.subset.Mask.get_subset_mask_prepared">[docs]</a>    <span class="k">def</span> <span class="nf">get_subset_mask_prepared</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">basis_filter</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Build an atom mask after preparing the selection once per call.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        basis_filter : str</span>
+<span class="sd">            Developer-supplied expression using the same molecular descriptors</span>
+<span class="sd">            and atom index ``i`` as :meth:`get_subset_mask`.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        error : list</span>
+<span class="sd">            Existing selection messages, or an empty list on success.</span>
+<span class="sd">        mask_array : numpy.ndarray or list</span>
+<span class="sd">            Atom-ordered integer mask on success; the existing no-match or</span>
+<span class="sd">            partial list on a selection failure.</span>
+
+<span class="sd">        Notes</span>
+<span class="sd">        -----</span>
+<span class="sd">        This opt-in method prepares Python expression text once, then evaluates</span>
+<span class="sd">        it for every atom. It requires no native compiler or new dependency.</span>
+<span class="sd">        Descriptors are read on every call; no expressions, masks or molecular</span>
+<span class="sd">        data are cached across calls. The original method is unchanged.</span>
+
+<span class="sd">        Callers own expression suitability and result handling. Preparation</span>
+<span class="sd">        occurs inside the first atom&#39;s existing evaluation boundary, so an</span>
+<span class="sd">        empty molecule does not evaluate the expression. This is not a sandbox.</span>
+<span class="sd">        The method&#39;s frame/locals and Python translation audit events differ</span>
+<span class="sd">        from the original; arbitrary Python introspection parity is not promised.</span>
+<span class="sd">        A subclass overriding the original method must review this separate</span>
+<span class="sd">        method before opting in; its override is not called automatically.</span>
+
+<span class="sd">        Examples</span>
+<span class="sd">        --------</span>
+<span class="sd">        &gt;&gt;&gt; import sasmol.system as system</span>
+<span class="sd">        &gt;&gt;&gt; molecule = system.Molecule_Maker(2, name=[&#39;N&#39;, &#39;CA&#39;])</span>
+<span class="sd">        &gt;&gt;&gt; error, mask = molecule.get_subset_mask_prepared(&#39;name[i] == &quot;CA&quot;&#39;)</span>
+<span class="sd">        &gt;&gt;&gt; error, mask.tolist()</span>
+<span class="sd">        ([], [0, 1])</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">index</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">index</span><span class="p">()</span>
+        <span class="n">name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">()</span>
+        <span class="n">loc</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">loc</span><span class="p">()</span>
+        <span class="n">resname</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">resname</span><span class="p">()</span>
+        <span class="n">chain</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">chain</span><span class="p">()</span>
+        <span class="n">resid</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">resid</span><span class="p">()</span>
+        <span class="n">rescode</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">rescode</span><span class="p">()</span>
+        <span class="n">occupancy</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">occupancy</span><span class="p">()</span>
+        <span class="n">beta</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">beta</span><span class="p">()</span>
+        <span class="n">segname</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">segname</span><span class="p">()</span>
+        <span class="n">element</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">element</span><span class="p">()</span>
+        <span class="n">charge</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">charge</span><span class="p">()</span>
+        <span class="n">moltype</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">moltype</span><span class="p">()</span>
+        <span class="n">residue_flag</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">residue_flag</span><span class="p">()</span>
+
+        <span class="n">error</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="n">preliminary_mask_array</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="n">natoms</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">natoms</span><span class="p">()</span>
+
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">natoms</span><span class="p">):</span>
+
+            <span class="k">try</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">i</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="n">prepared_expression</span> <span class="o">=</span> <span class="nb">compile</span><span class="p">(</span>
+                        <span class="nb">str</span><span class="o">.</span><span class="n">lstrip</span><span class="p">(</span><span class="n">basis_filter</span><span class="p">,</span> <span class="s1">&#39; </span><span class="se">\t</span><span class="s1">&#39;</span><span class="p">),</span> <span class="s1">&#39;&lt;string&gt;&#39;</span><span class="p">,</span> <span class="s1">&#39;eval&#39;</span><span class="p">,</span>
+                        <span class="n">dont_inherit</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+                <span class="k">if</span> <span class="p">(</span><span class="nb">eval</span><span class="p">(</span><span class="n">prepared_expression</span><span class="p">)):</span>
+                    <span class="n">preliminary_mask_array</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">preliminary_mask_array</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+            <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+                <span class="n">error</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;failed to evaluate filter selection &#39;</span> <span class="o">+</span>
+                             <span class="n">basis_filter</span> <span class="o">+</span> <span class="s1">&#39; for atom &#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="p">))</span>
+                <span class="k">return</span> <span class="n">error</span><span class="p">,</span> <span class="n">preliminary_mask_array</span>
+
+        <span class="k">if</span> <span class="p">(</span><span class="n">numpy</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">preliminary_mask_array</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">):</span>
+            <span class="n">error</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                <span class="s1">&#39;found no atoms using filter selection &#39;</span> <span class="o">+</span> <span class="n">basis_filter</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">error</span><span class="p">,</span> <span class="n">preliminary_mask_array</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">mask_array</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">preliminary_mask_array</span><span class="p">,</span> <span class="nb">int</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">error</span><span class="p">,</span> <span class="n">mask_array</span></div>
+
+
 <div class="viewcode-block" id="Mask.merge_two_molecules"><a class="viewcode-back" href="../../index_subset.html#sasmol.subset.Mask.merge_two_molecules">[docs]</a>    <span class="k">def</span> <span class="nf">merge_two_molecules</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mol1</span><span class="p">,</span> <span class="n">mol2</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;</span>
-<span class="sd">        This method combines two molecules into a single, new molecule. </span>
-<span class="sd">        It will assign coordinates from the first frame of a molecule.</span>
+<span class="sd">        Merge two input molecules into ``self``.</span>
 
-<span class="sd">        usage:</span>
+<span class="sd">        Coordinates are copied from frame 0 of each input molecule.</span>
 
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        mol1, mol2</span>
+<span class="sd">            system objects : molecules to merge</span>
 
-<span class="sd">                m1=system.Molecule(0)	### create a molecule m1</span>
-<span class="sd">                m1.read_pdb(filename1)	### read in variables, coor, etc.</span>
+<span class="sd">        kwargs</span>
+<span class="sd">            optional keyword arguments:</span>
+<span class="sd">            ``report_missing_descriptors`` (boolean)</span>
 
-<span class="sd">                m2=system.Molecule(1)	### create a molecule m2</span>
-<span class="sd">                m2.read_pdb(filename2)	### read in variables, coor, etc.</span>
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        error</span>
+<span class="sd">            list : merge status and optional informational messages</span>
 
-<span class="sd">                m3=system.Molecule(2)	### create a molecule m3</span>
-
-
-<span class="sd">                . . . do stuff . . . </span>
-
-<span class="sd">                error = m3.merge_two_molecules(m1,m2) 	### sets the values that define mol3</span>
-
-<span class="sd">        If report_missing_descriptors=True is passed, descriptors that are not</span>
-<span class="sd">        present in both input molecules are listed in the returned error list.</span>
-<span class="sd">        These messages are informational; the merge still proceeds when the</span>
-<span class="sd">        structural essentials are valid.</span>
-
-<span class="sd">        Might do: add a caller-supplied required_descriptors keyword so</span>
-<span class="sd">        simulation, PDB-writing, scattering, or coarse-grain callers can define</span>
-<span class="sd">        their own descriptor completeness requirements without imposing a</span>
-<span class="sd">        global molecule schema.</span>
+<span class="sd">        Examples</span>
+<span class="sd">        --------</span>
+<span class="sd">        &gt;&gt;&gt; import sasmol.system as system</span>
+<span class="sd">        &gt;&gt;&gt; m1 = system.Molecule(&#39;first.pdb&#39;)</span>
+<span class="sd">        &gt;&gt;&gt; m2 = system.Molecule(&#39;second.pdb&#39;)</span>
+<span class="sd">        &gt;&gt;&gt; merged = system.Molecule()</span>
+<span class="sd">        &gt;&gt;&gt; error = merged.merge_two_molecules(m1, m2)</span>
 
 <span class="sd">        &#39;&#39;&#39;</span>
         <span class="n">error</span> <span class="o">=</span> <span class="p">[]</span>
@@ -456,7 +556,7 @@
 
                 <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">natoms2</span><span class="p">):</span>
                     <span class="n">values</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">getattr</span><span class="p">(</span><span class="n">mol2</span><span class="p">,</span> <span class="n">field</span><span class="p">)[</span><span class="n">i</span><span class="p">])</span>
-            <span class="k">except</span><span class="p">:</span>
+            <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
                 <span class="n">error</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
                     <span class="s1">&#39;failed in merge_two_molecules when attempting to assign descriptor &#39;</span> <span class="o">+</span> <span class="n">field</span><span class="p">)</span>
                 <span class="k">return</span> <span class="kc">None</span>
@@ -468,7 +568,7 @@
 
         <span class="k">try</span><span class="p">:</span>
             <span class="n">last_index_mol1</span> <span class="o">=</span> <span class="n">mol1</span><span class="o">.</span><span class="n">_index</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
-        <span class="k">except</span><span class="p">:</span>
+        <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
             <span class="n">error</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;mol1 is missing atom indices&#39;</span><span class="p">)</span>
             <span class="k">return</span> <span class="n">error</span>
 
@@ -484,7 +584,7 @@
                 <span class="k">return</span> <span class="n">error</span>
 
             <span class="n">coor</span><span class="p">[</span><span class="n">frame</span><span class="p">,</span> <span class="mi">0</span><span class="p">:</span><span class="n">natoms1</span><span class="p">,</span> <span class="p">:]</span> <span class="o">=</span> <span class="n">mol1</span><span class="o">.</span><span class="n">coor</span><span class="p">()[</span><span class="n">frame</span><span class="p">,</span> <span class="p">:,</span> <span class="p">:]</span>
-        <span class="k">except</span><span class="p">:</span>
+        <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
             <span class="n">error</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
                 <span class="s1">&#39;failed in merge_two_molecules when assigning coordinates&#39;</span><span class="p">)</span>
             <span class="k">return</span> <span class="n">error</span>
@@ -497,7 +597,7 @@
                     <span class="k">return</span> <span class="n">error</span>
 
                 <span class="n">coor</span><span class="p">[</span><span class="n">frame</span><span class="p">,</span> <span class="n">natoms1</span><span class="p">:</span><span class="n">natoms</span><span class="p">,</span> <span class="p">:]</span> <span class="o">=</span> <span class="n">mol2</span><span class="o">.</span><span class="n">coor</span><span class="p">()[</span><span class="n">frame</span><span class="p">,</span> <span class="p">:,</span> <span class="p">:]</span>
-            <span class="k">except</span><span class="p">:</span>
+            <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
                 <span class="n">error</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
                     <span class="s1">&#39;failed in merge_two_molecules when assigning coordinates&#39;</span><span class="p">)</span>
                 <span class="k">return</span> <span class="n">error</span>
@@ -565,33 +665,38 @@
         <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">mol2</span><span class="p">,</span> <span class="s1">&#39;_conect&#39;</span><span class="p">):</span>
             <span class="k">try</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">_conect</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="nb">dict</span><span class="p">(</span><span class="n">mol2</span><span class="o">.</span><span class="n">_conect</span><span class="p">))</span>
-            <span class="k">except</span><span class="p">:</span>
+            <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
                 <span class="k">pass</span>
 
         <span class="k">return</span> <span class="n">error</span></div>
 
 <div class="viewcode-block" id="Mask.copy_molecule_using_mask"><a class="viewcode-back" href="../../index_subset.html#sasmol.subset.Mask.copy_molecule_using_mask">[docs]</a>    <span class="k">def</span> <span class="nf">copy_molecule_using_mask</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">,</span> <span class="n">mask</span><span class="p">,</span> <span class="n">frame</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;</span>
-<span class="sd">        This method initializes the standard descriptors and</span>
-<span class="sd">        coordinates for a subset molecule defined by the</span>
-<span class="sd">        supplied mask array.</span>
+<span class="sd">        Copy selected atoms into another molecule object.</span>
 
-<span class="sd">        usage:</span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        other</span>
+<span class="sd">            system object : destination molecule</span>
 
-<span class="sd">                Here is a way to create a mask to be used somewhere else:</span>
+<span class="sd">        mask</span>
+<span class="sd">            integer array : atom-aligned 0/1 selection mask</span>
 
-<span class="sd">                m1=system.Molecule(0)	### create a molecule m1</span>
-<span class="sd">                m1.read_pdb(filename)	### read in variables, coor, etc.</span>
+<span class="sd">        frame</span>
+<span class="sd">            integer : source frame used for copied coordinates</span>
 
-<span class="sd">                . . . do stuff . . . </span>
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        error</span>
+<span class="sd">            list : empty on success</span>
 
-<span class="sd">                basis_filter = XXXX     ### your (see examples below)</span>
-
-<span class="sd">                error,mask = m1.get_subset_mask(basis_filter)  ### get a mask</span>
-
-<span class="sd">                sub_m1=system.Molecule(1)		### create a new molecule sub_m1</span>
-
-<span class="sd">                error = m1.copy_molecule_using_mask(sub_m1,mask,frame) ### initializes sub_m1</span>
+<span class="sd">        Examples</span>
+<span class="sd">        --------</span>
+<span class="sd">        &gt;&gt;&gt; import sasmol.system as system</span>
+<span class="sd">        &gt;&gt;&gt; molecule = system.Molecule(&#39;hiv1_gag.pdb&#39;)</span>
+<span class="sd">        &gt;&gt;&gt; error, mask = molecule.get_subset_mask(&quot;name[i] == &#39;CA&#39;&quot;)</span>
+<span class="sd">        &gt;&gt;&gt; subset_molecule = system.Molecule()</span>
+<span class="sd">        &gt;&gt;&gt; error = molecule.copy_molecule_using_mask(subset_molecule, mask, 0)</span>
 
 <span class="sd">        &#39;&#39;&#39;</span>
         <span class="n">error</span> <span class="o">=</span> <span class="p">[]</span>
@@ -651,15 +756,15 @@
                     <span class="n">residue_flag</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_residue_flag</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
                     <span class="k">try</span><span class="p">:</span>
                         <span class="n">charmm_type</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_charmm_type</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
-                    <span class="k">except</span><span class="p">:</span>
+                    <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
                         <span class="k">pass</span>
                     <span class="k">try</span><span class="p">:</span>
                         <span class="n">atom_charge</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_atom_charge</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
-                    <span class="k">except</span><span class="p">:</span>
+                    <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
                         <span class="k">pass</span>
                     <span class="k">try</span><span class="p">:</span>
                         <span class="n">atom_vdw</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_atom_vdw</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
-                    <span class="k">except</span><span class="p">:</span>
+                    <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
                         <span class="k">pass</span>
 
                     <span class="k">if</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_name</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">unique_names</span><span class="p">):</span>
@@ -681,7 +786,7 @@
                     <span class="k">if</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_moltype</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">unique_moltypes</span><span class="p">):</span>
                         <span class="n">unique_moltypes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_moltype</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
 
-                <span class="k">except</span><span class="p">:</span>
+                <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
                     <span class="n">error</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
                         <span class="s1">&#39;failed in copy_molecule when attempting to assign descriptors to atom &#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="p">))</span>
                     <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n\n</span><span class="s1">error = &#39;</span><span class="p">,</span> <span class="n">error</span><span class="p">)</span>
@@ -796,24 +901,17 @@
 
 <div class="viewcode-block" id="Mask.get_indices_from_mask"><a class="viewcode-back" href="../../index_subset.html#sasmol.subset.Mask.get_indices_from_mask">[docs]</a>    <span class="k">def</span> <span class="nf">get_indices_from_mask</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mask</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;</span>
-<span class="sd">        This method returns the internal indices for the supplied</span>
-<span class="sd">        mask.  </span>
+<span class="sd">        Return atom indices selected by a mask.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
-<span class="sd">        mask </span>
-<span class="sd">            integer array : mask array of length of the number of atoms</span>
-<span class="sd">                                  with 1 or 0 for each atom depending on the selection</span>
-<span class="sd">                                  used to create the mask</span>
-
-<span class="sd">        kwargs </span>
-<span class="sd">            optional future arguments</span>
+<span class="sd">        mask</span>
+<span class="sd">            integer array : atom-aligned 0/1 selection mask</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">        indices</span>
-<span class="sd">            integer array : indices of atoms determined by the input mask</span>
-
+<span class="sd">            integer array : selected atom indices</span>
 
 <span class="sd">        Examples</span>
 <span class="sd">        --------</span>
@@ -822,7 +920,7 @@
 <span class="sd">        &gt;&gt;&gt; molecule = system.Molecule(&#39;hiv1_gag.pdb&#39;)</span>
 <span class="sd">        &gt;&gt;&gt; basis_filter = &quot;name[i] == &#39;CA&#39;&quot;</span>
 <span class="sd">        &gt;&gt;&gt; error, mask = molecule.get_subset_mask(basis_filter)</span>
-<span class="sd">        &gt;&gt;&gt; indices = molecule.get_indices_from_mask(mask) </span>
+<span class="sd">        &gt;&gt;&gt; indices = molecule.get_indices_from_mask(mask)</span>
 <span class="sd">        &gt;&gt;&gt; indices[:10]</span>
 <span class="sd">        array([  4,  11,  21,  45,  55,  66,  82, 101, 112, 119])</span>
 
@@ -835,31 +933,23 @@
 
 <div class="viewcode-block" id="Mask.get_coor_using_mask"><a class="viewcode-back" href="../../index_subset.html#sasmol.subset.Mask.get_coor_using_mask">[docs]</a>    <span class="k">def</span> <span class="nf">get_coor_using_mask</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">frame</span><span class="p">,</span> <span class="n">mask</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;</span>
-<span class="sd">        This method extracts coordinates from frame=frame of system object (self)</span>
-<span class="sd">        using a supplied mask which has been created before this method is called.</span>
-
-<span class="sd">        Coorindates are chosen for the elements that are equal to 1 in the supplied mask array.</span>
+<span class="sd">        Extract coordinates from one frame using a supplied mask.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
-<span class="sd">        frame </span>
+<span class="sd">        frame</span>
 <span class="sd">            integer : trajectory frame number to use</span>
 
-<span class="sd">        mask </span>
-<span class="sd">            integer array : mask array of length of the number of atoms</span>
-<span class="sd">                                  with 1 or 0 for each atom depending on the selection</span>
-<span class="sd">                                  used to create the mask</span>
-
-<span class="sd">        kwargs </span>
-<span class="sd">            optional future arguments</span>
+<span class="sd">        mask</span>
+<span class="sd">            integer array : atom-aligned 0/1 selection mask</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">        error</span>
-<span class="sd">            string : error statement</span>
+<span class="sd">            list : empty on success</span>
 
 <span class="sd">        coor</span>
-<span class="sd">            coordinates corresponding to those determined by the input mask</span>
+<span class="sd">            numpy array : selected coordinates with shape ``(1, nselected, 3)``</span>
 
 <span class="sd">        Examples</span>
 <span class="sd">        --------</span>
@@ -870,8 +960,8 @@
 <span class="sd">        &gt;&gt;&gt; error, mask = molecule.get_subset_mask(basis_filter)</span>
 <span class="sd">        &gt;&gt;&gt; frame = 0</span>
 <span class="sd">        &gt;&gt;&gt; error, coor = molecule.get_coor_using_mask(frame, mask)</span>
-<span class="sd">        &gt;&gt;&gt; coor[0][0]</span>
-<span class="sd">        array([-21.72500038, -66.91000366,  85.45700073], dtype=COORD_DTYPE)</span>
+<span class="sd">        &gt;&gt;&gt; len(error) == 0</span>
+<span class="sd">        True</span>
 
 <span class="sd">        &#39;&#39;&#39;</span>
         <span class="n">error</span> <span class="o">=</span> <span class="p">[]</span>
@@ -886,7 +976,7 @@
 
         <span class="k">try</span><span class="p">:</span>
             <span class="n">coor</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">take</span><span class="p">(</span><span class="n">this_frame_coor</span><span class="p">[:,</span> <span class="p">:],</span> <span class="n">indicies</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
-        <span class="k">except</span><span class="p">:</span>
+        <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
             <span class="n">error</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
                 <span class="s1">&#39;failed to extract coordinates from frame &#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">frame</span><span class="p">))</span>
             <span class="k">return</span> <span class="n">error</span><span class="p">,</span> <span class="n">coor</span>
@@ -957,7 +1047,7 @@
 
             <span class="bp">self</span><span class="o">.</span><span class="n">setCoor</span><span class="p">(</span><span class="n">coor</span><span class="p">)</span>
 
-        <span class="k">except</span><span class="p">:</span>
+        <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
             <span class="n">error</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
                 <span class="s1">&#39;failed to replace coordinates from frame &#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">frame</span><span class="p">))</span>
             <span class="k">return</span> <span class="n">error</span>
@@ -966,58 +1056,34 @@
 
 <div class="viewcode-block" id="Mask.set_descriptor_using_mask"><a class="viewcode-back" href="../../index_subset.html#sasmol.subset.Mask.set_descriptor_using_mask">[docs]</a>    <span class="k">def</span> <span class="nf">set_descriptor_using_mask</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mask</span><span class="p">,</span> <span class="n">descriptor</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;</span>
-<span class="sd">        This method writes the &quot;value&quot; to the given descriptor to</span>
-<span class="sd">        the elements that are equal to 1 in the supplied mask array.</span>
+<span class="sd">        Assign a descriptor value at atoms selected by mask.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
-<span class="sd">        mask </span>
-<span class="sd">            integer array : mask array of length of the number of atoms</span>
-<span class="sd">                                  with 1 or 0 for each atom depending on the selection</span>
-<span class="sd">                                  used to create the mask</span>
+<span class="sd">        mask</span>
+<span class="sd">            integer array : atom-aligned 0/1 selection mask</span>
 
-<span class="sd">        descriptor </span>
-<span class="sd">            system property : a property defined in an instance of a system object</span>
+<span class="sd">        descriptor</span>
+<span class="sd">            list-like object : atom-aligned descriptor container</span>
 
 <span class="sd">        value</span>
-<span class="sd">            string : new value to apply to selection defined by mask</span>
+<span class="sd">            object : value to write at selected atom positions</span>
 
-<span class="sd">        kwargs </span>
-<span class="sd">            point = True : will translate to a fixed point</span>
-<span class="sd">                           given by value variable                                                                             </span>
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
-<span class="sd">        None</span>
-<span class="sd">            updated self._descriptor</span>
+<span class="sd">        error</span>
+<span class="sd">            list : empty on success</span>
 
 <span class="sd">        Examples</span>
 <span class="sd">        --------</span>
 
 <span class="sd">        &gt;&gt;&gt; import sasmol.system as system</span>
 <span class="sd">        &gt;&gt;&gt; molecule = system.Molecule(&#39;hiv1_gag.pdb&#39;)</span>
-<span class="sd">        &gt;&gt;&gt; molecule.beta()[:10]</span>
-<span class="sd">        [&#39;0.00&#39;, &#39;0.00&#39;, &#39;0.00&#39;, &#39;0.00&#39;, &#39;0.00&#39;, &#39;0.00&#39;, &#39;0.00&#39;, &#39;0.00&#39;, &#39;0.00&#39;, &#39;0.00&#39;]</span>
-
 <span class="sd">        &gt;&gt;&gt; basis_filter = &quot;name[i] == &#39;CA&#39;&quot;</span>
 <span class="sd">        &gt;&gt;&gt; error, mask = molecule.get_subset_mask(basis_filter)</span>
 <span class="sd">        &gt;&gt;&gt; descriptor = molecule.beta()</span>
-<span class="sd">        &gt;&gt;&gt; value = &#39;1.00&#39;</span>
-<span class="sd">        &gt;&gt;&gt; error = molecule.set_descriptor_using_mask(mask, descriptor, value)</span>
-<span class="sd">        &gt;&gt;&gt; descriptor[:10]</span>
-<span class="sd">        [&#39;0.00&#39;, &#39;0.00&#39;, &#39;0.00&#39;, &#39;0.00&#39;, &#39;1.00&#39;, &#39;0.00&#39;, &#39;0.00&#39;, &#39;0.00&#39;, &#39;0.00&#39;, &#39;0.00&#39;]</span>
-
-<span class="sd">        which can then be used to set the new values into the molecule </span>
-
+<span class="sd">        &gt;&gt;&gt; error = molecule.set_descriptor_using_mask(mask, descriptor, &#39;1.00&#39;)</span>
 <span class="sd">        &gt;&gt;&gt; molecule.setBeta(descriptor)</span>
-<span class="sd">        &gt;&gt;&gt; molecule.beta()[:10]</span>
-<span class="sd">        [&#39;0.00&#39;, &#39;0.00&#39;, &#39;0.00&#39;, &#39;0.00&#39;, &#39;1.00&#39;, &#39;0.00&#39;, &#39;0.00&#39;, &#39;0.00&#39;, &#39;0.00&#39;, &#39;0.00&#39;]</span>
-
-<span class="sd">        Note</span>
-<span class="sd">        ____</span>
-<span class="sd">        Coordinate arrays can not be manipulated by this method.</span>
-
-<span class="sd">        TODO: If possible, get rid of loop</span>
-
 <span class="sd">        &#39;&#39;&#39;</span>
         <span class="n">error</span> <span class="o">=</span> <span class="p">[]</span>
 
@@ -1026,7 +1092,7 @@
             <span class="k">if</span> <span class="p">(</span><span class="n">mask</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">==</span> <span class="mi">1</span><span class="p">):</span>
                 <span class="k">try</span><span class="p">:</span>
                     <span class="n">descriptor</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span>
-                <span class="k">except</span><span class="p">:</span>
+                <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
                     <span class="n">error</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;failed to assign &#39;</span> <span class="o">+</span>
                                  <span class="nb">str</span><span class="p">(</span><span class="n">value</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39; to atom &#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="p">))</span>
                     <span class="k">return</span> <span class="n">error</span>
@@ -1034,8 +1100,7 @@
 
 <div class="viewcode-block" id="Mask.apply_biomt"><a class="viewcode-back" href="../../index_subset.html#sasmol.subset.Mask.apply_biomt">[docs]</a>    <span class="k">def</span> <span class="nf">apply_biomt</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">frame</span><span class="p">,</span> <span class="n">selection</span><span class="p">,</span> <span class="n">U</span><span class="p">,</span> <span class="n">M</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Apply biological unit transforms (BIOMT) to the coordinates of the</span>
-<span class="sd">        chosen selection and frame.</span>
+<span class="sd">        Apply one BIOMT transform to selected atoms in a chosen frame.</span>
 
 <span class="sd">        Information on BIOMT available at:</span>
 <span class="sd">        http://pdb101.rcsb.org/learn/guide-to-understanding-pdb-data/biological-assemblies</span>
@@ -1061,7 +1126,27 @@
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">        None</span>
-<span class="sd">            updated self._coor </span>
+<span class="sd">            updated self._coor</span>
+
+<span class="sd">        Plain speak contract</span>
+<span class="sd">        --------------------</span>
+<span class="sd">        This is an explicit, in-place coordinate edit helper. It does not:</span>
+
+<span class="sd">        - parse BIOMT information from PDB headers</span>
+<span class="sd">        - choose a biological assembly</span>
+<span class="sd">        - duplicate atoms or assign new segment names</span>
+<span class="sd">        - skip identity transforms</span>
+<span class="sd">        - run automatically from read_pdb()</span>
+
+<span class="sd">        The caller supplies the frame, atom selection, rotation matrix, and</span>
+<span class="sd">        translation vector.</span>
+
+<span class="sd">        Pseudocode intent</span>
+<span class="sd">        -----------------</span>
+<span class="sd">        1. Build mask from selection for this molecule.</span>
+<span class="sd">        2. Extract selected coordinates from the chosen frame.</span>
+<span class="sd">        3. Apply transform: transformed_xyz = U @ xyz + M</span>
+<span class="sd">        4. Write transformed coordinates back to this molecule.</span>
 
 <span class="sd">        Examples</span>
 <span class="sd">        -------</span>
@@ -1090,9 +1175,7 @@
 
 <div class="viewcode-block" id="Mask.copy_apply_biomt"><a class="viewcode-back" href="../../index_subset.html#sasmol.subset.Mask.copy_apply_biomt">[docs]</a>    <span class="k">def</span> <span class="nf">copy_apply_biomt</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">,</span> <span class="n">frame</span><span class="p">,</span> <span class="n">selection</span><span class="p">,</span> <span class="n">U</span><span class="p">,</span> <span class="n">M</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Copy selected atoms (with initial coordinates from the given frame)</span>
-<span class="sd">        to new Molecule object (other) and apply transforms taken from biological</span>
-<span class="sd">        unit (BIOMT) to the coordinates.</span>
+<span class="sd">        Copy selected atoms to another molecule, then apply one BIOMT transform.</span>
 
 <span class="sd">        Information on BIOMT available at:</span>
 <span class="sd">        http://pdb101.rcsb.org/learn/guide-to-understanding-pdb-data/biological-assemblies</span>
@@ -1121,7 +1204,27 @@
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">        None</span>
-<span class="sd">            updated self._coor </span>
+<span class="sd">            updates ``other`` coordinates for the copied selection</span>
+
+<span class="sd">        Plain speak contract</span>
+<span class="sd">        --------------------</span>
+<span class="sd">        This helper is for copy-then-transform usage. Source coordinates in</span>
+<span class="sd">        ``self`` are not edited by this method. It does not:</span>
+
+<span class="sd">        - parse BIOMT information from PDB headers</span>
+<span class="sd">        - choose which BIOMT records to apply</span>
+<span class="sd">        - skip identity transforms</span>
+<span class="sd">        - merge transformed copies into an assembled model</span>
+<span class="sd">        - run automatically from read_pdb()</span>
+
+<span class="sd">        Higher-level builder code is responsible for BIOMT record selection,</span>
+<span class="sd">        identity filtering, repeated-copy assembly, and segment naming.</span>
+
+<span class="sd">        Pseudocode intent</span>
+<span class="sd">        -----------------</span>
+<span class="sd">        1. Build mask from selection in source molecule.</span>
+<span class="sd">        2. Copy selected atoms from source frame to ``other``.</span>
+<span class="sd">        3. Apply one BIOMT transform to copied coordinates in ``other``.</span>
 
 <span class="sd">        Examples</span>
 <span class="sd">        -------</span>
@@ -1148,7 +1251,7 @@
 </pre></div>
 
           </div>
-
+          
         </div>
       </div>
       <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
@@ -1213,15 +1316,15 @@
     </div>
     <div class="footer">
       &copy;2016, Joseph E. Curtis, Ph.D.
-
+      
       |
       Powered by <a href="http://sphinx-doc.org/">Sphinx 4.4.0</a>
       &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
-
+      
     </div>
 
+    
 
-
-
+    
   </body>
 </html>

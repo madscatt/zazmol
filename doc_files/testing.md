@@ -129,3 +129,24 @@ Treat them per extension:
 See the current parity status ledger here:
 
 - [`python 3 parity ledger`](parity_ledger.md)
+
+
+#### Prepared selection coverage
+
+`test_subset/test_unit_subset_Mask_get_subset_mask_prepared.py` is a `unittest`
+module discovered automatically by both `--suite subset` and the default full
+suite. No separate runner or production installation is needed:
+
+```bash
+~/anaconda3/bin/python -B development_tools/test_runner.py --suite subset
+~/anaconda3/bin/python -B development_tools/test_runner.py
+```
+
+It compares the separate prepared method against unchanged `get_subset_mask()`:
+all selection descriptors, atom order and index conversion, mask types/dtypes,
+current values after mutation/atom-count changes, reader-produced molecules,
+existing subclass dispatch and a small set of existing return/failure boundaries.
+These are focused compatibility checks, not an expanded error-reporting contract.
+Developers remain responsible for expression suitability and handling results.
+Timing measurements belong outside the tests; they must verify equivalent results
+and distinguish selection-call improvements from whole-workflow improvements.
