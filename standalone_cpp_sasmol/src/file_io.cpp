@@ -881,6 +881,7 @@ IoStatus PdbReader::read_pdb(const std::filesystem::path& filename,
   std::size_t frame_index = 0;
   std::size_t atom_index = 0;
   std::vector<std::string> header_lines;
+  std::set<int> substituted_serials;
   std::string line;
   while (std::getline(input, line)) {
     const auto record = pdb_record_name(line);
@@ -947,6 +948,9 @@ IoStatus PdbReader::read_pdb(const std::filesystem::path& filename,
     if (frame_index == 0) {
       parsed_molecule.record()[atom_index] = atom.record;
       parsed_molecule.original_index()[atom_index] = atom.original_index;
+      if (fixed_slice(line, 6, 5) == "*****") {
+        substituted_serials.insert(atom.original_index);
+      }
       parsed_molecule.index()[atom_index] = static_cast<int>(atom_index + 1);
       parsed_molecule.name()[atom_index] = atom.name;
       parsed_molecule.loc()[atom_index] = atom.loc;
@@ -974,6 +978,48 @@ IoStatus PdbReader::read_pdb(const std::filesystem::path& filename,
 
   if (atom_index != 0 || frame_index != scan.nframes) {
     return {IoCode::format_error, "PDB contains fewer atoms than pre-scan."};
+  }
+
+  if (!substituted_serials.empty()) {
+    std::set<int> preserved_serials;
+    for (std::size_t atom = 0; atom < parsed_molecule.natoms(); ++atom) {
+      if (!substituted_serials.count(static_cast<int>(atom + 1))) {
+        preserved_serials.insert(parsed_molecule.original_index()[atom]);
+      }
+    }
+    for (const auto serial : substituted_serials) {
+      if (preserved_serials.count(serial)) {
+        return {IoCode::format_error,
+                "PDB ***** atom serial position collides with a preserved "
+                "original atom serial"};
+      }
+    }
+    if (options.pdbscan) {
+      // Rebuild only starred-file connectivity once all true source IDs are
+      // known; early CONECT records must not bind to ordinal defaults.
+      for (auto& linked : parsed_molecule.conect()) linked.clear();
+      for (const auto& record_line : header_lines) {
+        if (pdb_record_name(record_line) != "CONECT") continue;
+        const auto record = parse_conect_line(record_line, options);
+        if (!record.status) return record.status;
+        for (const auto endpoint : record.indices) {
+          if (substituted_serials.count(endpoint)) {
+            return {IoCode::format_error,
+                    "PDB CONECT endpoint depends on an unavailable ***** "
+                    "original atom serial"};
+          }
+        }
+        if (record.indices.size() > 1) {
+          for (std::size_t atom = 0; atom < parsed_molecule.natoms(); ++atom) {
+            if (parsed_molecule.original_index()[atom] == record.indices.front()) {
+              parsed_molecule.conect()[atom].assign(record.indices.begin() + 1,
+                                                     record.indices.end());
+              break;
+            }
+          }
+        }
+      }
+    }
   }
 
   if (options.apply_all_zero_coordinate_guard) {
@@ -1095,9 +1141,13 @@ IoStatus PdbReader::parse_pdb_atom_record(
 
   PdbAtomRecord parsed;
   parsed.record = record_name;
-  auto parsed_id = parse_pdb_id_field(fixed_slice(line, 6, 5), options, 99999,
-                                      "atom serial",
-                                      options.atom_ordinal_context);
+  const auto serial_field = fixed_slice(line, 6, 5);
+  auto parsed_id = (serial_field == "*****" &&
+                    options.atom_ordinal_context.has_value() &&
+                    *options.atom_ordinal_context > 0)
+      ? PdbIdParseResult{IoStatus::success(), *options.atom_ordinal_context}
+      : parse_pdb_id_field(serial_field, options, 99999, "atom serial",
+                           options.atom_ordinal_context);
   if (!parsed_id.status) {
     return parsed_id.status;
   }

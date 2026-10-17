@@ -78,3 +78,53 @@ The standalone C++ library returns `IoStatus` for file I/O operations. It should
 not call `exit`, print directly to stdout/stderr, or impose application logging
 policy. Applications can translate `IoStatus` into their own logging,
 exceptions, GUI messages, or workflow errors.
+
+## Unavailable PDB atom serials
+
+An exact `*****` ATOM/HETATM serial uses the one-based atom position in
+`original_index`; `index` remains sequential. This substitutes an unavailable
+source serial rather than recovering it. Preserved source serials must not
+collide with substituted positions. CONECT endpoints must not depend on those
+substitutions. The complete reader checks the first-frame map and returns
+`IoCode::format_error` on ambiguity, leaving the destination molecule unchanged.
+The standalone record helper requires a positive `atom_ordinal_context` to
+accept stars; it cannot validate whole-file collisions by itself. Other invalid
+fields and VMD-hex rules are unchanged. No new descriptor or writer behavior
+is introduced. Python uses its existing `ValueError` mechanism for these cases.
+
+
+### Star-serial validation checkpoint (2026-10-17)
+
+Validated on the Mac mini against baseline `989a3dd` in separate private
+Python 3.9 environments, without changing production installations:
+
+- Focused Python reader checks: 36 passed.
+- Complete SasMol Python suite: baseline 913 passed / 1 skipped; candidate
+  919 passed / 1 skipped, including six new reader regressions. The optional
+  archive-layout metadata check skipped in both isolated layouts also passed
+  in a paired recheck against the actual neighboring application checkout.
+  Large DCD tests, including the 6.4 GB fixture, were enabled.
+- Standalone C++ Debug CTest: 17/17 passed in each build, including the new
+  starred-serial, collision, connectivity and unchanged-destination checks.
+- SASSIE PDBScan/PDBRx checks: 1,531 passed with each SasMol version.
+- A 100,001-atom PDB/PSF identity probe accepted unavailable serials while
+  still rejecting a changed atom name.
+- Sphinx documentation built with two existing docstring diagnostics.
+- After correcting only the integration harness and private ProDy setup,
+  17 affected SASSIE integration checks produced identical outcomes:
+  15 passed and 2 unrelated failures in each environment, with no collection
+  errors or skips. This does not claim an entirely passing SASSIE suite.
+  No SASSIE test fixes are included in this patch.
+
+The paired rerun used original test/fixture paths and unchanged expectations;
+only the test-helper namespace was registered for collection. Scientific
+packages came from installed distributions. Hash checks found no changes to
+12,338 protected SASSIE repository files, production SASSIE/SasMol packages,
+production ProDy files or the production version-stack binding during that
+rerun. No tolerances, input contracts or scenario catalogs were changed.
+
+Machine-local evidence is retained under
+`/Volumes/ten_tee_bee/pdbrx_validation/sasmol_star_serial_20261016`, including
+`candidate_source_hashes.json`, the per-suite commands and results, and
+`affected_integration_recheck_20261017/{selected_nodes.json,audit.json,report.txt}`.
+These paths describe validation evidence, not portable runtime dependencies.

@@ -2,6 +2,7 @@
 
 #include <cassert>
 #include <cmath>
+#include <chrono>
 #include <filesystem>
 #include <fstream>
 #include <iomanip>
@@ -1272,9 +1273,107 @@ void test_read_pdb_model_multiframe_coordinates() {
   assert_close(xyz.z, 41.652F);
 }
 
+
+void test_star_serial_reader_contract() {
+  sasmol::PdbReader reader;
+  sasmol::PdbAtomRecord record;
+  auto line = atom_line_with_ids("*****", "   1");
+  assert(!reader.parse_pdb_atom_record(line, record));
+  sasmol::PdbReadOptions options;
+  options.atom_ordinal_context = 100000;
+  assert(reader.parse_pdb_atom_record(line, record, options));
+  assert(record.original_index == 100000);
+
+  const auto path = std::filesystem::temp_directory_path() /
+      ("sasmol_star_serial_" + std::to_string(
+          std::chrono::steady_clock::now().time_since_epoch().count()) + ".pdb");
+  const auto write_case = [&](const std::vector<std::string>& serials,
+                              const std::string& conect, bool before) {
+    std::ofstream out(path);
+    if (before) out << conect;
+    for (const auto& serial : serials) out << atom_line_with_ids(serial, "   1") << "\n";
+    if (!before) out << conect;
+    out << "END\n";
+  };
+  options = {};
+  options.pdbscan = true;
+  for (const bool before : {false, true}) {
+    write_case({"   10", "*****", "   30"}, "CONECT   10   30\n", before);
+    sasmol::Molecule molecule;
+    assert(reader.read_pdb(path, molecule, options));
+    assert((molecule.index() == std::vector<int>{1, 2, 3}));
+    assert((molecule.original_index() == std::vector<int>{10, 2, 30}));
+    assert((molecule.conect()[0] == std::vector<int>{30}));
+    for (const auto& conect : {"CONECT   10    2\n", "CONECT    2   30\n"}) {
+      write_case({"   10", "*****", "   30"}, conect, before);
+      sasmol::Molecule unchanged(1, 1);
+      const auto status = reader.read_pdb(path, unchanged, options);
+      assert(status.code == sasmol::IoCode::format_error);
+      assert(status.message.find("unavailable") != std::string::npos);
+      assert(unchanged.natoms() == 1);
+    }
+  }
+  for (const auto& serials : {std::vector<std::string>{"    2", "*****", "   30"},
+                              std::vector<std::string>{"*****", "    1"}}) {
+    write_case(serials, "", false);
+    sasmol::Molecule molecule;
+    const auto status = reader.read_pdb(path, molecule, options);
+    assert(status.code == sasmol::IoCode::format_error);
+    assert(status.message.find("collides") != std::string::npos);
+  }
+  write_case({"*****", "*****"}, "", false);
+  sasmol::Molecule molecule;
+  assert(reader.read_pdb(path, molecule, options));
+  assert((molecule.original_index() == std::vector<int>{1, 2}));
+  for (const auto& serial : {"**** ", "abcde"}) {
+    write_case({serial}, "", false);
+    assert(!reader.read_pdb(path, molecule, options));
+  }
+  {
+    std::ofstream out(path);
+    for (int frame = 1; frame <= 2; ++frame) {
+      out << "MODEL        " << frame << "\n";
+      out << atom_line_with_ids("*****", "   1") << "\nENDMDL\n";
+    }
+    out << "END\n";
+  }
+  assert(reader.read_pdb(path, molecule, options));
+  assert(molecule.number_of_frames() == 2);
+  assert((molecule.index() == std::vector<int>{1}));
+  assert((molecule.original_index() == std::vector<int>{1}));
+  std::filesystem::remove(path);
+}
+
+void test_star_serial_99999_boundary() {
+  const auto path = std::filesystem::temp_directory_path() /
+      ("sasmol_star_boundary_" + std::to_string(
+          std::chrono::steady_clock::now().time_since_epoch().count()) + ".pdb");
+  {
+    std::ofstream out(path);
+    for (int i = 1; i <= 100001; ++i) {
+      std::ostringstream serial;
+      if (i <= 99999) serial << std::setw(5) << i;
+      else serial << "*****";
+      out << atom_line_with_ids(serial.str(), "   1") << "\n";
+    }
+    out << "END\n";
+  }
+  sasmol::PdbReader reader;
+  sasmol::Molecule molecule;
+  assert(reader.read_pdb(path, molecule));
+  assert(molecule.natoms() == 100001);
+  for (int i = 0; i < 100001; ++i) {
+    assert(molecule.index()[i] == i + 1);
+    assert(molecule.original_index()[i] == i + 1);
+  }
+  std::filesystem::remove(path);
+}
+
 }  // namespace
 
 int main() {
+  test_star_serial_reader_contract();
+  test_star_serial_99999_boundary();
   test_all_zero_axis_guard_only_nudges_first_atom();
   test_nonzero_axes_are_untouched();
   test_conect_lines_remap_original_to_current_indices();

@@ -309,6 +309,104 @@ class Test_intg_file_io_Files_read_dcd(unittest.TestCase):
          os.unlink(pdb_file)
 
 
+   def test_star_serials_preserve_order_and_numeric_originals(self):
+      for options in ({}, {'fastread': True}, {'pdbscan': True},
+                      {'pdb_id_mode': 'vmd_hex'}):
+         with self.subTest(options=options):
+            path = self.write_temp_pdb([
+               self.make_atom_line(10, 'N', 'GLY', 'A', 1, 1.0),
+               self.make_atom_line('*****', 'CA', 'GLY', 'A', 1, 2.0),
+               self.make_atom_line(30, 'C', 'GLY', 'A', 1, 3.0), 'END\n'])
+            try:
+               self.o.read_pdb(path, **options)
+            finally:
+               os.unlink(path)
+            self.assertEqual(list(self.o.index()), [1, 2, 3])
+            self.assertEqual(list(self.o.original_index()), [10, 2, 30])
+            self.assertEqual(self.o.original_index().dtype.kind, 'i')
+            self.assertEqual(self.o.name(), ['N', 'CA', 'C'])
+            numpy.testing.assert_array_equal(
+               self.o.coor()[0], [[1, 2, 3], [2, 3, 4], [3, 4, 5]])
+
+   def test_star_serial_collision_checks_later_records_and_fastread(self):
+      for serials in ([2, '*****', 30], ['*****', 1]):
+         for fastread in (False, True):
+            with self.subTest(serials=serials, fastread=fastread):
+               path = self.write_temp_pdb([
+                  self.make_atom_line(v, 'N', 'GLY', 'A', 1, 1.0)
+                  for v in serials] + ['END\n'])
+               try:
+                  with self.assertRaisesRegex(ValueError, 'collides'):
+                     self.o.read_pdb(path, fastread=fastread)
+               finally:
+                  os.unlink(path)
+
+   def test_star_serial_conect_references_only_preserved_originals(self):
+      atoms = [self.make_atom_line(v, n, 'GLY', 'A', 1, x)
+               for v, n, x in [(10, 'N', 1), ('*****', 'CA', 2), (30, 'C', 3)]]
+      for endpoints in ((10, 30), (10, 2), (2, 30)):
+         for before_atoms in (False, True):
+            with self.subTest(endpoints=endpoints, before=before_atoms):
+               conect = 'CONECT%5d%5d\n' % endpoints
+               path = self.write_temp_pdb(
+                  ([conect] + atoms if before_atoms else atoms + [conect]) + ['END\n'])
+               try:
+                  if 2 in endpoints:
+                     with self.assertRaisesRegex(ValueError, 'unavailable'):
+                        self.o.read_pdb(path, pdbscan=True)
+                  else:
+                     self.o.read_pdb(path, pdbscan=True)
+                     # Preserve the legacy Python placement behavior: leading
+                     # CONECT records stay in the header, trailing ones map.
+                     self.assertEqual(self.o.conect(), {} if before_atoms else {10: [30]})
+                     if not before_atoms:
+                        self.assertEqual(self.o.create_conect_pdb_lines(), ['CONECT    1    3'])
+               finally:
+                  os.unlink(path)
+
+   def test_star_serial_does_not_enable_other_malformed_fields(self):
+      for serial, resid in [('**** ', 1), ('abcde', 1), ('*****', '****')]:
+         with self.subTest(serial=serial, resid=resid):
+            path = self.write_temp_pdb([
+               self.make_atom_line(serial, 'N', 'GLY', 'A', resid, 1.0), 'END\n'])
+            try:
+               with self.assertRaises(ValueError):
+                  self.o.read_pdb(path)
+            finally:
+               os.unlink(path)
+
+   def test_star_serial_all_unknown_copy_and_multiframe(self):
+      atoms = [self.make_atom_line('*****', n, 'GLY', 'A', 1, x)
+               for n, x in [('N', 1), ('CA', 2), ('C', 3)]]
+      path = self.write_temp_pdb(
+         ['MODEL        1\n'] + atoms + ['ENDMDL\nMODEL        2\n'] +
+         atoms + ['ENDMDL\nEND\n'])
+      try:
+         self.o.read_pdb(path)
+      finally:
+         os.unlink(path)
+      self.assertEqual(list(self.o.index()), [1, 2, 3])
+      self.assertEqual(list(self.o.original_index()), [1, 2, 3])
+      self.assertEqual(self.o.coor().shape, (2, 3, 3))
+      other = system.Molecule(1)
+      self.assertEqual(self.o.copy_molecule_using_mask(other, [1, 0, 1], 0), [])
+      # Subsetting preserves the selected indices; it does not renumber them.
+      self.assertEqual(list(other.index()), [1, 3])
+      self.assertEqual(list(other.original_index()), [1, 3])
+
+   def test_star_serial_real_99999_boundary(self):
+      lines = [self.make_atom_line(i if i <= 99999 else '*****',
+                                  'N', 'GLY', 'A', 1, 1.0)
+               for i in range(1, 100002)]
+      path = self.write_temp_pdb(lines + ['END\n'])
+      try:
+         self.o.read_pdb(path, fastread=True)
+      finally:
+         os.unlink(path)
+      self.assertEqual(self.o.natoms(), 100001)
+      numpy.testing.assert_array_equal(self.o.index(), numpy.arange(1, 100002))
+      numpy.testing.assert_array_equal(self.o.original_index(), self.o.index())
+
    def test_1ATM_two_frames(self):
       '''
 	   test a pdb file with 1 atom and 2 frames

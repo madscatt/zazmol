@@ -990,6 +990,12 @@ class PDB(object):
             ``fastread`` (skip heavier checks),
             ``pdbscan`` (scan mode used by callers)
 
+        Exact ``*****`` atom serials are unavailable source identifiers. Their
+        ``original_index`` entries use one-based atom positions; ``index`` is
+        unchanged. Substituted positions must not collide with real serials
+        or resolve CONECT endpoints. Residue IDs and other malformed fields
+        retain their existing parsing rules.
+
         Returns
         -------
         int
@@ -1132,6 +1138,7 @@ class PDB(object):
         unique_names = [] ; unique_resnames = [] ; unique_resids = [] ; unique_chains = [] 
         unique_occupancies = [] ; unique_betas = [] ; unique_segnames = [] ; unique_moltypes = []
         previous_resid = None
+        substituted_serials = set()
 
         for i in range(len(infile)):
             lin=infile[i]
@@ -1145,11 +1152,15 @@ class PDB(object):
                 true_index += 1
                 #atom.append(string.strip(lin[0:6]))		#	1-6		record name	
                 atom.append(lin[0:6].strip())		#	1-6		record name	
-                original_index.append(
-                    self._parse_pdb_id_field(
+                if lin[6:11] == '*****':
+                    original_index.append(true_index)
+                    substituted_serials.add(true_index)
+                else:
+                    source_serial = self._parse_pdb_id_field(
                         lin[6:11], pdb_id_mode, ambiguous_vmd_hex,
                         overflow_threshold=99999, ordinal=true_index,
-                        label='atom serial'))				#	7-11		atom serial number
+                        label='atom serial')
+                    original_index.append(source_serial)
                 index.append(str(true_index))   	        #   set index so that > 99,999 atoms can be read and counted
                 #this_name = string.strip(lin[12:16])		#	13-16		atom name
                 this_name = lin[12:16].strip()
@@ -1260,6 +1271,14 @@ class PDB(object):
 					
                 if(true_index == num_atoms):				
                     if(printme): print('finished reading frame = ',this_frame)
+                    if substituted_serials:
+                        preserved_serials = {
+                            value for position, value in enumerate(original_index, 1)
+                            if position not in substituted_serials}
+                        if substituted_serials.intersection(preserved_serials):
+                            raise ValueError(
+                                'PDB ***** atom serial position collides with a '
+                                'preserved original atom serial')
                     index=numpy.array(index,int)
                     original_index=numpy.array(original_index,int)
                     resid=numpy.array(resid,int)
@@ -1323,6 +1342,10 @@ class PDB(object):
                         lin[i:i+5], pdb_id_mode, ambiguous_vmd_hex,
                         overflow_threshold=99999, label='CONECT atom serial')
                     for i in range(6, len(lin), 5) if lin[i:i+5].strip()]
+                if substituted_serials.intersection(ndxs):
+                    raise ValueError(
+                        'PDB CONECT endpoint depends on an unavailable '
+                        '***** original atom serial')
                 conect[ndxs[0]] = ndxs[1:]
 
         if(((this_frame - 1) != num_frames) and not fastread):
@@ -1346,6 +1369,19 @@ class PDB(object):
 
         total_mass = self.calculate_mass()
         error = []
+
+        if pdbscan and not fastread and substituted_serials:
+            for line in header:
+                if line[:6].strip() == 'CONECT':
+                    endpoints = [self._parse_pdb_id_field(
+                        line[j:j+5], pdb_id_mode, ambiguous_vmd_hex,
+                        overflow_threshold=99999, label='CONECT atom serial')
+                        for j in range(6, len(line), 5)
+                        if line[j:j+5].strip()]
+                    if substituted_serials.intersection(endpoints):
+                        raise ValueError(
+                            'PDB CONECT endpoint depends on an unavailable '
+                            '***** original atom serial')
 
         if 'saspdbrx_topology' in kwargs:
             if kwargs['saspdbrx_topology']:	

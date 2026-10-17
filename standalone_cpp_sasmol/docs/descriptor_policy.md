@@ -53,3 +53,16 @@ this policy and choose one of:
 - add it as an explicit C++ `Molecule` field
 - keep it in extension maps temporarily with a stated reason
 - document why it is intentionally not part of standalone C++ parity
+
+## Unavailable PDB atom serials
+
+An exact `*****` ATOM/HETATM serial uses the one-based atom position in
+`original_index`; `index` remains sequential. This substitutes an unavailable
+source serial rather than recovering it. Preserved source serials must not
+collide with substituted positions. CONECT endpoints must not depend on those
+substitutions. The complete reader checks the first-frame map and returns
+`IoCode::format_error` on ambiguity, leaving the destination molecule unchanged.
+The standalone record helper requires a positive `atom_ordinal_context` to
+accept stars; it cannot validate whole-file collisions by itself. Other invalid
+fields and VMD-hex rules are unchanged. No new descriptor or writer behavior
+is introduced. Python uses its existing `ValueError` mechanism for these cases.
