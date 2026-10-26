@@ -138,3 +138,74 @@ Implemented in standalone C++ on 2026-06-11:
 - Validation gate passed on 2026-06-11:
   `ctest --test-dir standalone_cpp_sasmol/build --output-on-failure` reported
   17/17 standalone C++ tests passing.
+
+## Public mmCIF source metadata (schema 1)
+
+`molecule.mmcif_metadata()` returns a defensive deep copy of parsed source
+metadata, or `None` when unavailable. Successful ordinary `read_mmcif()` calls
+capture this automatically, including calls through `read_structure()` and the
+constructor, with either `pdbscan` setting. No new parser or interpretation is
+introduced. All parsed categories in all data blocks are retained, including
+unknown categories. This increases memory use in proportion to parsed input;
+requesting the accessor makes another independent copy.
+
+The returned dictionary has these fields:
+
+- `schema_version`: integer `1`.
+- `filename`: input filename, identifying the read source, not a content hash
+  or a guarantee that the file still contains the same bytes.
+- `data_blocks`: ordered list of dictionaries with `name` and `categories`.
+  Each category name (without a leading underscore) maps to `attributes`
+  (ordered attribute names without the category prefix) and `rows` (ordered
+  lists of parsed values in attribute order).
+- `coordinate_block_index`: `0`, preserving existing first-block selection.
+  Later blocks remain accessible but do not supply loaded coordinates. A first
+  block without atoms still fails; the reader does not search later blocks.
+- `correspondence_status`: `read_order` for normal reads, or
+  `unavailable_after_topology` for the existing `saspdbrx_topology=True` path.
+- `frame_atom_site_rows`: a list indexed by zero-based local frame, each holding
+  zero-based source `_atom_site` row indices in loaded atom order. It is `None`
+  after the topology path, which may reorganize atoms.
+
+For example, obtain the deposited identifiers of local frame 0, atom 0:
+
+```python
+metadata = molecule.mmcif_metadata()
+if metadata is not None and metadata['correspondence_status'] == 'read_order':
+    block = metadata['data_blocks'][metadata['coordinate_block_index']]
+    atoms = block['categories']['atom_site']
+    row_index = metadata['frame_atom_site_rows'][0][0]
+    deposited = dict(zip(atoms['attributes'], atoms['rows'][row_index]))
+    # auth_asym_id and label_asym_id remain separate if present.
+    # pdbx_PDB_model_num is the deposited value, not the local frame number.
+```
+
+Values are retained as delivered by the existing parser, without reader
+normalization: `.` and `?` remain distinct and absent attributes remain absent.
+Whitespace and quoting are not preserved. The caller remains responsible for
+retaining original file bytes. Connection types, endpoint alternates, symmetry
+references, sequence declarations, and assembly operator expressions remain
+uninterpreted tables. No bonds are inferred or assemblies applied. Working
+coordinates, descriptor defaults, atom order, and model acceptance are unchanged.
+Equal atom counts across models do not establish matching identities; per-frame
+rows describe exactly the input order used, including reordered models.
+
+This is a historical snapshot of a read, not a live mapping of arbitrarily
+modified molecules. Working label edits and coordinate transforms do not modify
+it. Direct atom/frame replacement, reordering, trajectory loading, or other
+subsequent mutations do not update correspondence; callers must not apply the
+read-order mapping to a changed order. A snapshot returned earlier remains
+independent of future molecule operations.
+
+A new mmCIF or PDB read clears the previous snapshot at entry. A failed mmCIF
+read leaves metadata unavailable; existing partial-failure coordinate behavior
+is unchanged. Normal success publishes the snapshot at completion. The topology
+path retains source tables after returning normally (including returned error
+lists) but does not assert final atom correspondence. An exception in that path
+leaves metadata unavailable.
+
+Subset-copy and merge clear the destination snapshot immediately before changing
+its molecular state, including a reused destination. They do not propagate source
+metadata; distinct source objects retain theirs. Full duplication uses existing
+deep-copy behavior and retains the historical snapshot independently. No other
+copy/merge algorithms, PDB parsing rules, or C++ behavior are changed.

@@ -1009,6 +1009,7 @@ class PDB(object):
         >>> molecule.natoms() > 0
         True
         '''
+        self._mmcif_metadata = None
         debug=0
         result=1
 

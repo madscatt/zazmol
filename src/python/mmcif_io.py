@@ -17,6 +17,7 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 '''
 
+import copy
 import gzip
 import os
 import sys
@@ -70,6 +71,35 @@ class MMCIF(object):
     ``read_pdb()``. Rich metadata interpretation for ``pdbscan``/``pdbrx`` is a
     separate workflow and should not be folded into this base reader.
     '''
+
+    def mmcif_metadata(self):
+        '''Return an independent copy of the last mmCIF read-time snapshot.
+
+        Returns None when unavailable. Source values and zero-based row mappings
+        describe the read, not subsequent edits to atom/frame order. See
+        doc_files/mmcif_support_plan.md for the schema and lifecycle contract.
+        '''
+        return copy.deepcopy(getattr(self, '_mmcif_metadata', None))
+
+    def _mmcif_source_snapshot(self, filename, data, model_groups):
+        blocks = []
+        for block in data:
+            categories = {}
+            for name in block.getObjNameList():
+                category = block.getObj(name)
+                categories[name] = {
+                    'attributes': list(category.getAttributeList()),
+                    'rows': copy.deepcopy(category.getRowList()),
+                }
+            blocks.append({'name': block.getName(), 'categories': categories})
+        return {
+            'schema_version': 1,
+            'filename': os.fspath(filename),
+            'data_blocks': blocks,
+            'coordinate_block_index': 0,
+            'correspondence_status': 'read_order',
+            'frame_atom_site_rows': [list(rows) for rows in model_groups],
+        }
 
     def _read_mmcif_data_blocks(self, filename):
         PdbxReader = _ensure_mmcif_parser_available()
@@ -153,6 +183,7 @@ class MMCIF(object):
         ``pdbscan``/``pdbrx``.
         '''
 
+        self._mmcif_metadata = None
         data = self._read_mmcif_data_blocks(filename)
         atom_site = self._mmcif_required_atom_site(data[0])
         model_groups = self._mmcif_model_groups(atom_site)
@@ -317,10 +348,16 @@ class MMCIF(object):
 
         if 'saspdbrx_topology' in kwargs:
             if kwargs['saspdbrx_topology']:
-                return self.check_charmm_atomic_order_reorganize()
+                result = self.check_charmm_atomic_order_reorganize()
+                snapshot = self._mmcif_source_snapshot(filename, data, model_groups)
+                snapshot['correspondence_status'] = 'unavailable_after_topology'
+                snapshot['frame_atom_site_rows'] = None
+                self._mmcif_metadata = snapshot
+                return result
 
         self._header = []
         self._biomt = {}
         self._conect = {}
+        self._mmcif_metadata = self._mmcif_source_snapshot(filename, data, model_groups)
 
         return

@@ -581,6 +581,7 @@ class Mask(object):
                     'failed in merge_two_molecules when assigning coordinates')
                 return error
 
+        self._mmcif_metadata = None
         self._index = index
         self._coor = numpy.array(coor)
         self._natoms = natoms
@@ -772,6 +773,7 @@ class Mask(object):
                     sys.stdout.flush()
                     return error
 
+        other._mmcif_metadata = None
         other.setAtom(atom)
         other.setIndex(numpy.array(index, int))
 
