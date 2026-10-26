@@ -49,6 +49,18 @@ import random
 '''
 
 
+def _biomt_coordinates(coordinates, U, M, dtype=None):
+    """Calculate a transform before writing any molecule coordinates."""
+    translation = numpy.asarray(M)
+    if translation.shape == (3, 1):
+        translation = translation[:, 0]
+    transformed = numpy.dot(U, coordinates.T).T + translation
+    # Complete broadcasting and storage conversion before editing the target.
+    result = numpy.empty_like(coordinates, dtype=dtype)
+    result[:] = transformed
+    return result
+
+
 class Mask(object):
 
     """Methods to create and apply atom-selection masks.
@@ -1074,7 +1086,8 @@ class Mask(object):
         Parameters
         ----------
         frame   
-            integer : frame number with coordinates to transform
+            integer : frame number with coordinates to transform;
+                      valid negative indices follow NumPy indexing
 
         selection
             string  : selection string in standard SASMOL format  
@@ -1084,7 +1097,7 @@ class Mask(object):
             numpy array : 3 x 3 rotation matrix
 
         M
-            numpy array : 3 x 1 translation vector
+            array-like : Cartesian translation, shape (3,), (1, 3), or (3, 1)
 
         kwargs 
             optional future arguments
@@ -1093,6 +1106,17 @@ class Mask(object):
         -------
         None
             updated self._coor
+
+        Raises
+        ------
+        ValueError
+            Selection or extraction returned an error (including no selected
+            atoms). The helper diagnostic is included in the exception.
+        IndexError
+            The requested frame is outside the coordinate array.
+
+        Selection, extraction, and calculation complete before coordinates
+        are edited. Underlying calculation exceptions propagate unchanged.
 
         Plain speak contract
         --------------------
@@ -1128,14 +1152,18 @@ class Mask(object):
         # as a masked numpy array
         coords = self.coor()
         err, mask = self.get_subset_mask(selection)
+        if err:
+            raise ValueError('BIOMT selection failed: ' + '; '.join(err))
         err, sel_coords = self.get_coor_using_mask(frame, mask)
+        if err:
+            raise ValueError('BIOMT extraction failed: ' + '; '.join(err))
 
         # Transform coordinates
-        new_coords = numpy.dot(U, sel_coords[frame].T).T
-        new_coords = new_coords + M
+        new_coords = _biomt_coordinates(sel_coords[0], U, M, dtype=coords.dtype)
 
         # Re-write edited coordinates into original array
-        coords[frame] = new_coords
+        indices = numpy.nonzero(mask)[0]
+        coords[frame, indices, :] = new_coords
 
         return
 
@@ -1152,7 +1180,8 @@ class Mask(object):
             system object : object to copy transformed information into
 
         frame   
-            integer : frame number with coordinates to transform
+            integer : source frame to copy; valid negative indices follow
+                      NumPy indexing. The destination has frame 0.
 
         selection
             string  : selection string in standard SASMOL format  
@@ -1162,7 +1191,7 @@ class Mask(object):
             numpy array : 3 x 3 rotation matrix
 
         M
-            numpy array : 3 x 1 translation vector
+            array-like : Cartesian translation, shape (3,), (1, 3), or (3, 1)
 
         kwargs 
             optional future arguments
@@ -1171,6 +1200,20 @@ class Mask(object):
         -------
         None
             updates ``other`` coordinates for the copied selection
+
+        Raises
+        ------
+        ValueError
+            Selection, extraction, or copying returned an error. The helper
+            diagnostic is included in the exception.
+        IndexError
+            The requested source frame is outside the coordinate array.
+
+        Operation calculation precedes copying; underlying exceptions
+        propagate unchanged. A failure inside the existing copy helper may
+        leave ``other`` partially populated; destination rollback is not
+        provided. Source preservation assumes distinct source/destination
+        objects.
 
         Plain speak contract
         --------------------
@@ -1204,9 +1247,18 @@ class Mask(object):
 
         # Copy selected atoms to new molecule (other)
         err, mask = self.get_subset_mask(selection)
+        if err:
+            raise ValueError('BIOMT selection failed: ' + '; '.join(err))
+        err, sel_coords = self.get_coor_using_mask(frame, mask)
+        if err:
+            raise ValueError('BIOMT extraction failed: ' + '; '.join(err))
+        new_coords = _biomt_coordinates(sel_coords[0], U, M)
         err = self.copy_molecule_using_mask(other, mask, frame)
+        if err:
+            raise ValueError('BIOMT copy failed: ' + '; '.join(err))
 
-        err = other.apply_biomt(0, selection, U, M)
+        # The source selection already determined every atom in this copy.
+        other.coor()[0, :, :] = new_coords
 
         return
 
