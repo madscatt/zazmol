@@ -845,9 +845,8 @@ class Mask(object):
         >>> molecule.name()[:10]
         ['N', 'HT1', 'HT2', 'HT3', 'CA', 'HA1', 'HA2', 'C', 'O', 'N']  
 
-        >>> import sasmol.util as utilities
         >>> number_of_duplicates = 108
-        >>> molecules = utilities.duplicate_molecule(molecule, number_of_duplicates)
+        >>> molecules = molecule.duplicate_molecule(number_of_duplicates)
         >>> molecules[-1].coor()[0][0]
         array([-21.52499962, -67.56199646,  86.75900269]) 
         >>> molecules[-1].name()[:10]
@@ -856,13 +855,13 @@ class Mask(object):
 
         Note
         ____
-        Using deepcopy directly in subset.py leads to inheritance conflict.  
-        Therefore subset calls a method held in utilities to make duplicates. 
+        Delegates to utilities.duplicate_molecule, which creates independent
+        deep copies of this molecule.
 
         '''
 
         molecules = utilities.duplicate_molecule(
-            molecule, number_of_duplicates)
+            self, number_of_duplicates)
 
         return molecules
 
